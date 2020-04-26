@@ -1,4 +1,4 @@
-import { assignProperties, defaultAndUpgradeProperties, callbackAssignedProperties } from './w.js';
+import { assignProperties, defaultAndUpgradeProperties, callbackAssignedProperties } from './util/w.js';
 
 export class BaseElement extends HTMLElement
 {

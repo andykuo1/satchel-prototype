@@ -1,5 +1,10 @@
 import { BaseElement } from './BaseElement.js';
-import { DEFAULT_ITEM_CARD_PORTRAIT, DEFAULT_ITEM_CARD_PORTRAIT_BACKGROUND, DEFAULT_ITEM_CARD_INFO_BACKGROUND } from './assets.js';
+
+import {
+    DEFAULT_ITEM_CARD_PORTRAIT,
+    DEFAULT_ITEM_CARD_PORTRAIT_BACKGROUND,
+    DEFAULT_ITEM_CARD_INFO_BACKGROUND
+} from '../assets.js';
 
 class ItemCard extends BaseElement
 {

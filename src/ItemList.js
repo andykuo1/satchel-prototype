@@ -1,4 +1,4 @@
-import { ItemElement } from './ItemElement.js';
+import { ItemElement } from './components/ItemElement.js';
 
 export class ItemList
 {

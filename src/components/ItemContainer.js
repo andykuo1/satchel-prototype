@@ -1,7 +1,9 @@
 import { BaseElement } from './BaseElement.js';
-import { GRID_CELL_SIZE, putDown } from './Satchel.js';
-import { NumberPair } from './types.js';
-import { ItemList } from './ItemList.js';
+
+import { NumberPair } from './util/types.js';
+
+import { GRID_CELL_SIZE, putDown } from '../Satchel.js';
+import { ItemList } from '../ItemList.js';
 
 export class ItemContainer extends BaseElement
 {
@@ -27,12 +29,13 @@ export class ItemContainer extends BaseElement
         :host {
             --containerWidth: 1;
             --containerHeight: 1;
+            --transition-duration: 0.3s;
         }
         article {
             display: inline-block;
             margin: 0.2rem;
             width: calc(var(--containerWidth) * ${GRID_CELL_SIZE}px);
-            transition: width 0.3s ease;
+            transition: width var(--transition-duration) ease;
         }
         h2 {
             font-size: 0.8rem;
@@ -54,7 +57,7 @@ export class ItemContainer extends BaseElement
             border-radius: 1rem;
             box-shadow: 0.2rem 0.2rem 0 0 black;
             overflow: hidden;
-            transition: height 0.3s ease;
+            transition: height var(--transition-duration) ease;
         }
         .grid {
             background-size: ${GRID_CELL_SIZE}px ${GRID_CELL_SIZE}px;

@@ -1,6 +1,7 @@
-import { DEFAULT_ITEM } from './assets.js';
-import * as Satchel from './Satchel.js';
 import { BaseElement } from './BaseElement.js';
+
+import { DEFAULT_ITEM } from '../assets.js';
+import * as Satchel from '../Satchel.js';
 
 export class ItemElement extends BaseElement
 {
@@ -8,7 +9,9 @@ export class ItemElement extends BaseElement
     static get template()
     {
         return `
-        <img src="${DEFAULT_ITEM}">
+        <div class="container">
+            <img src="${DEFAULT_ITEM}">
+        </div>
         `;
     }
 
@@ -22,15 +25,17 @@ export class ItemElement extends BaseElement
             --itemWidth: 1;
             --itemHeight: 1;
         }
-        img {
+        .container {
+            display: inline-block;
             position: absolute;
             left: calc(var(--itemX) * ${Satchel.GRID_CELL_SIZE}px);
             top: calc(var(--itemY) * ${Satchel.GRID_CELL_SIZE}px);
             width: calc(var(--itemWidth) * ${Satchel.GRID_CELL_SIZE}px);
             height: calc(var(--itemHeight) * ${Satchel.GRID_CELL_SIZE}px);
         }
-        img.hidden {
-            opacity: 0;
+        img {
+            width: 100%;
+            height: 100%;
         }
         `;
     }
@@ -61,6 +66,7 @@ export class ItemElement extends BaseElement
         super.connectedCallback();
 
         this.addEventListener('mousedown', this.onMouseDown);
+
         this.container = this.closest('item-container');
 
         this.style.setProperty('--itemX', this.x);

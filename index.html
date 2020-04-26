@@ -25,11 +25,14 @@
             border: none;
             z-index: 1;
             pointer-events: none;
+            --transition-duration: 0;
         }
     </style>
     
-    <script type="module" src="./src/ItemContainer.js"></script>
-    <script type="module" src="./src/ItemCard.js"></script>
+    <script type="module" src="./src/components/ItemContainer.js"></script>
+    <script type="module" src="./src/components/ItemCard.js"></script>
+    <script type="module" src="./src/components/ItemDisplay.js"></script>
+    <script type="module" src="./src/components/TreasureReceipt.js"></script>
 </head>
 <body>
     <header>
@@ -64,12 +67,12 @@
                     </item-container>
                 </fieldset>
             </div>
-            <!-- div class="cards">
+            <div class="cards">
                 <fieldset>
                     <legend>Display</legend>
-                    <item-card></item-card>
+                    <item-display></item-display>
                 </fieldset>
-            </div -->
+            </div>
         </div>
         <div>
             <h2>...</h2>
@@ -82,11 +85,7 @@
             </fieldset>
             <fieldset>
                 <legend>Loot</legend>
-                <div>
-                    <item-container size="6 6">
-                        <label slot="title">Gift</label>
-                    </item-container>
-                </div>
+                <treasure-receipt></treasure-receipt>
             </fieldset>
         </div>
     </main>
@@ -94,6 +93,7 @@
         <item-container id="holding" type="slot">
             <span slot="title"></span>
         </item-container>
+        <item-tooltip></item-tooltip>
     </footer>
     <script>
         window.addEventListener('DOMContentLoaded', () =>
