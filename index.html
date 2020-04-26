@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Satchel</title>
+
+    <style>
+        html, body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        main {
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+        }
+        main > * {
+            flex: 1;
+            text-align: center;
+            border: 1px solid black;
+        }
+        #holding {
+            position: absolute;
+            border: none;
+            z-index: 1;
+            pointer-events: none;
+        }
+    </style>
+    
+    <script type="module" src="./src/ItemContainer.js"></script>
+    <script type="module" src="./src/ItemCard.js"></script>
+</head>
+<body>
+    <header>
+    </header>
+    <nav>
+        <button>Inventory</button>
+        <button>Ground</button>
+        <button>Gift</button>
+        <p>
+            The main screen should have slots and clicking on these buttons will put
+            the screen on a slot, replacing or closing it.
+        </p>
+    </nav>
+    <main>
+        <div>
+            <h2>Inventory</h2>
+            <div class="inventories">
+                <fieldset>
+                    <legend>Satchel</legend>
+                    <item-container size="2 3">
+                        <label slot="title">Backpack</label>
+                        <item-element w="2" h="2"></item-element>
+                        <item-element w="2" h="1"></item-element>
+                        <item-element w="1" h="2"></item-element>
+                        <item-element w="1" h="3"></item-element>
+                    </item-container>
+                </fieldset>
+                <fieldset>
+                    <item-container size="2 3">
+                        <label slot="title">Pocket</label>
+                    </item-container>
+                </fieldset>
+            </div>
+        </div>
+        <div>
+            <h2>...</h2>
+            <fieldset>
+                <legend>Ground</legend>
+                <item-container id="ground" size="6 6">
+                    <label slot="title">Ground</label>
+                </item-container>
+                <button onclick="document.querySelector('#ground').clear();">Clear</button>
+            </fieldset>
+            <item-card></item-card>
+        </div>
+    </main>
+    <footer>
+        <item-container id="holding" size="1 1">
+            <span slot="title"></span>
+        </item-container>
+    </footer>
+    <script>
+        window.addEventListener('DOMContentLoaded', () =>
+        {
+            const itemContainer = document.querySelector('item-container');
+            itemContainer.appendChild(document.createElement('item-element'));
+        });
+    </script>
+</body>
+
+</html>
