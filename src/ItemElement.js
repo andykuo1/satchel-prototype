@@ -1,4 +1,3 @@
-import { defaultAndUpgradeProperties, assignProperties, callbackAssignedProperties } from './w.js';
 import { DEFAULT_ITEM } from './assets.js';
 import * as Satchel from './Satchel.js';
 import { BaseElement } from './BaseElement.js';

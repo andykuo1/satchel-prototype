@@ -1,7 +1,8 @@
-import { dijkstra2d } from './util.js';
+import { dijkstra2d, distanceSquared } from './util.js';
 
-const PUT_BUFFER_TIMEOUT = 100;
-export const GRID_CELL_SIZE = 32;
+const PUT_BUFFER_RANGE_SQUARED = 8 * 8;
+const PUT_BUFFER_TIMEOUT = 300;
+export const GRID_CELL_SIZE = 64;
 export const HALF_GRID_CELL_SIZE = GRID_CELL_SIZE / 2;
 
 let ground = {
@@ -11,6 +12,7 @@ let holding = {
     container: null,
     x: 0,
     y: 0,
+    pick: { x: 0, y: 0 },
     allowPutDown: true,
     putDownBufferTimeoutHandle: null,
 };
@@ -30,6 +32,14 @@ function onMouseMove(e)
     holding.y = e.pageY;
     holding.container.style.setProperty('left', holding.x - HALF_GRID_CELL_SIZE + 'px');
     holding.container.style.setProperty('top', holding.y - HALF_GRID_CELL_SIZE + 'px');
+
+    if (distanceSquared(holding.x, holding.y, holding.pick.x, holding.pick.y) >= PUT_BUFFER_RANGE_SQUARED)
+    {
+        holding.allowPutDown = true;
+
+        clearTimeout(holding.putDownBufferTimeoutHandle);
+        holding.putDownBufferTimeoutHandle = null;
+    }
 }
 
 function onMouseUp(e)
@@ -52,12 +62,12 @@ function startHolding(holding, itemElement)
     itemElement.x = 0;
     itemElement.y = 0;
 
-    holding.container.appendChild(itemElement);
-    holding.container.itemList.add(itemElement); // Althuogh later it will update automatically, this makes sure synchronous calls are in a valid state.
+    holding.container.itemList.add(itemElement);
     holding.container.style.display = 'unset';
-    holding.container.size = [itemElement.w, itemElement.h];
 
     holding.allowPutDown = false;
+    holding.pick.x = holding.x;
+    holding.pick.y = holding.y;
     holding.putDownBufferTimeoutHandle = setTimeout(() => {
         if (!holding.allowPutDown) holding.allowPutDown = true;
     }, PUT_BUFFER_TIMEOUT);
@@ -65,10 +75,8 @@ function startHolding(holding, itemElement)
 
 function stopHolding(holding, itemElement)
 {
-    holding.container.removeChild(itemElement);
-    holding.container.itemList.remove(itemElement); // Althuogh later it will update automatically, this makes sure synchronous calls are in a valid state.
+    holding.container.itemList.remove(itemElement);
     holding.container.style.display = 'none';
-    holding.container.size = [1, 1];
 
     holding.allowPutDown = true;
 
@@ -78,14 +86,14 @@ function stopHolding(holding, itemElement)
 
 export function clearGround()
 {
-    ground.container.clear();
+    ground.container.itemList.clear();
 }
 
 export function pickUp(itemElement, itemContainer)
 {
     if (holding.container && holding.container.itemList.length <= 0)
     {
-        itemContainer.removeChild(itemElement);
+        itemContainer.itemList.remove(itemElement);
 
         startHolding(holding, itemElement);
 
@@ -99,8 +107,44 @@ export function putDown(itemContainer, coordX, coordY, trySwap = true)
 {
     if (holding.container && holding.container.itemList.length > 0 && holding.allowPutDown)
     {
-        let itemElement = holding.container.itemList.get();
+        let itemElement = holding.container.itemList.at(0, 0);
         let [ containerWidth, containerHeight ] = itemContainer.size;
+        if (itemContainer.type === 'slot')
+        {
+            // This is a slot.
+            if (itemContainer.itemList.length > 0)
+            {
+                if (trySwap)
+                {
+                    stopHolding(holding, itemElement);
+        
+                    let result = pickUp(itemContainer.itemList.at(0, 0), itemContainer);
+                    if (!result) throw new Error('Failed to pick up item on swap.');
+        
+                    itemElement.x = 0;
+                    itemElement.y = 0;
+                    itemContainer.itemList.add(itemElement);
+        
+                    return true;
+                }
+
+                return false;
+            }
+            else
+            {
+                stopHolding(holding, itemElement);
+
+                itemElement.x = 0;
+                itemElement.y = 0;
+                itemContainer.itemList.add(itemElement);
+    
+                return true;
+            }
+
+            return false;
+        }
+
+        // This is NOT a slot.
         let { w: itemWidth, h: itemHeight } = itemElement;
         let maxCoordX = containerWidth - itemWidth;
         let maxCoordY = containerHeight - itemHeight;
@@ -116,7 +160,7 @@ export function putDown(itemContainer, coordX, coordY, trySwap = true)
 
             itemElement.x = targetCoordX;
             itemElement.y = targetCoordY;
-            itemContainer.appendChild(itemElement);
+            itemContainer.itemList.add(itemElement);
 
             return true;
         }
@@ -132,7 +176,7 @@ export function putDown(itemContainer, coordX, coordY, trySwap = true)
 
             itemElement.x = x;
             itemElement.y = y;
-            itemContainer.appendChild(itemElement);
+            itemContainer.itemList.add(itemElement);
 
             return true;
         }

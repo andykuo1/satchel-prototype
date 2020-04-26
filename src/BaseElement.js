@@ -56,6 +56,12 @@ export class BaseElement extends HTMLElement
     }
 
     /** @override */
+    disconnectedCallback()
+    {
+
+    }
+
+    /** @override */
     attributeChangedCallback(attribute, prev, value)
     {
         callbackAssignedProperties(this, this.constructor.__properties__, attribute, prev, value, this.attributeCallbacks);
