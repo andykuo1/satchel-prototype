@@ -9,18 +9,17 @@ import {
 
 const ATTRIBUTE_TO_PROPERTY_NAME_MAP = Symbol('attributeToPropertyNameMap');
 
-export function getAssignedPropertyNameForAttribute(constructor, attribute)
+export function getAssignedPropertyNameForAttribute(properties, attribute)
 {
-    return constructor.properties[ATTRIBUTE_TO_PROPERTY_NAME_MAP][attribute];
+    return properties[ATTRIBUTE_TO_PROPERTY_NAME_MAP][attribute];
 }
 
-export function callbackAssignedProperties(element, attribute, prev, value, callbacks)
+export function callbackAssignedProperties(element, properties, attribute, prev, value, callbacks)
 {
-    let constructor = element.constructor;
-    let propertyName = getAssignedPropertyNameForAttribute(constructor, attribute);
+    let propertyName = getAssignedPropertyNameForAttribute(properties, attribute);
     if (propertyName)
     {
-        let property = constructor.properties[propertyName];
+        let property = properties[propertyName];
         let prevValue = element[propertyName];
         let nextCachedValue = typeParse(property.type, value);
         updateCachedProperty(element, propertyName, nextCachedValue);
@@ -82,11 +81,9 @@ export function assignProperties(constructor, properties, opts = {})
 
     properties[ATTRIBUTE_TO_PROPERTY_NAME_MAP] = attributeToPropertyNameMap;
 
-    Object.defineProperty(constructor, 'properties', {
-        value: properties,
-    });
-
     if (observedAttributes.length > 0) assignObservedAttributes(constructor, observedAttributes);
+
+    return properties;
 }
 
 export function assignProperty(constructor, propertyName, propertyType = String)

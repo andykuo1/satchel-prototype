@@ -1,15 +1,22 @@
 import { defaultAndUpgradeProperties, assignProperties, callbackAssignedProperties } from './w.js';
 import { DEFAULT_ITEM } from './assets.js';
 import * as Satchel from './Satchel.js';
+import { BaseElement } from './BaseElement.js';
 
-export class ItemElement extends HTMLElement
+export class ItemElement extends BaseElement
 {
+    /** @override */
     static get template()
     {
-        const INNER_HTML = `
+        return `
         <img src="${DEFAULT_ITEM}">
         `;
-        const INNER_STYLE = `
+    }
+
+    /** @override */
+    static get style()
+    {
+        return `
         :host {
             --itemX: 0;
             --itemY: 0;
@@ -27,12 +34,9 @@ export class ItemElement extends HTMLElement
             opacity: 0;
         }
         `;
-        let template = document.createElement('template');
-        template.innerHTML = `<style>${INNER_STYLE}</style>${INNER_HTML}`;
-        Object.defineProperty(this, 'template', { value: template });
-        return template;
     }
 
+    /** @override */
     static get properties()
     {
         return {
@@ -47,20 +51,15 @@ export class ItemElement extends HTMLElement
     {
         super();
 
-        this.attachShadow({ mode: 'open' });
-        this.shadowRoot.appendChild(this.constructor.template.content.cloneNode(true));
-
         this.container = null;
 
         this.onMouseDown = this.onMouseDown.bind(this);
-
-        this._callbacks = {};
     }
 
     /** @override */
     connectedCallback()
     {
-        defaultAndUpgradeProperties(this, this.constructor.properties);
+        super.connectedCallback();
 
         this.addEventListener('mousedown', this.onMouseDown);
         this.container = this.closest('item-container');
@@ -74,6 +73,8 @@ export class ItemElement extends HTMLElement
     /** @override */
     disconnectedCallback()
     {
+        super.disconnectedCallback();
+        
         this.removeEventListener('click', this.onMouseDown);
         this.container = null;
     }
@@ -81,7 +82,7 @@ export class ItemElement extends HTMLElement
     /** @override */
     attributeChangedCallback(attribute, prev, value)
     {
-        callbackAssignedProperties(this, attribute, prev, value, this._callbacks);
+        super.attributeChangedCallback(attribute, prev, value);
 
         this.dispatchEvent(new CustomEvent('change', { composed: true, bubbles: false }));
     }
@@ -98,6 +99,4 @@ export class ItemElement extends HTMLElement
         }
     }
 }
-
-assignProperties(ItemElement, ItemElement.properties);
-window.customElements.define('item-element', ItemElement);
+BaseElement.define('item-element', ItemElement);

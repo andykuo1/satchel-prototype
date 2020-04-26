@@ -1,10 +1,12 @@
+import { BaseElement } from './BaseElement.js';
 import { DEFAULT_ITEM_CARD_PORTRAIT, DEFAULT_ITEM_CARD_PORTRAIT_BACKGROUND, DEFAULT_ITEM_CARD_INFO_BACKGROUND } from './assets.js';
 
-class ItemCard extends HTMLElement
+class ItemCard extends BaseElement
 {
+    /** @override */
     static get template()
     {
-        const INNER_HTML = `
+        return `
         <div class="flipContainer">
             <article class="container front">
                 <div class="cover">
@@ -30,7 +32,12 @@ class ItemCard extends HTMLElement
             </div>
         </div>
         `;
-        const INNER_STYLE = `
+    }
+
+    /** @override */
+    static get style()
+    {
+        return `
         :host {}
         h2 {
             margin: 0em;
@@ -116,18 +123,6 @@ class ItemCard extends HTMLElement
             margin-bottom: 0.5em;
         }
         `;
-        let template = document.createElement('template');
-        template.innerHTML = `<style>${INNER_STYLE}</style>${INNER_HTML}`;
-        Object.defineProperty(this, 'template', { value: template });
-        return template;
-    }
-
-    constructor()
-    {
-        super();
-
-        this.attachShadow({ mode: 'open' });
-        this.shadowRoot.appendChild(this.constructor.template.content.cloneNode(true));
     }
 }
-window.customElements.define('item-card', ItemCard);
+BaseElement.define('item-card', ItemCard);
