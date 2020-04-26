@@ -61,6 +61,7 @@ export function assignProperties(constructor, properties, opts = {})
         if (typeof property === 'function')
         {
             property = { type: property };
+            properties[propertyName] = property;
         }
         else if (typeof property !== 'object' || !property)
         {

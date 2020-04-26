@@ -102,7 +102,14 @@ export function typeParse(type, value)
 {
     if (typeof type === 'function')
     {
-        return type.call(undefined, value);
+        if (type === Boolean)
+        {
+            return value === '';
+        }
+        else
+        {
+            return type.call(undefined, value);
+        }
     }
     else
     {
