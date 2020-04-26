@@ -20,11 +20,16 @@
             text-align: center;
             border: 1px solid black;
         }
-        #holding {
-            position: absolute;
-            border: none;
-            z-index: 1;
+        .foreground {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
             pointer-events: none;
+            overflow: hidden;
+        }
+        #holding {
             --transition-duration: 0;
         }
     </style>
@@ -90,11 +95,15 @@
         </div>
     </main>
     <footer>
+        Some footer stuff.
+    </footer>
+    
+    <div class="foreground">
         <item-container id="holding" type="slot">
             <span slot="title"></span>
         </item-container>
-        <item-tooltip></item-tooltip>
-    </footer>
+    </div>
+
     <script>
         window.addEventListener('DOMContentLoaded', () =>
         {

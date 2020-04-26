@@ -116,7 +116,6 @@ export class ItemContainer extends BaseElement
 
     onSizeChanged(value)
     {
-        this.style
         this.style.setProperty('--containerWidth', value[0]);
         this.style.setProperty('--containerHeight', value[1]);
     }

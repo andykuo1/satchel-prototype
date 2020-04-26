@@ -20,6 +20,7 @@ let holding = {
 document.addEventListener('DOMContentLoaded', () => {
     ground.container = document.querySelector('#ground');
     holding.container = document.querySelector('#holding');
+    holding.container.style.position = 'absolute';
     holding.container.style.display = 'none';
     
     document.addEventListener('mousemove', onMouseMove);
@@ -28,8 +29,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function onMouseMove(e)
 {
-    holding.x = e.pageX;
-    holding.y = e.pageY;
+    holding.x = e.clientX;
+    holding.y = e.clientY;
     holding.container.style.setProperty('left', holding.x - HALF_GRID_CELL_SIZE + 'px');
     holding.container.style.setProperty('top', holding.y - HALF_GRID_CELL_SIZE + 'px');
 
