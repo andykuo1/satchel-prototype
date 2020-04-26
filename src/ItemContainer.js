@@ -108,22 +108,30 @@ export class ItemContainer extends HTMLElement
         }
         h2 {
             font-size: 0.8em;
+            /* Fill the container + grid shadow size */
+            width: calc(100% + 0.4em);
             margin: 0;
             overflow: hidden;
             text-overflow: ellipsis;
-            text-shadow: 0.1rem 0.1rem 0.1rem rgba(0, 0, 0, 0.4);
+            border-radius: 0.2em;
+            user-select: none;
         }
         h2:empty {
             display: none;
         }
+        h2:hover {
+            background-color: rgba(0, 0, 0, 0.2);
+        }
         .container {
             position: relative;
+            width: 100%;
             height: calc(var(--containerHeight) * ${GRID_CELL_SIZE});
             background-color: dodgerblue;
             border: 1px solid black;
             border-radius: 1em;
             box-shadow: 0.2rem 0.2rem 0 0 black;
             overflow: hidden;
+            transition: width 0.3s ease, height 0.3s ease;
         }
         .grid {
             background-size: ${GRID_CELL_SIZE} ${GRID_CELL_SIZE};
@@ -131,6 +139,11 @@ export class ItemContainer extends HTMLElement
             background-image:
                 linear-gradient(to right, black, transparent 1px),
                 linear-gradient(to bottom, black, transparent 1px);
+        }
+        .container:not(.open) {
+            width: 0;
+            height: 0;
+            border: none;
         }
         `;
         let template = document.createElement('template');
@@ -142,6 +155,7 @@ export class ItemContainer extends HTMLElement
     static get properties() {
         return {
             size: { type: NumberPair, value: '1 1' },
+            open: { type: Boolean, value: '' },
         };
     }
 
@@ -159,10 +173,12 @@ export class ItemContainer extends HTMLElement
         this._items = new ItemList();
 
         this.onSlotChange = this.onSlotChange.bind(this);
+        this.onTitleClick = this.onTitleClick.bind(this);
         this.onMouseUp = this.onMouseUp.bind(this);
 
         this._callbacks = {
-            size: this.onSizeChanged
+            size: this.onSizeChanged,
+            open: this.onOpenChanged,
         };
     }
 
@@ -172,6 +188,7 @@ export class ItemContainer extends HTMLElement
         defaultAndUpgradeProperties(this, this.constructor.properties);
 
         this._container.addEventListener('mouseup', this.onMouseUp);
+        this._containerTitle.addEventListener('click', this.onTitleClick);
         this._itemSlot.addEventListener('slotchange', this.onSlotChange);
     }
 
@@ -192,6 +209,11 @@ export class ItemContainer extends HTMLElement
     {
         this.style.setProperty('--containerWidth', value[0]);
         this.style.setProperty('--containerHeight', value[1]);
+    }
+
+    onOpenChanged(value)
+    {
+        this._container.classList.toggle('open', value);
     }
 
     onSlotChange(e)
@@ -224,6 +246,14 @@ export class ItemContainer extends HTMLElement
             e.preventDefault();
             e.stopPropagation();
         }
+    }
+
+    onTitleClick(e)
+    {
+        e.preventDefault();
+        e.stopPropagation();
+
+        this.open = !this.open;
     }
 
     clear()
