@@ -107,7 +107,8 @@
         window.addEventListener('DOMContentLoaded', () =>
         {
             const itemContainer = document.querySelector('item-container');
-            itemContainer.appendChild(document.createElement('item-element'));
+            let itemElement = document.createElement('item-element');
+            itemContainer.appendChild(itemElement);
         });
     </script>
 </body>

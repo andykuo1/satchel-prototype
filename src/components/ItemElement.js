@@ -10,7 +10,7 @@ export class ItemElement extends BaseElement
     {
         return `
         <div class="container">
-            <img src="${DEFAULT_ITEM}">
+            <img>
         </div>
         `;
     }
@@ -48,12 +48,15 @@ export class ItemElement extends BaseElement
             y: { type: Number, value: 0 },
             w: { type: Number, value: 1 },
             h: { type: Number, value: 1 },
+            src: { type: String, value: DEFAULT_ITEM },
         };
     }
 
     constructor()
     {
         super();
+
+        this._image = this.shadowRoot.querySelector('img');
 
         this.container = null;
 
@@ -73,6 +76,8 @@ export class ItemElement extends BaseElement
         this.style.setProperty('--itemY', this.y);
         this.style.setProperty('--itemWidth', this.w);
         this.style.setProperty('--itemHeight', this.h);
+        
+        this._image.src = this.src;
     }
 
     /** @override */

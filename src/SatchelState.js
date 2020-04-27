@@ -152,15 +152,19 @@ function saveItemElement(itemElement, itemData)
     itemData.y = itemElement.y;
     itemData.w = itemElement.w;
     itemData.h = itemElement.h;
+    itemData.src = itemElement.src;
+
     return itemData;
 }
 
 function loadItemElement(itemElement, itemData)
 {
-    itemElement.x = itemData.x || 0;
-    itemElement.y = itemData.y || 0;
-    itemElement.w = itemData.w || 1;
-    itemElement.h = itemData.h || 1;
+    if ('x' in itemData) itemElement.x = itemData.x;
+    if ('y' in itemData) itemElement.y = itemData.y;
+    if ('w' in itemData) itemElement.w = itemData.w;
+    if ('h' in itemData) itemElement.h = itemData.h;
+    if ('src' in itemData) itemElement.src = itemData.src;
+
     return itemElement;
 }
 
@@ -170,4 +174,5 @@ function clearItemElement(itemElement)
     itemElement.y = 0;
     itemElement.w = 1;
     itemElement.h = 1;
+    itemElement.src = '';
 }
