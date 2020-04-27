@@ -79,12 +79,10 @@
             <h2>Ground</h2>
             <section id="groundRoot">
                 <div>
-                    <item-container id="ground" size="6 6">
-                        <label slot="title"></label>
-                    </item-container>
+                    <item-container id="ground" size="6 6"></item-container>
                 </div>
                 <div>
-                    <button onclick="document.querySelector('#ground').clear();">Clear</button>
+                    <button onclick="document.querySelector('#ground').itemList.clear();">Clear</button>
                 </div>
             </section>
             <fieldset>
@@ -102,9 +100,7 @@
     </footer>
     
     <div class="foreground">
-        <item-container id="holding" type="slot">
-            <span slot="title"></span>
-        </item-container>
+        <item-container id="holding" type="slot"></item-container>
     </div>
 
     <script>
