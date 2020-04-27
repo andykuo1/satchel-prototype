@@ -1,72 +1,6 @@
 import { BaseElement } from './BaseElement.js';
 
-import { ItemContainer } from './ItemContainer.js';
-
-class LootItem extends BaseElement
-{
-    /** @override */
-    static get template()
-    {
-        return `
-        <section>
-            <h3 id="type">Unknown Item</h3>
-            <p id="name">Health Potions</p>
-            <p id="content"></p>
-        </section>
-        `;
-    }
-
-    /** @override */
-    static get style()
-    {
-        return `
-        section {
-            padding: 0.5rem;
-            margin: 0.5rem 0;
-            text-align: center;
-            border: 1px solid #EEEEEE;
-        }
-        section:hover {
-            background-color: #EEEEEE;
-        }
-        #content {
-            pointer-events: none;
-        }
-        `;
-    }
-
-    constructor(item)
-    {
-        super();
-
-        this._type = this.shadowRoot.querySelector('#type');
-        this._name = this.shadowRoot.querySelector('#name');
-        this._content = this.shadowRoot.querySelector('#content');
-
-        this.item = item;
-    }
-
-    /** @override */
-    connectedCallback()
-    {
-        super.connectedCallback();
-
-        let itemContainer = new ItemContainer();
-        itemContainer.type = 'slot';
-        itemContainer.itemList.add(this.item);
-
-        this._content.appendChild(itemContainer);
-    }
-
-    /** @override */
-    disconnectedCallback()
-    {
-        super.disconnectedCallback();
-
-        this._itemContainer.itemList.remove(this.item);
-    }
-}
-BaseElement.define('loot-item', LootItem);
+import { ItemDisplay } from './ItemDisplay.js';
 
 export class LootDialog extends BaseElement
 {
@@ -198,7 +132,7 @@ export class LootDialog extends BaseElement
         this.items = items;
         for(let item of this.items)
         {
-            this._items.appendChild(new LootItem(item));
+            this._items.appendChild(new ItemDisplay(item));
         }
 
         this.onWheel = this.onWheel.bind(this);
