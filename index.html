@@ -57,10 +57,6 @@
         <button id="newInv">Inventory</button>
         <button id="newItem">Item</button>
         <button id="newLoot">Loot</button>
-        <p>
-            The main screen should have slots and clicking on these buttons will put
-            the screen on a slot, replacing or closing it.
-        </p>
         <button id="save">Save</button>
         <button id="load">Load</button>
         <script type="module">
@@ -84,14 +80,13 @@
                 Satchel.putIn(ground, itemElement);
             });
             document.querySelector('#newLoot').addEventListener('click', () => {
-
                 let lootItems = [];
-                let lootItemCount = Math.trunc(Math.random() * 6) + 1;
+                let lootItemCount = Math.trunc(Math.random() * 10) + 1;
                 for(let i = 0; i < lootItemCount; ++i)
                 {
                     let itemElement = new ItemElement();
-                    itemElement.w = Math.trunc(Math.random() * 4) + 1;
-                    itemElement.h = Math.trunc(Math.random() * 4) + 1;
+                    itemElement.w = Math.trunc(Math.random() * 3) + 1;
+                    itemElement.h = Math.trunc(Math.random() * 3) + 1;
                     lootItems.push(itemElement);
                 }
 
@@ -120,6 +115,14 @@
                 let jsonData = JSON.parse(stringData);
                 SatchelState.importSatchelState(jsonData);
             });
+            document.querySelector('#clearGround').addEventListener('click', () => {
+                if (window.confirm('Are you sure you want to destroy all items on the ground?'))
+                {
+                    document.querySelector('#ground').itemList.clear();
+                    let lootRoot = document.querySelector('#lootRoot');
+                    lootRoot.innerHTML = '';
+                }
+            });
         </script>
     </nav>
     <main>
@@ -134,14 +137,12 @@
         <div>
             <h2>Ground</h2>
             <section id="groundRoot">
-                <div>
-                    <item-container id="ground" size="6 6"></item-container>
-                </div>
-                <fieldset>
-                    <button onclick="document.querySelector('#ground').itemList.clear();">Clear</button>
-                </fieldset>
+                <item-container id="ground" size="6 6"></item-container>
             </section>
             <section id="lootRoot"></section>
+            <fieldset>
+                <button id="clearGround">Clear</button>
+            </fieldset>
         </div>
     </main>
     <footer>
