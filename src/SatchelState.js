@@ -31,6 +31,8 @@ export function exportSatchelState(jsonData)
 
 export function importSatchelState(jsonData)
 {
+    clearSatchelState();
+
     if ('containers' in jsonData)
     {
         let { ground: groundData, holding: holdingData, inventory: inventoryData } = jsonData.containers;
@@ -64,6 +66,22 @@ export function importSatchelState(jsonData)
     return true;
 }
 
+export function clearSatchelState()
+{
+    let groundContainer = document.querySelector('#ground');
+    clearItemContainer(groundContainer);
+
+    let holdingContainer = document.querySelector('#holding');
+    clearItemContainer(holdingContainer);
+
+    let inventoryRoot = document.querySelector('#inventoryRoot');
+    for(let itemContainer of inventoryRoot.querySelectorAll('item-container'))
+    {
+        clearItemContainer(itemContainer);
+    }
+    inventoryRoot.innerHTML = ''
+}
+
 function saveItemContainer(itemContainer, itemContainerData)
 {
     let itemListData = {};
@@ -90,6 +108,11 @@ function loadItemContainer(itemContainer, itemContainerData)
     return itemContainer;
 }
 
+function clearItemContainer(itemContainer)
+{
+    clearItemList(itemContainer.itemList);
+}
+
 function saveItemList(itemList, itemListData)
 {
     let result = [];
@@ -106,8 +129,6 @@ function saveItemList(itemList, itemListData)
 
 function loadItemList(itemList, itemListData)
 {
-    itemList.clear();
-
     if ('items' in itemListData)
     {
         for(let itemData of itemListData.items)
@@ -118,6 +139,11 @@ function loadItemList(itemList, itemListData)
     }
 
     return itemList;
+}
+
+function clearItemList(itemList)
+{
+    itemList.clear();
 }
 
 function saveItemElement(itemElement, itemData)
@@ -136,4 +162,12 @@ function loadItemElement(itemElement, itemData)
     itemElement.w = itemData.w || 1;
     itemElement.h = itemData.h || 1;
     return itemElement;
+}
+
+function clearItemElement(itemElement)
+{
+    itemElement.x = 0;
+    itemElement.y = 0;
+    itemElement.w = 1;
+    itemElement.h = 1;
 }
