@@ -39,6 +39,15 @@ export class BaseElement extends HTMLElement
         return template;
     }
 
+    static get __style__()
+    {
+        // TODO: Not yet used.
+        let style = document.createElement('style');
+        style.innerHTML = this.style;
+        Object.defineProperty(this, '__style__', { value: style });
+        return style;
+    }
+
     constructor()
     {
         super();

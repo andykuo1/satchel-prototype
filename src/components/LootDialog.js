@@ -1,5 +1,73 @@
 import { BaseElement } from './BaseElement.js';
 
+import { ItemContainer } from './ItemContainer.js';
+
+class LootItem extends BaseElement
+{
+    /** @override */
+    static get template()
+    {
+        return `
+        <section>
+            <h3 id="type">Unknown Item</h3>
+            <p id="name">Health Potions</p>
+            <p id="content"></p>
+        </section>
+        `;
+    }
+
+    /** @override */
+    static get style()
+    {
+        return `
+        section {
+            padding: 0.5rem;
+            margin: 0.5rem 0;
+            text-align: center;
+            border: 1px solid #EEEEEE;
+        }
+        section:hover {
+            background-color: #EEEEEE;
+        }
+        #content {
+            pointer-events: none;
+        }
+        `;
+    }
+
+    constructor(item)
+    {
+        super();
+
+        this._type = this.shadowRoot.querySelector('#type');
+        this._name = this.shadowRoot.querySelector('#name');
+        this._content = this.shadowRoot.querySelector('#content');
+
+        this.item = item;
+    }
+
+    /** @override */
+    connectedCallback()
+    {
+        super.connectedCallback();
+
+        let itemContainer = new ItemContainer();
+        itemContainer.type = 'slot';
+        itemContainer.itemList.add(this.item);
+
+        this._content.appendChild(itemContainer);
+    }
+
+    /** @override */
+    disconnectedCallback()
+    {
+        super.disconnectedCallback();
+
+        this._itemContainer.itemList.remove(this.item);
+    }
+}
+BaseElement.define('loot-item', LootItem);
+
 export class LootDialog extends BaseElement
 {
     /** @override */
@@ -18,17 +86,7 @@ export class LootDialog extends BaseElement
                 </blockquote>
             </div>
             <hr>
-            <div class="items">
-                <section>
-                    <h3>Item #1</h3>
-                    <p>
-                        Health Potions
-                    </p>
-                    <p>
-                        <item-container type="slot"></item-container>
-                    </p>
-                </section>
-            </div>
+            <div class="items"></div>
             <hr>
             <div class="options">
                 <fieldset>
@@ -81,11 +139,6 @@ export class LootDialog extends BaseElement
             flex-direction: column;
         }
         .items > * {
-            padding: 0.5rem;
-            margin: 0.5rem 0;
-            text-align: center;
-            border: 1px solid #EEEEEE;
-
             animation: slidein 1.2s ease forwards;
             opacity: 0;
         }
@@ -94,9 +147,6 @@ export class LootDialog extends BaseElement
         }
         .items > *:last-child {
             margin-bottom: 0;
-        }
-        .items > *:hover {
-            background-color: #EEEEEE;
         }
         fieldset {
             border: none;
@@ -108,8 +158,8 @@ export class LootDialog extends BaseElement
                 filter: blur(4px);
             }
             to {
-                filter: blur(0);
                 opacity: 1;
+                filter: blur(0);
             }
         }
         @keyframes slidein {
@@ -127,23 +177,29 @@ export class LootDialog extends BaseElement
         `;
     }
 
-    constructor()
+    constructor(items = [])
     {
         super();
 
         this._dialog = this.shadowRoot.querySelector('dialog');
         this._accept = this.shadowRoot.querySelector('#accept');
+        this._items = this.shadowRoot.querySelector('.items');
 
         this.initialScrollDelay = 1.5;
         this.initialItemDelay = 1;
 
-        this.scrollTime = 0;
         this.scrollAnimationHandle = null;
         this.scrollSpeed = 1;
         this.scrollSpeedStep = 0.2;
         this.maxScrollSpeed = 12;
 
         this.itemDelayStep = 0.3;
+
+        this.items = items;
+        for(let item of this.items)
+        {
+            this._items.appendChild(new LootItem(item));
+        }
 
         this.onWheel = this.onWheel.bind(this);
         this.onStartAnimationFrame = this.onStartAnimationFrame.bind(this);
@@ -159,7 +215,7 @@ export class LootDialog extends BaseElement
         this._accept.addEventListener('click', this.onAcceptClick);
 
         let delayTime = this.initialItemDelay;
-        for(let section of this.shadowRoot.querySelectorAll('section'))
+        for(let section of this.shadowRoot.querySelectorAll('.items > *'))
         {
             section.style.animationDelay = `${delayTime}s`;
             delayTime += this.itemDelayStep;
@@ -192,10 +248,9 @@ export class LootDialog extends BaseElement
 
     onAcceptClick(e)
     {
-        let items = [];
         this.dispatchEvent(new CustomEvent('accept', {
             composed: true, bubbles: false,
-            detail: { items }
+            detail: { items: this.items }
         }));
     }
 }

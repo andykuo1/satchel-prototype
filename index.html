@@ -67,6 +67,9 @@
             import * as SatchelState from './src/SatchelState.js';
             import * as Satchel from './src/Satchel.js';
 
+            import { LootDialog } from './src/components/LootDialog.js';
+            import { ItemElement } from './src/components/ItemElement.js';
+
             document.querySelector('#newInv').addEventListener('click', () => {
                 let inventoryRoot = document.querySelector('#inventoryRoot');
                 let itemContainer = document.createElement('item-container');
@@ -81,8 +84,19 @@
                 Satchel.putIn(ground, itemElement);
             });
             document.querySelector('#newLoot').addEventListener('click', () => {
+
+                let lootItems = [];
+                let lootItemCount = Math.trunc(Math.random() * 6) + 1;
+                for(let i = 0; i < lootItemCount; ++i)
+                {
+                    let itemElement = new ItemElement();
+                    itemElement.w = Math.trunc(Math.random() * 4) + 1;
+                    itemElement.h = Math.trunc(Math.random() * 4) + 1;
+                    lootItems.push(itemElement);
+                }
+
                 let dialogRoot = document.querySelector('#dialogRoot');
-                let lootDialog = document.createElement('loot-dialog');
+                let lootDialog = new LootDialog(lootItems);
                 lootDialog.addEventListener('accept', e => {
                     let lootRoot = document.querySelector('#lootRoot');
                     for(let itemElement of e.detail.items)
@@ -106,7 +120,6 @@
                 let jsonData = JSON.parse(stringData);
                 SatchelState.importSatchelState(jsonData);
             });
-
         </script>
     </nav>
     <main>
