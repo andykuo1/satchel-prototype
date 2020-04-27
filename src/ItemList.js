@@ -56,11 +56,6 @@ export class ItemList
         return true;
     }
 
-    values()
-    {
-        return this._list;
-    }
-
     clear()
     {
         if (!this._slotElement) return;
@@ -76,5 +71,10 @@ export class ItemList
         }
 
         this._slotElement = null;
+    }
+
+    [Symbol.iterator]()
+    {
+        return this._list[Symbol.iterator]();
     }
 };

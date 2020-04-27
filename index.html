@@ -38,6 +38,7 @@
     <script type="module" src="./src/components/ItemCard.js"></script>
     <script type="module" src="./src/components/ItemDisplay.js"></script>
     <script type="module" src="./src/components/TreasureReceipt.js"></script>
+    <script type="module" src="./src/security.js"></script>
 </head>
 <body>
     <header>
@@ -50,47 +51,49 @@
             The main screen should have slots and clicking on these buttons will put
             the screen on a slot, replacing or closing it.
         </p>
+        <button id="save">Save</button>
+        <button id="load">Load</button>
+        <script type="module">
+            import * as SatchelState from './src/SatchelState.js';
+
+            document.querySelector('#save').addEventListener('click', () => {
+                let jsonData = {};
+                SatchelState.exportSatchelState(jsonData);
+                localStorage.setItem('save', JSON.stringify(jsonData));
+            });
+            document.querySelector('#load').addEventListener('click', () => {
+                let stringData = localStorage.getItem('save');
+                let jsonData = JSON.parse(stringData);
+                SatchelState.importSatchelState(jsonData);
+            });
+
+        </script>
     </nav>
     <main>
         <div>
             <h2>Inventory</h2>
-            <div class="inventories">
-                <fieldset>
-                    <legend>Inventory</legend>
-                    <item-container size="2 3">
-                        <label slot="title">Backpack</label>
-                        <item-element w="2" h="2"></item-element>
-                        <item-element w="2" h="1"></item-element>
-                        <item-element w="1" h="2"></item-element>
-                        <item-element w="1" h="3"></item-element>
-                    </item-container>
-                    <item-container size="2 3">
-                        <label slot="title">Pocket</label>
-                    </item-container>
-                    <item-container type="slot">
-                        <span slot="title"></span>
-                    </item-container>
-                </fieldset>
-            </div>
-            <div class="cards">
-                <fieldset>
-                    <legend>Display</legend>
-                    <item-display></item-display>
-                </fieldset>
-            </div>
+            <section id="inventoryRoot">
+            </section>
         </div>
         <div>
-            <h2>...</h2>
-            <fieldset>
-                <legend>Ground</legend>
-                <item-container id="ground" size="6 6">
-                    <label slot="title">Ground</label>
-                </item-container>
-                <button onclick="document.querySelector('#ground').clear();">Clear</button>
-            </fieldset>
+            <h2>Ground</h2>
+            <section id="groundRoot">
+                <div>
+                    <item-container id="ground" size="6 6">
+                        <label slot="title"></label>
+                    </item-container>
+                </div>
+                <div>
+                    <button onclick="document.querySelector('#ground').clear();">Clear</button>
+                </div>
+            </section>
             <fieldset>
                 <legend>Loot</legend>
                 <treasure-receipt></treasure-receipt>
+            </fieldset>
+            <fieldset>
+                <legend>Display</legend>
+                <item-display></item-display>
             </fieldset>
         </div>
     </main>

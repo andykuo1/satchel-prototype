@@ -13,7 +13,7 @@ export class ItemContainer extends BaseElement
         return `
         <article>
             <h2>
-                <slot name="title">Container</slot>
+                <slot name="title"></slot>
             </h2>
             <section class="container grid">
                 <slot></slot>
