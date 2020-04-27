@@ -12,9 +12,7 @@ export class ItemContainer extends BaseElement
     {
         return `
         <article>
-            <h2>
-                <slot name="title"></slot>
-            </h2>
+            <h2><slot name="title"></slot></h2>
             <section class="container grid">
                 <slot></slot>
             </section>
@@ -39,7 +37,7 @@ export class ItemContainer extends BaseElement
         }
         h2 {
             font-size: 0.8rem;
-            width: 100%
+            width: 100%;
             margin: 0;
             overflow: hidden;
             text-overflow: ellipsis;
