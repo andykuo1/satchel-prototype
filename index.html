@@ -48,14 +48,15 @@
     <script type="module" src="./src/components/ItemCard.js"></script>
     <script type="module" src="./src/components/ItemDisplay.js"></script>
     <script type="module" src="./src/components/TreasureReceipt.js"></script>
-    <script type="module" src="./src/components/LootDisplay.js"></script>
+    <script type="module" src="./src/components/LootDialog.js"></script>
 </head>
 <body>
     <header>
     </header>
     <nav>
         <button id="newInv">Inventory</button>
-        <button id="newItem">Gift</button>
+        <button id="newItem">Item</button>
+        <button id="newLoot">Loot</button>
         <p>
             The main screen should have slots and clicking on these buttons will put
             the screen on a slot, replacing or closing it.
@@ -79,6 +80,22 @@
                 itemElement.h = Math.trunc(Math.random() * 4) + 1;
                 Satchel.putIn(ground, itemElement);
             });
+            document.querySelector('#newLoot').addEventListener('click', () => {
+                let dialogRoot = document.querySelector('#dialogRoot');
+                let lootDialog = document.createElement('loot-dialog');
+                lootDialog.addEventListener('accept', e => {
+                    let lootRoot = document.querySelector('#lootRoot');
+                    for(let itemElement of e.detail.items)
+                    {
+                        let itemContainer = document.createElement('item-container');
+                        itemContainer.type = 'slot';
+                        Satchel.putIn(itemContainer, itemElement);
+                        lootRoot.appendChild(itemContainer);
+                    }
+                    dialogRoot.removeChild(lootDialog);
+                });
+                dialogRoot.appendChild(lootDialog);
+            });
             document.querySelector('#save').addEventListener('click', () => {
                 let jsonData = {};
                 SatchelState.exportSatchelState(jsonData);
@@ -96,6 +113,10 @@
         <div>
             <h2>Inventory</h2>
             <section id="inventoryRoot"></section>
+            <fieldset>
+                <legend>Display</legend>
+                <item-display></item-display>
+            </fieldset>
         </div>
         <div>
             <h2>Ground</h2>
@@ -103,18 +124,11 @@
                 <div>
                     <item-container id="ground" size="6 6"></item-container>
                 </div>
-                <div>
+                <fieldset>
                     <button onclick="document.querySelector('#ground').itemList.clear();">Clear</button>
-                </div>
+                </fieldset>
             </section>
-            <fieldset>
-                <legend>Loot</legend>
-                <treasure-receipt></treasure-receipt>
-            </fieldset>
-            <fieldset>
-                <legend>Display</legend>
-                <item-display></item-display>
-            </fieldset>
+            <section id="lootRoot"></section>
         </div>
     </main>
     <footer>
@@ -122,7 +136,7 @@
     </footer>
     
     <div class="foreground">
-        <div id="dialogRoot"><loot-display></loot-display></div>
+        <div id="dialogRoot"></div>
         <item-container id="holding" type="slot"></item-container>
     </div>
 </body>

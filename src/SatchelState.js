@@ -9,6 +9,16 @@ export function exportSatchelState(jsonData)
     let groundData = {};
     saveItemContainer(groundContainer, groundData);
     containers.ground = groundData;
+    
+    let lootRoot = document.querySelector('#lootRoot');
+    let lootData = [];
+    for(let itemContainer of lootRoot.querySelectorAll('item-container'))
+    {
+        let itemContainerData = {};
+        saveItemContainer(itemContainer, itemContainerData);
+        lootData.push(itemContainerData);
+    }
+    containers.loot = lootData;
 
     let holdingContainer = document.querySelector('#holding');
     let holdingData = {};
@@ -35,12 +45,25 @@ export function importSatchelState(jsonData)
 
     if ('containers' in jsonData)
     {
-        let { ground: groundData, holding: holdingData, inventory: inventoryData } = jsonData.containers;
+        let { ground: groundData, loot: lootData, holding: holdingData, inventory: inventoryData } = jsonData.containers;
         
         if (groundData)
         {
             let groundContainer = document.querySelector('#ground');
             loadItemContainer(groundContainer, groundData);
+        }
+
+        if (lootData)
+        {
+            let lootRoot = document.querySelector('#lootRoot');
+            lootRoot.innerHTML = '';
+            
+            for(let itemContainerData of lootData)
+            {
+                let itemContainer = new ItemContainer();
+                loadItemContainer(itemContainer, itemContainerData);
+                lootRoot.appendChild(itemContainer);
+            }
         }
 
         if (holdingData)
@@ -71,6 +94,13 @@ export function clearSatchelState()
     let groundContainer = document.querySelector('#ground');
     clearItemContainer(groundContainer);
 
+    let lootRoot = document.querySelector('#lootRoot');
+    for(let itemContainer of lootRoot.querySelectorAll('item-container'))
+    {
+        clearItemContainer(itemContainer);
+    }
+    lootRoot.innerHTML = ''
+
     let holdingContainer = document.querySelector('#holding');
     clearItemContainer(holdingContainer);
 
@@ -88,6 +118,7 @@ function saveItemContainer(itemContainer, itemContainerData)
     saveItemList(itemContainer.itemList, itemListData);
     itemContainerData.itemList = itemListData;
 
+    itemContainerData.type = itemContainer.type;
     itemContainerData.size = itemContainer.size;
 
     return itemContainerData;
@@ -98,6 +129,11 @@ function loadItemContainer(itemContainer, itemContainerData)
     if ('itemList' in itemContainerData)
     {
         loadItemList(itemContainer.itemList, itemContainerData.itemList);
+    }
+
+    if ('type' in itemContainerData)
+    {
+        itemContainer.type = itemContainerData.type;
     }
 
     if ('size' in itemContainerData)

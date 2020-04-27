@@ -71,7 +71,7 @@ export class ItemContainer extends BaseElement
     static get properties() {
         return {
             size: { type: NumberPair, value: '1 1' },
-            type: String,
+            type: { type: String, value: 'grid' },
         };
     }
 
@@ -160,4 +160,9 @@ BaseElement.define('item-container', ItemContainer);
 export function isSlotContainer(itemContainer)
 {
     return itemContainer.type === 'slot';
+}
+
+export function isGridContainer(itemContainer)
+{
+    return itemContainer.type === 'grid';
 }

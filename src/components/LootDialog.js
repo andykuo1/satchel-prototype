@@ -1,6 +1,6 @@
 import { BaseElement } from './BaseElement.js';
 
-export class LootDisplay extends BaseElement
+export class LootDialog extends BaseElement
 {
     /** @override */
     static get template()
@@ -132,6 +132,7 @@ export class LootDisplay extends BaseElement
         super();
 
         this._dialog = this.shadowRoot.querySelector('dialog');
+        this._accept = this.shadowRoot.querySelector('#accept');
 
         this.initialScrollDelay = 1.5;
         this.initialItemDelay = 1;
@@ -144,8 +145,9 @@ export class LootDisplay extends BaseElement
 
         this.itemDelayStep = 0.3;
 
-        this.onStartAnimationFrame = this.onStartAnimationFrame.bind(this);
         this.onWheel = this.onWheel.bind(this);
+        this.onStartAnimationFrame = this.onStartAnimationFrame.bind(this);
+        this.onAcceptClick = this.onAcceptClick.bind(this);
     }
 
     /** @override */
@@ -154,6 +156,7 @@ export class LootDisplay extends BaseElement
         super.connectedCallback();
 
         this._dialog.addEventListener('wheel', this.onWheel);
+        this._accept.addEventListener('click', this.onAcceptClick);
 
         let delayTime = this.initialItemDelay;
         for(let section of this.shadowRoot.querySelectorAll('section'))
@@ -186,5 +189,14 @@ export class LootDisplay extends BaseElement
             cancelAnimationFrame(this.scrollAnimationHandle);
         }
     }
+
+    onAcceptClick(e)
+    {
+        let items = [];
+        this.dispatchEvent(new CustomEvent('accept', {
+            composed: true, bubbles: false,
+            detail: { items }
+        }));
+    }
 }
-BaseElement.define('loot-display', LootDisplay);
+BaseElement.define('loot-dialog', LootDialog);
