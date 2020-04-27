@@ -75,8 +75,8 @@
             document.querySelector('#newItem').addEventListener('click', () => {
                 let ground = document.querySelector('#ground');
                 let itemElement = document.createElement('item-element');
-                itemElement.w = Math.trunc(Math.random() * 4) + 1;
-                itemElement.h = Math.trunc(Math.random() * 4) + 1;
+                itemElement.w = Math.trunc(Math.random() * 2) + 1;
+                itemElement.h = Math.trunc(Math.random() * 2) + 1;
                 Satchel.putIn(ground, itemElement);
             });
             document.querySelector('#newLoot').addEventListener('click', () => {

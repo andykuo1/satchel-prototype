@@ -10,8 +10,11 @@ export class ItemDisplay extends BaseElement
         return `
         <section>
             <h3 id="type">Unknown Item</h3>
-            <p id="name">Health Potions</p>
-            <p id="content"></p>
+            <p id="name">???</p>
+            <p id="content">
+                <item-container type="slot">
+                </item-container>
+            </p>
         </section>
         `;
     }
@@ -50,11 +53,7 @@ export class ItemDisplay extends BaseElement
         this._type = this.shadowRoot.querySelector('#type');
         this._name = this.shadowRoot.querySelector('#name');
         this._content = this.shadowRoot.querySelector('#content');
-
-        let itemContainer = new ItemContainer();
-        itemContainer.type = 'slot';
-        this._content.appendChild(itemContainer);
-        this._itemContainer = itemContainer;
+        this._itemContainer = this.shadowRoot.querySelector('item-container');
 
         this._connected = false;
         
@@ -98,12 +97,12 @@ export class ItemDisplay extends BaseElement
         {
             if (this.item)
             {
-                this._itemContainer.itemList.clear();
+                this._itemContainer.innerHTML = '';
             }
     
             if (item)
             {
-                this._itemContainer.itemList.add(item);
+                this._itemContainer.appendChild(item);
             }
 
             this.item = item;

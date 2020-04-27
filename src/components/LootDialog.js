@@ -132,7 +132,8 @@ export class LootDialog extends BaseElement
         this.items = items;
         for(let item of this.items)
         {
-            this._items.appendChild(new ItemDisplay(item));
+            let itemDisplay = new ItemDisplay(item);
+            this._items.appendChild(itemDisplay);
         }
 
         this.onWheel = this.onWheel.bind(this);
