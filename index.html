@@ -44,9 +44,8 @@
     <header>
     </header>
     <nav>
-        <button>Inventory</button>
-        <button>Ground</button>
-        <button>Gift</button>
+        <button id="newInv">Inventory</button>
+        <button id="newItem">Gift</button>
         <p>
             The main screen should have slots and clicking on these buttons will put
             the screen on a slot, replacing or closing it.
@@ -55,7 +54,21 @@
         <button id="load">Load</button>
         <script type="module">
             import * as SatchelState from './src/SatchelState.js';
+            import * as Satchel from './src/Satchel.js';
 
+            document.querySelector('#newInv').addEventListener('click', () => {
+                let inventoryRoot = document.querySelector('#inventoryRoot');
+                let itemContainer = document.createElement('item-container');
+                itemContainer.size = [Math.trunc(Math.random() * 6) + 1, Math.trunc(Math.random() * 6) + 1];
+                inventoryRoot.appendChild(itemContainer);
+            });
+            document.querySelector('#newItem').addEventListener('click', () => {
+                let ground = document.querySelector('#ground');
+                let itemElement = document.createElement('item-element');
+                itemElement.w = Math.trunc(Math.random() * 4) + 1;
+                itemElement.h = Math.trunc(Math.random() * 4) + 1;
+                Satchel.putIn(ground, itemElement);
+            });
             document.querySelector('#save').addEventListener('click', () => {
                 let jsonData = {};
                 SatchelState.exportSatchelState(jsonData);
@@ -102,15 +115,6 @@
     <div class="foreground">
         <item-container id="holding" type="slot"></item-container>
     </div>
-
-    <script>
-        window.addEventListener('DOMContentLoaded', () =>
-        {
-            const itemContainer = document.querySelector('item-container');
-            let itemElement = document.createElement('item-element');
-            itemContainer.appendChild(itemElement);
-        });
-    </script>
 </body>
 
 </html>

@@ -2,7 +2,7 @@ import { BaseElement } from './BaseElement.js';
 
 import { NumberPair } from './util/types.js';
 
-import { GRID_CELL_SIZE, putDown } from '../Satchel.js';
+import { GRID_CELL_SIZE, placeDown } from '../Satchel.js';
 import { ItemList } from '../ItemList.js';
 
 export class ItemContainer extends BaseElement
@@ -149,7 +149,7 @@ export class ItemContainer extends BaseElement
         let coordX = Math.trunc(offsetX / GRID_CELL_SIZE);
         let coordY = Math.trunc(offsetY / GRID_CELL_SIZE);
 
-        let result = putDown(this, coordX, coordY);
+        let result = placeDown(this, coordX, coordY);
         if (result)
         {
             e.preventDefault();

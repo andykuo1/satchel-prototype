@@ -54,6 +54,7 @@ export function distanceSquared(x1, y1, x2, y2)
  */
 export function dijkstra2d(x, y, minX, minY, maxX, maxY, isEnd, getNeighbors, fromCoord, toCoord)
 {
+    if (Number.isNaN(maxX) || Number.isNaN(maxY)) throw new Error('Maximum coordinates must be a number.');
     if (minX < 0 || minY < 0 || maxX < 0 || maxY < 0) throw new Error('Coordinates must be non-negative.');
     if (minX > maxX || minY > maxY) throw new Error('Minimum coordinates must be less than maximum coordinates.');
     if (maxX !== (maxX & 0xFFFF) || maxY !== (maxY & 0xFFFF)) throw new Error('Cannot find coordinates in dimensions larger than 2^16.');

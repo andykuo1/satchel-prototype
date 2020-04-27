@@ -1,7 +1,7 @@
 import { dijkstra2d, distanceSquared } from './util.js';
 
-const PUT_BUFFER_RANGE_SQUARED = 8 * 8;
-const PUT_BUFFER_TIMEOUT = 300;
+const PLACE_BUFFER_RANGE_SQUARED = 8 * 8;
+const PLACE_BUFFER_TIMEOUT = 300;
 export const GRID_CELL_SIZE = 64;
 export const HALF_GRID_CELL_SIZE = GRID_CELL_SIZE / 2;
 
@@ -13,8 +13,8 @@ let holding = {
     x: 0,
     y: 0,
     pick: { x: 0, y: 0 },
-    allowPutDown: true,
-    putDownBufferTimeoutHandle: null,
+    placeDownAllowed: true,
+    placeDownBufferTimeoutHandle: null,
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -34,12 +34,12 @@ function onMouseMove(e)
     holding.container.style.setProperty('left', holding.x - HALF_GRID_CELL_SIZE + 'px');
     holding.container.style.setProperty('top', holding.y - HALF_GRID_CELL_SIZE + 'px');
 
-    if (distanceSquared(holding.x, holding.y, holding.pick.x, holding.pick.y) >= PUT_BUFFER_RANGE_SQUARED)
+    if (distanceSquared(holding.x, holding.y, holding.pick.x, holding.pick.y) >= PLACE_BUFFER_RANGE_SQUARED)
     {
-        holding.allowPutDown = true;
+        holding.placeDownAllowed = true;
 
-        clearTimeout(holding.putDownBufferTimeoutHandle);
-        holding.putDownBufferTimeoutHandle = null;
+        clearTimeout(holding.placeDownBufferTimeoutHandle);
+        holding.placeDownBufferTimeoutHandle = null;
     }
 }
 
@@ -48,9 +48,9 @@ function onMouseUp(e)
     e.preventDefault();
     e.stopPropagation();
 
-    if (holding.container && holding.container.itemList.length > 0 && holding.allowPutDown)
+    if (holding.container && holding.container.itemList.length > 0 && holding.placeDownAllowed)
     {
-        let result = putDown(ground.container, 0, 0, false);
+        let result = placeDown(ground.container, 0, 0, false);
         if (!result)
         {
             // Leave it in the holding container.
@@ -66,12 +66,12 @@ function startHolding(holding, itemElement)
     holding.container.itemList.add(itemElement);
     holding.container.style.display = 'unset';
 
-    holding.allowPutDown = false;
+    holding.placeDownAllowed = false;
     holding.pick.x = holding.x;
     holding.pick.y = holding.y;
-    holding.putDownBufferTimeoutHandle = setTimeout(() => {
-        if (!holding.allowPutDown) holding.allowPutDown = true;
-    }, PUT_BUFFER_TIMEOUT);
+    holding.placeDownBufferTimeoutHandle = setTimeout(() => {
+        if (!holding.placeDownAllowed) holding.placeDownAllowed = true;
+    }, PLACE_BUFFER_TIMEOUT);
 }
 
 function stopHolding(holding, itemElement)
@@ -79,10 +79,10 @@ function stopHolding(holding, itemElement)
     holding.container.itemList.remove(itemElement);
     holding.container.style.display = 'none';
 
-    holding.allowPutDown = true;
+    holding.placeDownAllowed = true;
 
-    clearTimeout(holding.putDownBufferTimeoutHandle);
-    holding.putDownBufferTimeoutHandle = null;
+    clearTimeout(holding.placeDownBufferTimeoutHandle);
+    holding.placeDownBufferTimeoutHandle = null;
 }
 
 export function clearGround()
@@ -104,12 +104,11 @@ export function pickUp(itemElement, itemContainer)
     return false;
 }
 
-export function putDown(itemContainer, coordX, coordY, trySwap = true)
+export function placeDown(itemContainer, coordX, coordY, trySwap = true)
 {
-    if (holding.container && holding.container.itemList.length > 0 && holding.allowPutDown)
+    if (holding.container && holding.container.itemList.length > 0 && holding.placeDownAllowed)
     {
         let itemElement = holding.container.itemList.at(0, 0);
-        let [ containerWidth, containerHeight ] = itemContainer.size;
         if (itemContainer.type === 'slot')
         {
             // This is a slot.
@@ -146,6 +145,7 @@ export function putDown(itemContainer, coordX, coordY, trySwap = true)
         }
 
         // This is NOT a slot.
+        let [ containerWidth, containerHeight ] = itemContainer.size;
         let { w: itemWidth, h: itemHeight } = itemElement;
         let maxCoordX = containerWidth - itemWidth;
         let maxCoordY = containerHeight - itemHeight;
@@ -181,6 +181,67 @@ export function putDown(itemContainer, coordX, coordY, trySwap = true)
 
             return true;
         }
+    }
+
+    return false;
+}
+
+export function takeOut(itemContainer, filter)
+{
+    let result = [];
+
+    for(let itemElement of itemContainer.itemList)
+    {
+        if (filter(itemElement, itemContainer))
+        {
+            itemContainer.itemList.remove(itemElement);
+
+            itemElement.x = 0;
+            itemElement.y = 0;
+            result.push(itemElement);
+        }
+    }
+
+    return result;
+}
+
+export function putIn(itemContainer, itemElement)
+{
+    if (itemContainer.type === 'slot')
+    {
+        // This is a slot.
+        if (itemContainer.itemList.length > 0)
+        {
+            return false;
+        }
+        else
+        {
+            itemElement.x = 0;
+            itemElement.y = 0;
+            itemContainer.itemList.add(itemElement);
+
+            return true;
+        }
+    }
+
+    // This is NOT a slot.
+    let [ containerWidth, containerHeight ] = itemContainer.size;
+    let { w: itemWidth, h: itemHeight } = itemElement;
+    let maxCoordX = containerWidth - itemWidth;
+    let maxCoordY = containerHeight - itemHeight;
+
+    let [ x, y ] = findEmptyCoords(
+        0, 0,
+        maxCoordX, maxCoordY,
+        (x, y) => canPlaceAt(itemContainer, x, y, itemWidth, itemHeight));
+
+    if (x >= 0 && y >= 0)
+    {
+        itemElement.x = x;
+        itemElement.y = y;
+        itemContainer.itemList.add(itemElement);
+
+        return true;
     }
 
     return false;
