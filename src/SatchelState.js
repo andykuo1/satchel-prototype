@@ -41,8 +41,8 @@ export function exportSatchelState(jsonData)
     if (displayItem)
     {
         saveItemElement(displayItem, displayItemData);
+        containers.displayItem = displayItemData;
     }
-    containers.displayItem = displayItemData;
 
     jsonData.containers = containers;
     return jsonData;
