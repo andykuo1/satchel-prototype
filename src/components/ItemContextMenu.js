@@ -144,8 +144,8 @@ class ItemContextMenu extends BaseElement
         // Update the position.
         let maxX = window.innerWidth - this.clientWidth;
         let maxY = window.innerHeight - this.clientHeight;
-        if (x >= maxX) x -= this.clientWidth;
-        if (y >= maxY) y -= this.clientHeight;
+        if (x - window.pageXOffset >= maxX) x -= this.clientWidth;
+        if (y - window.pageYOffset >= maxY) y -= this.clientHeight;
         this.style.setProperty('left', x + 'px');
         this.style.setProperty('top', y + 'px');
 

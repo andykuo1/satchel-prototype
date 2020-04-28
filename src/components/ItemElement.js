@@ -121,8 +121,7 @@ export class ItemElement extends BaseElement
         let contextMenu = document.querySelector('#contextmenu');
         if (contextMenu)
         {
-            let { clientX: x, clientY: y } = e;
-            contextMenu.setItem(this, x, y);
+            contextMenu.setItem(this, e.pageX, e.pageY);
     
             e.preventDefault();
             e.stopPropagation();
