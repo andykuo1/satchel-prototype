@@ -85,6 +85,11 @@ function stopHolding(holding, itemElement)
     holding.placeDownBufferTimeoutHandle = null;
 }
 
+export function getHoldingItem()
+{
+    return holding.container.itemList.at(0, 0);
+}
+
 export function clearGround()
 {
     ground.container.itemList.clear();

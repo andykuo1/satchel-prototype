@@ -103,6 +103,9 @@
                     }
                     dialogRoot.removeChild(lootDialog);
                 });
+                lootDialog.addEventListener('cancel', e => {
+                    dialogRoot.removeChild(lootDialog);
+                });
                 dialogRoot.appendChild(lootDialog);
             });
             document.querySelector('#save').addEventListener('click', () => {

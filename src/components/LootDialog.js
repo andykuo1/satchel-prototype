@@ -25,6 +25,7 @@ export class LootDialog extends BaseElement
             <div class="options">
                 <fieldset>
                     <button id="accept">Accept</button>
+                    <button id="cancel">Cancel</button>
                 </fieldset>
             </div>
         </dialog>
@@ -62,7 +63,8 @@ export class LootDialog extends BaseElement
             background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
             margin: 1rem;
         }
-        #accept {
+        button {
+            margin-bottom: 0.5rem;
             width: 100%;
         }
         .details, .options, hr {
@@ -117,6 +119,7 @@ export class LootDialog extends BaseElement
 
         this._dialog = this.shadowRoot.querySelector('dialog');
         this._accept = this.shadowRoot.querySelector('#accept');
+        this._cancel = this.shadowRoot.querySelector('#cancel');
         this._items = this.shadowRoot.querySelector('.items');
 
         this.initialScrollDelay = 1.5;
@@ -139,6 +142,7 @@ export class LootDialog extends BaseElement
         this.onWheel = this.onWheel.bind(this);
         this.onStartAnimationFrame = this.onStartAnimationFrame.bind(this);
         this.onAcceptClick = this.onAcceptClick.bind(this);
+        this.onCancelClick = this.onCancelClick.bind(this);
     }
 
     /** @override */
@@ -148,6 +152,7 @@ export class LootDialog extends BaseElement
 
         this._dialog.addEventListener('wheel', this.onWheel);
         this._accept.addEventListener('click', this.onAcceptClick);
+        this._cancel.addEventListener('click', this.onCancelClick);
 
         let delayTime = this.initialItemDelay;
         for(let section of this.shadowRoot.querySelectorAll('.items > *'))
@@ -186,6 +191,13 @@ export class LootDialog extends BaseElement
         this.dispatchEvent(new CustomEvent('accept', {
             composed: true, bubbles: false,
             detail: { items: this.items }
+        }));
+    }
+
+    onCancelClick(e)
+    {
+        this.dispatchEvent(new CustomEvent('cancel', {
+            composed: true, bubbles: false,
         }));
     }
 }
