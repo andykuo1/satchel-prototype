@@ -1,5 +1,7 @@
 import { ItemContainer } from './components/ItemContainer.js';
 import { ItemElement } from './components/ItemElement.js';
+import { LootDialog } from './components/LootDialog.js';
+import { putIn } from './Satchel.js';
 
 export function exportSatchelState(jsonData)
 {
@@ -136,6 +138,44 @@ export function clearSatchelState()
 
     let display = document.querySelector('#display');
     display.setItem(null);
+}
+
+export async function importLootDialog(jsonData)
+{
+    let { items } = jsonData;
+
+    let lootItems = [];
+    // let lootTitle = '';
+    
+    for(let itemData of items)
+    {
+        lootItems.push(loadItemElement(new ItemElement(), itemData));
+    }
+
+    return new Promise(resolve =>
+    {
+        let dialogRoot = document.querySelector('#dialogRoot');
+        let lootDialog = new LootDialog(lootItems);
+        lootDialog.addEventListener('accept', e => {
+            let lootRoot = document.querySelector('#lootRoot');
+            for(let itemElement of e.detail.items)
+            {
+                let itemContainer = document.createElement('item-container');
+                itemContainer.type = 'slot';
+                putIn(itemContainer, itemElement);
+                lootRoot.appendChild(itemContainer);
+            }
+            dialogRoot.removeChild(lootDialog);
+
+            resolve();
+        });
+        lootDialog.addEventListener('cancel', e => {
+            dialogRoot.removeChild(lootDialog);
+
+            resolve();
+        });
+        dialogRoot.appendChild(lootDialog);
+    });
 }
 
 function saveItemContainer(itemContainer, itemContainerData)

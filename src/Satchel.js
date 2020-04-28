@@ -1,4 +1,5 @@
 import { dijkstra2d, distanceSquared } from './util.js';
+import { importLootDialog } from './SatchelState.js';
 
 const PLACE_BUFFER_RANGE_SQUARED = 8 * 8;
 const PLACE_BUFFER_TIMEOUT = 300;
@@ -25,6 +26,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
+
+    document.body.addEventListener('dragover', onDragOver, true);
+    document.body.addEventListener('dragleave', onDragLeave, true);
+    document.body.addEventListener('drop', onDrop, true);
 });
 
 function onMouseMove(e)
@@ -56,6 +61,69 @@ function onMouseUp(e)
             // Leave it in the holding container.
         }
     }
+}
+
+function onDragOver(e)
+{
+    e.preventDefault();
+    e.stopPropagation();
+
+    let dropZone = document.querySelector('#dropZone');
+    dropZone.classList.add('active');
+}
+
+function onDragLeave(e)
+{
+    e.preventDefault();
+    e.stopPropagation();
+
+    let dropZone = document.querySelector('#dropZone');
+    dropZone.classList.remove('active');
+}
+
+function onDrop(e)
+{
+    onDragLeave(e);
+
+    let fileBlobs = [];
+
+    if (e.dataTransfer.items)
+    {
+        for(let item of e.dataTransfer.items)
+        {
+            if (item.kind === 'file')
+            {
+                let fileBlob = item.getAsFile();
+                fileBlobs.push(fileBlob);
+            }
+            // Ignore non-file items.
+        }
+    }
+    else
+    {
+        for(let fileBlob of e.dataTransfer.files)
+        {
+            fileBlobs.push(fileBlob);
+        }
+    }
+
+    fileBlobs.reduce((prev, fileBlob) => {
+        if (fileBlob.type === 'application/json')
+        {
+            return prev
+                .then(() => fileBlob.text())
+                .then(textData => JSON.parse(textData))
+                .then(jsonData => importLootDialog(jsonData))
+                .catch(e => {
+                    /* Ignore the error. */
+                    console.error(e);
+                });
+        }
+
+        // Skip this file.
+        return prev;
+    },
+    Promise.resolve());
 }
 
 function startHolding(holding, itemElement)

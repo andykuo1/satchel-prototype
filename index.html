@@ -20,6 +20,7 @@
             text-align: center;
             border: 1px solid black;
         }
+
         .foreground {
             position: fixed;
             top: 0;
@@ -28,7 +29,30 @@
             height: 100vh;
             pointer-events: none;
             overflow: hidden;
+
+            background-color: rgba(0, 0, 0, 0);
+            transition: background-color 0.3s ease;
         }
+        
+        #dropZone {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            text-align: center;
+            font-size: 10vmin;
+
+            opacity: 0;
+            transition: opacity 0.1s ease;
+        }
+        #dropZone.active {
+            opacity: 0.9;
+        }
+        #dropZone > * {
+            flex: 1;
+        }
+
         #dialogRoot {
             width: 100%;
             height: 100%;
@@ -39,6 +63,7 @@
         #dialogRoot:not(:empty) {
             background-color: rgba(0, 0, 0, 0.8);
         }
+
         #holding {
             --transition-duration: 0;
         }
@@ -47,7 +72,6 @@
     <script type="module" src="./src/components/ItemContainer.js"></script>
     <script type="module" src="./src/components/ItemCard.js"></script>
     <script type="module" src="./src/components/ItemDisplay.js"></script>
-    <script type="module" src="./src/components/ItemTooltip.js"></script>
     <script type="module" src="./src/components/ItemContextMenu.js"></script>
     <script type="module" src="./src/components/LootDialog.js"></script>
 </head>
@@ -153,7 +177,7 @@
         <div>
             <h2>Ground</h2>
             <section id="groundRoot">
-                <item-container id="ground" size="6 6"></item-container>
+                <item-container id="ground" size="6 4"></item-container>
             </section>
             <section id="lootRoot"></section>
             <fieldset>
@@ -163,12 +187,13 @@
     </main>
     <footer>
         Some footer stuff.
-        <item-contextmenu id="contextmenu"></item-contextmenu>
     </footer>
-    
+    <item-contextmenu id="contextmenu"></item-contextmenu>
     <div class="foreground">
+        <div id="dropZone">
+            <p>Got Loot?</p>
+        </div>
         <div id="dialogRoot"></div>
-        <!-- item-tooltip id="tooltip"></item-tooltip -->
         <item-container id="holding" type="slot"></item-container>
     </div>
 </body>
