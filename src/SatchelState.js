@@ -214,6 +214,7 @@ function saveItemElement(itemElement, itemData)
     itemData.src = itemElement.src;
     itemData.name = itemElement.name;
     itemData.category = itemElement.category;
+    itemData.detail = itemElement.detail;
 
     return itemData;
 }
@@ -227,6 +228,7 @@ function loadItemElement(itemElement, itemData)
     if ('src' in itemData) itemElement.src = itemData.src;
     if ('name' in itemData) itemElement.name = itemData.name;
     if ('category' in itemData) itemElement.category = itemData.category;
+    if ('detail' in itemData) itemElement.detail = itemData.detail;
 
     return itemElement;
 }
@@ -239,4 +241,6 @@ function clearItemElement(itemElement)
     itemElement.h = 1;
     itemElement.removeAttribute('src');
     itemElement.removeAttribute('name');
+    itemElement.removeAttribute('category');
+    itemElement.removeAttribute('detail');
 }

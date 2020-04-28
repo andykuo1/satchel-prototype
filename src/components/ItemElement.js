@@ -51,6 +51,7 @@ export class ItemElement extends BaseElement
             src: { type: String, value: DEFAULT_ITEM },
             name: { type: String, value: 'Unknown' },
             category: { type: String, value: 'Item' },
+            detail: String,
         };
     }
 
@@ -64,6 +65,10 @@ export class ItemElement extends BaseElement
 
         this.onMouseDown = this.onMouseDown.bind(this);
         this.onContextMenu = this.onContextMenu.bind(this);
+
+        this.attributeCallbacks = {
+            name: this.onNameChanged,
+        };
     }
 
     /** @override */
@@ -81,8 +86,6 @@ export class ItemElement extends BaseElement
         this.style.setProperty('--itemWidth', this.w);
         this.style.setProperty('--itemHeight', this.h);
         
-        this._image.alt = this.name;
-        this._image.title = this.name;
         this._image.src = this.src;
     }
 
@@ -102,6 +105,12 @@ export class ItemElement extends BaseElement
         super.attributeChangedCallback(attribute, prev, value);
 
         this.dispatchEvent(new CustomEvent('change', { composed: true, bubbles: false }));
+    }
+
+    onNameChanged(value)
+    {
+        this._image.alt = value;
+        this._image.title = value;
     }
 
     onContextMenu(e)
