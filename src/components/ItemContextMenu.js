@@ -83,6 +83,7 @@ class ItemContextMenu extends BaseElement
         this._item = null;
 
         this.onMouseDown = this.onMouseDown.bind(this);
+        this.onWindowResize = this.onWindowResize.bind(this);
 
         this.onNameBlur = this.onNameBlur.bind(this);
         this.onDetailBlur = this.onDetailBlur.bind(this);
@@ -94,6 +95,7 @@ class ItemContextMenu extends BaseElement
         super.connectedCallback();
 
         document.addEventListener('mousedown', this.onMouseDown, true);
+        window.addEventListener('resize', this.onWindowResize);
     }
 
     /** @override */
@@ -102,13 +104,15 @@ class ItemContextMenu extends BaseElement
         super.disconnectedCallback();
 
         document.removeEventListener('mousedown', this.onMouseDown, true);
+        window.removeEventListener('resize', this.onWindowResize);
     }
 
-    setItem(item)
+    setItem(item, x = 0, y = 0)
     {
         if (this._item && item)
         {
-            this.setItem(null);
+            // It must reset to (0, 0) so the client width/height is preserved.
+            this.setItem(null, 0, 0);
         }
 
         if (item)
@@ -136,6 +140,15 @@ class ItemContextMenu extends BaseElement
             this._category.textContent = '';
             this._detail.value = '';
         }
+
+        // Update the position.
+        let maxX = window.innerWidth - this.clientWidth;
+        let maxY = window.innerHeight - this.clientHeight;
+        if (x >= maxX) x -= this.clientWidth;
+        if (y >= maxY) y -= this.clientHeight;
+        this.style.setProperty('left', x + 'px');
+        this.style.setProperty('top', y + 'px');
+
         this._item = item;
         return this;
     }
@@ -144,8 +157,13 @@ class ItemContextMenu extends BaseElement
     {
         if (!this.contains(e.target))
         {
-            this.setItem(null);
+            this.setItem(null, 0, 0);
         }
+    }
+
+    onWindowResize(e)
+    {
+        this.setItem(null, 0, 0);
     }
 
     onNameBlur(e)

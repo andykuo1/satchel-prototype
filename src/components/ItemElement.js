@@ -122,16 +122,7 @@ export class ItemElement extends BaseElement
         if (contextMenu)
         {
             let { clientX: x, clientY: y } = e;
-
-            // TODO: This doesn't not handle window resize.
-            let windowWidth = window.innerWidth;
-            let windowHeight = window.innerHeight;
-            if (x >= windowWidth - contextMenu.clientWidth) x -= contextMenu.clientWidth;
-            if (y >= windowHeight - contextMenu.clientHeight) y -= contextMenu.clientHeight;
-
-            contextMenu.style.left = x + 'px';
-            contextMenu.style.top = y + 'px';
-            contextMenu.setItem(this);
+            contextMenu.setItem(this, x, y);
     
             e.preventDefault();
             e.stopPropagation();
