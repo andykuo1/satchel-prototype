@@ -47,7 +47,7 @@
     <script type="module" src="./src/components/ItemContainer.js"></script>
     <script type="module" src="./src/components/ItemCard.js"></script>
     <script type="module" src="./src/components/ItemDisplay.js"></script>
-    <script type="module" src="./src/components/TreasureReceipt.js"></script>
+    <script type="module" src="./src/components/ItemTooltip.js"></script>
     <script type="module" src="./src/components/LootDialog.js"></script>
 </head>
 <body>
@@ -76,10 +76,16 @@
                 return itemElement;
             }
 
+            function createItemContainer()
+            {
+                let itemContainer = document.createElement('item-container');
+                itemContainer.size = [Math.trunc(Math.random() * 3) + 3, Math.trunc(Math.random() * 3) + 3];
+                return itemContainer;
+            }
+
             document.querySelector('#newInv').addEventListener('click', () => {
                 let inventoryRoot = document.querySelector('#inventoryRoot');
-                let itemContainer = document.createElement('item-container');
-                itemContainer.size = [Math.trunc(Math.random() * 6) + 1, Math.trunc(Math.random() * 6) + 1];
+                let itemContainer = createItemContainer();
                 inventoryRoot.appendChild(itemContainer);
             });
             document.querySelector('#newItem').addEventListener('click', () => {
@@ -160,6 +166,7 @@
     
     <div class="foreground">
         <div id="dialogRoot"></div>
+        <!-- item-tooltip id="tooltip"></item-tooltip -->
         <item-container id="holding" type="slot"></item-container>
     </div>
 </body>

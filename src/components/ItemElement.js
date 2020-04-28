@@ -79,6 +79,8 @@ export class ItemElement extends BaseElement
         this.style.setProperty('--itemWidth', this.w);
         this.style.setProperty('--itemHeight', this.h);
         
+        this._image.alt = this.name;
+        this._image.title = this.name;
         this._image.src = this.src;
     }
 
