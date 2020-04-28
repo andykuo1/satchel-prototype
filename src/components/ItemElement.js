@@ -51,7 +51,8 @@ export class ItemElement extends BaseElement
             src: { type: String, value: DEFAULT_ITEM },
             name: { type: String, value: 'Unknown' },
             category: { type: String, value: 'Item' },
-            detail: String,
+            detail: { type: String, value: '' },
+            disabled: Boolean,
         };
     }
 
@@ -118,18 +119,29 @@ export class ItemElement extends BaseElement
         if (this.disabled) return;
         
         let contextMenu = document.querySelector('#contextmenu');
-        contextMenu.setItem(null);
-        contextMenu.style.left = e.clientX + 'px';
-        contextMenu.style.top = e.clientY + 'px';
-        contextMenu.setItem(this);
+        if (contextMenu)
+        {
+            let { clientX: x, clientY: y } = e;
 
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
+            // TODO: This doesn't not handle window resize.
+            let windowWidth = window.innerWidth;
+            let windowHeight = window.innerHeight;
+            if (x >= windowWidth - contextMenu.clientWidth) x -= contextMenu.clientWidth;
+            if (y >= windowHeight - contextMenu.clientHeight) y -= contextMenu.clientHeight;
+
+            contextMenu.style.left = x + 'px';
+            contextMenu.style.top = y + 'px';
+            contextMenu.setItem(this);
+    
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
     }
 
     onMouseDown(e)
     {
+        if (this.disabled) return;
         if (e.button === 2) return;
 
         let result = Satchel.pickUp(this, this.container);

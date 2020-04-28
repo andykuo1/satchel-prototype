@@ -19,7 +19,7 @@ class ItemContextMenu extends BaseElement
     {
         return `
         :host {
-            display: none;
+            visibility: hidden;
             position: absolute;
             left: 0;
             top: 0;
@@ -120,11 +120,11 @@ class ItemContextMenu extends BaseElement
             this._name.addEventListener('blur', this.onNameBlur);
             this._detail.addEventListener('blur', this.onDetailBlur);
 
-            this.style.setProperty('display', 'block');
+            this.style.setProperty('visibility', 'visible');
         }
         else
         {
-            this.style.setProperty('display', 'none');
+            this.style.setProperty('visibility', 'hidden');
 
             this._name.blur();
             this._detail.blur();

@@ -132,7 +132,10 @@ export function clearSatchelState()
     {
         clearItemContainer(itemContainer);
     }
-    inventoryRoot.innerHTML = ''
+    inventoryRoot.innerHTML = '';
+
+    let display = document.querySelector('#display');
+    display.setItem(null);
 }
 
 function saveItemContainer(itemContainer, itemContainerData)

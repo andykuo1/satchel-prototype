@@ -9,11 +9,18 @@ export class ItemDisplay extends BaseElement
     {
         return `
         <section>
-            <h3 id="category"></h3>
-            <p id="name"></p>
-            <p id="content">
-                <item-container type="slot"></item-container>
-            </p>
+            <div>
+            </div>
+            <div>
+                <h3 id="category"></h3>
+                <p id="name"></p>
+                <p id="content">
+                    <item-container type="slot"></item-container>
+                </p>
+                <p id="detail"></p>
+            </div>
+            <div>
+            </div>
         </section>
         `;
     }
@@ -23,6 +30,8 @@ export class ItemDisplay extends BaseElement
     {
         return `
         section {
+            display: flex;
+            flex-direction: row;
             padding: 0.5rem;
             margin: 0.5rem 0;
             text-align: center;
@@ -32,8 +41,14 @@ export class ItemDisplay extends BaseElement
         section:hover {
             background-color: #EEEEEE;
         }
+        section > * {
+            flex: 1;
+        }
         #content {
             pointer-events: none;
+        }
+        #detail {
+            overflow-y: auto;
         }
         `;
     }
@@ -53,6 +68,7 @@ export class ItemDisplay extends BaseElement
         this._root = this.shadowRoot.querySelector('section');
         this._category = this.shadowRoot.querySelector('#category');
         this._name = this.shadowRoot.querySelector('#name');
+        this._detail = this.shadowRoot.querySelector('#detail');
         this._content = this.shadowRoot.querySelector('#content');
         this._container = this.shadowRoot.querySelector('item-container');
 
@@ -98,9 +114,10 @@ export class ItemDisplay extends BaseElement
 
     onItemUpdate()
     {
-        let { name, category } = this._item || {};
+        let { name, category, detail } = this._item || {};
         this._name.textContent = name || '';
         this._category.textContent = category || '';
+        this._detail.textContent = detail || '';
     }
 
     onMouseDown(e)
