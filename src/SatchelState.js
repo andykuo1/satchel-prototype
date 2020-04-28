@@ -35,6 +35,15 @@ export function exportSatchelState(jsonData)
     }
     containers.inventory = inventoryData;
 
+    let display = document.querySelector('#display');
+    let displayItemData = {};
+    let displayItem = display.getItem();
+    if (displayItem)
+    {
+        saveItemElement(displayItem, displayItemData);
+    }
+    containers.displayItem = displayItemData;
+
     jsonData.containers = containers;
     return jsonData;
 }
@@ -45,7 +54,13 @@ export function importSatchelState(jsonData)
 
     if ('containers' in jsonData)
     {
-        let { ground: groundData, loot: lootData, holding: holdingData, inventory: inventoryData } = jsonData.containers;
+        let {
+            ground: groundData,
+            loot: lootData,
+            holding: holdingData,
+            inventory: inventoryData,
+            displayItem: displayItemData,
+        } = jsonData.containers;
         
         if (groundData)
         {
@@ -83,6 +98,14 @@ export function importSatchelState(jsonData)
                 loadItemContainer(itemContainer, itemContainerData);
                 inventoryRoot.appendChild(itemContainer);
             }
+        }
+
+        if (displayItemData)
+        {
+            let display = document.querySelector('#display');
+            let itemElement = new ItemElement();
+            loadItemElement(itemElement, displayItemData);
+            display.setItem(itemElement);
         }
     }
 
@@ -189,6 +212,8 @@ function saveItemElement(itemElement, itemData)
     itemData.w = itemElement.w;
     itemData.h = itemElement.h;
     itemData.src = itemElement.src;
+    itemData.name = itemElement.name;
+    itemData.category = itemElement.category;
 
     return itemData;
 }
@@ -200,6 +225,8 @@ function loadItemElement(itemElement, itemData)
     if ('w' in itemData) itemElement.w = itemData.w;
     if ('h' in itemData) itemElement.h = itemData.h;
     if ('src' in itemData) itemElement.src = itemData.src;
+    if ('name' in itemData) itemElement.name = itemData.name;
+    if ('category' in itemData) itemElement.category = itemData.category;
 
     return itemElement;
 }
@@ -210,5 +237,6 @@ function clearItemElement(itemElement)
     itemElement.y = 0;
     itemElement.w = 1;
     itemElement.h = 1;
-    itemElement.src = '';
+    itemElement.removeAttribute('src');
+    itemElement.removeAttribute('name');
 }

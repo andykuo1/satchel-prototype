@@ -66,6 +66,16 @@
             import { LootDialog } from './src/components/LootDialog.js';
             import { ItemElement } from './src/components/ItemElement.js';
 
+            function createItemElement()
+            {
+                let itemElement = new ItemElement();
+                itemElement.w = Math.trunc(Math.random() * 3) + 1;
+                itemElement.h = Math.trunc(Math.random() * 3) + 1;
+                itemElement.name = 'Healing Potion';
+                itemElement.category = 'Potion';
+                return itemElement;
+            }
+
             document.querySelector('#newInv').addEventListener('click', () => {
                 let inventoryRoot = document.querySelector('#inventoryRoot');
                 let itemContainer = document.createElement('item-container');
@@ -74,9 +84,7 @@
             });
             document.querySelector('#newItem').addEventListener('click', () => {
                 let ground = document.querySelector('#ground');
-                let itemElement = document.createElement('item-element');
-                itemElement.w = Math.trunc(Math.random() * 2) + 1;
-                itemElement.h = Math.trunc(Math.random() * 2) + 1;
+                let itemElement = createItemElement();
                 Satchel.putIn(ground, itemElement);
             });
             document.querySelector('#newLoot').addEventListener('click', () => {
@@ -84,9 +92,7 @@
                 let lootItemCount = Math.trunc(Math.random() * 10) + 1;
                 for(let i = 0; i < lootItemCount; ++i)
                 {
-                    let itemElement = new ItemElement();
-                    itemElement.w = Math.trunc(Math.random() * 3) + 1;
-                    itemElement.h = Math.trunc(Math.random() * 3) + 1;
+                    let itemElement = createItemElement();
                     lootItems.push(itemElement);
                 }
 
@@ -134,7 +140,7 @@
             <section id="inventoryRoot"></section>
             <fieldset>
                 <legend>Display</legend>
-                <item-display editable></item-display>
+                <item-display id="display" editable></item-display>
             </fieldset>
         </div>
         <div>

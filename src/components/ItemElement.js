@@ -49,6 +49,8 @@ export class ItemElement extends BaseElement
             w: { type: Number, value: 1 },
             h: { type: Number, value: 1 },
             src: { type: String, value: DEFAULT_ITEM },
+            name: { type: String, value: 'Unknown' },
+            category: { type: String, value: 'Item' },
         };
     }
 

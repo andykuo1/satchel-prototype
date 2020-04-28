@@ -9,11 +9,10 @@ export class ItemDisplay extends BaseElement
     {
         return `
         <section>
-            <h3 id="type">Unknown Item</h3>
-            <p id="name">???</p>
+            <h3 id="category"></h3>
+            <p id="name"></p>
             <p id="content">
-                <item-container type="slot">
-                </item-container>
+                <item-container type="slot"></item-container>
             </p>
         </section>
         `;
@@ -52,14 +51,13 @@ export class ItemDisplay extends BaseElement
         super();
 
         this._root = this.shadowRoot.querySelector('section');
-        this._type = this.shadowRoot.querySelector('#type');
+        this._category = this.shadowRoot.querySelector('#category');
         this._name = this.shadowRoot.querySelector('#name');
         this._content = this.shadowRoot.querySelector('#content');
         this._container = this.shadowRoot.querySelector('item-container');
 
         this._connected = false;
-        
-        this.item = item;
+        this._item = item;
 
         this.onMouseDown = this.onMouseDown.bind(this);
         this.onMouseUp = this.onMouseUp.bind(this);
@@ -76,10 +74,9 @@ export class ItemDisplay extends BaseElement
 
         this._root.addEventListener('mousedown', this.onMouseDown);
         this._root.addEventListener('mouseup', this.onMouseUp);
-        this._root.style.setProperty('pointer-events', this.editable ? 'unset' : 'none');
 
         this._connected = true;
-        this.setItem(this.item);
+        this.setItem(this._item);
     }
 
     /** @override */
@@ -99,14 +96,23 @@ export class ItemDisplay extends BaseElement
         this._root.style.setProperty('pointer-events', value ? 'unset' : 'none');
     }
 
+    onItemUpdate()
+    {
+        let { name, category } = this._item || {};
+        this._name.textContent = name || '';
+        this._category.textContent = category || '';
+    }
+
     onMouseDown(e)
     {
         if (e.button === 2) return;
+        if (!this.editable) return;
 
-        if (!this.item) return;
-        let result = Satchel.pickUp(this.item, this._container);
+        if (!this._item) return;
+        let result = Satchel.pickUp(this._item, this._container);
         if (result)
         {
+            this.setItem(null, false);
             e.preventDefault();
             e.stopPropagation();
         }
@@ -115,39 +121,43 @@ export class ItemDisplay extends BaseElement
     onMouseUp(e)
     {
         if (e.button === 2) return;
+        if (!this.editable) return;
 
         let holdingItem = Satchel.getHoldingItem();
         if (!holdingItem) return;
         let result = Satchel.placeDown(this._container, 0, 0);
         if (result)
         {
-            this.item = holdingItem;
+            this.setItem(holdingItem, false);
             e.preventDefault();
             e.stopPropagation();
         }
     }
 
-    setItem(item)
+    setItem(item, forceContainerUpdate = this._connected)
     {
-        if (!this._connected)
+        if (forceContainerUpdate)
         {
-            this.item = item;
-        }
-        else
-        {
-            if (this.item)
+            let prevItem = this._item;
+            if (this._container.contains(prevItem))
             {
-                this._container.innerHTML = '';
+                this._container.removeChild(prevItem);
             }
     
             if (item)
             {
                 this._container.appendChild(item);
             }
-
-            this.item = item;
         }
+
+        this._item = item;
+        this.onItemUpdate();
         return this;
+    }
+
+    getItem()
+    {
+        return this._item;
     }
 }
 BaseElement.define('item-display', ItemDisplay);
