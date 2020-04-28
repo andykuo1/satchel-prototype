@@ -48,12 +48,17 @@ export class ItemList
         return true;
     }
 
-    remove(itemElement)
+    delete(itemElement)
     {
         this._element.removeChild(itemElement);
         // Althuogh later it will update automatically, this makes sure synchronous calls are in a valid state.
         this._list.splice(this._list.indexOf(itemElement), 1);
         return true;
+    }
+
+    has(itemElement)
+    {
+        return this._list.includes(itemElement);
     }
 
     clear()

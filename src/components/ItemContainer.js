@@ -25,14 +25,15 @@ export class ItemContainer extends BaseElement
     {
         return `
         :host {
-            --containerWidth: 1;
-            --containerHeight: 1;
+            --background-color: dodgerblue;
+            --container-width: 1;
+            --container-height: 1;
             --transition-duration: 0.3s;
         }
         article {
             display: inline-block;
             margin: 0.2rem;
-            width: calc(var(--containerWidth) * ${GRID_CELL_SIZE}px);
+            width: calc(var(--container-width) * ${GRID_CELL_SIZE}px);
             transition: width var(--transition-duration) ease;
         }
         h2 {
@@ -49,8 +50,8 @@ export class ItemContainer extends BaseElement
         .container {
             position: relative;
             width: 100%;
-            height: calc(var(--containerHeight) * ${GRID_CELL_SIZE}px);
-            background-color: dodgerblue;
+            height: calc(var(--container-height) * ${GRID_CELL_SIZE}px);
+            background-color: var(--background-color);
             border: 1px solid black;
             border-radius: 1rem;
             box-shadow: 0.2rem 0.2rem 0 0 black;
@@ -114,8 +115,8 @@ export class ItemContainer extends BaseElement
 
     onSizeChanged(value)
     {
-        this.style.setProperty('--containerWidth', value[0]);
-        this.style.setProperty('--containerHeight', value[1]);
+        this.style.setProperty('--container-width', value[0]);
+        this.style.setProperty('--container-height', value[1]);
     }
 
     onSlotChange(e)

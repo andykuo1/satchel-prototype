@@ -76,7 +76,7 @@ function startHolding(holding, itemElement)
 
 function stopHolding(holding, itemElement)
 {
-    holding.container.itemList.remove(itemElement);
+    holding.container.itemList.delete(itemElement);
     holding.container.style.display = 'none';
 
     holding.placeDownAllowed = true;
@@ -99,8 +99,8 @@ export function pickUp(itemElement, itemContainer)
 {
     if (holding.container && holding.container.itemList.length <= 0)
     {
-        itemContainer.itemList.remove(itemElement);
-
+        itemContainer.itemList.delete(itemElement);
+        
         startHolding(holding, itemElement);
 
         return true;
@@ -199,7 +199,7 @@ export function takeOut(itemContainer, filter)
     {
         if (filter(itemElement, itemContainer))
         {
-            itemContainer.itemList.remove(itemElement);
+            itemContainer.itemList.delete(itemElement);
 
             itemElement.x = 0;
             itemElement.y = 0;

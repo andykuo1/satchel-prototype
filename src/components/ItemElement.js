@@ -63,6 +63,7 @@ export class ItemElement extends BaseElement
         this.container = null;
 
         this.onMouseDown = this.onMouseDown.bind(this);
+        this.onContextMenu = this.onContextMenu.bind(this);
     }
 
     /** @override */
@@ -71,6 +72,7 @@ export class ItemElement extends BaseElement
         super.connectedCallback();
 
         this.addEventListener('mousedown', this.onMouseDown);
+        this.addEventListener('contextmenu', this.onContextMenu);
 
         this.container = this.closest('item-container');
 
@@ -89,7 +91,8 @@ export class ItemElement extends BaseElement
     {
         super.disconnectedCallback();
         
-        this.removeEventListener('click', this.onMouseDown);
+        this.removeEventListener('mousedown', this.onMouseDown);
+        this.removeEventListener('contextmenu', this.onContextMenu);
         this.container = null;
     }
 
@@ -99,6 +102,21 @@ export class ItemElement extends BaseElement
         super.attributeChangedCallback(attribute, prev, value);
 
         this.dispatchEvent(new CustomEvent('change', { composed: true, bubbles: false }));
+    }
+
+    onContextMenu(e)
+    {
+        if (this.disabled) return;
+        
+        let contextMenu = document.querySelector('#contextmenu');
+        contextMenu.setItem(null);
+        contextMenu.style.left = e.clientX + 'px';
+        contextMenu.style.top = e.clientY + 'px';
+        contextMenu.setItem(this);
+
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
     }
 
     onMouseDown(e)
