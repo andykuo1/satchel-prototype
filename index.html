@@ -21,6 +21,16 @@
             border: 1px solid black;
         }
 
+        .nav-main {
+            display: flex;
+            flex-direction: row;
+        }
+
+        nav {
+            display: flex;
+            flex-direction: column;
+        }
+
         .foreground {
             position: fixed;
             top: 0;
@@ -66,114 +76,119 @@
 </head>
 <body>
     <header>
+        <h1>Satchel</h1>
     </header>
-    <nav>
-        <button id="newInv">Inventory</button>
-        <button id="newItem">Item</button>
-        <button id="newLoot">Loot</button>
-        <button id="save">Save</button>
-        <button id="load">Load</button>
-        <script type="module">
-            import * as SatchelState from './src/SatchelState.js';
-            import * as Satchel from './src/Satchel.js';
+    <div class="nav-main">
+        <nav>
+            <item-container id="inv0" type="slot"></item-container>
+            <item-container id="inv1" type="slot"></item-container>
+            <button id="newInv">Inventory</button>
+            <button id="newItem">Item</button>
+            <button id="newLoot">Loot</button>
+            <button id="save">Save</button>
+            <button id="load">Load</button>
+            <script type="module">
+                import * as SatchelState from './src/SatchelState.js';
+                import * as Satchel from './src/Satchel.js';
 
-            import { LootDialog } from './src/components/LootDialog.js';
-            import { ItemElement } from './src/components/ItemElement.js';
+                import { LootDialog } from './src/components/LootDialog.js';
+                import { ItemElement } from './src/components/ItemElement.js';
 
-            function createItemElement()
-            {
-                let itemElement = new ItemElement();
-                itemElement.w = Math.trunc(Math.random() * 3) + 1;
-                itemElement.h = Math.trunc(Math.random() * 3) + 1;
-                itemElement.name = 'Healing Potion';
-                itemElement.category = 'Potion';
-                return itemElement;
-            }
-
-            function createItemContainer()
-            {
-                let itemContainer = document.createElement('item-container');
-                itemContainer.size = [Math.trunc(Math.random() * 3) + 3, Math.trunc(Math.random() * 3) + 3];
-                return itemContainer;
-            }
-
-            document.querySelector('#newInv').addEventListener('click', () => {
-                let inventoryRoot = document.querySelector('#inventoryRoot');
-                let itemContainer = createItemContainer();
-                inventoryRoot.appendChild(itemContainer);
-            });
-            document.querySelector('#newItem').addEventListener('click', () => {
-                let ground = document.querySelector('#ground');
-                let itemElement = createItemElement();
-                Satchel.putIn(ground, itemElement);
-            });
-            document.querySelector('#newLoot').addEventListener('click', () => {
-                let lootItems = [];
-                let lootItemCount = Math.trunc(Math.random() * 10) + 1;
-                for(let i = 0; i < lootItemCount; ++i)
+                function createItemElement()
                 {
+                    let itemElement = new ItemElement();
+                    itemElement.w = Math.trunc(Math.random() * 3) + 1;
+                    itemElement.h = Math.trunc(Math.random() * 3) + 1;
+                    itemElement.name = 'Healing Potion';
+                    itemElement.category = 'Potion';
+                    return itemElement;
+                }
+
+                function createItemContainer()
+                {
+                    let itemContainer = document.createElement('item-container');
+                    itemContainer.size = [Math.trunc(Math.random() * 3) + 3, Math.trunc(Math.random() * 3) + 3];
+                    return itemContainer;
+                }
+
+                document.querySelector('#newInv').addEventListener('click', () => {
+                    let inventoryRoot = document.querySelector('#inventoryRoot');
+                    let itemContainer = createItemContainer();
+                    inventoryRoot.appendChild(itemContainer);
+                });
+                document.querySelector('#newItem').addEventListener('click', () => {
+                    let ground = document.querySelector('#ground');
                     let itemElement = createItemElement();
-                    lootItems.push(itemElement);
-                }
-
-                let dialogRoot = document.querySelector('#dialogRoot');
-                let lootDialog = new LootDialog(lootItems);
-                lootDialog.addEventListener('accept', e => {
-                    let lootRoot = document.querySelector('#lootRoot');
-                    for(let itemElement of e.detail.items)
+                    Satchel.putIn(ground, itemElement);
+                });
+                document.querySelector('#newLoot').addEventListener('click', () => {
+                    let lootItems = [];
+                    let lootItemCount = Math.trunc(Math.random() * 10) + 1;
+                    for(let i = 0; i < lootItemCount; ++i)
                     {
-                        let itemContainer = document.createElement('item-container');
-                        itemContainer.type = 'slot';
-                        Satchel.putIn(itemContainer, itemElement);
-                        lootRoot.appendChild(itemContainer);
+                        let itemElement = createItemElement();
+                        lootItems.push(itemElement);
                     }
-                    dialogRoot.removeChild(lootDialog);
+
+                    let dialogRoot = document.querySelector('#dialogRoot');
+                    let lootDialog = new LootDialog(lootItems);
+                    lootDialog.addEventListener('accept', e => {
+                        let lootRoot = document.querySelector('#lootRoot');
+                        for(let itemElement of e.detail.items)
+                        {
+                            let itemContainer = document.createElement('item-container');
+                            itemContainer.type = 'slot';
+                            Satchel.putIn(itemContainer, itemElement);
+                            lootRoot.appendChild(itemContainer);
+                        }
+                        dialogRoot.removeChild(lootDialog);
+                    });
+                    lootDialog.addEventListener('cancel', e => {
+                        dialogRoot.removeChild(lootDialog);
+                    });
+                    dialogRoot.appendChild(lootDialog);
                 });
-                lootDialog.addEventListener('cancel', e => {
-                    dialogRoot.removeChild(lootDialog);
+                document.querySelector('#save').addEventListener('click', () => {
+                    let jsonData = {};
+                    SatchelState.exportSatchelState(jsonData);
+                    localStorage.setItem('save', JSON.stringify(jsonData));
                 });
-                dialogRoot.appendChild(lootDialog);
-            });
-            document.querySelector('#save').addEventListener('click', () => {
-                let jsonData = {};
-                SatchelState.exportSatchelState(jsonData);
-                localStorage.setItem('save', JSON.stringify(jsonData));
-            });
-            document.querySelector('#load').addEventListener('click', () => {
-                let stringData = localStorage.getItem('save');
-                let jsonData = JSON.parse(stringData);
-                SatchelState.importSatchelState(jsonData);
-            });
-            document.querySelector('#clearGround').addEventListener('click', () => {
-                if (window.confirm('Are you sure you want to destroy all items on the ground?'))
-                {
-                    document.querySelector('#ground').itemList.clear();
-                    let lootRoot = document.querySelector('#lootRoot');
-                    lootRoot.innerHTML = '';
-                }
-            });
-        </script>
-    </nav>
-    <main>
-        <div>
-            <h2>Inventory</h2>
-            <section id="inventoryRoot"></section>
-            <fieldset>
-                <legend>Display</legend>
-                <item-display id="display" editable></item-display>
-            </fieldset>
-        </div>
-        <div>
-            <h2>Ground</h2>
-            <section id="groundRoot">
-                <item-container id="ground" size="6 4"></item-container>
-            </section>
-            <section id="lootRoot"></section>
-            <fieldset>
-                <button id="clearGround">Clear</button>
-            </fieldset>
-        </div>
-    </main>
+                document.querySelector('#load').addEventListener('click', () => {
+                    let stringData = localStorage.getItem('save');
+                    let jsonData = JSON.parse(stringData);
+                    SatchelState.importSatchelState(jsonData);
+                });
+                document.querySelector('#clearGround').addEventListener('click', () => {
+                    if (window.confirm('Are you sure you want to destroy all items on the ground?'))
+                    {
+                        document.querySelector('#ground').itemList.clear();
+                        let lootRoot = document.querySelector('#lootRoot');
+                        lootRoot.innerHTML = '';
+                    }
+                });
+            </script>
+        </nav>
+        <main>
+            <div>
+                <h2>Inventory</h2>
+                <section id="inventoryRoot"></section>
+                <fieldset>
+                    <legend>Display</legend>
+                    <item-display id="display" editable></item-display>
+                </fieldset>
+            </div>
+            <div>
+                <h2>Ground</h2>
+                <section id="groundRoot">
+                    <item-container id="ground" size="6 4"></item-container>
+                </section>
+                <section id="lootRoot"></section>
+                <fieldset>
+                    <button id="clearGround">Clear</button>
+                </fieldset>
+            </div>
+        </main>
+    </div>
     <footer>
         Some footer stuff.
     </footer>

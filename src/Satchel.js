@@ -222,8 +222,6 @@ export function placeDown(itemContainer, coordX, coordY, trySwap = true)
     
                 return true;
             }
-
-            return false;
         }
 
         // This is NOT a slot.

@@ -50,9 +50,9 @@ export class ItemList
 
     add(itemElement)
     {
-        prepare(this, itemElement);
         this._element.appendChild(itemElement);
         this._list.push(itemElement);
+        prepare(this, itemElement);
         return true;
     }
 
