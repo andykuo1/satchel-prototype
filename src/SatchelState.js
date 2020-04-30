@@ -1,7 +1,9 @@
 import { ItemContainer } from './components/ItemContainer.js';
 import { ItemElement } from './components/ItemElement.js';
 import { LootDialog } from './components/LootDialog.js';
+
 import { putIn } from './Satchel.js';
+import { saveItemElement, loadItemElement } from './Item.js';
 
 export function exportSatchelState(jsonData)
 {
@@ -246,44 +248,4 @@ function loadItemList(itemList, itemListData)
 function clearItemList(itemList)
 {
     itemList.clear();
-}
-
-function saveItemElement(itemElement, itemData)
-{
-    itemData.x = itemElement.x;
-    itemData.y = itemElement.y;
-    itemData.w = itemElement.w;
-    itemData.h = itemElement.h;
-    itemData.src = itemElement.src;
-    itemData.name = itemElement.name;
-    itemData.category = itemElement.category;
-    itemData.detail = itemElement.detail;
-
-    return itemData;
-}
-
-function loadItemElement(itemElement, itemData)
-{
-    if ('x' in itemData) itemElement.x = itemData.x;
-    if ('y' in itemData) itemElement.y = itemData.y;
-    if ('w' in itemData) itemElement.w = itemData.w;
-    if ('h' in itemData) itemElement.h = itemData.h;
-    if ('src' in itemData) itemElement.src = itemData.src;
-    if ('name' in itemData) itemElement.name = itemData.name;
-    if ('category' in itemData) itemElement.category = itemData.category;
-    if ('detail' in itemData) itemElement.detail = itemData.detail;
-
-    return itemElement;
-}
-
-function clearItemElement(itemElement)
-{
-    itemElement.x = 0;
-    itemElement.y = 0;
-    itemElement.w = 1;
-    itemElement.h = 1;
-    itemElement.removeAttribute('src');
-    itemElement.removeAttribute('name');
-    itemElement.removeAttribute('category');
-    itemElement.removeAttribute('detail');
 }

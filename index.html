@@ -82,6 +82,16 @@
         <nav>
             <item-container id="inv0" type="slot"></item-container>
             <item-container id="inv1" type="slot"></item-container>
+            <script>
+                let inv0 = document.querySelector('item-container#inv0');
+                inv0.filter = function(itemElement)
+                {
+                    if (itemElement.category === 'Container')
+                    {
+                        return true;
+                    }
+                };
+            </script>
             <button id="newInv">Inventory</button>
             <button id="newItem">Item</button>
             <button id="newLoot">Loot</button>
@@ -94,13 +104,27 @@
                 import { LootDialog } from './src/components/LootDialog.js';
                 import { ItemElement } from './src/components/ItemElement.js';
 
+                function choose(elements)
+                {
+                    return elements[Math.floor(Math.random() * elements.length)];
+                }
+
                 function createItemElement()
                 {
                     let itemElement = new ItemElement();
                     itemElement.w = Math.trunc(Math.random() * 3) + 1;
                     itemElement.h = Math.trunc(Math.random() * 3) + 1;
-                    itemElement.name = 'Healing Potion';
-                    itemElement.category = 'Potion';
+                    itemElement.name = choose(['Healing Potion', 'Backpack', 'Iron Blade']);
+                    itemElement.category = choose(['Potion', 'Container', 'Weapon', 'Wonder', 'Artifact']);
+
+                    if (itemElement.category === 'Container')
+                    {
+                        itemElement.metadata = {
+                            container: {
+                                size: [Math.trunc(Math.random() * 3) + 3, Math.trunc(Math.random() * 3) + 3],
+                            }
+                        };
+                    }
                     return itemElement;
                 }
 

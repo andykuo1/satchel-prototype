@@ -15,7 +15,7 @@ export class ItemDisplay extends BaseElement
                 <h3 id="category"></h3>
                 <p id="name"></p>
                 <p id="content">
-                    <item-container type="slot" disabled-transfer></item-container>
+                    <item-container type="slot" disabled-transfer disabled-edit></item-container>
                 </p>
                 <p id="detail"></p>
             </div>
