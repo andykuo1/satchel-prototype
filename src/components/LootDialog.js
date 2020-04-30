@@ -50,10 +50,11 @@ export class LootDialog extends BaseElement
             background-color: rgba(0, 0, 0, 0.8);
         }
         blockquote {
-            width: 100%;
             margin: 0;
+            width: 100%;
         }
         blockquote p {
+            width: 100%;
             padding: 1rem;
             background-color: #EEEEEE;
             border-radius: 0.2rem;
@@ -155,6 +156,7 @@ export class LootDialog extends BaseElement
         super.connectedCallback();
 
         this._dialog.showModal();
+        this._dialog.scrollTo(0, 0);
 
         this._dialog.addEventListener('wheel', this.onWheel);
         this._accept.addEventListener('click', this.onAcceptClick);

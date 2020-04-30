@@ -74,6 +74,7 @@ export class ItemContainer extends BaseElement
         return {
             size: { type: NumberPair, value: '1 1' },
             type: { type: String, value: 'grid' },
+            filter: Function,
             disabledTransfer: Boolean,
             disabledTransferIn: Boolean,
             disabledTransferOut: Boolean,
