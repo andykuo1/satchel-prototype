@@ -8,7 +8,7 @@ export class LootDialog extends BaseElement
     static get template()
     {
         return html`
-        <dialog open>
+        <dialog>
             <div class="details">
                 <h2><slot name="title">Loot!</slot></h2>
                 <blockquote>
@@ -45,6 +45,9 @@ export class LootDialog extends BaseElement
             border-radius: 0.5rem;
             background-color: white;
             color: black;
+        }
+        dialog::backdrop {
+            background-color: rgba(0, 0, 0, 0.8);
         }
         blockquote {
             margin: 0;
@@ -149,6 +152,8 @@ export class LootDialog extends BaseElement
     connectedCallback()
     {
         super.connectedCallback();
+
+        this._dialog.showModal();
 
         this._dialog.addEventListener('wheel', this.onWheel);
         this._accept.addEventListener('click', this.onAcceptClick);
