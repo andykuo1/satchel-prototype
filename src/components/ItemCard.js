@@ -1,4 +1,4 @@
-import { BaseElement } from './BaseElement.js';
+import { BaseElement, html, css } from './BaseElement.js';
 
 import {
     DEFAULT_ITEM_CARD_PORTRAIT,
@@ -11,7 +11,7 @@ class ItemCard extends BaseElement
     /** @override */
     static get template()
     {
-        return `
+        return html`
         <div class="flipContainer">
             <article class="container front">
                 <div class="cover">
@@ -42,7 +42,7 @@ class ItemCard extends BaseElement
     /** @override */
     static get style()
     {
-        return `
+        return css`
         :host {}
         h2 {
             margin: 0em;

@@ -1,11 +1,11 @@
-import { BaseElement } from './BaseElement.js';
+import { BaseElement, html, css } from './BaseElement.js';
 
 class ItemContextMenu extends BaseElement
 {
     /** @override */
     static get template()
     {
-        return `
+        return html`
         <fieldset>
             <h3></h3>
             <input type="text">
@@ -17,7 +17,7 @@ class ItemContextMenu extends BaseElement
     /** @override */
     static get style()
     {
-        return `
+        return css`
         :host {
             visibility: hidden;
             position: absolute;

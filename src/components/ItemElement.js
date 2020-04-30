@@ -1,4 +1,4 @@
-import { BaseElement } from './BaseElement.js';
+import { BaseElement, html, css } from './BaseElement.js';
 
 import { DEFAULT_ITEM } from '../assets.js';
 import * as Satchel from '../Satchel.js';
@@ -9,7 +9,7 @@ export class ItemElement extends BaseElement
     /** @override */
     static get template()
     {
-        return `
+        return html`
         <div class="container">
             <img>
         </div>
@@ -19,7 +19,7 @@ export class ItemElement extends BaseElement
     /** @override */
     static get style()
     {
-        return `
+        return css`
         :host {
             --itemX: 0;
             --itemY: 0;

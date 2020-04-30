@@ -1,4 +1,4 @@
-import { BaseElement } from './BaseElement.js';
+import { BaseElement, html, css } from './BaseElement.js';
 
 import { ItemDisplay } from './ItemDisplay.js';
 
@@ -7,7 +7,7 @@ export class LootDialog extends BaseElement
     /** @override */
     static get template()
     {
-        return `
+        return html`
         <dialog open>
             <div class="details">
                 <h2><slot name="title">Loot!</slot></h2>
@@ -35,7 +35,7 @@ export class LootDialog extends BaseElement
     /** @override */
     static get style()
     {
-        return `
+        return css`
         dialog {
             top: 10%;
             max-height: 80%;

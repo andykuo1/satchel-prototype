@@ -13,12 +13,12 @@ export class BaseElement extends HTMLElement
 
     static get template()
     {
-        return '';
+        return html``;
     }
 
     static get style()
     {
-        return '';
+        return css``;
     }
 
     static get properties()
@@ -33,16 +33,14 @@ export class BaseElement extends HTMLElement
 
     static get __template__()
     {
-        let template = document.createElement('template');
-        template.innerHTML = this.template;
+        let template = this.template;
         Object.defineProperty(this, '__template__', { value: template });
         return template;
     }
 
     static get __style__()
     {
-        let style = document.createElement('style');
-        style.innerHTML = this.style;
+        let style = this.style;
         Object.defineProperty(this, '__style__', { value: style });
         return style;
     }
@@ -85,4 +83,25 @@ export class BaseElement extends HTMLElement
         Object.defineProperty(this, '__changedAttributes__', { value: changedAttributes });
         return changedAttributes;
     }
+}
+
+export function html(strings, ...args)
+{
+    const s = lit(strings, args);
+    const t = document.createElement('template');
+    t.innerHTML = s;
+    return t;
+}
+
+export function css(strings, ...args)
+{
+    const s = lit(strings, args);
+    const t = document.createElement('style');
+    t.innerHTML = s;
+    return t;
+}
+
+function lit(strings, args)
+{
+    return strings.reduce((prev, curr, i) => prev + curr + (args[i] || ''), '');
 }

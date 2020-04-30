@@ -1,4 +1,4 @@
-import { BaseElement } from './BaseElement.js';
+import { BaseElement, html, css } from './BaseElement.js';
 
 import { NumberPair } from './util/types.js';
 
@@ -10,7 +10,7 @@ export class ItemContainer extends BaseElement
     /** @override */
     static get template()
     {
-        return `
+        return html`
         <article>
             <h2><slot name="title"></slot></h2>
             <section class="container grid">
@@ -23,7 +23,7 @@ export class ItemContainer extends BaseElement
     /** @override */
     static get style()
     {
-        return `
+        return css`
         :host {
             --background-color: dodgerblue;
             --container-width: 1;

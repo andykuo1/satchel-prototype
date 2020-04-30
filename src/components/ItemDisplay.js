@@ -1,4 +1,4 @@
-import { BaseElement } from './BaseElement.js';
+import { BaseElement, html, css } from './BaseElement.js';
 
 import * as Satchel from '../Satchel.js';
 
@@ -7,7 +7,7 @@ export class ItemDisplay extends BaseElement
     /** @override */
     static get template()
     {
-        return `
+        return html`
         <section>
             <div>
             </div>
@@ -28,7 +28,7 @@ export class ItemDisplay extends BaseElement
     /** @override */
     static get style()
     {
-        return `
+        return css`
         section {
             display: flex;
             flex-direction: row;
