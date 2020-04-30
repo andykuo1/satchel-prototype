@@ -32,9 +32,10 @@ export class ItemContainer extends BaseElement
         }
         article {
             display: inline-block;
-            margin: 0.2rem;
             width: calc(var(--container-width) * ${GRID_CELL_SIZE}px);
             transition: width var(--transition-duration) ease;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
         }
         h2 {
             font-size: 0.8rem;
@@ -99,10 +100,11 @@ export class ItemContainer extends BaseElement
         this._container = this.shadowRoot.querySelector('.container');
         this._containerTitle = this.shadowRoot.querySelector('h2');
 
-        this.itemList = new ItemList(this);
-
+        this.onItemChange = this.onItemChange.bind(this);
         this.onSlotChange = this.onSlotChange.bind(this);
         this.onMouseUp = this.onMouseUp.bind(this);
+        
+        this.itemList = new ItemList(this, this.onItemChange);
     }
 
     /** @override */
@@ -149,6 +151,11 @@ export class ItemContainer extends BaseElement
                 this._containerTitle.textContent = '';
             }
         }
+    }
+
+    onItemChange()
+    {
+        this.dispatchEvent(new CustomEvent('itemchange', { composed: true, bubbles: false }));
     }
 
     onMouseUp(e)

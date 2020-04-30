@@ -2,19 +2,24 @@ import { ItemElement } from './components/ItemElement.js';
 
 export class ItemList
 {
-    constructor(containerElement)
+    constructor(containerElement, changeCallback = null)
     {
         this._element = containerElement;
         this._slotElement = null;
 
+        this._changeCallback = changeCallback;
+
         this._list = [];
+
+        this.onItemChange = this.onItemChange.bind(this);
     }
 
     get length() { return this._list.length; }
 
     update(slotElement)
     {
-        this._list.length = 0;
+        resetAll(this, this._list);
+
         this._slotElement = slotElement;
         
         let nodes = slotElement.assignedNodes();
@@ -22,9 +27,12 @@ export class ItemList
         {
             if (node instanceof ItemElement)
             {
+                prepare(this, node);
                 this._list.push(node);
             }
         }
+
+        if (this._changeCallback) this._changeCallback(this._element);
     }
 
     at(coordX, coordY)
@@ -42,16 +50,16 @@ export class ItemList
 
     add(itemElement)
     {
+        prepare(this, itemElement);
         this._element.appendChild(itemElement);
-        // Althuogh later it will update automatically, this makes sure synchronous calls are in a valid state.
         this._list.push(itemElement);
         return true;
     }
 
     delete(itemElement)
     {
+        reset(this, itemElement);
         this._element.removeChild(itemElement);
-        // Althuogh later it will update automatically, this makes sure synchronous calls are in a valid state.
         this._list.splice(this._list.indexOf(itemElement), 1);
         return true;
     }
@@ -65,7 +73,7 @@ export class ItemList
     {
         if (!this._slotElement) return;
 
-        this._list.length = 0;
+        resetAll(this, this._list);
 
         for(let node of this._slotElement.assignedNodes())
         {
@@ -78,8 +86,37 @@ export class ItemList
         this._slotElement = null;
     }
 
+    onItemChange(e)
+    {
+        if (this._changeCallback) this._changeCallback(e.target);
+    }
+
     [Symbol.iterator]()
     {
         return this._list[Symbol.iterator]();
     }
 };
+
+function prepare(itemList, itemElement)
+{
+    itemElement.addEventListener('change', itemList.onItemChange);
+    return itemElement;
+}
+
+function reset(itemList, itemElement)
+{
+    itemElement.removeEventListener('change', itemList.onItemChange);
+    return itemElement;
+}
+
+function resetAll(itemList, itemElements)
+{
+    let result = [];
+    for(let itemElement of itemElements)
+    {
+        reset(itemList, itemElement);
+        result.push(itemElement);
+    }
+    itemElements.length = 0;
+    return result;
+}
