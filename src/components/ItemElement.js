@@ -2,6 +2,7 @@ import { BaseElement } from './BaseElement.js';
 
 import { DEFAULT_ITEM } from '../assets.js';
 import * as Satchel from '../Satchel.js';
+import { canTransferItemOut } from './ItemContainer.js';
 
 export class ItemElement extends BaseElement
 {
@@ -52,7 +53,17 @@ export class ItemElement extends BaseElement
             name: { type: String, value: 'Unknown' },
             category: { type: String, value: 'Item' },
             detail: { type: String, value: '' },
-            disabled: Boolean,
+        };
+    }
+
+    /** @override */
+    get changedAttributes()
+    {
+        return {
+            name: value => {
+                this._image.alt = value;
+                this._image.title = value;
+            },
         };
     }
 
@@ -66,10 +77,6 @@ export class ItemElement extends BaseElement
 
         this.onMouseDown = this.onMouseDown.bind(this);
         this.onContextMenu = this.onContextMenu.bind(this);
-
-        this.attributeCallbacks = {
-            name: this.onNameChanged,
-        };
     }
 
     /** @override */
@@ -108,30 +115,24 @@ export class ItemElement extends BaseElement
         this.dispatchEvent(new CustomEvent('change', { composed: true, bubbles: false }));
     }
 
-    onNameChanged(value)
-    {
-        this._image.alt = value;
-        this._image.title = value;
-    }
-
     onContextMenu(e)
     {
-        if (this.disabled) return;
+        // Don't open the context menu regardless of what happens.
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (this.container && this.container.disabledEdit) return;
         
         let contextMenu = document.querySelector('#contextmenu');
         if (contextMenu)
         {
             contextMenu.setItem(this, e.pageX, e.pageY);
-    
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
         }
     }
 
     onMouseDown(e)
     {
-        if (this.disabled) return;
+        if (!canTransferItemOut(this.container)) return;
         if (e.button === 2) return;
 
         let result = Satchel.pickUp(this, this.container);

@@ -73,6 +73,21 @@ export class ItemContainer extends BaseElement
         return {
             size: { type: NumberPair, value: '1 1' },
             type: { type: String, value: 'grid' },
+            disabledTransfer: Boolean,
+            disabledTransferIn: Boolean,
+            disabledTransferOut: Boolean,
+            disabledEdit: Boolean,
+        };
+    }
+
+    /** @override */
+    get changedAttributes()
+    {
+        return {
+            size: value => {
+                this.style.setProperty('--container-width', value[0]);
+                this.style.setProperty('--container-height', value[1]);
+            },
         };
     }
 
@@ -88,10 +103,6 @@ export class ItemContainer extends BaseElement
 
         this.onSlotChange = this.onSlotChange.bind(this);
         this.onMouseUp = this.onMouseUp.bind(this);
-
-        this.attributeCallbacks = {
-            size: this.onSizeChanged,
-        };
     }
 
     /** @override */
@@ -113,12 +124,6 @@ export class ItemContainer extends BaseElement
         this._itemSlot.removeEventListener('slotchange', this.onSlotChange);
     }
 
-    onSizeChanged(value)
-    {
-        this.style.setProperty('--container-width', value[0]);
-        this.style.setProperty('--container-height', value[1]);
-    }
-
     onSlotChange(e)
     {
         this.itemList.update(e.target);
@@ -129,16 +134,26 @@ export class ItemContainer extends BaseElement
             if (itemElement)
             {
                 this.size = [ itemElement.w, itemElement.h ];
+
+                // TODO: This is nice, but not robust enough.
+                if (itemElement.name)
+                {
+                    this._containerTitle.textContent = itemElement.name;
+                }
             }
             else
             {
                 this.size = [ 1, 1 ];
+                
+                // TODO: This is nice, but not robust enough.
+                this._containerTitle.textContent = '';
             }
         }
     }
 
     onMouseUp(e)
     {
+        if (!canTransferItemIn(this)) return;
         if (e.button === 2) return;
     
         let boundingRect = this._container.getBoundingClientRect();
@@ -148,7 +163,7 @@ export class ItemContainer extends BaseElement
         let coordX = Math.trunc(offsetX / GRID_CELL_SIZE);
         let coordY = Math.trunc(offsetY / GRID_CELL_SIZE);
 
-        let result = placeDown(this, coordX, coordY);
+        let result = placeDown(this, coordX, coordY, this.disabledTransferOut);
         if (result)
         {
             e.preventDefault();
@@ -166,4 +181,14 @@ export function isSlotContainer(itemContainer)
 export function isGridContainer(itemContainer)
 {
     return itemContainer.type === 'grid';
+}
+
+export function canTransferItemIn(itemContainer)
+{
+    return itemContainer && !itemContainer.disabledTransfer && !itemContainer.disabledTransferIn;
+}
+
+export function canTransferItemOut(itemContainer)
+{
+    return itemContainer && !itemContainer.disabledTransfer && !itemContainer.disabledTransferOut;
 }

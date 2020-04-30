@@ -76,7 +76,7 @@ export function assignProperties(constructor, properties, opts = {})
         attributeToPropertyNameMap[attributeName] = propertyName;
         if (property.observed) observedAttributes.push(attributeName);
 
-        assignProperty(constructor, propertyName, type || String);
+        assignProperty(constructor, propertyName, type || String, attributeName);
     }
 
     properties[ATTRIBUTE_TO_PROPERTY_NAME_MAP] = attributeToPropertyNameMap;
@@ -86,10 +86,10 @@ export function assignProperties(constructor, properties, opts = {})
     return properties;
 }
 
-export function assignProperty(constructor, propertyName, propertyType = String)
+export function assignProperty(constructor, propertyName, propertyType = String, attributeName = camelToKebab(propertyName))
 {
-    const setter = getPropertySetter(propertyName, propertyType, false);
-    const getter = getPropertyGetter(propertyName, propertyType, true);
+    const setter = getPropertySetter(attributeName, propertyName, propertyType, false);
+    const getter = getPropertyGetter(attributeName, propertyName, propertyType, true);
 
     Object.defineProperty(constructor.prototype, propertyName, {
         set: setter,

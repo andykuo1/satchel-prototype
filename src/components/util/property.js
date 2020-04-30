@@ -41,12 +41,12 @@ export function getPropertyParser(propertyType = String)
     }
 }
 
-export function getPropertyGetter(propertyName, propertyType = String, cached = true)
+export function getPropertyGetter(attributeName, propertyName, propertyType = String, cached = true)
 {
     if (cached) return bindFunction(getCachedProperty, propertyName);
-    else if (propertyType === String) return bindFunction(getStringProperty, propertyName);
-    else if (propertyType === Boolean) return bindFunction(getBooleanProperty, propertyName);
-    else if (propertyType === Number) return bindFunction(getNumberProperty, propertyName);
+    else if (propertyType === String) return bindFunction(getStringProperty, attributeName);
+    else if (propertyType === Boolean) return bindFunction(getBooleanProperty, attributeName);
+    else if (propertyType === Number) return bindFunction(getNumberProperty, attributeName);
     else if (propertyType === Function) return bindFunction(getFunctionProperty, propertyName);
     else if (propertyType === Symbol) throw new Error('Symbols cannot be a non-cached property type - unable to preserve uniqueness when converted to string.');
     else
@@ -54,11 +54,11 @@ export function getPropertyGetter(propertyName, propertyType = String, cached = 
         const type = typeof propertyType;
         if (type === 'function')
         {
-            return bindFunction(getTypedProperty, propertyType, propertyName);
+            return bindFunction(getTypedProperty, propertyType, attributeName);
         }
         else if (type === 'object')
         {
-            return bindFunction(getParsedProperty, propertyType, propertyName);
+            return bindFunction(getParsedProperty, propertyType, attributeName);
         }
         else
         {
@@ -67,12 +67,12 @@ export function getPropertyGetter(propertyName, propertyType = String, cached = 
     }
 }
 
-export function getPropertySetter(propertyName, propertyType = String, cached = false)
+export function getPropertySetter(attributeName, propertyName, propertyType = String, cached = false)
 {
     if (cached) return bindFunction(setCachedProperty, propertyName);
-    else if (propertyType === String) return bindFunction(setStringProperty, propertyName);
-    else if (propertyType === Boolean) return bindFunction(setBooleanProperty, propertyName);
-    else if (propertyType === Number) return bindFunction(setNumberProperty, propertyName);
+    else if (propertyType === String) return bindFunction(setStringProperty, attributeName);
+    else if (propertyType === Boolean) return bindFunction(setBooleanProperty, attributeName);
+    else if (propertyType === Number) return bindFunction(setNumberProperty, attributeName);
     else if (propertyType === Function) return bindFunction(setFunctionProperty, propertyName);
     else if (propertyType === Symbol) throw new Error('Symbols cannot be a non-cached property type - unable to preserve uniqueness when converted from string.');
     else
@@ -80,11 +80,11 @@ export function getPropertySetter(propertyName, propertyType = String, cached = 
         const type = typeof propertyType;
         if (type === 'function')
         {
-            return bindFunction(setTypedProperty, propertyName);
+            return bindFunction(setTypedProperty, attributeName);
         }
         else if (type === 'object')
         {
-            return bindFunction(setParsedProperty, propertyType, propertyName);
+            return bindFunction(setParsedProperty, propertyType, attributeName);
         }
         else
         {

@@ -34,14 +34,13 @@ export class BaseElement extends HTMLElement
     static get __template__()
     {
         let template = document.createElement('template');
-        template.innerHTML = `<style>${this.style}</style>${this.template}`;
+        template.innerHTML = this.template;
         Object.defineProperty(this, '__template__', { value: template });
         return template;
     }
 
     static get __style__()
     {
-        // TODO: Not yet used.
         let style = document.createElement('style');
         style.innerHTML = this.style;
         Object.defineProperty(this, '__style__', { value: style });
@@ -54,8 +53,7 @@ export class BaseElement extends HTMLElement
 
         this.attachShadow({ mode: 'open' });
         this.shadowRoot.appendChild(this.constructor.__template__.content.cloneNode(true));
-
-        this.attributeCallbacks = {};
+        this.shadowRoot.appendChild(this.constructor.__style__.cloneNode(true));
     }
     
     /** @override */
@@ -73,6 +71,18 @@ export class BaseElement extends HTMLElement
     /** @override */
     attributeChangedCallback(attribute, prev, value)
     {
-        callbackAssignedProperties(this, this.constructor.__properties__, attribute, prev, value, this.attributeCallbacks);
+        callbackAssignedProperties(this, this.constructor.__properties__, attribute, prev, value, this.__changedAttributes__);
+    }
+
+    get changedAttributes()
+    {
+        return {};
+    }
+
+    get __changedAttributes__()
+    {
+        let changedAttributes = this.changedAttributes;
+        Object.defineProperty(this, '__changedAttributes__', { value: changedAttributes });
+        return changedAttributes;
     }
 }

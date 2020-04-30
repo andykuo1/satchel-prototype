@@ -15,7 +15,7 @@ export class ItemDisplay extends BaseElement
                 <h3 id="category"></h3>
                 <p id="name"></p>
                 <p id="content">
-                    <item-container type="slot"></item-container>
+                    <item-container type="slot" disabled-transfer></item-container>
                 </p>
                 <p id="detail"></p>
             </div>
@@ -44,9 +44,6 @@ export class ItemDisplay extends BaseElement
         section > * {
             flex: 1;
         }
-        #content {
-            pointer-events: none;
-        }
         #detail {
             overflow-y: auto;
         }
@@ -58,6 +55,14 @@ export class ItemDisplay extends BaseElement
     {
         return {
             editable: Boolean,
+        };
+    }
+
+    /** @override */
+    get changedAttributes()
+    {
+        return {
+            editable: value => this._container.disabledTransfer = !value,
         };
     }
 
@@ -77,10 +82,6 @@ export class ItemDisplay extends BaseElement
 
         this.onMouseDown = this.onMouseDown.bind(this);
         this.onMouseUp = this.onMouseUp.bind(this);
-
-        this.attributeCallbacks = {
-            editable: this.onEditableChanged,
-        };
     }
 
     /** @override */
@@ -107,11 +108,6 @@ export class ItemDisplay extends BaseElement
         this._connected = false;
     }
 
-    onEditableChanged(value)
-    {
-        this._root.style.setProperty('pointer-events', value ? 'unset' : 'none');
-    }
-
     onItemUpdate()
     {
         let { name, category, detail } = this._item || {};
@@ -122,8 +118,8 @@ export class ItemDisplay extends BaseElement
 
     onMouseDown(e)
     {
+        if (this._container.disabledTransfer || this._container.disabledTransferOut) return;
         if (e.button === 2) return;
-        if (!this.editable) return;
 
         if (!this._item) return;
         let result = Satchel.pickUp(this._item, this._container);
@@ -137,12 +133,12 @@ export class ItemDisplay extends BaseElement
 
     onMouseUp(e)
     {
+        if (this._container.disabledTransfer || this._container.disabledTransferIn) return;
         if (e.button === 2) return;
-        if (!this.editable) return;
 
         let holdingItem = Satchel.getHoldingItem();
         if (!holdingItem) return;
-        let result = Satchel.placeDown(this._container, 0, 0);
+        let result = Satchel.placeDown(this._container, 0, 0, this._container.disabledTransferOut);
         if (result)
         {
             this.setItem(holdingItem, false);
