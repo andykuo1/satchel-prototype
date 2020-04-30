@@ -107,7 +107,8 @@ function onDrop(e)
         }
     }
 
-    fileBlobs.reduce((prev, fileBlob) => {
+    let otherBlobs = [];
+    let promise = fileBlobs.reduce((prev, fileBlob) => {
         if (fileBlob.type === 'application/json')
         {
             return prev
@@ -121,9 +122,17 @@ function onDrop(e)
         }
 
         // Skip this file.
+        otherBlobs.push(fileBlob);
         return prev;
     },
-    Promise.resolve());
+    Promise.resolve())
+    .then(() => {
+        if (otherBlobs.length > 0)
+        {
+            window.alert('Sorry, but these do not look like loot.\n\n'
+                + otherBlobs.map(fileBlob => fileBlob.name).join('\n'));
+        }
+    });
 }
 
 function startHolding(holding, itemElement)

@@ -50,6 +50,7 @@ export class LootDialog extends BaseElement
             background-color: rgba(0, 0, 0, 0.8);
         }
         blockquote {
+            width: 100%;
             margin: 0;
         }
         blockquote p {
