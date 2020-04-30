@@ -14,7 +14,7 @@ let holding = {
     x: 0,
     y: 0,
     pick: { x: 0, y: 0 },
-    placeDownAllowed: true,
+    placeDownBuffer: true,
     placeDownBufferTimeoutHandle: null,
 };
 
@@ -41,7 +41,7 @@ function onMouseMove(e)
 
     if (distanceSquared(holding.x, holding.y, holding.pick.x, holding.pick.y) >= PLACE_BUFFER_RANGE_SQUARED)
     {
-        holding.placeDownAllowed = true;
+        holding.placeDownBuffer = true;
 
         clearTimeout(holding.placeDownBufferTimeoutHandle);
         holding.placeDownBufferTimeoutHandle = null;
@@ -53,7 +53,7 @@ function onMouseUp(e)
     e.preventDefault();
     e.stopPropagation();
 
-    if (holding.container && holding.container.itemList.length > 0 && holding.placeDownAllowed)
+    if (holding.container && holding.container.itemList.length > 0 && holding.placeDownBuffer)
     {
         let result = placeDown(ground.container, 0, 0, false);
         if (!result)
@@ -143,11 +143,11 @@ function startHolding(holding, itemElement)
     holding.container.itemList.add(itemElement);
     holding.container.style.display = 'unset';
 
-    holding.placeDownAllowed = false;
+    holding.placeDownBuffer = false;
     holding.pick.x = holding.x;
     holding.pick.y = holding.y;
     holding.placeDownBufferTimeoutHandle = setTimeout(() => {
-        if (!holding.placeDownAllowed) holding.placeDownAllowed = true;
+        if (!holding.placeDownBuffer) holding.placeDownBuffer = true;
     }, PLACE_BUFFER_TIMEOUT);
 }
 
@@ -156,7 +156,7 @@ function stopHolding(holding, itemElement)
     holding.container.itemList.delete(itemElement);
     holding.container.style.display = 'none';
 
-    holding.placeDownAllowed = true;
+    holding.placeDownBuffer = true;
 
     clearTimeout(holding.placeDownBufferTimeoutHandle);
     holding.placeDownBufferTimeoutHandle = null;
@@ -188,9 +188,16 @@ export function pickUp(itemElement, itemContainer)
 
 export function placeDown(itemContainer, coordX, coordY, trySwap = true)
 {
-    if (holding.container && holding.container.itemList.length > 0 && holding.placeDownAllowed)
+    if (holding.container && holding.container.itemList.length > 0 && holding.placeDownBuffer)
     {
         let itemElement = holding.container.itemList.at(0, 0);
+
+        // Always check with the filter first if defined.
+        if (itemContainer.filter && !itemContainer.filter.call(itemContainer, itemElement))
+        {
+            return false;
+        }
+
         if (itemContainer.type === 'slot')
         {
             // This is a slot.
@@ -287,6 +294,12 @@ export function takeOut(itemContainer, filter)
 
 export function putIn(itemContainer, itemElement)
 {
+    // Always check with the filter first if defined.
+    if (itemContainer.filter && !itemContainer.filter.call(itemContainer, itemElement))
+    {
+        return false;
+    }
+
     if (itemContainer.type === 'slot')
     {
         // This is a slot.
