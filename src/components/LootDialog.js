@@ -51,13 +51,12 @@ export class LootDialog extends BaseElement
         }
         blockquote {
             margin: 0;
-            width: 100%;
         }
         blockquote p {
-            width: 100%;
             padding: 1rem;
             background-color: #EEEEEE;
             border-radius: 0.2rem;
+            text-align: center;
         }
         h2 {
             text-align: center;
@@ -71,6 +70,9 @@ export class LootDialog extends BaseElement
         button {
             margin-bottom: 0.5rem;
             width: 100%;
+        }
+        #accept {
+            font-size: 1.6rem;
         }
         .details, .options, hr {
             animation: fadein 1s ease forwards;

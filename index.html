@@ -85,13 +85,16 @@
     </header>
     <div class="nav-main">
         <nav>
-            <div id="socketRoot"></div>
+            <button id="save">Save</button>
+            <button id="load">Load</button>
+            <hr>
             <button id="newInv">Inventory</button>
             <button id="newItem">Item</button>
             <button id="newLoot">Loot</button>
             <button id="newSocket">Socket</button>
-            <button id="save">Save</button>
-            <button id="load">Load</button>
+            <hr>
+            <div id="socketRoot"></div>
+            <hr>
             <script type="module">
                 import * as SatchelState from './src/SatchelState.js';
                 import * as Satchel from './src/Satchel.js';
@@ -104,22 +107,79 @@
                     return elements[Math.floor(Math.random() * elements.length)];
                 }
 
+                function randomRange(min, max)
+                {
+                    return (Math.random() * (max - min)) + min;
+                }
+
+                function randomRangeInt(min, max)
+                {
+                    return Math.floor(randomRange(min, max));
+                }
+
                 function createItemElement()
                 {
-                    let itemElement = new ItemElement();
-                    itemElement.w = Math.trunc(Math.random() * 3) + 1;
-                    itemElement.h = Math.trunc(Math.random() * 3) + 1;
-                    itemElement.name = choose(['Healing Potion', 'Backpack', 'Iron Blade']);
-                    itemElement.category = choose(['Potion', 'Container', 'Weapon', 'Wonder', 'Artifact']);
+                    let backpack = itemElement => {
+                        itemElement.w = randomRangeInt(3, 4);
+                        itemElement.h = choose([3, 3, 3, 4, 4, 4, 5]);
+                        itemElement.name = 'Backpack';
+                        itemElement.category = 'Container';
+                        itemElement.src = './out/res/backpack.jpg';
+                        itemElement.detail = 'It can hold stuff. Yay!';
+                    };
+                    let potion = itemElement => {
+                        itemElement.w = 1;
+                        itemElement.h = choose([1, 1, 2, 2, 2, 3]);
+                        itemElement.name = 'Potion of Healing';
+                        itemElement.category = 'Potion';
+                        itemElement.src = './out/res/potion.jpg';
+                        itemElement.detail = 'Drink it to heal yourself.\n Or give it to someone else to heal them too!';
+                    };
+                    let sword = itemElement => {
+                        itemElement.w = 1;
+                        itemElement.h = choose([2, 2, 2, 3, 3, 3, 4]);
+                        itemElement.name = 'Wooden Sword';
+                        itemElement.category = 'Weapon';
+                        itemElement.src = './out/res/sword.jpg';
+                        itemElement.detail = 'Maybe one day I can get an actual sword...';
+                    };
+                    let cube = itemElement => {
+                        itemElement.w = 1;
+                        itemElement.h = 1;
+                        itemElement.name = 'The Cube';
+                        itemElement.category = 'Artifact';
+                        itemElement.src = './out/res/cube.jpg';
+                        itemElement.detail = 'It looks like a cube?';
+                    };
+                    let shield = itemElement => {
+                        itemElement.w = 2;
+                        itemElement.h = choose([2, 3]);
+                        itemElement.name = 'Wooden Shield';
+                        itemElement.category = 'Armor';
+                        itemElement.src = './out/res/shield.jpg';
+                        itemElement.detail = 'Sharp stuff. Bad.';
+                    };
+                    let magicRope = itemElement => {
+                        itemElement.w = 2;
+                        itemElement.h = 1;
+                        itemElement.name = 'Never-Ending Rope';
+                        itemElement.category = 'Wonder';
+                        itemElement.src = './out/res/rope.png';
+                        itemElement.detail = 'Seriously. It never ends!';
+                    };
 
-                    if (itemElement.category === 'Container')
-                    {
-                        itemElement.metadata = {
-                            container: {
-                                size: [Math.trunc(Math.random() * 3) + 3, Math.trunc(Math.random() * 3) + 3],
-                            }
-                        };
-                    }
+                    let items = [
+                        backpack,
+                        potion,
+                        sword,
+                        cube,
+                        shield,
+                        magicRope
+                    ];
+
+                    let chosenItem = choose(items);
+                    let itemElement = new ItemElement();
+                    chosenItem(itemElement);
                     return itemElement;
                 }
 
@@ -222,7 +282,9 @@
         </main>
     </div>
     <footer>
-        Some footer stuff.
+        <small>
+            Made by Andrew Kuo.
+        </small>
     </footer>
     <item-contextmenu id="contextmenu"></item-contextmenu>
     <div class="foreground">

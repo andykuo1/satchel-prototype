@@ -328,4 +328,7 @@ export function loadItemContainer(itemContainer, itemContainerData)
 export function clearItemContainer(itemContainer)
 {
     clearItemList(itemContainer.itemList);
+
+    // BUGFIX: This makes sure that the socketed container is removed. Maybe there's a better way to do this?
+    itemContainer.onItemListChange();
 }
