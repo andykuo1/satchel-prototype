@@ -102,6 +102,13 @@
                 import { LootDialog } from './src/components/LootDialog.js';
                 import { ItemElement } from './src/components/ItemElement.js';
 
+                import BackpackImage from './res/backpack.js';
+                import CubeImage from './res/cube.js';
+                import PotionImage from './res/potion.js';
+                import RopeImage from './res/rope.js';
+                import ShieldImage from './res/shield.js';
+                import SwordImage from './res/sword.js';
+
                 function choose(elements)
                 {
                     return elements[Math.floor(Math.random() * elements.length)];
@@ -124,7 +131,7 @@
                         itemElement.h = choose([3, 3, 3, 4, 4, 4, 5]);
                         itemElement.name = 'Backpack';
                         itemElement.category = 'Container';
-                        itemElement.src = './out/res/backpack.jpg';
+                        itemElement.src = BackpackImage;
                         itemElement.detail = 'It can hold stuff. Yay!';
                     };
                     let potion = itemElement => {
@@ -132,7 +139,7 @@
                         itemElement.h = choose([1, 1, 2, 2, 2, 3]);
                         itemElement.name = 'Potion of Healing';
                         itemElement.category = 'Potion';
-                        itemElement.src = './out/res/potion.jpg';
+                        itemElement.src = PotionImage;
                         itemElement.detail = 'Drink it to heal yourself.\n Or give it to someone else to heal them too!';
                     };
                     let sword = itemElement => {
@@ -140,7 +147,7 @@
                         itemElement.h = choose([2, 2, 2, 3, 3, 3, 4]);
                         itemElement.name = 'Wooden Sword';
                         itemElement.category = 'Weapon';
-                        itemElement.src = './out/res/sword.jpg';
+                        itemElement.src = SwordImage;
                         itemElement.detail = 'Maybe one day I can get an actual sword...';
                     };
                     let cube = itemElement => {
@@ -148,7 +155,7 @@
                         itemElement.h = 1;
                         itemElement.name = 'The Cube';
                         itemElement.category = 'Artifact';
-                        itemElement.src = './out/res/cube.jpg';
+                        itemElement.src = CubeImage;
                         itemElement.detail = 'It looks like a cube?';
                     };
                     let shield = itemElement => {
@@ -156,7 +163,7 @@
                         itemElement.h = choose([2, 3]);
                         itemElement.name = 'Wooden Shield';
                         itemElement.category = 'Armor';
-                        itemElement.src = './out/res/shield.jpg';
+                        itemElement.src = ShieldImage;
                         itemElement.detail = 'Sharp stuff. Bad.';
                     };
                     let magicRope = itemElement => {
@@ -164,7 +171,7 @@
                         itemElement.h = 1;
                         itemElement.name = 'Never-Ending Rope';
                         itemElement.category = 'Wonder';
-                        itemElement.src = './out/res/rope.png';
+                        itemElement.src = RopeImage;
                         itemElement.detail = 'Seriously. It never ends!';
                     };
 
