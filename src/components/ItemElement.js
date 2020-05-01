@@ -1,7 +1,7 @@
 import { BaseElement, html, css } from './BaseElement.js';
 
 import { DEFAULT_ITEM } from '../assets.js';
-import * as Satchel from '../Satchel.js';
+import { pickUp } from '../Satchel.js';
 import { canTransferItemOut } from './ItemContainer.js';
 
 export class ItemElement extends BaseElement
@@ -25,14 +25,15 @@ export class ItemElement extends BaseElement
             --itemY: 0;
             --itemWidth: 1;
             --itemHeight: 1;
+            /* var(--item-unit-size) is inherited from parent container. */
         }
         .container {
             display: inline-block;
             position: absolute;
-            left: calc(var(--itemX) * ${Satchel.GRID_CELL_SIZE}px);
-            top: calc(var(--itemY) * ${Satchel.GRID_CELL_SIZE}px);
-            width: calc(var(--itemWidth) * ${Satchel.GRID_CELL_SIZE}px);
-            height: calc(var(--itemHeight) * ${Satchel.GRID_CELL_SIZE}px);
+            left: calc(var(--itemX) * var(--item-unit-size));
+            top: calc(var(--itemY) *  var(--item-unit-size));
+            width: calc(var(--itemWidth) *  var(--item-unit-size));
+            height: calc(var(--itemHeight) *  var(--item-unit-size));
         }
         img {
             width: 100%;
@@ -53,7 +54,6 @@ export class ItemElement extends BaseElement
             name: { type: String, value: 'Unknown' },
             category: { type: String, value: 'Item' },
             detail: { type: String, value: '' },
-            metadata: { type: Object, value: {} },
         };
     }
 
@@ -136,7 +136,7 @@ export class ItemElement extends BaseElement
         if (!canTransferItemOut(this.container)) return;
         if (e.button === 2) return;
 
-        let result = Satchel.pickUp(this, this.container);
+        let result = pickUp(this, this.container);
         if (result)
         {
             e.preventDefault();
@@ -145,3 +145,33 @@ export class ItemElement extends BaseElement
     }
 }
 BaseElement.define('item-element', ItemElement);
+
+export function saveItemElement(itemElement, itemData)
+{
+    itemData.x = itemElement.x;
+    itemData.y = itemElement.y;
+    itemData.w = itemElement.w;
+    itemData.h = itemElement.h;
+    itemData.src = itemElement.src;
+    itemData.name = itemElement.name;
+    itemData.category = itemElement.category;
+    itemData.detail = itemElement.detail;
+    itemData.metadata = itemElement.metadata;
+
+    return itemData;
+}
+
+export function loadItemElement(itemElement, itemData)
+{
+    if ('x' in itemData) itemElement.x = itemData.x;
+    if ('y' in itemData) itemElement.y = itemData.y;
+    if ('w' in itemData) itemElement.w = itemData.w;
+    if ('h' in itemData) itemElement.h = itemData.h;
+    if ('src' in itemData) itemElement.src = itemData.src;
+    if ('name' in itemData) itemElement.name = itemData.name;
+    if ('category' in itemData) itemElement.category = itemData.category;
+    if ('detail' in itemData) itemElement.detail = itemData.detail;
+    if ('metadata' in itemData) itemElement.metadata = itemData.metadata;
+
+    return itemElement;
+}

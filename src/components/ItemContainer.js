@@ -2,8 +2,10 @@ import { BaseElement, html, css } from './BaseElement.js';
 
 import { NumberPair } from './util/types.js';
 
-import { GRID_CELL_SIZE, placeDown } from '../Satchel.js';
-import { ItemList } from '../ItemList.js';
+import { placeDown } from '../Satchel.js';
+import { ItemList, loadItemList, saveItemList, clearItemList } from '../ItemList.js';
+
+const DEFAULT_ITEM_UNIT_SIZE = 64;
 
 export class ItemContainer extends BaseElement
 {
@@ -28,11 +30,12 @@ export class ItemContainer extends BaseElement
             --background-color: dodgerblue;
             --container-width: 1;
             --container-height: 1;
+            --item-unit-size: ${DEFAULT_ITEM_UNIT_SIZE}px;
             --transition-duration: 0.3s;
         }
         article {
             display: inline-block;
-            width: calc(var(--container-width) * ${GRID_CELL_SIZE}px);
+            width: calc(var(--container-width) * var(--item-unit-size));
             transition: width var(--transition-duration) ease;
             margin-right: 0.5rem;
             margin-bottom: 0.5rem;
@@ -51,7 +54,7 @@ export class ItemContainer extends BaseElement
         .container {
             position: relative;
             width: 100%;
-            height: calc(var(--container-height) * ${GRID_CELL_SIZE}px);
+            height: calc(var(--container-height) * var(--item-unit-size));
             background-color: var(--background-color);
             border: 1px solid black;
             border-radius: 1rem;
@@ -60,7 +63,7 @@ export class ItemContainer extends BaseElement
             transition: height var(--transition-duration) ease;
         }
         .grid {
-            background-size: ${GRID_CELL_SIZE}px ${GRID_CELL_SIZE}px;
+            background-size: var(--item-unit-size) var(--item-unit-size);
             background-position: -1px -1px;
             background-image:
                 linear-gradient(to right, black, transparent 1px),
@@ -75,6 +78,7 @@ export class ItemContainer extends BaseElement
             size: { type: NumberPair, value: '1 1' },
             type: { type: String, value: 'grid' },
             filter: Function,
+            unit: { type: Number, value: `${DEFAULT_ITEM_UNIT_SIZE}` },
             disabledTransfer: Boolean,
             disabledTransferIn: Boolean,
             disabledTransferOut: Boolean,
@@ -90,6 +94,9 @@ export class ItemContainer extends BaseElement
                 this.style.setProperty('--container-width', value[0]);
                 this.style.setProperty('--container-height', value[1]);
             },
+            unit: value => {
+                this.style.setProperty('--item-unit-size', value + 'px');
+            },
         };
     }
 
@@ -101,11 +108,13 @@ export class ItemContainer extends BaseElement
         this._container = this.shadowRoot.querySelector('.container');
         this._containerTitle = this.shadowRoot.querySelector('h2');
 
-        this.onItemChange = this.onItemChange.bind(this);
+        this.onItemListChange = this.onItemListChange.bind(this);
         this.onSlotChange = this.onSlotChange.bind(this);
         this.onMouseUp = this.onMouseUp.bind(this);
+        this.onSocketedContainerChange = this.onSocketedContainerChange.bind(this);
         
-        this.itemList = new ItemList(this, this.onItemChange);
+        this.itemList = new ItemList(this, this.onItemListChange);
+        this.socket = { item: null, container: null };
     }
 
     /** @override */
@@ -124,6 +133,7 @@ export class ItemContainer extends BaseElement
         super.disconnectedCallback();
         
         this._container.removeEventListener('mouseup', this.onMouseUp);
+        this._containerTitle.removeEventListener('click', this.onTitleClick);
         this._itemSlot.removeEventListener('slotchange', this.onSlotChange);
     }
 
@@ -131,7 +141,7 @@ export class ItemContainer extends BaseElement
     {
         this.itemList.update(e.target);
         
-        if (this.type === 'slot')
+        if (this.type === 'slot' || this.type === 'socket')
         {
             let itemElement = this.itemList.at(0, 0);
             if (itemElement)
@@ -154,9 +164,85 @@ export class ItemContainer extends BaseElement
         }
     }
 
-    onItemChange()
+    onItemListChange()
     {
         this.dispatchEvent(new CustomEvent('itemchange', { composed: true, bubbles: false }));
+
+        // Socket containers
+        if (this.type === 'socket')
+        {
+            let itemElement = this.itemList.at(0, 0);
+            let socketItem = this.socket.item;
+            if (socketItem !== itemElement)
+            {
+                let socketContainerRoot = document.querySelector('#socketContainerRoot');
+
+                // Remove the existing socketed item
+                if (socketItem)
+                {
+                    // Save the container to the item.
+                    let socketContainer = this.socket.container;
+
+                    socketContainer.removeEventListener('itemchange', this.onSocketedContainerChange);
+
+                    let socketContainerData = {};
+                    saveItemContainer(socketContainer, socketContainerData);
+                    clearItemContainer(socketContainer);
+                    if (!socketItem.metadata) socketItem.metadata = {};
+                    socketItem.metadata.containerData = socketContainerData;
+                    
+                    socketContainerRoot.removeChild(socketContainer);
+                    this.socket.container = null;
+                    this.socket.item = null;
+                }
+
+                // Add the new socketed item
+                if (itemElement && itemElement.category === 'Container')
+                {
+                    let socketContainer = new ItemContainer();
+                    socketContainer.type = 'grid';
+                    socketContainer.size = [ itemElement.w, itemElement.h ];
+
+                    // Load the container from the item.
+                    if (itemElement.metadata && itemElement.metadata.containerData)
+                    {
+                        let socketContainerData = itemElement.metadata.containerData;
+                        loadItemContainer(socketContainer, socketContainerData);
+                    }
+
+                    socketContainer.addEventListener('itemchange', this.onSocketedContainerChange);
+
+                    socketContainerRoot.appendChild(socketContainer);
+                    this.socket.container = socketContainer;
+                    this.socket.item = itemElement;
+                }
+
+                this.onSocketedItemChange(socketItem, itemElement);
+            }
+        }
+    }
+
+    onSocketedItemChange(prev, next)
+    {
+        if (next)
+        {
+            this.unit = DEFAULT_ITEM_UNIT_SIZE / (Math.min(next.w, next.h) || 1);
+        }
+        else
+        {
+            this.unit = DEFAULT_ITEM_UNIT_SIZE;
+        }
+    }
+
+    onSocketedContainerChange(e)
+    {
+        if (e.target !== this.socket.container) throw new Error('Mismatched socketed container.');
+
+        let itemContainerData = {};
+        saveItemContainer(e.target, itemContainerData);
+        let socketItem = this.socket.item;
+        if (!socketItem.metadata) socketItem.metadata = {};
+        socketItem.metadata.containerData = itemContainerData;
     }
 
     onMouseUp(e)
@@ -168,8 +254,9 @@ export class ItemContainer extends BaseElement
         let offsetX = e.clientX - boundingRect.x;
         let offsetY = e.clientY - boundingRect.y;
     
-        let coordX = Math.trunc(offsetX / GRID_CELL_SIZE);
-        let coordY = Math.trunc(offsetY / GRID_CELL_SIZE);
+        const UNIT_SIZE = this.unit;
+        let coordX = Math.trunc(offsetX / UNIT_SIZE);
+        let coordY = Math.trunc(offsetY / UNIT_SIZE);
 
         let result = placeDown(this, coordX, coordY, this.disabledTransferOut);
         if (result)
@@ -180,6 +267,11 @@ export class ItemContainer extends BaseElement
     }
 }
 BaseElement.define('item-container', ItemContainer);
+
+export function isSocketContainer(itemContainer)
+{
+    return itemContainer.type === 'socket';
+}
 
 export function isSlotContainer(itemContainer)
 {
@@ -199,4 +291,41 @@ export function canTransferItemIn(itemContainer)
 export function canTransferItemOut(itemContainer)
 {
     return itemContainer && !itemContainer.disabledTransfer && !itemContainer.disabledTransferOut;
+}
+
+export function saveItemContainer(itemContainer, itemContainerData)
+{
+    let itemListData = {};
+    saveItemList(itemContainer.itemList, itemListData);
+    itemContainerData.itemList = itemListData;
+
+    itemContainerData.type = itemContainer.type;
+    itemContainerData.size = itemContainer.size;
+
+    return itemContainerData;
+}
+
+export function loadItemContainer(itemContainer, itemContainerData)
+{
+    if ('itemList' in itemContainerData)
+    {
+        loadItemList(itemContainer.itemList, itemContainerData.itemList);
+    }
+
+    if ('type' in itemContainerData)
+    {
+        itemContainer.type = itemContainerData.type;
+    }
+
+    if ('size' in itemContainerData)
+    {
+        itemContainer.size = itemContainerData.size;
+    }
+
+    return itemContainer;
+}
+
+export function clearItemContainer(itemContainer)
+{
+    clearItemList(itemContainer.itemList);
 }

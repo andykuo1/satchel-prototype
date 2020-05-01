@@ -43,6 +43,11 @@
             background-color: rgba(0, 0, 0, 0);
             transition: background-color 0.3s ease;
         }
+
+        #socketRoot {
+            display: flex;
+            flex-direction: column;
+        }
         
         #dropZone {
             display: flex;
@@ -80,21 +85,11 @@
     </header>
     <div class="nav-main">
         <nav>
-            <item-container id="inv0" type="slot"></item-container>
-            <item-container id="inv1" type="slot"></item-container>
-            <script>
-                let inv0 = document.querySelector('item-container#inv0');
-                inv0.filter = function(itemElement)
-                {
-                    if (itemElement.category === 'Container')
-                    {
-                        return true;
-                    }
-                };
-            </script>
+            <div id="socketRoot"></div>
             <button id="newInv">Inventory</button>
             <button id="newItem">Item</button>
             <button id="newLoot">Loot</button>
+            <button id="newSocket">Socket</button>
             <button id="save">Save</button>
             <button id="load">Load</button>
             <script type="module">
@@ -135,10 +130,22 @@
                     return itemContainer;
                 }
 
+                function createSocketContainer()
+                {
+                    let itemContainer = document.createElement('item-container');
+                    itemContainer.type = 'socket';
+                    return itemContainer;
+                }
+
                 document.querySelector('#newInv').addEventListener('click', () => {
                     let inventoryRoot = document.querySelector('#inventoryRoot');
                     let itemContainer = createItemContainer();
                     inventoryRoot.appendChild(itemContainer);
+                });
+                document.querySelector('#newSocket').addEventListener('click', () => {
+                    let socketRoot = document.querySelector('#socketRoot');
+                    let socketContainer = createSocketContainer();
+                    socketRoot.appendChild(socketContainer);
                 });
                 document.querySelector('#newItem').addEventListener('click', () => {
                     let ground = document.querySelector('#ground');
@@ -195,6 +202,7 @@
         <main>
             <div>
                 <h2>Inventory</h2>
+                <section id="socketContainerRoot"></section>
                 <section id="inventoryRoot"></section>
                 <fieldset>
                     <legend>Display</legend>

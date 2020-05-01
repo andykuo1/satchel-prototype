@@ -1,34 +1,3 @@
-export function saveItemElement(itemElement, itemData)
-{
-    itemData.x = itemElement.x;
-    itemData.y = itemElement.y;
-    itemData.w = itemElement.w;
-    itemData.h = itemElement.h;
-    itemData.src = itemElement.src;
-    itemData.name = itemElement.name;
-    itemData.category = itemElement.category;
-    itemData.detail = itemElement.detail;
-    itemData.metadata = itemElement.metadata;
-
-    return itemData;
-}
-
-export function loadItemElement(itemElement, itemData)
-{
-    if ('x' in itemData) itemElement.x = itemData.x;
-    if ('y' in itemData) itemElement.y = itemData.y;
-    if ('w' in itemData) itemElement.w = itemData.w;
-    if ('h' in itemData) itemElement.h = itemData.h;
-    if ('src' in itemData) itemElement.src = itemData.src;
-    if ('name' in itemData) itemElement.name = itemData.name;
-    if ('category' in itemData) itemElement.category = itemData.category;
-    if ('detail' in itemData) itemElement.detail = itemData.detail;
-    if ('metadata' in itemData) itemElement.metadata = itemData.metadata;
-
-    return itemElement;
-}
-
-
 /*
 function createItemTransaction()
 {

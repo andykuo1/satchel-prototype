@@ -1,4 +1,4 @@
-import { ItemElement } from './components/ItemElement.js';
+import { ItemElement, loadItemElement, saveItemElement } from './components/ItemElement.js';
 
 export class ItemList
 {
@@ -96,6 +96,39 @@ export class ItemList
         return this._list[Symbol.iterator]();
     }
 };
+
+export function saveItemList(itemList, itemListData)
+{
+    let result = [];
+    for(let itemElement of itemList)
+    {
+        let itemData = {};
+        saveItemElement(itemElement, itemData);
+        result.push(itemData);
+    }
+    itemListData.items = result;
+
+    return itemListData;
+}
+
+export function loadItemList(itemList, itemListData)
+{
+    if ('items' in itemListData)
+    {
+        for(let itemData of itemListData.items)
+        {
+            let itemElement = loadItemElement(new ItemElement(), itemData);
+            itemList.add(itemElement);
+        }
+    }
+
+    return itemList;
+}
+
+export function clearItemList(itemList)
+{
+    itemList.clear();
+}
 
 function prepare(itemList, itemElement)
 {

@@ -1,9 +1,9 @@
-import { ItemContainer } from './components/ItemContainer.js';
-import { ItemElement } from './components/ItemElement.js';
+import { ItemContainer, saveItemContainer, loadItemContainer, clearItemContainer } from './components/ItemContainer.js';
+import { ItemElement, saveItemElement, loadItemElement } from './components/ItemElement.js';
+
 import { LootDialog } from './components/LootDialog.js';
 
 import { putIn } from './Satchel.js';
-import { saveItemElement, loadItemElement } from './Item.js';
 
 export function exportSatchelState(jsonData)
 {
@@ -48,6 +48,16 @@ export function exportSatchelState(jsonData)
         containers.displayItem = displayItemData;
     }
 
+    let socketRoot = document.querySelector('#socketRoot');
+    let socketsData = [];
+    for(let socketContainer of socketRoot.querySelectorAll('item-container'))
+    {
+        let itemContainerData = {};
+        saveItemContainer(socketContainer, itemContainerData);
+        socketsData.push(itemContainerData);
+    }
+    containers.sockets = socketsData;
+
     jsonData.containers = containers;
     return jsonData;
 }
@@ -64,6 +74,7 @@ export function importSatchelState(jsonData)
             holding: holdingData,
             inventory: inventoryData,
             displayItem: displayItemData,
+            sockets: socketsData,
         } = jsonData.containers;
         
         if (groundData)
@@ -111,6 +122,19 @@ export function importSatchelState(jsonData)
             loadItemElement(itemElement, displayItemData);
             display.setItem(itemElement);
         }
+
+        if (socketsData)
+        {
+            let socketRoot = document.querySelector('#socketRoot');
+            socketRoot.innerHTML = '';
+            
+            for(let itemContainerData of socketsData)
+            {
+                let itemContainer = new ItemContainer();
+                loadItemContainer(itemContainer, itemContainerData);
+                socketRoot.appendChild(itemContainer);
+            }
+        }
     }
 
     return true;
@@ -140,6 +164,13 @@ export function clearSatchelState()
 
     let display = document.querySelector('#display');
     display.setItem(null);
+
+    let socketRoot = document.querySelector('#socketRoot');
+    for(let itemContainer of socketRoot.querySelectorAll('item-container'))
+    {
+        clearItemContainer(itemContainer);
+    }
+    socketRoot.innerHTML = '';
 }
 
 export async function importLootDialog(jsonData)
@@ -178,74 +209,4 @@ export async function importLootDialog(jsonData)
         });
         dialogRoot.appendChild(lootDialog);
     });
-}
-
-function saveItemContainer(itemContainer, itemContainerData)
-{
-    let itemListData = {};
-    saveItemList(itemContainer.itemList, itemListData);
-    itemContainerData.itemList = itemListData;
-
-    itemContainerData.type = itemContainer.type;
-    itemContainerData.size = itemContainer.size;
-
-    return itemContainerData;
-}
-
-function loadItemContainer(itemContainer, itemContainerData)
-{
-    if ('itemList' in itemContainerData)
-    {
-        loadItemList(itemContainer.itemList, itemContainerData.itemList);
-    }
-
-    if ('type' in itemContainerData)
-    {
-        itemContainer.type = itemContainerData.type;
-    }
-
-    if ('size' in itemContainerData)
-    {
-        itemContainer.size = itemContainerData.size;
-    }
-
-    return itemContainer;
-}
-
-function clearItemContainer(itemContainer)
-{
-    clearItemList(itemContainer.itemList);
-}
-
-function saveItemList(itemList, itemListData)
-{
-    let result = [];
-    for(let itemElement of itemList)
-    {
-        let itemData = {};
-        saveItemElement(itemElement, itemData);
-        result.push(itemData);
-    }
-    itemListData.items = result;
-
-    return itemListData;
-}
-
-function loadItemList(itemList, itemListData)
-{
-    if ('items' in itemListData)
-    {
-        for(let itemData of itemListData.items)
-        {
-            let itemElement = loadItemElement(new ItemElement(), itemData);
-            itemList.add(itemElement);
-        }
-    }
-
-    return itemList;
-}
-
-function clearItemList(itemList)
-{
-    itemList.clear();
 }
