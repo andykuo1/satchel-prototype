@@ -53,7 +53,6 @@ export class ItemElement extends BaseElement
             name: { type: String, value: 'Unknown' },
             category: { type: String, value: 'Item' },
             detail: { type: String, value: '' },
-            metadata: { type: Object, value: {} },
         };
     }
 

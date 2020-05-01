@@ -72,6 +72,7 @@
     <script type="module" src="./src/components/ItemCard.js"></script>
     <script type="module" src="./src/components/ItemDisplay.js"></script>
     <script type="module" src="./src/components/ItemContextMenu.js"></script>
+    <script type="module" src="./src/components/SocketContainer.js"></script>
     <script type="module" src="./src/components/LootDialog.js"></script>
 </head>
 <body>
@@ -80,23 +81,20 @@
     </header>
     <div class="nav-main">
         <nav>
-            <item-container id="inv0" type="slot"></item-container>
-            <item-container id="inv1" type="slot"></item-container>
-            <script>
-                let inv0 = document.querySelector('item-container#inv0');
-                inv0.filter = function(itemElement)
-                {
-                    if (itemElement.category === 'Container')
-                    {
-                        return true;
-                    }
-                };
-            </script>
+            <div id="socketRoot">
+            </div>
             <button id="newInv">Inventory</button>
             <button id="newItem">Item</button>
             <button id="newLoot">Loot</button>
             <button id="save">Save</button>
             <button id="load">Load</button>
+
+            <script type="module">
+                import { createSocketContainer } from './src/SocketContainer.js';
+                let socketRoot = document.querySelector('#socketRoot');
+                socketRoot.appendChild(createSocketContainer());
+            </script>
+
             <script type="module">
                 import * as SatchelState from './src/SatchelState.js';
                 import * as Satchel from './src/Satchel.js';
@@ -195,6 +193,7 @@
         <main>
             <div>
                 <h2>Inventory</h2>
+                <section id="containerRoot"></section>
                 <section id="inventoryRoot"></section>
                 <fieldset>
                     <legend>Display</legend>

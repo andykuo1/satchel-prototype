@@ -124,6 +124,7 @@ export class ItemContainer extends BaseElement
         super.disconnectedCallback();
         
         this._container.removeEventListener('mouseup', this.onMouseUp);
+        this._containerTitle.removeEventListener('click', this.onTitleClick);
         this._itemSlot.removeEventListener('slotchange', this.onSlotChange);
     }
 
@@ -154,9 +155,9 @@ export class ItemContainer extends BaseElement
         }
     }
 
-    onItemChange()
+    onItemChange(target)
     {
-        this.dispatchEvent(new CustomEvent('itemchange', { composed: true, bubbles: false }));
+        this.dispatchEvent(new CustomEvent('itemchange', { composed: true, bubbles: false, detail: { target } }));
     }
 
     onMouseUp(e)

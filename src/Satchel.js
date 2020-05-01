@@ -239,6 +239,8 @@ export function placeDown(itemContainer, coordX, coordY, trySwap = true)
         let targetCoordX = Math.min(Math.max(0, coordX), maxCoordX);
         let targetCoordY = Math.min(Math.max(0, coordY), maxCoordY);
 
+        if (maxCoordX < 0 || maxCoordY < 0) return false;
+
         if (trySwap && canSwapAt(itemContainer, coordX, coordY, targetCoordX, targetCoordY, itemWidth, itemHeight))
         {
             stopHolding(holding, itemElement);
@@ -322,6 +324,8 @@ export function putIn(itemContainer, itemElement)
     let { w: itemWidth, h: itemHeight } = itemElement;
     let maxCoordX = containerWidth - itemWidth;
     let maxCoordY = containerHeight - itemHeight;
+
+    if (maxCoordX < 0 || maxCoordY < 0) return false;
 
     let [ x, y ] = findEmptyCoords(
         0, 0,
