@@ -131,11 +131,9 @@ export function clearSatchelState()
 
 export async function importLootDialog(jsonData)
 {
-    let { items } = jsonData;
+    let { items, title, description } = jsonData;
 
     let lootItems = [];
-    // let lootTitle = '';
-    
     for(let itemData of items)
     {
         lootItems.push(loadItemElement(new ItemElement(), itemData));
@@ -145,6 +143,8 @@ export async function importLootDialog(jsonData)
     {
         let dialogRoot = document.querySelector('#dialogRoot');
         let lootDialog = new LootDialog(lootItems);
+        lootDialog.title = title;
+        lootDialog.description = description;
         lootDialog.addEventListener('accept', e => {
             for(let itemElement of e.detail.items)
             {

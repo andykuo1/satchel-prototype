@@ -10,9 +10,9 @@ export class LootDialog extends BaseElement
         return html`
         <dialog>
             <div class="details">
-                <h2><slot name="title">Loot!</slot></h2>
+                <h2 id="title">Loot!</h2>
                 <blockquote>
-                    <p>Looted from a bunch of goblins near Stillwater.</p>
+                    <p id="description">Found it somewhere.</p>
                     <footer>
                         <slot name="footer"></slot>
                         <cite><slot name="footer-cite"></slot></cite>
@@ -126,6 +126,15 @@ export class LootDialog extends BaseElement
         `;
     }
 
+    /** @override */
+    static get properties()
+    {
+        return {
+            title: String,
+            description: String,
+        };
+    }
+
     constructor(items = [])
     {
         super();
@@ -134,6 +143,9 @@ export class LootDialog extends BaseElement
         this._accept = this.shadowRoot.querySelector('#accept');
         this._cancel = this.shadowRoot.querySelector('#cancel');
         this._items = this.shadowRoot.querySelector('.items');
+
+        this._titleElement = this.shadowRoot.querySelector('#title');
+        this._descriptionElement = this.shadowRoot.querySelector('#description');
 
         this.initialScrollDelay = 1.5;
         this.initialItemDelay = 1;
@@ -169,6 +181,9 @@ export class LootDialog extends BaseElement
         this._dialog.addEventListener('wheel', this.onWheel);
         this._accept.addEventListener('click', this.onAcceptClick);
         this._cancel.addEventListener('click', this.onCancelClick);
+
+        if (this.title) this._titleElement.textContent = this.title;
+        if (this.description) this._descriptionElement.textContent = this.description;
 
         let delayTime = this.initialItemDelay;
         for(let section of this.shadowRoot.querySelectorAll('.items > *'))
