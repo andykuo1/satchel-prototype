@@ -59,6 +59,7 @@ export class ItemElement extends BaseElement
             opacity: var(--itemTitleOpacity);
             text-align: center;
             transition: opacity 0.1s ease, bottom 0.1s ease;
+            color: white;
             background-color: rgba(0, 0, 0, 0.7);
         }
         .container:hover figcaption:not(.active), figcaption.active {

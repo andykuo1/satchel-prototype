@@ -40,11 +40,11 @@ export class LootDialog extends BaseElement
             top: 10%;
             max-height: 80%;
             pointer-events: auto;
-            overflow-x: hidden;
-            overflow-y: auto;
             border-radius: 0.5rem;
             background-color: white;
             color: black;
+            overflow-x: hidden;
+            overflow-y: auto;
         }
         dialog::backdrop {
             background-color: rgba(0, 0, 0, 0.8);

@@ -51,6 +51,7 @@ export class ItemContainer extends BaseElement
             text-overflow: ellipsis;
             border-radius: 0.2rem;
             text-align: center;
+            color: white;
             background-color: rgba(0, 0, 0, 0.7);
             z-index: 1;
             transform: translateY(-100%);
