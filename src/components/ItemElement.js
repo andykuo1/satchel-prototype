@@ -10,9 +10,10 @@ export class ItemElement extends BaseElement
     static get template()
     {
         return html`
-        <div class="container">
+        <figure class="container">
             <img>
-        </div>
+            <figcaption></figcaption>
+        </figure>
         `;
     }
 
@@ -25,6 +26,7 @@ export class ItemElement extends BaseElement
             --itemY: 0;
             --itemWidth: 1;
             --itemHeight: 1;
+            --itemTitleOpacity: 0;
             /* var(--item-unit-size) is inherited from parent container. */
         }
         .container {
@@ -34,10 +36,29 @@ export class ItemElement extends BaseElement
             top: calc(var(--itemY) *  var(--item-unit-size));
             width: calc(var(--itemWidth) *  var(--item-unit-size));
             height: calc(var(--itemHeight) *  var(--item-unit-size));
+            padding: 0;
+            margin: 0;
+            user-select: none;
+        }
+        .container:hover {
+            background-color: rgba(0, 0, 0, 0.2);
         }
         img {
             width: 100%;
             height: 100%;
+        }
+        figcaption {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 10px;
+            opacity: var(--itemTitleOpacity);
+            text-align: center;
+            transition: opacity 0.1s ease, bottom 0.1s ease;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+        .container:hover figcaption:not(.active), figcaption.active {
+            opacity: 1;
         }
         `;
     }
@@ -63,7 +84,7 @@ export class ItemElement extends BaseElement
         return {
             name: value => {
                 this._image.alt = value;
-                this._image.title = value;
+                this._caption.textContent = value;
             },
         };
     }
@@ -73,6 +94,7 @@ export class ItemElement extends BaseElement
         super();
 
         this._image = this.shadowRoot.querySelector('img');
+        this._caption = this.shadowRoot.querySelector('figcaption');
 
         this.container = null;
 

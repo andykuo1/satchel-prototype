@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     holding.container = document.querySelector('#holding');
     holding.container.style.position = 'absolute';
     holding.container.style.display = 'none';
+    holding.container.addEventListener('itemchange', onHoldingContainerChange);
     
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
@@ -34,10 +35,9 @@ function onMouseMove(e)
 {
     holding.x = e.clientX;
     holding.y = e.clientY;
-    const UNIT_SIZE = holding.container.unit;
-    const HALF_UNIT_SIZE = UNIT_SIZE / 2;
-    holding.container.style.setProperty('left', holding.x - HALF_UNIT_SIZE + 'px');
-    holding.container.style.setProperty('top', holding.y - HALF_UNIT_SIZE + 'px');
+    const holdingOffset = 10;
+    holding.container.style.setProperty('left', holding.x - holdingOffset + 'px');
+    holding.container.style.setProperty('top', holding.y - holdingOffset + 'px');
 
     if (distanceSquared(holding.x, holding.y, holding.pick.x, holding.pick.y) >= PLACE_BUFFER_RANGE_SQUARED)
     {
@@ -59,6 +59,22 @@ function onMouseUp(e)
         if (!result)
         {
             // Leave it in the holding container.
+        }
+    }
+}
+
+function onHoldingContainerChange(e)
+{
+    if (holding.container)
+    {
+        let itemElement = holding.container.itemList.at(0, 0);
+        if (itemElement)
+        {
+            holding.container._containerTitle.textContent = itemElement.name;
+        }
+        else
+        {
+            holding.container._containerTitle.textContent = '';
         }
     }
 }

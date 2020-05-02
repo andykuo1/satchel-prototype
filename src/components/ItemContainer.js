@@ -14,7 +14,7 @@ export class ItemContainer extends BaseElement
     {
         return html`
         <article>
-            <h2><slot name="title"></slot></h2>
+            <h2><span class="innerTitle"><slot name="title"></slot></span></h2>
             <section class="container grid">
                 <slot></slot>
             </section>
@@ -41,12 +41,19 @@ export class ItemContainer extends BaseElement
             margin-bottom: 0.5rem;
         }
         h2 {
-            font-size: 0.8rem;
-            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            font-size: 0.9rem;
             margin: 0;
             overflow: hidden;
             text-overflow: ellipsis;
             border-radius: 0.2rem;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1;
+            transform: translateY(-100%);
         }
         h2:empty {
             display: none;
@@ -147,19 +154,10 @@ export class ItemContainer extends BaseElement
             if (itemElement)
             {
                 this.size = [ itemElement.w, itemElement.h ];
-
-                // TODO: This is nice, but not robust enough.
-                if (itemElement.name)
-                {
-                    this._containerTitle.textContent = itemElement.name;
-                }
             }
             else
             {
                 this.size = [ 1, 1 ];
-                
-                // TODO: This is nice, but not robust enough.
-                this._containerTitle.textContent = '';
             }
         }
     }
