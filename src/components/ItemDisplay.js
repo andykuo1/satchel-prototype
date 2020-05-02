@@ -95,7 +95,9 @@ export class ItemDisplay extends BaseElement
         this._container.addEventListener('itemchange', this.onItemUpdate);
 
         this._connected = true;
-        this.setItem(this._item);
+        
+        // Debounce this call until after this call.
+        setTimeout(() => this.setItem(this._item));
     }
 
     /** @override */

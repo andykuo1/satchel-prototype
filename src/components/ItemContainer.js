@@ -210,7 +210,24 @@ export class ItemContainer extends BaseElement
 
                     socketContainer.addEventListener('itemchange', this.onSocketedContainerChange);
 
-                    socketContainerRoot.appendChild(socketContainer);
+                    // Find the correct socket order.
+                    let beforeSocketContainer = null;
+                    let flag = false;
+                    for(let child of this.parentNode.querySelectorAll('item-container[type="socket"]').values())
+                    {
+                        if (flag && child.socket.container)
+                        {
+                            beforeSocketContainer = child.socket.container;
+                            break;
+                        }
+                        else if (child === this)
+                        {
+                            flag = true;
+                        }
+                    }
+                    socketContainerRoot.insertBefore(socketContainer, beforeSocketContainer);
+
+                    // Set self as socketed.
                     this.socket.container = socketContainer;
                     this.socket.item = itemElement;
                 }
