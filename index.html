@@ -18,7 +18,6 @@
         main > * {
             flex: 1;
             text-align: center;
-            border: 1px solid black;
         }
 
         .nav-main {
@@ -71,6 +70,18 @@
 
         #holding {
             --transition-duration: 0;
+        }
+        #ground {
+            min-height: 2rem;
+            max-height: 30rem;
+            overflow-y: auto;
+            padding: 1rem;
+            border: 1rem dashed rgba(0, 0, 0, 0.2);
+        }
+
+        .secondary {
+            padding: 1rem;
+            outline: 1px solid rgba(0, 0, 0, 0.1);
         }
     </style>
     
@@ -257,15 +268,15 @@
             </script>
         </nav>
         <main>
-            <div>
+            <div class="primary">
                 <h2>Inventory</h2>
                 <section id="socketContainerRoot"></section>
-                <fieldset>
-                    <legend>Display</legend>
-                    <item-display id="display" editable></item-display>
-                </fieldset>
             </div>
-            <div>
+            <div class="secondary">
+                <h2>Display</h2>
+                <section id="displayRoot">
+                    <item-display id="display" editable></item-display>
+                </section>
                 <h2>Ground</h2>
                 <section id="ground"></section>
             </div>

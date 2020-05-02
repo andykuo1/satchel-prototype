@@ -148,9 +148,7 @@ function onDrop(e)
         // Skip this file.
         otherBlobs.push(fileBlob);
         return prev;
-    },
-    Promise.resolve())
-    .then(() => {
+    }, Promise.resolve()).then(() => {
         if (otherBlobs.length > 0)
         {
             window.alert('Sorry, but these do not look like loot.\n\n'

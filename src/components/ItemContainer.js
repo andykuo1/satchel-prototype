@@ -77,6 +77,9 @@ export class ItemContainer extends BaseElement
                 linear-gradient(to right, black, transparent 1px),
                 linear-gradient(to bottom, black, transparent 1px);
         }
+        .hidden {
+            display: none;
+        }
         `;
     }
 
@@ -87,6 +90,7 @@ export class ItemContainer extends BaseElement
             type: { type: String, value: 'grid' },
             filter: Function,
             unit: { type: Number, value: `${DEFAULT_ITEM_UNIT_SIZE}` },
+            hidden: Boolean,
             disabledTransfer: Boolean,
             disabledTransferIn: Boolean,
             disabledTransferOut: Boolean,
@@ -105,6 +109,9 @@ export class ItemContainer extends BaseElement
             unit: value => {
                 this.style.setProperty('--item-unit-size', value + 'px');
             },
+            hidden: value => {
+                this._root.classList.toggle('hidden', value);
+            }
         };
     }
 
@@ -112,6 +119,7 @@ export class ItemContainer extends BaseElement
     {
         super();
 
+        this._root = this.shadowRoot.querySelector('article');
         this._itemSlot = this.shadowRoot.querySelector('.container slot');
         this._container = this.shadowRoot.querySelector('.container');
         this._containerTitle = this.shadowRoot.querySelector('h2');
@@ -317,6 +325,7 @@ export function saveItemContainer(itemContainer, itemContainerData)
 
     itemContainerData.type = itemContainer.type;
     itemContainerData.size = itemContainer.size;
+    itemContainerData.hidden = itemContainer.hidden;
 
     return itemContainerData;
 }
@@ -328,15 +337,9 @@ export function loadItemContainer(itemContainer, itemContainerData)
         loadItemList(itemContainer.itemList, itemContainerData.itemList);
     }
 
-    if ('type' in itemContainerData)
-    {
-        itemContainer.type = itemContainerData.type;
-    }
-
-    if ('size' in itemContainerData)
-    {
-        itemContainer.size = itemContainerData.size;
-    }
+    if ('type' in itemContainerData) itemContainer.type = itemContainerData.type;
+    if ('size' in itemContainerData) itemContainer.size = itemContainerData.size;
+    if ('hidden' in itemContainerData) itemContainer.hidden = itemContainerData.hidden;
 
     return itemContainer;
 }
