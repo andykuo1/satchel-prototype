@@ -76,13 +76,13 @@ function onHoldingContainerChange(e)
     }
 }
 
-function onLootContainerChange(e)
+function onGroundContainerChange(e)
 {
     let target = e.target;
     let itemElement = target.itemList.at(0, 0);
     if (!itemElement)
     {
-        target.removeEventListener('itemchange', onLootContainerChange);
+        target.removeEventListener('itemchange', onGroundContainerChange);
         target.parentNode.removeChild(target);
     }
 }
@@ -200,22 +200,22 @@ export function putOnGroundFromHolding()
 
 export function putOnGround(itemElement)
 {
-    let lootRoot = document.querySelector('#lootRoot');
-    let lootContainer = new ItemContainer();
-    lootContainer.type = 'slot';
-    putIn(lootContainer, itemElement);
-    lootContainer.addEventListener('itemchange', onLootContainerChange);
-    lootRoot.appendChild(lootContainer);
+    let ground = document.querySelector('#ground');
+    let groundContainer = new ItemContainer();
+    groundContainer.type = 'slot';
+    putIn(groundContainer, itemElement);
+    groundContainer.addEventListener('itemchange', onGroundContainerChange);
+    ground.appendChild(groundContainer);
 }
 
 export function clearGround()
 {
-    let lootRoot = document.querySelector('#lootRoot');
-    for(let lootContainer of lootRoot.querySelectorAll('item-container'))
+    let ground = document.querySelector('#ground');
+    for(let groundContainer of ground.querySelectorAll('item-container'))
     {
-        clearItemContainer(lootContainer);
+        clearItemContainer(groundContainer);
     }
-    lootRoot.innerHTML = '';
+    ground.innerHTML = '';
 }
 
 export function pickUp(itemElement, itemContainer)

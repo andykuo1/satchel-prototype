@@ -9,15 +9,15 @@ export function exportSatchelState(jsonData)
 {
     let containers = {};
     
-    let lootRoot = document.querySelector('#lootRoot');
-    let lootData = [];
-    for(let itemContainer of lootRoot.querySelectorAll('item-container'))
+    let ground = document.querySelector('#ground');
+    let groundData = [];
+    for(let itemContainer of ground.querySelectorAll('item-container'))
     {
         let itemContainerData = {};
         saveItemContainer(itemContainer, itemContainerData);
-        lootData.push(itemContainerData);
+        groundData.push(itemContainerData);
     }
-    containers.loot = lootData;
+    containers.ground = groundData;
 
     let holdingContainer = document.querySelector('#holding');
     let holdingData = {};
@@ -54,22 +54,22 @@ export function importSatchelState(jsonData)
     if ('containers' in jsonData)
     {
         let {
-            loot: lootData,
+            ground: groundData,
             holding: holdingData,
             displayItem: displayItemData,
             sockets: socketsData,
         } = jsonData.containers;
         
-        if (lootData)
+        if (groundData)
         {
-            let lootRoot = document.querySelector('#lootRoot');
-            lootRoot.innerHTML = '';
+            let ground = document.querySelector('#ground');
+            ground.innerHTML = '';
             
-            for(let itemContainerData of lootData)
+            for(let itemContainerData of groundData)
             {
                 let itemContainer = new ItemContainer();
                 loadItemContainer(itemContainer, itemContainerData);
-                lootRoot.appendChild(itemContainer);
+                ground.appendChild(itemContainer);
             }
         }
 
@@ -106,12 +106,12 @@ export function importSatchelState(jsonData)
 
 export function clearSatchelState()
 {
-    let lootRoot = document.querySelector('#lootRoot');
-    for(let itemContainer of lootRoot.querySelectorAll('item-container'))
+    let ground = document.querySelector('#ground');
+    for(let itemContainer of ground.querySelectorAll('item-container'))
     {
         clearItemContainer(itemContainer);
     }
-    lootRoot.innerHTML = ''
+    ground.innerHTML = ''
 
     let holdingContainer = document.querySelector('#holding');
     clearItemContainer(holdingContainer);
