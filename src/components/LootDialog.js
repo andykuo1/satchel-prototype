@@ -45,6 +45,10 @@ export class LootDialog extends BaseElement
             color: black;
             overflow-x: hidden;
             overflow-y: auto;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.15) 0%, rgba(0,0,0,0.15) 100%),
+                radial-gradient(at top center, rgba(255,255,255,0.40) 0%, rgba(0,0,0,0.40) 120%) #989898; 
+            background-blend-mode: multiply,multiply;
+            font-family: Georgia, 'Times New Roman', Times, serif;
         }
         dialog::backdrop {
             background-color: rgba(0, 0, 0, 0.8);
@@ -54,7 +58,7 @@ export class LootDialog extends BaseElement
         }
         blockquote p {
             padding: 1rem;
-            background-color: #EEEEEE;
+            background-color: rgba(255, 255, 255, 0.3);
             border-radius: 0.2rem;
             text-align: center;
         }
@@ -68,6 +72,8 @@ export class LootDialog extends BaseElement
             margin: 1rem;
         }
         button {
+            font-family: monospace;
+            border-radius: 0.5rem;
             margin-bottom: 0.5rem;
             width: 100%;
         }
