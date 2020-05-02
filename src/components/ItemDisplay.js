@@ -82,6 +82,7 @@ export class ItemDisplay extends BaseElement
 
         this.onMouseDown = this.onMouseDown.bind(this);
         this.onMouseUp = this.onMouseUp.bind(this);
+        this.onItemUpdate = this.onItemUpdate.bind(this);
     }
 
     /** @override */
@@ -91,6 +92,7 @@ export class ItemDisplay extends BaseElement
 
         this._root.addEventListener('mousedown', this.onMouseDown);
         this._root.addEventListener('mouseup', this.onMouseUp);
+        this._container.addEventListener('itemchange', this.onItemUpdate);
 
         this._connected = true;
         this.setItem(this._item);
@@ -103,13 +105,15 @@ export class ItemDisplay extends BaseElement
 
         this._root.removeEventListener('mousedown', this.onMouseDown);
         this._root.removeEventListener('mouseup', this.onMouseUp);
+        this._container.removeEventListener('itemchange', this.onItemUpdate);
 
         this.setItem(null);
         this._connected = false;
     }
 
-    onItemUpdate()
+    onItemUpdate(e)
     {
+        this._item = this._container.itemList.at(0, 0);
         let { name, category, detail } = this._item || {};
         this._name.textContent = name || '';
         this._category.textContent = category || '';
