@@ -3,16 +3,11 @@ import { ItemElement, saveItemElement, loadItemElement } from './components/Item
 
 import { LootDialog } from './components/LootDialog.js';
 
-import { putIn } from './Satchel.js';
+import { putOnGround } from './Satchel.js';
 
 export function exportSatchelState(jsonData)
 {
     let containers = {};
-    
-    let groundContainer = document.querySelector('#ground');
-    let groundData = {};
-    saveItemContainer(groundContainer, groundData);
-    containers.ground = groundData;
     
     let lootRoot = document.querySelector('#lootRoot');
     let lootData = [];
@@ -28,16 +23,6 @@ export function exportSatchelState(jsonData)
     let holdingData = {};
     saveItemContainer(holdingContainer, holdingData);
     containers.holding = holdingData;
-
-    let inventoryRoot = document.querySelector('#inventoryRoot');
-    let inventoryData = [];
-    for(let itemContainer of inventoryRoot.querySelectorAll('item-container'))
-    {
-        let itemContainerData = {};
-        saveItemContainer(itemContainer, itemContainerData);
-        inventoryData.push(itemContainerData);
-    }
-    containers.inventory = inventoryData;
 
     let display = document.querySelector('#display');
     let displayItemData = {};
@@ -69,20 +54,12 @@ export function importSatchelState(jsonData)
     if ('containers' in jsonData)
     {
         let {
-            ground: groundData,
             loot: lootData,
             holding: holdingData,
-            inventory: inventoryData,
             displayItem: displayItemData,
             sockets: socketsData,
         } = jsonData.containers;
         
-        if (groundData)
-        {
-            let groundContainer = document.querySelector('#ground');
-            loadItemContainer(groundContainer, groundData);
-        }
-
         if (lootData)
         {
             let lootRoot = document.querySelector('#lootRoot');
@@ -100,19 +77,6 @@ export function importSatchelState(jsonData)
         {
             let holdingContainer = document.querySelector('#holding');
             loadItemContainer(holdingContainer, holdingData);
-        }
-
-        if (inventoryData)
-        {
-            let inventoryRoot = document.querySelector('#inventoryRoot');
-            inventoryRoot.innerHTML = '';
-            
-            for(let itemContainerData of inventoryData)
-            {
-                let itemContainer = new ItemContainer();
-                loadItemContainer(itemContainer, itemContainerData);
-                inventoryRoot.appendChild(itemContainer);
-            }
         }
 
         if (displayItemData)
@@ -142,9 +106,6 @@ export function importSatchelState(jsonData)
 
 export function clearSatchelState()
 {
-    let groundContainer = document.querySelector('#ground');
-    clearItemContainer(groundContainer);
-
     let lootRoot = document.querySelector('#lootRoot');
     for(let itemContainer of lootRoot.querySelectorAll('item-container'))
     {
@@ -154,13 +115,6 @@ export function clearSatchelState()
 
     let holdingContainer = document.querySelector('#holding');
     clearItemContainer(holdingContainer);
-
-    let inventoryRoot = document.querySelector('#inventoryRoot');
-    for(let itemContainer of inventoryRoot.querySelectorAll('item-container'))
-    {
-        clearItemContainer(itemContainer);
-    }
-    inventoryRoot.innerHTML = '';
 
     let display = document.querySelector('#display');
     display.setItem(null);
@@ -190,13 +144,9 @@ export async function importLootDialog(jsonData)
         let dialogRoot = document.querySelector('#dialogRoot');
         let lootDialog = new LootDialog(lootItems);
         lootDialog.addEventListener('accept', e => {
-            let lootRoot = document.querySelector('#lootRoot');
             for(let itemElement of e.detail.items)
             {
-                let itemContainer = document.createElement('item-container');
-                itemContainer.type = 'slot';
-                putIn(itemContainer, itemElement);
-                lootRoot.appendChild(itemContainer);
+                putOnGround(itemElement);
             }
             dialogRoot.removeChild(lootDialog);
 

@@ -1,12 +1,10 @@
 import { dijkstra2d, distanceSquared } from './util.js';
 import { importLootDialog } from './SatchelState.js';
+import { clearItemContainer, ItemContainer } from './components/ItemContainer.js';
 
 const PLACE_BUFFER_RANGE_SQUARED = 8 * 8;
 const PLACE_BUFFER_TIMEOUT = 300;
 
-let ground = {
-    container: null,
-};
 let holding = {
     container: null,
     x: 0,
@@ -17,7 +15,6 @@ let holding = {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-    ground.container = document.querySelector('#ground');
     holding.container = document.querySelector('#holding');
     holding.container.style.position = 'absolute';
     holding.container.style.display = 'none';
@@ -55,7 +52,7 @@ function onMouseUp(e)
 
     if (holding.container && holding.container.itemList.length > 0 && holding.placeDownBuffer)
     {
-        let result = placeDown(ground.container, 0, 0, false);
+        let result = putOnGroundFromHolding();
         if (!result)
         {
             // Leave it in the holding container.
@@ -76,6 +73,17 @@ function onHoldingContainerChange(e)
         {
             holding.container._containerTitle.textContent = '';
         }
+    }
+}
+
+function onLootContainerChange(e)
+{
+    let target = e.target;
+    let itemElement = target.itemList.at(0, 0);
+    if (!itemElement)
+    {
+        target.removeEventListener('itemchange', onLootContainerChange);
+        target.parentNode.removeChild(target);
     }
 }
 
@@ -124,7 +132,7 @@ function onDrop(e)
     }
 
     let otherBlobs = [];
-    let promise = fileBlobs.reduce((prev, fileBlob) => {
+    fileBlobs.reduce((prev, fileBlob) => {
         if (fileBlob.type === 'application/json')
         {
             return prev
@@ -183,9 +191,31 @@ export function getHoldingItem()
     return holding.container.itemList.at(0, 0);
 }
 
+export function putOnGroundFromHolding()
+{
+    let itemElement = holding.container.itemList.at(0, 0);
+    stopHolding(holding, itemElement);
+    putOnGround(itemElement);
+}
+
+export function putOnGround(itemElement)
+{
+    let lootRoot = document.querySelector('#lootRoot');
+    let lootContainer = new ItemContainer();
+    lootContainer.type = 'slot';
+    putIn(lootContainer, itemElement);
+    lootContainer.addEventListener('itemchange', onLootContainerChange);
+    lootRoot.appendChild(lootContainer);
+}
+
 export function clearGround()
 {
-    ground.container.itemList.clear();
+    let lootRoot = document.querySelector('#lootRoot');
+    for(let lootContainer of lootRoot.querySelectorAll('item-container'))
+    {
+        clearItemContainer(lootContainer);
+    }
+    lootRoot.innerHTML = '';
 }
 
 export function pickUp(itemElement, itemContainer)
@@ -263,7 +293,6 @@ export function placeDown(itemContainer, coordX, coordY, trySwap = true, fromHol
 
         return true;
     }
-
 
     return false;
 }

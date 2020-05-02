@@ -89,7 +89,6 @@
             <button id="save">Save</button>
             <button id="load">Load</button>
             <hr>
-            <button id="newInv">Inventory</button>
             <button id="newItem">Item</button>
             <button id="newLoot">Loot</button>
             <button id="newSocket">Socket</button>
@@ -101,7 +100,7 @@
                 import * as Satchel from './src/Satchel.js';
 
                 import { LootDialog } from './src/components/LootDialog.js';
-                import { ItemElement } from './src/components/ItemElement.js';
+                import { ItemElement, saveItemElement } from './src/components/ItemElement.js';
 
                 import BackpackImage from './res/backpack.js';
                 import CubeImage from './res/cube.js';
@@ -205,20 +204,17 @@
                     return itemContainer;
                 }
 
-                document.querySelector('#newInv').addEventListener('click', () => {
-                    let inventoryRoot = document.querySelector('#inventoryRoot');
-                    let itemContainer = createItemContainer();
-                    inventoryRoot.appendChild(itemContainer);
-                });
-                document.querySelector('#newSocket').addEventListener('click', () => {
+                document.querySelector('#newSocket').addEventListener('click', e => {
                     let socketRoot = document.querySelector('#socketRoot');
                     let socketContainer = createSocketContainer();
                     socketRoot.appendChild(socketContainer);
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
                 });
                 document.querySelector('#newItem').addEventListener('click', () => {
-                    let ground = document.querySelector('#ground');
                     let itemElement = createItemElement();
-                    Satchel.putIn(ground, itemElement);
+                    Satchel.putOnGround(itemElement);
                 });
                 document.querySelector('#newLoot').addEventListener('click', () => {
                     let lootItems = [];
@@ -226,26 +222,20 @@
                     for(let i = 0; i < lootItemCount; ++i)
                     {
                         let itemElement = createItemElement();
-                        lootItems.push(itemElement);
+                        let itemData = {};
+                        saveItemElement(itemElement, itemData);
+                        lootItems.push(itemData);
                     }
 
-                    let dialogRoot = document.querySelector('#dialogRoot');
-                    let lootDialog = new LootDialog(lootItems);
-                    lootDialog.addEventListener('accept', e => {
-                        let lootRoot = document.querySelector('#lootRoot');
-                        for(let itemElement of e.detail.items)
-                        {
-                            let itemContainer = document.createElement('item-container');
-                            itemContainer.type = 'slot';
-                            Satchel.putIn(itemContainer, itemElement);
-                            lootRoot.appendChild(itemContainer);
-                        }
-                        dialogRoot.removeChild(lootDialog);
-                    });
-                    lootDialog.addEventListener('cancel', e => {
-                        dialogRoot.removeChild(lootDialog);
-                    });
-                    dialogRoot.appendChild(lootDialog);
+                    let lootData = {
+                        title: 'Loot!',
+                        description: 'Looted from a bunch of goblins near Stillwater.',
+                        author: '',
+                        cite: '',
+                        items: lootItems,
+                    };
+
+                    SatchelState.importLootDialog(lootData);
                 });
                 document.querySelector('#save').addEventListener('click', () => {
                     let jsonData = {};
@@ -260,9 +250,7 @@
                 document.querySelector('#clearGround').addEventListener('click', () => {
                     if (window.confirm('Are you sure you want to destroy all items on the ground?'))
                     {
-                        document.querySelector('#ground').itemList.clear();
-                        let lootRoot = document.querySelector('#lootRoot');
-                        lootRoot.innerHTML = '';
+                        Satchel.clearGround();
                     }
                 });
             </script>
@@ -271,7 +259,6 @@
             <div>
                 <h2>Inventory</h2>
                 <section id="socketContainerRoot"></section>
-                <section id="inventoryRoot"></section>
                 <fieldset>
                     <legend>Display</legend>
                     <item-display id="display" editable></item-display>
@@ -279,9 +266,6 @@
             </div>
             <div>
                 <h2>Ground</h2>
-                <section id="groundRoot">
-                    <item-container id="ground" size="6 4"></item-container>
-                </section>
                 <section id="lootRoot"></section>
                 <fieldset>
                     <button id="clearGround">Clear</button>

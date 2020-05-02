@@ -175,8 +175,8 @@ BaseElement.define('item-element', ItemElement);
 
 export function saveItemElement(itemElement, itemData)
 {
-    itemData.x = itemElement.x;
-    itemData.y = itemElement.y;
+    itemData.x = itemElement.x || 0;
+    itemData.y = itemElement.y || 0;
     itemData.w = itemElement.w;
     itemData.h = itemElement.h;
     itemData.src = itemElement.src;
@@ -190,8 +190,8 @@ export function saveItemElement(itemElement, itemData)
 
 export function loadItemElement(itemElement, itemData)
 {
-    if ('x' in itemData) itemElement.x = itemData.x;
-    if ('y' in itemData) itemElement.y = itemData.y;
+    if ('x' in itemData) itemElement.x = Number(itemData.x) || 0;
+    if ('y' in itemData) itemElement.y = Number(itemData.y) || 0;
     if ('w' in itemData) itemElement.w = itemData.w;
     if ('h' in itemData) itemElement.h = itemData.h;
     if ('src' in itemData) itemElement.src = itemData.src;
