@@ -14,19 +14,22 @@ let holding = {
     placeDownBufferTimeoutHandle: null,
 };
 
-document.addEventListener('DOMContentLoaded', () => {
-    holding.container = document.querySelector('#holding');
-    holding.container.style.position = 'absolute';
-    holding.container.style.display = 'none';
-    holding.container.addEventListener('itemchange', onHoldingContainerChange);
+export function init()
+{
+    document.addEventListener('DOMContentLoaded', () => {
+        holding.container = document.querySelector('#holding');
+        holding.container.style.position = 'absolute';
+        holding.container.style.display = 'none';
+        holding.container.addEventListener('itemchange', onHoldingContainerChange);
+        
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
     
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
-
-    document.body.addEventListener('dragover', onDragOver, true);
-    document.body.addEventListener('dragleave', onDragLeave, true);
-    document.body.addEventListener('drop', onDrop, true);
-});
+        document.body.addEventListener('dragover', onDragOver, true);
+        document.body.addEventListener('dragleave', onDragLeave, true);
+        document.body.addEventListener('drop', onDrop, true);
+    });
+}
 
 function onMouseMove(e)
 {
