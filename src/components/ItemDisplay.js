@@ -35,11 +35,11 @@ export class ItemDisplay extends BaseElement
             padding: 0.5rem;
             margin: 0.5rem 0;
             text-align: center;
-            border: 1px solid #EEEEEE;
+            border: 1px solid rgba(0, 0, 0, 0.1);
             user-select: none;
         }
         section:hover {
-            background-color: #EEEEEE;
+            background-color: rgba(0, 0, 0, 0.2);
         }
         section > * {
             flex: 1;

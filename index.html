@@ -7,9 +7,65 @@
     <style>
         html, body {
             margin: 0;
-            width: 100%;
-            height: 100%;
         }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            width: 100vw;
+            height: 100vh;
+            background-image: url("./out/res/wood2.jpg");
+            background-size: 30rem;
+            background-repeat: repeat;
+            background-color: black;
+            color: white;
+            overflow: hidden;
+            font-family: Georgia, 'Times New Roman', Times, serif;
+        }
+
+        header, footer {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+        }
+
+        footer {
+            color: gray;
+        }
+
+        h1 {
+            display: inline-block;
+            margin: 0;
+        }
+
+        h2 {
+            text-decoration: underline;
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .menu {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .divider {
+            flex: 1;
+        }
+
+        nav {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            overflow-y: auto;
+            padding: 0.5rem;
+        }
+
         main {
             display: flex;
             flex-direction: row;
@@ -18,16 +74,7 @@
         main > * {
             flex: 1;
             text-align: center;
-        }
-
-        .nav-main {
-            display: flex;
-            flex-direction: row;
-        }
-
-        nav {
-            display: flex;
-            flex-direction: column;
+            overflow: auto;
         }
 
         .foreground {
@@ -71,10 +118,9 @@
         #holding {
             --transition-duration: 0;
         }
+
         #ground {
             min-height: 2rem;
-            max-height: 30rem;
-            overflow-y: auto;
             padding: 1rem;
             border: 1rem dashed rgba(0, 0, 0, 0.2);
         }
@@ -82,6 +128,12 @@
         .secondary {
             padding: 1rem;
             outline: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        button {
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            margin: 0.5rem;
         }
     </style>
     
@@ -94,9 +146,8 @@
 <body>
     <header>
         <h1>Satchel</h1>
-    </header>
-    <div class="nav-main">
-        <nav>
+        <div class="divider"></div>
+        <div class="menu">
             <button id="save">Save</button>
             <button id="load">Load</button>
             <button id="clearGround">Clear</button>
@@ -104,168 +155,11 @@
             <button id="newItem">Item</button>
             <button id="newLoot">Loot</button>
             <button id="newSocket">Socket</button>
-            <hr>
+        </div>
+    </header>
+    <div class="content">
+        <nav>
             <div id="socketRoot"></div>
-            <hr>
-            <script type="module">
-                import * as SatchelState from './src/SatchelState.js';
-                import * as Satchel from './src/Satchel.js';
-
-                import { LootDialog } from './src/components/LootDialog.js';
-                import { ItemElement, saveItemElement } from './src/components/ItemElement.js';
-
-                import BackpackImage from './res/backpack.js';
-                import CubeImage from './res/cube.js';
-                import PotionImage from './res/potion.js';
-                import RopeImage from './res/rope.js';
-                import ShieldImage from './res/shield.js';
-                import SwordImage from './res/sword.js';
-
-                function choose(elements)
-                {
-                    return elements[Math.floor(Math.random() * elements.length)];
-                }
-
-                function randomRange(min, max)
-                {
-                    return (Math.random() * (max - min)) + min;
-                }
-
-                function randomRangeInt(min, max)
-                {
-                    return Math.floor(randomRange(min, max));
-                }
-
-                function createItemElement()
-                {
-                    let backpack = itemElement => {
-                        itemElement.w = randomRangeInt(3, 4);
-                        itemElement.h = choose([3, 3, 3, 4, 4, 4, 5]);
-                        itemElement.name = 'Backpack';
-                        itemElement.category = 'Container';
-                        itemElement.src = BackpackImage;
-                        itemElement.detail = 'It can hold stuff. Yay!';
-                    };
-                    let potion = itemElement => {
-                        itemElement.w = 1;
-                        itemElement.h = choose([1, 1, 2, 2, 2, 3]);
-                        itemElement.name = 'Potion of Healing';
-                        itemElement.category = 'Potion';
-                        itemElement.src = PotionImage;
-                        itemElement.detail = 'Drink it to heal yourself.\n Or give it to someone else to heal them too!';
-                    };
-                    let sword = itemElement => {
-                        itemElement.w = 1;
-                        itemElement.h = choose([2, 2, 2, 3, 3, 3, 4]);
-                        itemElement.name = 'Wooden Sword';
-                        itemElement.category = 'Weapon';
-                        itemElement.src = SwordImage;
-                        itemElement.detail = 'Maybe one day I can get an actual sword...';
-                    };
-                    let cube = itemElement => {
-                        itemElement.w = 1;
-                        itemElement.h = 1;
-                        itemElement.name = 'The Cube';
-                        itemElement.category = 'Artifact';
-                        itemElement.src = CubeImage;
-                        itemElement.detail = 'It looks like a cube?';
-                    };
-                    let shield = itemElement => {
-                        itemElement.w = 2;
-                        itemElement.h = choose([2, 3]);
-                        itemElement.name = 'Wooden Shield';
-                        itemElement.category = 'Armor';
-                        itemElement.src = ShieldImage;
-                        itemElement.detail = 'Sharp stuff. Bad.';
-                    };
-                    let magicRope = itemElement => {
-                        itemElement.w = 2;
-                        itemElement.h = 1;
-                        itemElement.name = 'Never-Ending Rope';
-                        itemElement.category = 'Wonder';
-                        itemElement.src = RopeImage;
-                        itemElement.detail = 'Seriously. It never ends!';
-                    };
-
-                    let items = [
-                        backpack,
-                        potion,
-                        sword,
-                        cube,
-                        shield,
-                        magicRope
-                    ];
-
-                    let chosenItem = choose(items);
-                    let itemElement = new ItemElement();
-                    chosenItem(itemElement);
-                    return itemElement;
-                }
-
-                function createItemContainer()
-                {
-                    let itemContainer = document.createElement('item-container');
-                    itemContainer.size = [Math.trunc(Math.random() * 3) + 3, Math.trunc(Math.random() * 3) + 3];
-                    return itemContainer;
-                }
-
-                function createSocketContainer()
-                {
-                    let itemContainer = document.createElement('item-container');
-                    itemContainer.type = 'socket';
-                    return itemContainer;
-                }
-
-                document.querySelector('#newSocket').addEventListener('click', e => {
-                    let socketRoot = document.querySelector('#socketRoot');
-                    let socketContainer = createSocketContainer();
-                    socketRoot.appendChild(socketContainer);
-                    e.preventDefault();
-                    e.stopPropagation();
-                    return false;
-                });
-                document.querySelector('#newItem').addEventListener('click', () => {
-                    let itemElement = createItemElement();
-                    Satchel.putOnGround(itemElement);
-                });
-                document.querySelector('#newLoot').addEventListener('click', () => {
-                    let lootItems = [];
-                    let lootItemCount = Math.trunc(Math.random() * 10) + 1;
-                    for(let i = 0; i < lootItemCount; ++i)
-                    {
-                        let itemElement = createItemElement();
-                        let itemData = {};
-                        saveItemElement(itemElement, itemData);
-                        lootItems.push(itemData);
-                    }
-
-                    let lootData = {
-                        title: 'Loot!',
-                        description: 'Looted from a bunch of goblins near Stillwater.',
-                        author: '',
-                        cite: '',
-                        items: lootItems,
-                    };
-
-                    SatchelState.importLootDialog(lootData);
-                });
-                document.querySelector('#save').addEventListener('click', () => {
-                    let jsonData = {};
-                    SatchelState.exportSatchelState(jsonData);
-                    localStorage.setItem('save', JSON.stringify(jsonData));
-                });
-                document.querySelector('#load').addEventListener('click', () => {
-                    let stringData = localStorage.getItem('save');
-                    let jsonData = JSON.parse(stringData);
-                    SatchelState.importSatchelState(jsonData);
-                });
-                document.querySelector('#clearGround').addEventListener('click', () => {
-                    if (window.confirm('Are you sure you want to destroy all items on the ground?'))
-                    {
-                        Satchel.clearGround();
-                    }
-                });
-            </script>
         </nav>
         <main>
             <div class="primary">
@@ -287,7 +181,9 @@
             Made by Andrew Kuo.
         </small>
     </footer>
+    
     <item-contextmenu id="contextmenu"></item-contextmenu>
+
     <div class="foreground">
         <div id="dropZone">
             <p>Got Loot?</p>
@@ -295,6 +191,166 @@
         <div id="dialogRoot"></div>
         <item-container id="holding" type="slot"></item-container>
     </div>
+
+    <script type="module">
+        import * as SatchelState from './src/SatchelState.js';
+        import * as Satchel from './src/Satchel.js';
+
+        import { LootDialog } from './src/components/LootDialog.js';
+        import { ItemElement, saveItemElement } from './src/components/ItemElement.js';
+
+        import BackpackImage from './res/backpack.js';
+        import CubeImage from './res/cube.js';
+        import PotionImage from './res/potion.js';
+        import RopeImage from './res/rope.js';
+        import ShieldImage from './res/shield.js';
+        import SwordImage from './res/sword.js';
+
+        function choose(elements)
+        {
+            return elements[Math.floor(Math.random() * elements.length)];
+        }
+
+        function randomRange(min, max)
+        {
+            return (Math.random() * (max - min)) + min;
+        }
+
+        function randomRangeInt(min, max)
+        {
+            return Math.floor(randomRange(min, max));
+        }
+
+        function createItemElement()
+        {
+            let backpack = itemElement => {
+                itemElement.w = randomRangeInt(3, 4);
+                itemElement.h = choose([3, 3, 3, 4, 4, 4, 5]);
+                itemElement.name = 'Backpack';
+                itemElement.category = 'Container';
+                itemElement.src = BackpackImage;
+                itemElement.detail = 'It can hold stuff. Yay!';
+            };
+            let potion = itemElement => {
+                itemElement.w = 1;
+                itemElement.h = choose([1, 1, 2, 2, 2, 3]);
+                itemElement.name = 'Potion of Healing';
+                itemElement.category = 'Potion';
+                itemElement.src = PotionImage;
+                itemElement.detail = 'Drink it to heal yourself.\n Or give it to someone else to heal them too!';
+            };
+            let sword = itemElement => {
+                itemElement.w = 1;
+                itemElement.h = choose([2, 2, 2, 3, 3, 3, 4]);
+                itemElement.name = 'Wooden Sword';
+                itemElement.category = 'Weapon';
+                itemElement.src = SwordImage;
+                itemElement.detail = 'Maybe one day I can get an actual sword...';
+            };
+            let cube = itemElement => {
+                itemElement.w = 1;
+                itemElement.h = 1;
+                itemElement.name = 'The Cube';
+                itemElement.category = 'Artifact';
+                itemElement.src = CubeImage;
+                itemElement.detail = 'It looks like a cube?';
+            };
+            let shield = itemElement => {
+                itemElement.w = 2;
+                itemElement.h = choose([2, 3]);
+                itemElement.name = 'Wooden Shield';
+                itemElement.category = 'Armor';
+                itemElement.src = ShieldImage;
+                itemElement.detail = 'Sharp stuff. Bad.';
+            };
+            let magicRope = itemElement => {
+                itemElement.w = 2;
+                itemElement.h = 1;
+                itemElement.name = 'Never-Ending Rope';
+                itemElement.category = 'Wonder';
+                itemElement.src = RopeImage;
+                itemElement.detail = 'Seriously. It never ends!';
+            };
+
+            let items = [
+                backpack,
+                potion,
+                sword,
+                cube,
+                shield,
+                magicRope
+            ];
+
+            let chosenItem = choose(items);
+            let itemElement = new ItemElement();
+            chosenItem(itemElement);
+            return itemElement;
+        }
+
+        function createItemContainer()
+        {
+            let itemContainer = document.createElement('item-container');
+            itemContainer.size = [Math.trunc(Math.random() * 3) + 3, Math.trunc(Math.random() * 3) + 3];
+            return itemContainer;
+        }
+
+        function createSocketContainer()
+        {
+            let itemContainer = document.createElement('item-container');
+            itemContainer.type = 'socket';
+            return itemContainer;
+        }
+
+        document.querySelector('#newSocket').addEventListener('click', e => {
+            let socketRoot = document.querySelector('#socketRoot');
+            let socketContainer = createSocketContainer();
+            socketRoot.appendChild(socketContainer);
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        });
+        document.querySelector('#newItem').addEventListener('click', () => {
+            let itemElement = createItemElement();
+            Satchel.putOnGround(itemElement);
+        });
+        document.querySelector('#newLoot').addEventListener('click', () => {
+            let lootItems = [];
+            let lootItemCount = Math.trunc(Math.random() * 10) + 1;
+            for(let i = 0; i < lootItemCount; ++i)
+            {
+                let itemElement = createItemElement();
+                let itemData = {};
+                saveItemElement(itemElement, itemData);
+                lootItems.push(itemData);
+            }
+
+            let lootData = {
+                title: 'Loot!',
+                description: 'Looted from a bunch of goblins near Stillwater.',
+                author: '',
+                cite: '',
+                items: lootItems,
+            };
+
+            SatchelState.importLootDialog(lootData);
+        });
+        document.querySelector('#save').addEventListener('click', () => {
+            let jsonData = {};
+            SatchelState.exportSatchelState(jsonData);
+            localStorage.setItem('save', JSON.stringify(jsonData));
+        });
+        document.querySelector('#load').addEventListener('click', () => {
+            let stringData = localStorage.getItem('save');
+            let jsonData = JSON.parse(stringData);
+            SatchelState.importSatchelState(jsonData);
+        });
+        document.querySelector('#clearGround').addEventListener('click', () => {
+            if (window.confirm('Are you sure you want to destroy all items on the ground?'))
+            {
+                Satchel.clearGround();
+            }
+        });
+    </script>
 </body>
 
 </html>
