@@ -39,9 +39,13 @@ export class ItemElement extends BaseElement
             padding: 0;
             margin: 0;
             user-select: none;
+            box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+            transition: box-shadow 0.3s ease;
         }
         .container:hover {
             background-color: rgba(0, 0, 0, 0.2);
+            box-shadow: 0 0 0.7rem rgba(0, 0, 0, 0.6);
+            z-index: 1;
         }
         img {
             width: 100%;
