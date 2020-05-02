@@ -3,7 +3,7 @@ import { ItemElement, saveItemElement, loadItemElement } from './components/Item
 
 import { LootDialog } from './components/LootDialog.js';
 
-import { putOnGround } from './Satchel.js';
+import { putOnGround, cleanUpGroundSlotContainer, setUpGroundSlotContainer } from './Satchel.js';
 
 export function exportSatchelState(jsonData)
 {
@@ -68,6 +68,7 @@ export function importSatchelState(jsonData)
             for(let itemContainerData of groundData)
             {
                 let itemContainer = new ItemContainer();
+                setUpGroundSlotContainer(itemContainer);
                 loadItemContainer(itemContainer, itemContainerData);
                 ground.appendChild(itemContainer);
             }
@@ -109,6 +110,7 @@ export function clearSatchelState()
     let ground = document.querySelector('#ground');
     for(let itemContainer of ground.querySelectorAll('item-container'))
     {
+        cleanUpGroundSlotContainer(itemContainer);
         clearItemContainer(itemContainer);
     }
     ground.innerHTML = ''

@@ -76,13 +76,13 @@ function onHoldingContainerChange(e)
     }
 }
 
-function onGroundContainerChange(e)
+function onGroundSlotContainerChange(e)
 {
     let target = e.target;
     let itemElement = target.itemList.at(0, 0);
     if (!itemElement)
     {
-        target.removeEventListener('itemchange', onGroundContainerChange);
+        cleanUpGroundSlotContainer(target);
         target.parentNode.removeChild(target);
     }
 }
@@ -191,6 +191,17 @@ export function getHoldingItem()
     return holding.container.itemList.at(0, 0);
 }
 
+export function setUpGroundSlotContainer(itemContainer)
+{
+    itemContainer.type = 'slot';
+    itemContainer.addEventListener('itemchange', onGroundSlotContainerChange);
+}
+
+export function cleanUpGroundSlotContainer(itemContainer)
+{
+    itemContainer.removeEventListener('itemchange', onGroundSlotContainerChange);
+}
+
 export function putOnGroundFromHolding()
 {
     let itemElement = holding.container.itemList.at(0, 0);
@@ -201,19 +212,18 @@ export function putOnGroundFromHolding()
 export function putOnGround(itemElement)
 {
     let ground = document.querySelector('#ground');
-    let groundContainer = new ItemContainer();
-    groundContainer.type = 'slot';
-    putIn(groundContainer, itemElement);
-    groundContainer.addEventListener('itemchange', onGroundContainerChange);
-    ground.appendChild(groundContainer);
+    let groundSlotContainer = new ItemContainer();
+    setUpGroundSlotContainer(groundSlotContainer);
+    putIn(groundSlotContainer, itemElement);
+    ground.appendChild(groundSlotContainer);
 }
 
 export function clearGround()
 {
     let ground = document.querySelector('#ground');
-    for(let groundContainer of ground.querySelectorAll('item-container'))
+    for(let groundSlotContainer of ground.querySelectorAll('item-container'))
     {
-        clearItemContainer(groundContainer);
+        clearItemContainer(groundSlotContainer);
     }
     ground.innerHTML = '';
 }
