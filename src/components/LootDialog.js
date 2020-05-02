@@ -130,10 +130,36 @@ export class LootDialog extends BaseElement
     static get properties()
     {
         return {
+            disabled: Boolean,
             title: String,
             description: String,
         };
     }
+
+    /** @override */
+    get changedAttributes()
+    {
+        return {
+            title: value => {
+                this._titleElement.textContent = value;
+            },
+            description: value => {
+                this._descriptionElement.textContent = value;
+            },
+            disabled: value => {
+                if (value)
+                {
+                    this._accept.textContent = 'Already accepted!';
+                }
+                else
+                {
+                    this._accept.textContent = 'Accept';
+                }
+                this._accept.disabled = value;
+            },
+        };
+    }
+
 
     constructor(items = [])
     {
@@ -181,9 +207,6 @@ export class LootDialog extends BaseElement
         this._dialog.addEventListener('wheel', this.onWheel);
         this._accept.addEventListener('click', this.onAcceptClick);
         this._cancel.addEventListener('click', this.onCancelClick);
-
-        if (this.title) this._titleElement.textContent = this.title;
-        if (this.description) this._descriptionElement.textContent = this.description;
 
         let delayTime = this.initialItemDelay;
         for(let section of this.shadowRoot.querySelectorAll('.items > *'))

@@ -131,7 +131,23 @@ export function clearSatchelState()
 
 export async function importLootDialog(jsonData)
 {
-    let { items, title, description } = jsonData;
+    let { items, title, description, transactionId } = jsonData;
+
+    let disabled = false;
+
+    // TODO: This is a hack to stop repeated transaction spamming.
+    if (transactionId)
+    {
+        let transactions = JSON.parse(sessionStorage.getItem('transactions') || '[]');
+        if (transactions.includes(transactionId))
+        {
+            disabled = true;
+        }
+        else
+        {
+            sessionStorage.setItem('transactions', JSON.stringify([...transactions, transactionId]));
+        }
+    }
 
     let lootItems = [];
     for(let itemData of items)
@@ -145,6 +161,8 @@ export async function importLootDialog(jsonData)
         let lootDialog = new LootDialog(lootItems);
         lootDialog.title = title;
         lootDialog.description = description;
+        if (disabled) lootDialog.disabled = true;
+
         lootDialog.addEventListener('accept', e => {
             for(let itemElement of e.detail.items)
             {
@@ -159,6 +177,7 @@ export async function importLootDialog(jsonData)
 
             resolve();
         });
+        
         dialogRoot.appendChild(lootDialog);
     });
 }
