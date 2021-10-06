@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Satchel</title>
+    <style>
+        html, body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            background-image: url("./res/images/wood.jpg");
+            background-size: 30rem;
+            background-repeat: repeat;
+            background-color: #211B1C;
+            color: #FFFFFF;
+            overflow: hidden;
+            font-family: Georgia, 'Times New Roman', Times, serif;
+            box-shadow: inset 0 0 16rem #000000;
+        }
+
+        main {
+            flex: 1;
+        }
+    </style>
+    <script type="module" src="./src/components/ItemContainer.js"></script>
+    <script type="module" src="./src/app/AppClient.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Satchel</h1>
+    </header>
+    <main>
+        <client-app></client-app>
+    </main>
+    <footer style="font-family: monospace; opacity: 0.6;">
+        <small>
+            Made with ❤ <br> by Andrew Kuo.
+        </small>
+    </footer>
+</body>
+
+</html>

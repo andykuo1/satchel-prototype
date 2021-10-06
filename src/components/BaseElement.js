@@ -50,26 +50,23 @@ export class BaseElement extends HTMLElement
         super();
 
         this.attachShadow({ mode: 'open' });
-        this.shadowRoot.appendChild(this.constructor.__template__.content.cloneNode(true));
-        this.shadowRoot.appendChild(this.constructor.__style__.cloneNode(true));
+        const constructor = /** @type {typeof BaseElement} */ (this.constructor);
+        this.shadowRoot.appendChild(constructor.__template__.content.cloneNode(true));
+        this.shadowRoot.appendChild(constructor.__style__.cloneNode(true));
     }
     
-    /** @override */
     connectedCallback()
     {
-        defaultAndUpgradeProperties(this, this.constructor.__properties__);
+        const constructor = /** @type {typeof BaseElement} */ (this.constructor);
+        defaultAndUpgradeProperties(this, constructor.__properties__);
     }
 
-    /** @override */
-    disconnectedCallback()
-    {
+    disconnectedCallback() {}
 
-    }
-
-    /** @override */
     attributeChangedCallback(attribute, prev, value)
     {
-        callbackAssignedProperties(this, this.constructor.__properties__, attribute, prev, value, this.__changedAttributes__);
+        const constructor = /** @type {typeof BaseElement} */ (this.constructor);
+        callbackAssignedProperties(this, constructor.__properties__, attribute, prev, value, this.__changedAttributes__);
     }
 
     get changedAttributes()

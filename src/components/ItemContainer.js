@@ -5,7 +5,7 @@ import { NumberPair } from './util/types.js';
 import { placeDown } from '../Satchel.js';
 import { ItemList, loadItemList, saveItemList, clearItemList } from '../ItemList.js';
 
-const DEFAULT_ITEM_UNIT_SIZE = 64;
+const DEFAULT_ITEM_UNIT_SIZE = 48;
 
 export class ItemContainer extends BaseElement
 {
@@ -49,7 +49,7 @@ export class ItemContainer extends BaseElement
             margin: 0;
             overflow: hidden;
             text-overflow: ellipsis;
-            border-radius: 0.2rem;
+            border-radius: ${DEFAULT_ITEM_UNIT_SIZE / 16}rem;
             text-align: center;
             color: white;
             background-color: rgba(0, 0, 0, 0.7);
@@ -95,6 +95,7 @@ export class ItemContainer extends BaseElement
             disabledTransferIn: Boolean,
             disabledTransferOut: Boolean,
             disabledEdit: Boolean,
+            containerRoot: String,
         };
     }
 
@@ -139,7 +140,7 @@ export class ItemContainer extends BaseElement
         super.connectedCallback();
 
         this._container.addEventListener('mouseup', this.onMouseUp);
-        this._containerTitle.addEventListener('click', this.onTitleClick);
+        // this._containerTitle.addEventListener('click', this.onTitleClick);
         this._itemSlot.addEventListener('slotchange', this.onSlotChange);
     }
 
@@ -149,7 +150,7 @@ export class ItemContainer extends BaseElement
         super.disconnectedCallback();
         
         this._container.removeEventListener('mouseup', this.onMouseUp);
-        this._containerTitle.removeEventListener('click', this.onTitleClick);
+        // this._containerTitle.removeEventListener('click', this.onTitleClick);
         this._itemSlot.removeEventListener('slotchange', this.onSlotChange);
     }
 
@@ -182,7 +183,7 @@ export class ItemContainer extends BaseElement
             let socketItem = this.socket.item;
             if (socketItem !== itemElement)
             {
-                let socketContainerRoot = document.querySelector('#socketContainerRoot');
+                let socketContainerRoot = document.querySelector(this.containerRoot);
 
                 // Remove the existing socketed item
                 if (socketItem)

@@ -46,6 +46,7 @@
         .content {
             flex: 1;
             display: flex;
+            flex-direction: column;
             overflow: hidden;
         }
 
@@ -59,23 +60,35 @@
         }
 
         nav {
-            display: flex;
-            flex-direction: column;
+            position: fixed;
+            bottom: 0;
             align-items: center;
-            overflow-x: hidden;
-            overflow-y: auto;
+            overflow-x: auto;
             padding: 0.5rem;
         }
 
         main {
+            position: relative;
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+            height: 100%;
+        }
+
+        nav {
+            position: fixed;
             display: flex;
             flex-direction: row;
             width: 100%;
         }
-        main > * {
+
+        .spacer {
             flex: 1;
             text-align: center;
-            overflow: auto;
+        }
+
+        .side {
+            padding: 0 1em;
         }
 
         .foreground {
@@ -94,7 +107,7 @@
 
         #socketRoot {
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
         }
         
         #dropZone {
@@ -121,6 +134,7 @@
         }
 
         #ground {
+            position: relative;
             min-height: 2rem;
             padding: 1rem;
             border: 1rem dashed rgba(0, 0, 0, 0.2);
@@ -159,27 +173,30 @@
         </div>
     </header>
     <div class="content">
-        <nav>
-            <div id="socketRoot"></div>
-        </nav>
         <main>
-            <div class="primary">
-                <h2>Inventory</h2>
-                <section id="socketContainerRoot"></section>
-            </div>
             <div class="secondary">
-                <h2>Display</h2>
-                <section id="displayRoot">
-                    <item-display id="display" editable></item-display>
-                </section>
-                <h2>Ground</h2>
+                <section id="otherContainerRoot"></section>
                 <section id="ground"></section>
             </div>
+            <div class="spacer"></div>
+            <div class="primary">
+                <section id="socketContainerRoot"></section>
+            </div>
         </main>
+        <nav>
+            <div class="side">
+                <item-container type="socket" id="other" container-root="#otherContainerRoot"></item-container>
+            </div>
+            <div class="spacer">
+            </div>
+            <div class="side">
+                <item-container type="socket" id="backpack" container-root="#socketContainerRoot"></item-container>
+            </div>
+        </nav>
     </div>
-    <footer>
+    <footer style="font-family: monospace; opacity: 0.6;">
         <small>
-            Made by Andrew Kuo.
+            Made with ❤ <br> by Andrew Kuo.
         </small>
     </footer>
     
@@ -304,14 +321,27 @@
             return itemContainer;
         }
 
-        document.querySelector('#newSocket').addEventListener('click', e => {
-            let socketRoot = document.querySelector('#socketRoot');
-            let socketContainer = createSocketContainer();
-            socketRoot.appendChild(socketContainer);
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
+        const BACKPACK = itemElement => {
+            itemElement.w = 5;
+            itemElement.h = 8;
+            itemElement.name = 'Backpack';
+            itemElement.category = 'Container';
+            itemElement.src = BackpackImage;
+            itemElement.detail = 'This was all you could carry.';
+        };
+
+        function spawnDefaultBackpack()
+        {
+            let itemElement = new ItemElement();
+            BACKPACK(itemElement)
+            Satchel.putOnGround(itemElement);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            spawnDefaultBackpack();
         });
+
+
         document.querySelector('#newItem').addEventListener('click', () => {
             let itemElement = createItemElement();
             Satchel.putOnGround(itemElement);

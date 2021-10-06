@@ -14,21 +14,36 @@ let holding = {
     placeDownBufferTimeoutHandle: null,
 };
 
-export function init()
+export function init(holdingContainerElement = document.querySelector('#holding')) {
+    addToHoldingContainer(holdingContainerElement);
+}
+
+export function addToHoldingContainer(holdingContainerElement)
 {
-    document.addEventListener('DOMContentLoaded', () => {
-        holding.container = document.querySelector('#holding');
-        holding.container.style.position = 'absolute';
-        holding.container.style.display = 'none';
-        holding.container.addEventListener('itemchange', onHoldingContainerChange);
-        
-        document.addEventListener('mousemove', onMouseMove);
-        document.addEventListener('mouseup', onMouseUp);
+    holding.container = holdingContainerElement;
+    holdingContainerElement.style.position = 'absolute';
+    holdingContainerElement.style.display = 'none';
     
-        document.body.addEventListener('dragover', onDragOver, true);
-        document.body.addEventListener('dragleave', onDragLeave, true);
-        document.body.addEventListener('drop', onDrop, true);
-    });
+    holdingContainerElement.addEventListener('itemchange', onHoldingContainerChange);
+    
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+
+    document.body.addEventListener('dragover', onDragOver, true);
+    document.body.addEventListener('dragleave', onDragLeave, true);
+    document.body.addEventListener('drop', onDrop, true);
+}
+
+export function removeFromHoldingContainer(holdingContainerElement)
+{
+    holdingContainerElement.removeEventListener('itemchange', onHoldingContainerChange);
+    
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+
+    document.body.removeEventListener('dragover', onDragOver, true);
+    document.body.removeEventListener('dragleave', onDragLeave, true);
+    document.body.removeEventListener('drop', onDrop, true);
 }
 
 function onMouseMove(e)
