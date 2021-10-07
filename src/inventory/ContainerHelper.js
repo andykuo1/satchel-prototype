@@ -1,4 +1,20 @@
-import { putDown } from './InventoryHelper.js';
+import { updateCursorPosition } from './CursorHelper.js';
+import { pickUp, putDown } from './InventoryHelper.js';
+
+export function itemMouseDownCallback(mouseEvent, itemElement, unitSize) {
+    let containerElement = itemElement.container;
+    let boundingRect = containerElement._container.getBoundingClientRect();
+    let clientCoordX = getClientCoordX(boundingRect, mouseEvent.clientX, unitSize);
+    let clientCoordY = getClientCoordY(boundingRect, mouseEvent.clientY, unitSize);
+    let result = pickUp(itemElement, containerElement, clientCoordX, clientCoordY);
+    updateCursorPosition(mouseEvent.clientX, mouseEvent.clientY, unitSize);
+    if (result)
+    {
+        mouseEvent.preventDefault();
+        mouseEvent.stopPropagation();
+        return false;
+    }
+}
 
 export function containerMouseUpCallback(mouseEvent, containerElement, unitSize)
 {

@@ -7,14 +7,19 @@ import { freeFromCursor, getCursorContext, getCursorInventory, getCursorItem, st
  * @param {*} fromInventory 
  * @returns 
  */
-export function pickUp(storedItem, fromInventory) {
-    let inv = getCursorInventory();
+export function pickUp(storedItem, fromInventory, fromCoordX = 0, fromCoordY = 0) {
+    let ctx = getCursorContext();
+    let inv = getCursorInventory(ctx);
     if (!inv) return false;
     if (inv.itemList.length > 0) return false;
     fromInventory.itemList.delete(storedItem);
+    let prevX = storedItem.x;
+    let prevY = storedItem.y;
     storedItem.x = 0;
     storedItem.y = 0;
-    storeToCursor(storedItem);
+    storeToCursor(ctx, storedItem);
+    ctx.pickOffsetX = prevX - fromCoordX;
+    ctx.pickOffsetY = prevY - fromCoordY;
     return true;
 }
 
@@ -26,23 +31,25 @@ export function pickUp(storedItem, fromInventory) {
  */
 export function putDown(toInventory, toCoordX, toCoordY, allowSwap = true) {
     let ctx = getCursorContext();
-    let item = getCursorItem();
+    let item = getCursorItem(ctx);
     if (!item || !ctx.placeDownBuffer) return false;
 
     let invWidth = toInventory.rows;
     let invHeight = toInventory.cols;
     let itemWidth = item.w;
     let itemHeight = item.h;
+    let coordX = toCoordX + ctx.pickOffsetX;
+    let coordY = toCoordY + ctx.pickOffsetY;
 
     let maxCoordX = invWidth - itemWidth;
     let maxCoordY = invHeight - itemHeight;
     if (maxCoordX < 0 || maxCoordY < 0) return false;
-    let targetCoordX = Math.min(Math.max(0, toCoordX), maxCoordX);
-    let targetCoordY = Math.min(Math.max(0, toCoordY), maxCoordY);
+    let targetCoordX = Math.min(Math.max(0, coordX), maxCoordX);
+    let targetCoordY = Math.min(Math.max(0, coordY), maxCoordY);
 
-    if (allowSwap && canSwapAt(toInventory, toCoordX, toCoordY, targetCoordX, targetCoordY, itemWidth, itemHeight)) {
-        freeFromCursor();
-        let result = pickUp(toInventory.itemList.at(toCoordX, toCoordY), toInventory);
+    if (allowSwap && canSwapAt(toInventory, coordX, coordY, targetCoordX, targetCoordY, itemWidth, itemHeight)) {
+        freeFromCursor(ctx);
+        let result = pickUp(toInventory.itemList.at(coordX, coordY), toInventory);
         if (!result) {
             throw new Error('Failed to pick up item on swap.');
         }
@@ -56,7 +63,7 @@ export function putDown(toInventory, toCoordX, toCoordY, allowSwap = true) {
             maxCoordX, maxCoordY,
             (x, y) => canPlaceAt(toInventory, x, y, itemWidth, itemHeight));
         if (x >= 0 && y >= 0) {
-            freeFromCursor();
+            freeFromCursor(ctx);
             item.x = x;
             item.y = y;
             toInventory.itemList.add(item);
@@ -86,6 +93,7 @@ export function insertIn(toInventory, freedItem) {
         toInventory.itemList.add(freedItem);
         return true;
     }
+    let ctx = getCursorContext();
     let invWidth = toInventory.rows;
     let invHeight = toInventory.cols;
     let itemWidth = freedItem.w;
@@ -98,7 +106,7 @@ export function insertIn(toInventory, freedItem) {
         maxCoordX, maxCoordY,
         (x, y) => canPlaceAt(toInventory, x, y, itemWidth, itemHeight));
     if (x >= 0 && y >= 0) {
-        freeFromCursor();
+        freeFromCursor(ctx);
         freedItem.x = x;
         freedItem.y = y;
         toInventory.itemList.add(freedItem);

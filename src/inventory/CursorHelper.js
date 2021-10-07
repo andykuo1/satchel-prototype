@@ -1,6 +1,6 @@
 import { distanceSquared } from './util.js';
 
-const CURSOR_OFFSET_PIXELS = 16;
+const CURSOR_OFFSET_PIXELS = 24;
 const PLACE_BUFFER_RANGE_SQUARED = 8 * 8;
 const PLACE_BUFFER_TIMEOUT_MILLIS = 300;
 
@@ -9,6 +9,7 @@ const CURSOR_CONTEXT = {
     ground: null,
     x: 0, y: 0,
     pickX: 0, pickY: 0,
+    pickOffsetX: 0, pickOffsetY: 0,
     placeDownBuffer: true,
     placeDownBufferTimeoutHandle: null,
 };
@@ -27,18 +28,22 @@ export function setCursorInventory(inventory) {
     }
 }
 
-function onMouseMove(e) {
+export function updateCursorPosition(clientX, clientY, unitSize) {
     let ctx = getCursorContext();
-    let x = e.clientX;
-    let y = e.clientY;
+    let inv = getCursorInventory(ctx);
+    let x = clientX + ctx.pickOffsetX * unitSize;
+    let y = clientY + ctx.pickOffsetY * unitSize;
     ctx.x = x;
     ctx.y = y;
-    let inv = getCursorInventory();
     inv.style.setProperty('left', `${x - CURSOR_OFFSET_PIXELS}px`);
     inv.style.setProperty('top', `${y - CURSOR_OFFSET_PIXELS}px`);
     if (distanceSquared(x, y, ctx.pickX, ctx.pickY) >= PLACE_BUFFER_RANGE_SQUARED) {
         clearPlaceDownBuffer();
     }
+}
+
+function onMouseMove(e) {
+    updateCursorPosition(e.clientX, e.clientY, 48);
 }
 
 export function getCursorContext() {
@@ -48,22 +53,22 @@ export function getCursorContext() {
 /**
  * @returns {import('./InventoryBag.js').InventoryBag}
  */
-export function getCursorInventory() {
-    return getCursorContext().inventory;
+export function getCursorInventory(ctx) {
+    return ctx.inventory;
 }
 
 /**
  * @returns {import('./InventoryItem.js').InventoryItem}
  */
-export function getCursorItem() {
-    let inv = getCursorInventory();
+export function getCursorItem(ctx) {
+    let inv = getCursorInventory(ctx);
     if (!inv) return null;
     return inv.itemList.at(0, 0);
 }
 
-export function storeToCursor(freedItem) {
+export function storeToCursor(ctx, freedItem) {
     if (!freedItem) return;
-    let inv = getCursorInventory();
+    let inv = getCursorInventory(ctx);
     inv.itemList.add(freedItem);
     if (inv.itemList.length > 0) {
         inv.style.display = 'unset';
@@ -71,8 +76,8 @@ export function storeToCursor(freedItem) {
     }
 }
 
-export function freeFromCursor() {
-    let inv = getCursorInventory();
+export function freeFromCursor(ctx) {
+    let inv = getCursorInventory(ctx);
     inv.itemList.clear();
     if (inv.itemList.length <= 0) {
         inv.style.display = 'none';

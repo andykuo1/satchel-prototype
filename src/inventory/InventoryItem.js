@@ -1,6 +1,6 @@
 import { DEFAULT_ITEM } from '../assets.js';
 import { upgradeProperty } from './util.js';
-import { pickUp } from './InventoryHelper.js';
+import { itemMouseDownCallback } from './ContainerHelper.js';
 
 const INNER_HTML = `
 <figure class="container">
@@ -205,12 +205,7 @@ export class InventoryItem extends HTMLElement {
 
     onMouseDown(e) {
         if (e.button === 2) return;
-        let result = pickUp(this, this.container);
-        if (result) {
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
-        }
+        return itemMouseDownCallback(e, this, 48);
     }
 }
 InventoryItem.define();
