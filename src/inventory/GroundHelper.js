@@ -14,9 +14,9 @@ export function setGroundContainer(ground) {
 
 function onMouseUp(e) {
     let ctx = getCursorContext();
-    let item = getCursorItem();
+    let item = getCursorItem(ctx);
     if (item && ctx.placeDownBuffer) {
-        freeFromCursor();
+        freeFromCursor(ctx);
         dropOnGround(item);
     }
 }

@@ -31,8 +31,6 @@ export class ItemList
                 this._list.push(node);
             }
         }
-
-        if (this._changeCallback) this._changeCallback(this._element);
     }
 
     at(coordX, coordY)
@@ -53,6 +51,7 @@ export class ItemList
         this._element.appendChild(itemElement);
         this._list.push(itemElement);
         prepare(this, itemElement);
+        if (this._changeCallback) this._changeCallback(this._slotElement);
         return true;
     }
 
@@ -61,6 +60,7 @@ export class ItemList
         reset(this, itemElement);
         this._element.removeChild(itemElement);
         this._list.splice(this._list.indexOf(itemElement), 1);
+        if (this._changeCallback) this._changeCallback(this._slotElement);
         return true;
     }
 
@@ -72,10 +72,11 @@ export class ItemList
     clear()
     {
         if (!this._slotElement) return;
+        let slotElement = this._slotElement;
 
         resetAll(this, this._list);
 
-        for(let node of this._slotElement.assignedNodes())
+        for(let node of slotElement.assignedNodes())
         {
             if (node instanceof InventoryItem)
             {
@@ -84,6 +85,7 @@ export class ItemList
         }
 
         this._slotElement = null;
+        if (this._changeCallback) this._changeCallback(slotElement);
     }
 
     onItemChange(e)
