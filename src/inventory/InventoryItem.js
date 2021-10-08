@@ -165,13 +165,10 @@ export class InventoryItem extends HTMLElement {
         upgradeProperty(this, 'name');
 
         this.addEventListener('mousedown', this.onMouseDown);
-
-        this.container = this.closest('inventory-bag');
     }
 
     disconnectedCallback() {
         this.removeEventListener('mousedown', this.onMouseDown);
-        this.container = null;
     }
 
     attributeChangedCallback(attribute, prev, value) {

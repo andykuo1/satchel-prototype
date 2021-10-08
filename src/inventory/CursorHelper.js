@@ -1,3 +1,4 @@
+import { addItemToInventory, clearInventory, getInventoryStore, getItemAtInventory } from './InventoryStore.js';
 import { distanceSquared } from './util.js';
 
 const CURSOR_OFFSET_PIXELS = 24;
@@ -5,7 +6,7 @@ const PLACE_BUFFER_RANGE_SQUARED = 8 * 8;
 const PLACE_BUFFER_TIMEOUT_MILLIS = 300;
 
 const CURSOR_CONTEXT = {
-    inventory: null,
+    element: null,
     ground: null,
     x: 0, y: 0,
     pickX: 0, pickY: 0,
@@ -14,29 +15,29 @@ const CURSOR_CONTEXT = {
     placeDownBufferTimeoutHandle: null,
 };
 
-export function setCursorInventory(inventory) {
+export function setCursorElement(inventoryElement) {
     let ctx = getCursorContext();
-    if (ctx.inventory) {
+    if (ctx.element) {
         document.removeEventListener('mousemove', onMouseMove);
-        ctx.inventory = null;
+        ctx.element = null;
     }
-    if (inventory) {
-        inventory.style.position = 'absolute';
-        inventory.style.display = 'none';
-        ctx.inventory = inventory;
+    if (inventoryElement) {
+        inventoryElement.style.position = 'absolute';
+        inventoryElement.style.display = 'none';
+        ctx.element = inventoryElement;
         document.addEventListener('mousemove', onMouseMove);
     }
 }
 
 export function updateCursorPosition(clientX, clientY, unitSize) {
     let ctx = getCursorContext();
-    let inv = getCursorInventory(ctx);
+    let element = getCursorElement(ctx);
     let x = clientX + ctx.pickOffsetX * unitSize;
     let y = clientY + ctx.pickOffsetY * unitSize;
     ctx.x = x;
     ctx.y = y;
-    inv.style.setProperty('left', `${x - CURSOR_OFFSET_PIXELS}px`);
-    inv.style.setProperty('top', `${y - CURSOR_OFFSET_PIXELS}px`);
+    element.style.setProperty('left', `${x - CURSOR_OFFSET_PIXELS}px`);
+    element.style.setProperty('top', `${y - CURSOR_OFFSET_PIXELS}px`);
     if (distanceSquared(x, y, ctx.pickX, ctx.pickY) >= PLACE_BUFFER_RANGE_SQUARED) {
         clearPlaceDownBuffer();
     }
@@ -53,36 +54,28 @@ export function getCursorContext() {
 /**
  * @returns {import('./InventoryBag.js').InventoryBag}
  */
-export function getCursorInventory(ctx) {
-    return ctx.inventory;
+export function getCursorElement(ctx) {
+    return ctx.element;
 }
 
 /**
  * @returns {import('./InventoryItem.js').InventoryItem}
  */
 export function getCursorItem(ctx) {
-    let inv = getCursorInventory(ctx);
-    if (!inv) return null;
-    return inv.itemList.at(0, 0);
+    return getItemAtInventory(getInventoryStore(), ctx.element.name, 0, 0);
 }
 
 export function storeToCursor(ctx, freedItem) {
     if (!freedItem) return;
-    let inv = getCursorInventory(ctx);
-    inv.itemList.add(freedItem);
-    if (inv.itemList.length > 0) {
-        inv.style.display = 'unset';
-        startPlaceDownBuffer();
-    }
+    addItemToInventory(getInventoryStore(), ctx.element.name, freedItem);
+    ctx.element.style.display = 'unset';
+    startPlaceDownBuffer();
 }
 
 export function freeFromCursor(ctx) {
-    let inv = getCursorInventory(ctx);
-    inv.itemList.clear();
-    if (inv.itemList.length <= 0) {
-        inv.style.display = 'none';
-        clearPlaceDownBuffer();
-    }
+    clearInventory(getInventoryStore(), ctx.element.name);
+    ctx.element.style.display = 'none';
+    clearPlaceDownBuffer();
 }
 
 export function startPlaceDownBuffer() {

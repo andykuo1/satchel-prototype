@@ -1,6 +1,6 @@
-import { clearItemList, ItemList, loadItemList, saveItemList } from './ItemList.js';
 import { containerMouseUpCallback } from './ContainerHelper.js';
-import { upgradeProperty } from './util.js';
+import { upgradeProperty, uuid } from './util.js';
+import { addInventoryChangeListener, getInventoryStore, getItemAtInventory, getItemsInInventory, removeInventoryChangeListener, resolveInventory } from './InventoryStore.js';
 
 const DEFAULT_ITEM_UNIT_SIZE = 48;
 
@@ -93,10 +93,19 @@ export class InventoryBag extends HTMLElement {
 
     static get observedAttributes() {
         return [
+            'name',
             'rows',
             'cols',
             'type',
         ];
+    }
+
+    get name() {
+        return this._name;
+    }
+
+    set name(value) {
+        this.setAttribute('name', value);
     }
 
     get rows() {
@@ -123,60 +132,54 @@ export class InventoryBag extends HTMLElement {
         this.setAttribute('type', value);
     }
 
-    get size() {
-        return [ this.rows, this.cols ];
-    }
-
-    set size(value) {
-        this.rows = value[0];
-        this.cols = value[1];
-    }
-
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
         this.shadowRoot.appendChild(this.constructor[Symbol.for('templateNode')].content.cloneNode(true));
         this.shadowRoot.appendChild(this.constructor[Symbol.for('styleNode')].cloneNode(true));
 
+        this._name = uuid();
         this._rows = 1;
         this._cols = 1;
         this._type = 'grid';
 
-        this.disabledTransfer = false;
-        this.disabledTransferIn = false;
-        this.disabledTransferOut = false;
-        this.disabledEdit = false;
-        this.hidden = false;
-
         this._root = this.shadowRoot.querySelector('article');
-        this._itemSlot = this.shadowRoot.querySelector('.container slot');
+        this._itemSlot = /** @type {HTMLSlotElement} */ (this.shadowRoot.querySelector('.container slot'));
         this._container = this.shadowRoot.querySelector('.container');
         this._containerTitle = this.shadowRoot.querySelector('h2');
 
-        this.onItemListChange = this.onItemListChange.bind(this);
-        this.onSlotChange = this.onSlotChange.bind(this);
+        this.onInventoryChange = this.onInventoryChange.bind(this);
         this.onMouseUp = this.onMouseUp.bind(this);
-        
-        this.itemList = new ItemList(this, this.onItemListChange);
-        this.socket = { item: null, container: null };
     }
 
     connectedCallback() {
+        upgradeProperty(this, 'name');
         upgradeProperty(this, 'rows');
         upgradeProperty(this, 'cols');
         upgradeProperty(this, 'type');
-
+        
+        resolveInventory(getInventoryStore(), this.name);
         this._container.addEventListener('mouseup', this.onMouseUp);
-        this._itemSlot.addEventListener('slotchange', this.onSlotChange);
     }
 
     disconnectedCallback() {
         this._container.removeEventListener('mouseup', this.onMouseUp);
-        this._itemSlot.removeEventListener('slotchange', this.onSlotChange);
     }
 
     attributeChangedCallback(attribute, prev, value) {
         switch(attribute) {
+            case 'name': {
+                    let store = getInventoryStore();
+                    let prevName = this._name;
+                    let nextName = value;
+                    this._name = nextName;
+                    if (prevName) {
+                        removeInventoryChangeListener(store, prevName, this.onInventoryChange);
+                    }
+                    if (nextName) {
+                        addInventoryChangeListener(store, nextName, this.onInventoryChange);
+                    }
+                } break;
             case 'rows':
                 this._rows = Number(value);
                 this.style.setProperty('--container-width', value);
@@ -191,112 +194,30 @@ export class InventoryBag extends HTMLElement {
         }
     }
 
-    onSlotChange(e)
-    {
-        this.itemList.update(e.target);
-        
-        if (this.type === 'socket')
-        {
-            let itemElement = this.itemList.at(0, 0);
-            if (itemElement)
-            {
-                this.rows = itemElement.w;
-                this.cols = itemElement.h;
-            }
-            else
-            {
+    onInventoryChange(store, inventoryName) {
+        if (this.type === 'socket') {
+            let item = getItemAtInventory(store, inventoryName, 0, 0);
+            if (item) {
+                this.rows = item.w;
+                this.cols = item.h;
+            } else {
                 this.rows = 1;
                 this.cols = 1;
             }
         }
-    }
-
-    onItemListChange()
-    {
+        // Clear items in slot
+        this._itemSlot.innerHTML = '';
+        // Add new items into slot.
+        for(let item of getItemsInInventory(store, inventoryName)) {
+            item.container = this;
+            this._itemSlot.appendChild(item);
+        }
         this.dispatchEvent(new CustomEvent('itemchange', { composed: true, bubbles: false }));
-
-        // Socket containers
-        if (this.type === 'socket')
-        {
-            let itemElement = this.itemList.at(0, 0);
-            let socketItem = this.socket.item;
-            if (socketItem !== itemElement)
-            {
-                this.onSocketedItemChange(socketItem, itemElement);
-            }
-        }
     }
 
-    onSocketedItemChange(prev, next)
-    {
-        if (next)
-        {
-            this.unit = DEFAULT_ITEM_UNIT_SIZE / (Math.min(next.w, next.h) || 1);
-        }
-        else
-        {
-            this.unit = DEFAULT_ITEM_UNIT_SIZE;
-        }
-    }
-    
     onMouseUp(e)
     {
         return containerMouseUpCallback(e, this, 48);
     }
 }
 InventoryBag.define();
-
-export function isSocketContainer(itemContainer)
-{
-    return itemContainer.type === 'socket';
-}
-
-export function isGridContainer(itemContainer)
-{
-    return itemContainer.type === 'grid';
-}
-
-export function canTransferItemIn(itemContainer)
-{
-    return itemContainer && !itemContainer.disabledTransfer && !itemContainer.disabledTransferIn;
-}
-
-export function canTransferItemOut(itemContainer)
-{
-    return itemContainer && !itemContainer.disabledTransfer && !itemContainer.disabledTransferOut;
-}
-
-export function saveItemContainer(itemContainer, itemContainerData)
-{
-    let itemListData = {};
-    saveItemList(itemContainer.itemList, itemListData);
-    itemContainerData.itemList = itemListData;
-
-    itemContainerData.type = itemContainer.type;
-    itemContainerData.size = itemContainer.size;
-    itemContainerData.hidden = itemContainer.hidden;
-
-    return itemContainerData;
-}
-
-export function loadItemContainer(itemContainer, itemContainerData)
-{
-    if ('itemList' in itemContainerData)
-    {
-        loadItemList(itemContainer.itemList, itemContainerData.itemList);
-    }
-
-    if ('type' in itemContainerData) itemContainer.type = itemContainerData.type;
-    if ('size' in itemContainerData) itemContainer.size = itemContainerData.size;
-    if ('hidden' in itemContainerData) itemContainer.hidden = itemContainerData.hidden;
-
-    return itemContainer;
-}
-
-export function clearItemContainer(itemContainer)
-{
-    clearItemList(itemContainer.itemList);
-
-    // BUGFIX: This makes sure that the socketed container is removed. Maybe there's a better way to do this?
-    itemContainer.onItemListChange();
-}

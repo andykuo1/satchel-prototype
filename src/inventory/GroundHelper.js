@@ -1,5 +1,6 @@
 import { freeFromCursor, getCursorContext, getCursorItem } from './CursorHelper.js';
 import { insertIn } from './InventoryHelper.js';
+import { createInventory, deleteInventory, getInventoryStore, isEmptyInventory } from './InventoryStore.js';
 
 export function setGroundContainer(ground) {
     let ctx = getCursorContext();
@@ -27,18 +28,19 @@ export function getGroundContainer() {
 
 export function dropOnGround(freedItem) {
     let ground = getGroundContainer();
-    let inv = document.createElement('inventory-bag');
-    inv.type = 'socket';
-    insertIn(inv, freedItem);
-    inv.addEventListener('itemchange', onGroundSlotChange);
-    ground.appendChild(inv);
+    let element = document.createElement('inventory-bag');
+    element.name = createInventory(getInventoryStore()).name;
+    element.type = 'socket';
+    insertIn(element, freedItem);
+    element.addEventListener('itemchange', onGroundSlotChange);
+    ground.appendChild(element);
 }
 
 function onGroundSlotChange(e) {
     let target = e.target;
-    let item = target.itemList.at(0, 0);
-    if (!item) {
+    if (isEmptyInventory(getInventoryStore(), target.id)) {
         target.removeEventListener('itemchange', onGroundSlotChange);
         target.parentNode.removeChild(target);
+        deleteInventory(getInventoryStore(), target.id);
     }
 }

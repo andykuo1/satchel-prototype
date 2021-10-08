@@ -55,7 +55,7 @@
         <h1>Satchel</h1>
     </header>
     <main>
-        <inventory-bag type="grid" size="4 6" rows=4 cols=6></inventory-bag>
+        <inventory-bag name="main" type="grid" size="4 6" rows=4 cols=6></inventory-bag>
         <div id="ground"></div>
     </main>
     <footer style="font-family: monospace; opacity: 0.6;">
@@ -64,11 +64,11 @@
         </small>
     </footer>
     <div class="foreground">
-        <inventory-bag id="holding" type="socket"></inventory-bag>
+        <inventory-bag name="cursor" id="holding" type="socket"></inventory-bag>
     </div>
 
     <script type="module">
-        import { setCursorInventory } from './src/inventory/CursorHelper.js';
+        import { setCursorElement } from './src/inventory/CursorHelper.js';
         import { setGroundContainer, dropOnGround } from './src/inventory/GroundHelper.js';
 
         import BackpackImage from './res/backpack.js';
@@ -175,7 +175,7 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            setCursorInventory(document.querySelector('#holding'));
+            setCursorElement(document.querySelector('#holding'));
             setGroundContainer(document.querySelector('#ground'));
             spawnDefaultBackpack();
         });

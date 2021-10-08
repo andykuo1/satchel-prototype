@@ -1,5 +1,6 @@
 import { dijkstra2d } from '../util.js';
-import { freeFromCursor, getCursorContext, getCursorInventory, getCursorItem, storeToCursor } from './CursorHelper.js';
+import { freeFromCursor, getCursorContext, getCursorElement, getCursorItem, storeToCursor } from './CursorHelper.js';
+import { addItemToInventory, deleteItemFromInventory, getInventoryStore, getItemAtInventory, getItemsInInventory, isEmptyInventory } from './InventoryStore.js';
 
 /**
  * Pick up from target inventory to cursor.
@@ -9,10 +10,10 @@ import { freeFromCursor, getCursorContext, getCursorInventory, getCursorItem, st
  */
 export function pickUp(storedItem, fromInventory, fromCoordX = 0, fromCoordY = 0) {
     let ctx = getCursorContext();
-    let inv = getCursorInventory(ctx);
-    if (!inv) return false;
-    if (inv.itemList.length > 0) return false;
-    fromInventory.itemList.delete(storedItem);
+    let element = getCursorElement(ctx);
+    if (!element) return false;
+    if (!isEmptyInventory(getInventoryStore(), ctx.element.name)) return false;
+    deleteItemFromInventory(getInventoryStore(), fromInventory.name, storedItem);
     let prevX = storedItem.x;
     let prevY = storedItem.y;
     storedItem.x = 0;
@@ -49,13 +50,14 @@ export function putDown(toInventory, toCoordX, toCoordY, allowSwap = true) {
 
     if (allowSwap && canSwapAt(toInventory, coordX, coordY, targetCoordX, targetCoordY, itemWidth, itemHeight)) {
         freeFromCursor(ctx);
-        let result = pickUp(toInventory.itemList.at(coordX, coordY), toInventory);
+        let storedItem = getItemAtInventory(getInventoryStore(), toInventory.name, coordX, coordY);
+        let result = pickUp(storedItem, toInventory);
         if (!result) {
             throw new Error('Failed to pick up item on swap.');
         }
         item.x = targetCoordX;
         item.y = targetCoordY;
-        toInventory.itemList.add(item);
+        addItemToInventory(getInventoryStore(), toInventory.name, item);
         return true;
     } else {
         let [ x, y ] = findEmptyCoords(
@@ -66,7 +68,7 @@ export function putDown(toInventory, toCoordX, toCoordY, allowSwap = true) {
             freeFromCursor(ctx);
             item.x = x;
             item.y = y;
-            toInventory.itemList.add(item);
+            addItemToInventory(getInventoryStore(), toInventory.name, item);
             return true;
         }
     }
@@ -75,9 +77,10 @@ export function putDown(toInventory, toCoordX, toCoordY, allowSwap = true) {
 
 export function extractOut(fromInventory, filter) {
     let result = [];
-    for(let item of fromInventory.itemList) {
+    let items = getItemsInInventory(getInventoryStore(), fromInventory.name);
+    for(let item of items) {
         if (filter(item, fromInventory)) {
-            fromInventory.itemList.delete(item);
+            deleteItemFromInventory(getInventoryStore(), fromInventory.name, item);
             item.x = 0;
             item.y = 0;
             result.push(item);
@@ -87,10 +90,10 @@ export function extractOut(fromInventory, filter) {
 }
 
 export function insertIn(toInventory, freedItem) {
-    if (toInventory.type === 'socket' && toInventory.itemList.length <= 0) {
+    if (toInventory.type === 'socket' && isEmptyInventory(getInventoryStore(), toInventory.name)) {
         freedItem.x = 0;
         freedItem.y = 0;
-        toInventory.itemList.add(freedItem);
+        addItemToInventory(getInventoryStore(), toInventory.name, freedItem);
         return true;
     }
     let ctx = getCursorContext();
@@ -109,7 +112,7 @@ export function insertIn(toInventory, freedItem) {
         freeFromCursor(ctx);
         freedItem.x = x;
         freedItem.y = y;
-        toInventory.itemList.add(freedItem);
+        addItemToInventory(getInventoryStore(), toInventory.name, freedItem);
         return true;
     }
     return false;
@@ -117,7 +120,7 @@ export function insertIn(toInventory, freedItem) {
 
 
 function canSwapAt(inv, coordX, coordY, itemX, itemY, itemWidth, itemHeight) {
-    let item = inv.itemList.at(coordX, coordY);
+    let item = getItemAtInventory(getInventoryStore(), inv.name, coordX, coordY);
     return item && canPlaceAt(inv, itemX, itemY, itemWidth, itemHeight, item);
 }
 
@@ -126,8 +129,8 @@ function canPlaceAt(inv, coordX, coordY, itemWidth, itemHeight, exclude = null) 
     {
         for(let x = 0; x < itemWidth; ++x)
         {
-            let itemElement = inv.itemList.at(coordX + x, coordY + y);
-            if (itemElement && (!exclude || itemElement !== exclude))
+            let item = getItemAtInventory(getInventoryStore(), inv.name, coordX + x, coordY + y);
+            if (item && (!exclude || item !== exclude))
             {
                 return false;
             }
