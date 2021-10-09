@@ -28,7 +28,7 @@ export function getGroundContainer() {
 
 export function dropOnGround(freedItem) {
     let ground = getGroundContainer();
-    let element = document.createElement('inventory-bag');
+    let element = document.createElement('inventory-grid');
     element.name = createInventory(getInventoryStore()).name;
     element.type = 'socket';
     insertIn(element, freedItem);

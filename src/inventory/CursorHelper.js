@@ -52,7 +52,7 @@ export function getCursorContext() {
 }
 
 /**
- * @returns {import('./InventoryBag.js').InventoryBag}
+ * @returns {import('./InventoryGrid.js').InventoryGrid}
  */
 export function getCursorElement(ctx) {
     return ctx.element;

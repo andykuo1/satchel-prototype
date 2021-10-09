@@ -47,7 +47,7 @@
         }
     </style>
     
-    <script type="module" src="./src/inventory/InventoryBag.js"></script>
+    <script type="module" src="./src/inventory/InventoryGrid.js"></script>
     <script type="module" src="./src/inventory/InventoryItem.js"></script>
 </head>
 <body>
@@ -55,7 +55,7 @@
         <h1>Satchel</h1>
     </header>
     <main>
-        <inventory-bag name="main" type="grid" size="4 6" rows=4 cols=6></inventory-bag>
+        <inventory-grid name="main" type="grid" size="4 6" rows=4 cols=6></inventory-grid>
         <div id="ground"></div>
     </main>
     <footer style="font-family: monospace; opacity: 0.6;">
@@ -64,113 +64,19 @@
         </small>
     </footer>
     <div class="foreground">
-        <inventory-bag name="cursor" id="holding" type="socket"></inventory-bag>
+        <inventory-grid name="cursor" id="holding" type="socket"></inventory-grid>
     </div>
 
     <script type="module">
         import { setCursorElement } from './src/inventory/CursorHelper.js';
         import { setGroundContainer, dropOnGround } from './src/inventory/GroundHelper.js';
-
-        import BackpackImage from './res/backpack.js';
-        import CubeImage from './res/cube.js';
-        import PotionImage from './res/potion.js';
-        import RopeImage from './res/rope.js';
-        import ShieldImage from './res/shield.js';
-        import SwordImage from './res/sword.js';
-
-        function choose(elements)
-        {
-            return elements[Math.floor(Math.random() * elements.length)];
-        }
-
-        function randomRange(min, max)
-        {
-            return (Math.random() * (max - min)) + min;
-        }
-
-        function randomRangeInt(min, max)
-        {
-            return Math.floor(randomRange(min, max));
-        }
-
-        function createItemElement()
-        {
-            let backpack = itemElement => {
-                itemElement.w = randomRangeInt(3, 4);
-                itemElement.h = choose([3, 3, 3, 4, 4, 4, 5]);
-                itemElement.name = 'Backpack';
-                itemElement.category = 'Container';
-                itemElement.src = BackpackImage;
-                itemElement.detail = 'It can hold stuff. Yay!';
-            };
-            let potion = itemElement => {
-                itemElement.w = 1;
-                itemElement.h = choose([1, 1, 2, 2, 2, 3]);
-                itemElement.name = 'Potion of Healing';
-                itemElement.category = 'Potion';
-                itemElement.src = PotionImage;
-                itemElement.detail = 'Drink it to heal yourself.\n Or give it to someone else to heal them too!';
-            };
-            let sword = itemElement => {
-                itemElement.w = 1;
-                itemElement.h = choose([2, 2, 2, 3, 3, 3, 4]);
-                itemElement.name = 'Wooden Sword';
-                itemElement.category = 'Weapon';
-                itemElement.src = SwordImage;
-                itemElement.detail = 'Maybe one day I can get an actual sword...';
-            };
-            let cube = itemElement => {
-                itemElement.w = 1;
-                itemElement.h = 1;
-                itemElement.name = 'The Cube';
-                itemElement.category = 'Artifact';
-                itemElement.src = CubeImage;
-                itemElement.detail = 'It looks like a cube?';
-            };
-            let shield = itemElement => {
-                itemElement.w = 2;
-                itemElement.h = choose([2, 3]);
-                itemElement.name = 'Wooden Shield';
-                itemElement.category = 'Armor';
-                itemElement.src = ShieldImage;
-                itemElement.detail = 'Sharp stuff. Bad.';
-            };
-            let magicRope = itemElement => {
-                itemElement.w = 2;
-                itemElement.h = 1;
-                itemElement.name = 'Never-Ending Rope';
-                itemElement.category = 'Wonder';
-                itemElement.src = RopeImage;
-                itemElement.detail = 'Seriously. It never ends!';
-            };
-
-            let items = [
-                backpack,
-                potion,
-                sword,
-                cube,
-                shield,
-                magicRope
-            ];
-
-            let chosenItem = choose(items);
-            let itemElement = document.createElement('inventory-item');
-            chosenItem(itemElement);
-            return itemElement;
-        }
-
-        const BACKPACK = itemElement => {
-            itemElement.w = 2;
-            itemElement.h = 2;
-            itemElement.name = 'Backpack';
-            itemElement.category = 'Container';
-            itemElement.src = BackpackImage;
-            itemElement.detail = 'This was all you could carry.';
-        };
+        import { createItem, getInventoryStore } from './src/inventory/InventoryStore.js';
+        import { BACKPACK } from './src/inventory/Items.js';
+        import { InventoryItem } from './src/inventory/InventoryItem.js';
 
         function spawnDefaultBackpack() {
-            let itemElement = document.createElement('inventory-item');
-            BACKPACK(itemElement);
+            let item = createItem(getInventoryStore(), BACKPACK);
+            let itemElement = new InventoryItem(item.itemId);
             dropOnGround(itemElement);
         }
 

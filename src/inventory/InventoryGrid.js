@@ -69,7 +69,7 @@ h2:empty {
 }
 `;
 
-export class InventoryBag extends HTMLElement {
+export class InventoryGrid extends HTMLElement {
 
     /** @private */
     static get [Symbol.for('templateNode')]() {
@@ -88,7 +88,7 @@ export class InventoryBag extends HTMLElement {
     }
 
     static define(customElements = window.customElements) {
-        customElements.define('inventory-bag', this);
+        customElements.define('inventory-grid', this);
     }
 
     static get observedAttributes() {
@@ -157,7 +157,7 @@ export class InventoryBag extends HTMLElement {
         upgradeProperty(this, 'rows');
         upgradeProperty(this, 'cols');
         upgradeProperty(this, 'type');
-        
+
         resolveInventory(getInventoryStore(), this.name);
         this._container.addEventListener('mouseup', this.onMouseUp);
     }
@@ -220,4 +220,4 @@ export class InventoryBag extends HTMLElement {
         return containerMouseUpCallback(e, this, 48);
     }
 }
-InventoryBag.define();
+InventoryGrid.define();

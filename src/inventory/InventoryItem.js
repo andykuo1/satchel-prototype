@@ -1,6 +1,7 @@
 import { DEFAULT_ITEM } from '../assets.js';
-import { upgradeProperty } from './util.js';
+import { upgradeProperty, uuid } from './util.js';
 import { itemMouseDownCallback } from './ContainerHelper.js';
+import { addItemChangeListener, getInventoryStore, getItem, removeItemChangeListener, resolveItem, updateItem } from './InventoryStore.js';
 
 const INNER_HTML = `
 <figure class="container">
@@ -78,93 +79,97 @@ export class InventoryItem extends HTMLElement {
 
     static get observedAttributes() {
         return [
-            'x',
-            'y',
-            'w',
-            'h',
-            'src',
-            'name',
+            'itemId'
         ];
     }
 
+    get itemId() {
+        return this._itemId;
+    }
+
+    set itemId(value) {
+        this.setAttribute('itemId', value);
+    }
+
     get x() {
-        return this._x;
+        let item = getItem(getInventoryStore(), this.itemId);
+        return item.x;
     }
 
     set x(value) {
-        this.setAttribute('x', String(value));
+        updateItem(getInventoryStore(), this.itemId, { x: value });
     }
 
     get y() {
-        return this._y;
+        let item = getItem(getInventoryStore(), this.itemId);
+        return item.y;
     }
 
     set y(value) {
-        this.setAttribute('y', String(value));
+        updateItem(getInventoryStore(), this.itemId, { y: value });
     }
 
     get w() {
-        return this._w;
+        let item = getItem(getInventoryStore(), this.itemId);
+        return item.w;
     }
 
     set w(value) {
-        this.setAttribute('w', String(value));
+        updateItem(getInventoryStore(), this.itemId, { w: value });
     }
 
     get h() {
-        return this._h;
+        let item = getItem(getInventoryStore(), this.itemId);
+        return item.h;
     }
 
     set h(value) {
-        this.setAttribute('h', String(value));
+        updateItem(getInventoryStore(), this.itemId, { h: value });
     }
 
     get src() {
-        return this._src;
+        let item = getItem(getInventoryStore(), this.itemId);
+        return item.imgSrc;
     }
 
     set src(value) {
-        this.setAttribute('src', value);
+        updateItem(getInventoryStore(), this.itemId, { imgSrc: value });
     }
 
     get name() {
-        return this._name;
+        let item = getItem(getInventoryStore(), this.itemId);
+        return item.displayName;
     }
 
     set name(value) {
-        this.setAttribute('name', value);
+        updateItem(getInventoryStore(), this.itemId, { displayName: value });
     }
 
-    constructor() {
+    constructor(itemId = undefined) {
         super();
         this.attachShadow({ mode: 'open' });
         this.shadowRoot.appendChild(this.constructor[Symbol.for('templateNode')].content.cloneNode(true));
         this.shadowRoot.appendChild(this.constructor[Symbol.for('styleNode')].cloneNode(true));
 
-        this._x = 0;
-        this._y = 0;
-        this._w = 1;
-        this._h = 1;
-        this._src = '';
-        this._name = '';
+        this._itemId = itemId;
 
         this._image = this.shadowRoot.querySelector('img');
         this._caption = this.shadowRoot.querySelector('figcaption');
 
         this.container = null;
 
+        this.onItemChange = this.onItemChange.bind(this);
         this.onMouseDown = this.onMouseDown.bind(this);
     }
 
     connectedCallback() {
-        upgradeProperty(this, 'x');
-        upgradeProperty(this, 'y');
-        upgradeProperty(this, 'w');
-        upgradeProperty(this, 'h');
-        upgradeProperty(this, 'src');
-        upgradeProperty(this, 'name');
+        upgradeProperty(this, 'itemId');
 
         this.addEventListener('mousedown', this.onMouseDown);
+
+        if (this.itemId) {
+            this.onItemChange(getInventoryStore(), this.itemId);
+        }
     }
 
     disconnectedCallback() {
@@ -173,31 +178,31 @@ export class InventoryItem extends HTMLElement {
 
     attributeChangedCallback(attribute, prev, value) {
         switch(attribute) {
-            case 'x':
-                this._x = Number(value);
-                this.style.setProperty('--itemX', value);
-                break;
-            case 'y':
-                this._y = Number(value);
-                this.style.setProperty('--itemY', value);
-                break;
-            case 'w':
-                this._w = Number(value);
-                this.style.setProperty('--itemWidth', value);
-                break;
-            case 'h':
-                this._h = Number(value);
-                this.style.setProperty('--itemHeight', value);
-                break;
-            case 'src':
-                this._src = value;
-                this._image.src = value;
-                break;
-            case 'name':
-                this._image.alt = value;
-                this._caption.textContent = value;
-                break;
+            case 'itemId': {
+                let store = getInventoryStore();
+                let prevId = this._itemId;
+                let nextId = value;
+                this._itemId = nextId;
+                if (prevId) {
+                    removeItemChangeListener(store, prevId, this.onItemChange);
+                }
+                if (nextId) {
+                    addItemChangeListener(store, nextId, this.onItemChange);
+                    this.onItemChange(store, nextId);
+                }
+            } break;
         }
+    }
+
+    onItemChange(store, itemId) {
+        let item = getItem(store, itemId);
+        this.style.setProperty('--itemX', item.x);
+        this.style.setProperty('--itemY', item.y);
+        this.style.setProperty('--itemWidth', item.w);
+        this.style.setProperty('--itemHeight', item.h);
+        this._image.src = item.imgSrc;
+        this._image.alt = item.displayName;
+        this._caption.textContent = item.displayName;
     }
 
     onMouseDown(e) {
@@ -206,33 +211,3 @@ export class InventoryItem extends HTMLElement {
     }
 }
 InventoryItem.define();
-
-export function saveItemElement(itemElement, itemData)
-{
-    itemData.x = itemElement.x || 0;
-    itemData.y = itemElement.y || 0;
-    itemData.w = itemElement.w;
-    itemData.h = itemElement.h;
-    itemData.src = itemElement.src;
-    itemData.name = itemElement.name;
-    itemData.category = itemElement.category;
-    itemData.detail = itemElement.detail;
-    itemData.metadata = itemElement.metadata;
-
-    return itemData;
-}
-
-export function loadItemElement(itemElement, itemData)
-{
-    if ('x' in itemData) itemElement.x = Number(itemData.x) || 0;
-    if ('y' in itemData) itemElement.y = Number(itemData.y) || 0;
-    if ('w' in itemData) itemElement.w = itemData.w;
-    if ('h' in itemData) itemElement.h = itemData.h;
-    if ('src' in itemData) itemElement.src = itemData.src;
-    if ('name' in itemData) itemElement.name = itemData.name;
-    if ('category' in itemData) itemElement.category = itemData.category;
-    if ('detail' in itemData) itemElement.detail = itemData.detail;
-    if ('metadata' in itemData) itemElement.metadata = itemData.metadata;
-
-    return itemElement;
-}
