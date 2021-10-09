@@ -1,6 +1,7 @@
 import { containerMouseUpCallback } from './ContainerHelper.js';
 import { upgradeProperty, uuid } from './util.js';
 import { addInventoryChangeListener, getInventoryStore, getItemAtInventory, getItemsInInventory, removeInventoryChangeListener, resolveInventory } from './InventoryStore.js';
+import { InventoryItem } from './InventoryItem.js';
 
 const DEFAULT_ITEM_UNIT_SIZE = 48;
 
@@ -205,12 +206,28 @@ export class InventoryGrid extends HTMLElement {
                 this.cols = 1;
             }
         }
+        // Preserve unchanged items in slot
+        let preservedItems = {};
+        for(let node of this._itemSlot.assignedNodes()) {
+            let itemId = node['itemId'];
+            if (typeof itemId === 'string') {
+                preservedItems[itemId] = node;
+            }
+        }
         // Clear items in slot
         this._itemSlot.innerHTML = '';
         // Add new items into slot.
         for(let item of getItemsInInventory(store, inventoryName)) {
-            item.container = this;
-            this._itemSlot.appendChild(item);
+            let itemId = item.itemId;
+            if (itemId in preservedItems) {
+                let element = preservedItems[itemId];
+                element.container = this;
+                this._itemSlot.appendChild(element);
+            } else {
+                let element = new InventoryItem(itemId);
+                element.container = this;
+                this._itemSlot.appendChild(element);
+            }
         }
         this.dispatchEvent(new CustomEvent('itemchange', { composed: true, bubbles: false }));
     }
