@@ -1,6 +1,6 @@
 import { containerMouseUpCallback } from './ContainerHelper.js';
 import { upgradeProperty, uuid } from './util.js';
-import { addInventoryChangeListener, getInventoryStore, getItemAtInventory, getItemsInInventory, removeInventoryChangeListener, resolveInventory } from './InventoryStore.js';
+import { addInventoryChangeListener, changeInventoryType, getInventoryStore, getItemAtInventory, getItemsInInventory, removeInventoryChangeListener, resolveInventory } from './InventoryStore.js';
 import { InventoryItem } from './InventoryItem.js';
 
 const DEFAULT_ITEM_UNIT_SIZE = 48;
@@ -160,6 +160,7 @@ export class InventoryGrid extends HTMLElement {
         upgradeProperty(this, 'type');
 
         resolveInventory(getInventoryStore(), this.name);
+        changeInventoryType(getInventoryStore(), this.name, this.type);
         this._container.addEventListener('mouseup', this.onMouseUp);
     }
 
@@ -191,6 +192,7 @@ export class InventoryGrid extends HTMLElement {
                 break;
             case 'type':
                 this._type = value;
+                changeInventoryType(getInventoryStore(), this.name, value);
                 break;
         }
     }

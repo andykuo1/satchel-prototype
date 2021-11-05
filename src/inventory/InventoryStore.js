@@ -57,6 +57,7 @@ export function createInventory(store, inventoryName = uuid()) {
         items: [],
         width: 1,
         height: 1,
+        type: 'grid',
     };
     let container = resolveContainer(store, inventoryName);
     container.inventory = inventory;
@@ -101,6 +102,11 @@ export function clearInventory(store, inventoryName) {
             dispatchInventoryChange(store, inventoryName);
         }
     }
+}
+
+export function changeInventoryType(store, inventoryName, type) {
+    let inventory = getInventory(store, inventoryName);
+    inventory.type = type;
 }
 
 export function isEmptyInventory(store, inventoryName) {

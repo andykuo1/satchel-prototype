@@ -28,10 +28,12 @@ export function getGroundContainer() {
 
 export function dropOnGround(freedItem) {
     let ground = getGroundContainer();
+    let inventory = createInventory(getInventoryStore());
+    inventory.type = 'socket';
     let element = document.createElement('inventory-grid');
-    element.name = createInventory(getInventoryStore()).name;
+    element.name = inventory.name;
     element.type = 'socket';
-    insertIn(element, freedItem);
+    insertIn(inventory, freedItem);
     element.addEventListener('itemchange', onGroundSlotChange);
     ground.appendChild(element);
 }

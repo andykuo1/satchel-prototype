@@ -92,8 +92,6 @@
                 <img src="res/settings.svg" alt="settings" width="40">
             </button>
             <script type="module">
-                import { getInventoryStore, clearInventory } from './src/inventory/InventoryStore.js';
-                import { storeToString } from './src/inventory/InventoryHelper.js';
                 import { clearGround } from './src/inventory/GroundHelper.js';
                 
                 window.addEventListener('DOMContentLoaded', () => {
@@ -209,6 +207,7 @@
         });
 
         function onItemBuild(e) {
+            console.log(getInventoryStore());
             let result = {
                 w: 1,
                 h: 1,
@@ -292,8 +291,7 @@
 
         function spawnItem(opts) {
             let item = createItem(getInventoryStore(), opts);
-            let itemElement = new InventoryItem(item.itemId);
-            dropOnGround(itemElement);
+            dropOnGround(item);
         }
 
         function spawnDefaultBackpack() {
