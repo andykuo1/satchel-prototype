@@ -1,6 +1,6 @@
 import { freeFromCursor, getCursorContext, getCursorItem } from './CursorHelper.js';
 import { insertIn } from './InventoryHelper.js';
-import { createInventory, deleteInventory, getInventoryStore, isEmptyInventory } from './InventoryStore.js';
+import { clearInventory, createInventory, deleteInventory, getInventoryStore, isEmptyInventory } from './InventoryStore.js';
 
 export function setGroundContainer(ground) {
     let ctx = getCursorContext();
@@ -34,6 +34,13 @@ export function dropOnGround(freedItem) {
     insertIn(element, freedItem);
     element.addEventListener('itemchange', onGroundSlotChange);
     ground.appendChild(element);
+}
+
+export function clearGround() {
+    for(let child of getGroundContainer().children) {
+        let inventoryName = child.name;
+        clearInventory(getInventoryStore(), inventoryName);
+    }
 }
 
 function onGroundSlotChange(e) {

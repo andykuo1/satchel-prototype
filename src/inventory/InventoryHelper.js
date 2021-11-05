@@ -173,7 +173,7 @@ function getNeighborsFromCoords(coordX, coordY, out) {
     return out;
 }
 
-function storeToString(store) {
+export function storeToString(store) {
     let result = '';
     result += 'containers:\n';
     for(let containerName of Object.keys(store.containers)) {
@@ -188,12 +188,12 @@ function storeToString(store) {
     return result;
 }
 
-function containerToString(container) {
+export function containerToString(container) {
     if (!container) return '[Container#null::{}]'
     return `[Container#${container.inventory.width}x${container.inventory.height}@${container.active?'active':'inactive'}::{${container.inventory.items.map(item => itemToString(item) + ',')}}]`
 }
 
-function itemToString(item) {
+export function itemToString(item) {
     if (!item) return '[Item#null]';
     return `[${item.itemId}#${item.w}x${item.h}@${item.x},${item.y}]`
 }

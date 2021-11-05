@@ -15,7 +15,7 @@ export function createInventoryStore() {
         listeners: {
             item: {},
             inventory: {},
-        }
+        },
     };
 }
 
@@ -49,7 +49,6 @@ function resolveContainer(store, inventoryName) {
         return createContainer(store, inventoryName);
     }
 }
-
 
 
 export function createInventory(store, inventoryName = uuid()) {
