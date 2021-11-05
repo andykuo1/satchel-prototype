@@ -26,7 +26,6 @@ export function loadFromJSON(store, jsonData) {
             inventory: jsonData.inventory,
         }
     };
-    console.log(nextStore);
     resetInventoryStore(store, nextStore);
 }
 

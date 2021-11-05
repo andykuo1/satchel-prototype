@@ -89,6 +89,7 @@
             </button>
             <script type="module">
                 import { clearGround } from './src/inventory/GroundHelper.js';
+                import { openItemBuilder } from './src/inventory/ItemBuilder.js';
                 
                 window.addEventListener('DOMContentLoaded', () => {
                     document.querySelector('#settingsButton').addEventListener('click', onSettingsClick);
@@ -96,7 +97,13 @@
                 });
 
                 function onSettingsClick() {
-                    document.querySelector('#settingsContent').classList.toggle('open');
+                    let settings = document.querySelector('#settingsContent');
+                    if (settings.classList.contains('open')) {
+                        settings.classList.remove('open');
+                    } else {
+                        openItemBuilder(document.querySelector('#itemBuilder'));
+                        document.querySelector('#settingsContent').classList.add('open');
+                    }
                 }
 
                 function onDeleteClick() {
@@ -124,8 +131,11 @@
                     position: absolute;
                     top: 0;
                     right: 0;
+                    max-height: 100%;
+                    overflow-y: auto;
                     transform: translateX(100%);
                     transition: transform 0.3s ease;
+                    border-left: 0.5em solid black;
                 }
                 .sidebar.open {
                     transform: translateX(0%);
@@ -142,8 +152,17 @@
                     display: flex;
                     flex-direction: column;
                 }
+                fieldset:disabled {
+                    opacity: 0.3;
+                }
+                #itemName {
+                    text-align: center;
+                }
+                input[type="text"], textarea {
+                    font-family: 'Times New Roman', Times, serif;
+                }
             </style>
-            <form id="itemBuilder">
+            <form id="itemBuilder" autocomplete="off">
                 <legend>Item Builder</legend>
                 <fieldset id="itemSizeSet">
                     <legend>Size</legend>
@@ -169,17 +188,16 @@
                 </fieldset>
                 <fieldset id="itemDetailSet">
                     <legend>Details</legend>
+                    <input type="hidden" id="itemId" name="itemId">
                     <label for="itemName">Name</label>
                     <input type="text" id="itemName" name="itemName" value="Item">
                     <label for="itemDetail">Description</label>
                     <textarea id="itemDetail" name="itemDetail"></textarea>
-                    <label for="itemPortrait" name="itemPortrait">Image</label>
-                    <input id="itemPortrait" type="file">
                 </fieldset>
                 <br>
                 <fieldset id="itemFinishSet">
-                    <button id="itemResetButton">Reset to Default</button>
-                    <input type="submit" value="Build Item">
+                    <input type="submit" value="Build">
+                    <button id="itemResetButton">Cancel</button>
                 </fieldset>
             </form>
         </div>

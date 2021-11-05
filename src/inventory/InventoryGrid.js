@@ -155,22 +155,30 @@ export class InventoryGrid extends HTMLElement {
         this.onInventoryChange = this.onInventoryChange.bind(this);
         /** @protected */
         this.onMouseUp = this.onMouseUp.bind(this);
+        /** @protected */
+        this.onContextMenu = this.onContextMenu.bind(this);
     }
 
     /** @protected */
     connectedCallback() {
-        upgradeProperty(this, 'name');
-
         this._container.addEventListener('mouseup', this.onMouseUp);
-
-        if (this.name) {
-            this.onInventoryChange(getInventoryStore(), this.name);
+        this._container.addEventListener('contextmenu', this.onContextMenu);
+        if (this._name) {
+            let name = this._name;
+            addInventoryChangeListener(getInventoryStore(), name, this.onInventoryChange);
+            this.onInventoryChange(getInventoryStore(), name);
         }
+        upgradeProperty(this, 'name');
     }
 
     /** @protected */
     disconnectedCallback() {
         this._container.removeEventListener('mouseup', this.onMouseUp);
+        this._container.removeEventListener('contextmenu', this.onContextMenu);
+        if (this._name) {
+            let name = this._name;
+            removeInventoryChangeListener(getInventoryStore(), name, this.onInventoryChange);
+        }
     }
 
     /** @protected */
@@ -245,7 +253,16 @@ export class InventoryGrid extends HTMLElement {
 
     /** @protected */
     onMouseUp(e) {
-        return containerMouseUpCallback(e, this, 48);
+        if (e.button === 0) {
+            return containerMouseUpCallback(e, this, 48);
+        }
+    }
+
+    /** @protected */
+    onContextMenu(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
     }
 }
 InventoryGrid.define();

@@ -50,7 +50,7 @@ figcaption {
     font-size: 1.2em;
     background-color: rgba(0, 0, 0, 0.7);
 }
-.container:hover figcaption:not(.active), figcaption.active {
+.container:hover figcaption {
     opacity: 1;
 }
 `;
@@ -165,22 +165,30 @@ export class InventoryItem extends HTMLElement {
         this.onItemChange = this.onItemChange.bind(this);
         /** @protected */
         this.onMouseDown = this.onMouseDown.bind(this);
+        /** @protected */
+        this.onContextMenu = this.onContextMenu.bind(this);
     }
 
     /** @protected */
     connectedCallback() {
-        upgradeProperty(this, 'itemId');
-
         this.addEventListener('mousedown', this.onMouseDown);
-
-        if (this.itemId) {
-            this.onItemChange(getInventoryStore(), this.itemId);
+        this.addEventListener('contextmenu', this.onContextMenu);
+        if (this._itemId) {
+            let itemId = this._itemId;
+            addItemChangeListener(getInventoryStore(), itemId, this.onItemChange);
+            this.onItemChange(getInventoryStore(), itemId);
         }
+        upgradeProperty(this, 'itemId');
     }
 
     /** @protected */
     disconnectedCallback() {
         this.removeEventListener('mousedown', this.onMouseDown);
+        this.removeEventListener('contextmenu', this.onContextMenu);
+        if (this._itemId) {
+            let itemId = this._itemId;
+            removeItemChangeListener(getInventoryStore(), itemId, this.onItemChange);
+        }
     }
 
     /** @protected */
@@ -216,8 +224,17 @@ export class InventoryItem extends HTMLElement {
 
     /** @protected */
     onMouseDown(e) {
-        if (e.button === 2) return;
-        return itemMouseDownCallback(e, this, 48);
+        if (e.button === 0) {
+            return itemMouseDownCallback(e, this, 48);
+        }
+    }
+
+    /** @protected */
+    onContextMenu(e) {
+        this.dispatchEvent(new CustomEvent('itemcontext', { bubbles: true, composed: true, detail: { itemId: this.itemId } }))
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
     }
 }
 InventoryItem.define();
