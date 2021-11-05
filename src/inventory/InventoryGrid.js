@@ -1,6 +1,6 @@
 import { containerMouseUpCallback } from './ContainerHelper.js';
-import { upgradeProperty, uuid } from './util.js';
-import { addInventoryChangeListener, changeInventorySize, changeInventoryType, createInventory, getInventory, getInventoryList, getInventoryStore, getItemAtInventory, getItemsInInventory, removeInventoryChangeListener, resolveInventory } from './InventoryStore.js';
+import { upgradeProperty } from './util.js';
+import { addInventoryChangeListener, changeInventorySize, changeInventoryType, getInventory, getInventoryStore, getItemAtInventory, getItemsInInventory, removeInventoryChangeListener } from './InventoryStore.js';
 import { InventoryItem } from './InventoryItem.js';
 
 const DEFAULT_ITEM_UNIT_SIZE = 48;

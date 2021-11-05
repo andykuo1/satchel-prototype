@@ -100,7 +100,9 @@
                 }
 
                 function onDeleteClick() {
-                    clearGround();
+                    if (window.confirm('Clear all items on the ground?')) {
+                        clearGround();
+                    }
                 }
             </script>
         </div>

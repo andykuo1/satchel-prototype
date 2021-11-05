@@ -1,6 +1,6 @@
 import { dijkstra2d } from '../util.js';
 import { freeFromCursor, getCursorContext, getCursorElement, getCursorItem, storeToCursor } from './CursorHelper.js';
-import { addItemToInventory, deleteItemFromInventory, getInventoryStore, getItemAtInventory, getItemsInInventory, isEmptyInventory } from './InventoryStore.js';
+import { addItemToInventory, deleteItemFromInventory, getInventoryList, getInventoryStore, getItemAtInventory, getItemsInInventory, isEmptyInventory } from './InventoryStore.js';
 
 /**
  * Pick up from target inventory to cursor.
@@ -175,10 +175,9 @@ function getNeighborsFromCoords(coordX, coordY, out) {
 
 export function storeToString(store) {
     let result = '';
-    result += 'containers:\n';
-    for(let containerName of Object.keys(store.containers)) {
-        let container = store.containers[containerName];
-        result += '\n\t' + containerName + ': ' + containerToString(container) + '\n';
+    result += 'inventory:\n';
+    for(let inventory of getInventoryList(store)) {
+        result += '\n\t' + inventory.name + ': ' + inventoryToString(inventory) + '\n';
     }
     result += '\nitems:\n';
     for(let itemId of Object.keys(store.items)) {
@@ -188,9 +187,9 @@ export function storeToString(store) {
     return result;
 }
 
-export function containerToString(container) {
-    if (!container) return '[Container#null::{}]'
-    return `[Container#${container.inventory.width}x${container.inventory.height}@${container.active?'active':'inactive'}::{${container.inventory.items}}]`
+export function inventoryToString(inventory) {
+    if (!inventory) return '[Inventory#null::{}]'
+    return `[Inventory#${inventory.width}x${inventory.height}::{${inventory.items}}]`
 }
 
 export function itemToString(item) {

@@ -10,6 +10,9 @@ let GLOBAL_STORE = createInventoryStore();
 
 export function createInventoryStore() {
     return {
+        data: {
+            inventory: {},
+        },
         items: {},
         containers: {},
         listeners: {
@@ -30,28 +33,6 @@ export function getInventoryStore() {
 
 
 
-function createContainer(store, inventoryName) {
-    let container = {
-        inventory: null,
-        active: false,
-    };
-    store.containers[inventoryName] = container;
-    return container;
-}
-
-function getContainer(store, inventoryName) {
-    return store.containers[inventoryName];
-}
-
-function resolveContainer(store, inventoryName) {
-    if (inventoryName in store.containers) {
-        return getContainer(store, inventoryName);
-    } else {
-        return createContainer(store, inventoryName);
-    }
-}
-
-
 export function createInventory(store, inventoryName = uuid(), inventoryType = 'grid', inventoryWidth = 1, inventoryHeight = 1) {
     let inventory = {
         name: inventoryName,
@@ -60,37 +41,24 @@ export function createInventory(store, inventoryName = uuid(), inventoryType = '
         height: inventoryHeight,
         type: inventoryType,
     };
-    let container = resolveContainer(store, inventoryName);
-    container.inventory = inventory;
-    container.active = true;
+    store.data.inventory[inventoryName] = inventory;
     dispatchInventoryListChange(store);
     dispatchInventoryChange(store, inventoryName);
     return inventory;
 }
 
 export function deleteInventory(store, inventoryName) {
-    let container = getContainer(store, inventoryName);
-    if (container) {
-        container.active = false;
-        container.inventory = null;
+    if (inventoryName in store.data.inventory) {
+        delete store.data.inventory[inventoryName];
         dispatchInventoryListChange(store);
         dispatchInventoryChange(store, inventoryName);
     }
 }
 
-export function resolveInventory(store, inventoryName) {
-    let container = getContainer(store, inventoryName);
-    if (container && container.inventory) {
-        return container.inventory;
-    } else {
-        return createInventory(store, inventoryName);
-    }
-}
-
 export function getInventory(store, inventoryName) {
-    let container = getContainer(store, inventoryName);
-    if (container) {
-        return container.inventory;
+    let inventory = store.data.inventory[inventoryName];
+    if (inventory) {
+        return inventory;
     } else {
         return null;
     }
@@ -220,7 +188,7 @@ export function removeInventoryListChangeListener(store, callback) {
 }
 
 export function getInventoryList(store) {
-    return Object.keys(store.containers).map(inventoryName => getInventory(store, inventoryName));
+    return Object.values(store.data.inventory);
 }
 
 
