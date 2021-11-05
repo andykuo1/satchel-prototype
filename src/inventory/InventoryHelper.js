@@ -190,7 +190,7 @@ export function storeToString(store) {
 
 export function containerToString(container) {
     if (!container) return '[Container#null::{}]'
-    return `[Container#${container.inventory.width}x${container.inventory.height}@${container.active?'active':'inactive'}::{${container.inventory.items.map(item => itemToString(item) + ',')}}]`
+    return `[Container#${container.inventory.width}x${container.inventory.height}@${container.active?'active':'inactive'}::{${container.inventory.items}}]`
 }
 
 export function itemToString(item) {

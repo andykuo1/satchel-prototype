@@ -1,6 +1,8 @@
 import { freeFromCursor, getCursorContext, getCursorItem } from './CursorHelper.js';
 import { insertIn } from './InventoryHelper.js';
-import { clearInventory, createInventory, deleteInventory, getInventoryStore, isEmptyInventory } from './InventoryStore.js';
+import { clearInventory, createInventory, getInventoryStore } from './InventoryStore.js';
+import { createTemporaryInventoryView } from './InventoryView.js';
+import { uuid } from './util.js';
 
 export function setGroundContainer(ground) {
     let ctx = getCursorContext();
@@ -28,28 +30,16 @@ export function getGroundContainer() {
 
 export function dropOnGround(freedItem) {
     let ground = getGroundContainer();
-    let inventory = createInventory(getInventoryStore());
-    inventory.type = 'socket';
-    let element = document.createElement('inventory-grid');
-    element.name = inventory.name;
-    element.type = 'socket';
+    let inventory = createInventory(getInventoryStore(), uuid(), 'socket');
     insertIn(inventory, freedItem);
-    element.addEventListener('itemchange', onGroundSlotChange);
-    ground.appendChild(element);
+
+    let invElement = createTemporaryInventoryView(getInventoryStore(), inventory.name);
+    ground.appendChild(invElement);
 }
 
 export function clearGround() {
-    for(let child of getGroundContainer().children) {
-        let inventoryName = child.name;
-        clearInventory(getInventoryStore(), inventoryName);
-    }
-}
-
-function onGroundSlotChange(e) {
-    let target = e.target;
-    if (isEmptyInventory(getInventoryStore(), target.id)) {
-        target.removeEventListener('itemchange', onGroundSlotChange);
-        target.parentNode.removeChild(target);
-        deleteInventory(getInventoryStore(), target.id);
+    let ground = getGroundContainer();
+    for(let grid of ground.querySelectorAll('inventory-grid')) {
+        clearInventory(getInventoryStore(), grid.name);
     }
 }

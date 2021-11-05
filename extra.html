@@ -35,10 +35,6 @@
             z-index: 5;
         }
 
-        #holding {
-            --transition-duration: 0;
-        }
-
         #ground {
             position: relative;
             padding: 1rem;
@@ -110,14 +106,14 @@
         </div>
     </header>
     <div class="content">
-        <main class="workspace">
+        <main>
             <style>
                 .content {
                     position: relative;
                     text-align: center;
                     display: flex;
                 }
-                .workspace {
+                main {
                     overflow: auto;
                     flex: 1;
                 }
@@ -133,7 +129,9 @@
                     transform: translateX(0%);
                 }
             </style>
-            <inventory-grid id="main" name="main" type="grid" rows=9 cols=12></inventory-grid>
+            <div id="workspace">
+                <!-- MAIN -->
+            </div>
             <div id="ground"></div>
         </main>
         <div class="sidebar" id="settingsContent">
@@ -189,121 +187,11 @@
             Made with ❤ by Andrew Kuo.
         </small>
     </footer>
-    <div class="foreground">
-        <inventory-grid name="cursor" id="holding" type="socket"></inventory-grid>
+    <div class="foreground" id="cursor">
+        <!-- CURSOR -->
     </div>
 
-    <script type="module">
-        import { setCursorElement } from './src/inventory/CursorHelper.js';
-        import { setGroundContainer, dropOnGround } from './src/inventory/GroundHelper.js';
-        import { createItem, getInventoryStore } from './src/inventory/InventoryStore.js';
-        import { BACKPACK } from './src/inventory/Items.js';
-        import { InventoryItem } from './src/inventory/InventoryItem.js';
-        import RopeImage from '../../res/rope.js';
-
-        window.addEventListener('DOMContentLoaded', () => {
-            document.querySelector('#itemBuilder').addEventListener('submit', onItemBuild);
-            document.querySelector('#itemResetButton').addEventListener('click', onItemReset);
-        });
-
-        function onItemBuild(e) {
-            console.log(getInventoryStore());
-            let result = {
-                w: 1,
-                h: 1,
-                displayName: 'Item',
-                imgSrc: RopeImage,
-                metadata: {
-                    detail: 'A mundane item.',
-                    category: 'Container',
-                    size: 'small',
-                    traits: []
-                }
-            };
-            let data = new FormData(e.target);
-            for(let entry of data) {
-                let [key, value] = entry;
-                switch(key) {
-                    case 'itemSize':
-                        result.metadata.size = value;
-                        break;
-                    case 'itemTrait':
-                        result.metadata.traits.push(value);
-                    case 'itemName':
-                        result.displayName = value;
-                        break;
-                    case 'itemPortrait':
-                        result.imgSrc = value;
-                        break;
-                    case 'itemDetail':
-                        result.metadata.detail = value;
-                        break;
-                }
-            }
-
-            let size = result.metadata.size;
-            if (result.metadata.traits.includes('heavy')) {
-                size = getNextItemSize(size);
-            }
-            let [width, height] = getDefaultItemSizeDimensions(size);
-            if (result.metadata.traits.includes('long')) {
-                width = Math.ceil(width / 2);
-                height = height + 1;
-            }
-            if (result.metadata.traits.includes('flat')) {
-                width = width + 1;
-                height = Math.ceil(height / 2);
-            }
-            result.w = width;
-            result.h = height;
-
-            spawnItem(result);
-
-            e.preventDefault();
-            return false;
-        }
-
-        function getNextItemSize(itemSize) {
-            switch(itemSize) {
-                case 'tiny': return 'small';
-                case 'small': return 'medium';
-                case 'medium': return 'large';
-                case 'large': return 'huge';
-                case 'huge': throw new Error(`No item size bigger than huge.`);
-                default: throw new Error(`Unknown item size '${itemSize}'`);
-            }
-        }
-
-        function getDefaultItemSizeDimensions(itemSize) {
-            switch(itemSize) {
-                case 'tiny': return [1, 1];
-                case 'small': return [1, 1];
-                case 'medium': return [2, 2];
-                case 'large': return [4, 4];
-                case 'huge': return [6, 6];
-                default: throw new Error(`Unknown item size '${itemSize}'`);
-            }
-        }
-
-        function onItemReset(e) {
-            document.querySelector('#itemBuilder').reset();
-        }
-
-        function spawnItem(opts) {
-            let item = createItem(getInventoryStore(), opts);
-            dropOnGround(item);
-        }
-
-        function spawnDefaultBackpack() {
-            spawnItem(BACKPACK);
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            setCursorElement(document.querySelector('#holding'));
-            setGroundContainer(document.querySelector('#ground'));
-            spawnDefaultBackpack();
-        });
-    </script>
+    <script type="module" src="src/inventory/main.js"></script>
 </body>
 
 </html>

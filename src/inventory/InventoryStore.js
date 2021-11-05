@@ -15,6 +15,7 @@ export function createInventoryStore() {
         listeners: {
             item: {},
             inventory: {},
+            container: {},
         },
     };
 }
@@ -51,17 +52,18 @@ function resolveContainer(store, inventoryName) {
 }
 
 
-export function createInventory(store, inventoryName = uuid()) {
+export function createInventory(store, inventoryName = uuid(), inventoryType = 'grid', inventoryWidth = 1, inventoryHeight = 1) {
     let inventory = {
         name: inventoryName,
         items: [],
-        width: 1,
-        height: 1,
-        type: 'grid',
+        width: inventoryWidth,
+        height: inventoryHeight,
+        type: inventoryType,
     };
     let container = resolveContainer(store, inventoryName);
     container.inventory = inventory;
     container.active = true;
+    dispatchInventoryListChange(store);
     dispatchInventoryChange(store, inventoryName);
     return inventory;
 }
@@ -71,6 +73,7 @@ export function deleteInventory(store, inventoryName) {
     if (container) {
         container.active = false;
         container.inventory = null;
+        dispatchInventoryListChange(store);
         dispatchInventoryChange(store, inventoryName);
     }
 }
@@ -106,7 +109,19 @@ export function clearInventory(store, inventoryName) {
 
 export function changeInventoryType(store, inventoryName, type) {
     let inventory = getInventory(store, inventoryName);
-    inventory.type = type;
+    if (type !== inventory.type) {
+        inventory.type = type;
+        dispatchInventoryChange(store, inventoryName);
+    }
+}
+
+export function changeInventorySize(store, inventoryName, width, height) {
+    let inventory = getInventory(store, inventoryName);
+    if (width !== inventory.width || height !== inventory.height) {
+        inventory.width = width;
+        inventory.height = height;
+        dispatchInventoryChange(store, inventoryName);
+    }
 }
 
 export function isEmptyInventory(store, inventoryName) {
@@ -121,7 +136,8 @@ export function isEmptyInventory(store, inventoryName) {
 export function getItemAtInventory(store, inventoryName, coordX, coordY) {
     let inventory = getInventory(store, inventoryName);
     if (inventory) {
-        for(let item of inventory.items) {
+        for(let itemId of inventory.items) {
+            let item = getItem(store, itemId);
             if (coordX >= item.x
                 && coordX < item.x + item.w
                 && coordY >= item.y
@@ -133,17 +149,23 @@ export function getItemAtInventory(store, inventoryName, coordX, coordY) {
     return null;
 }
 
-export function getItemsInInventory(store, inventoryName) {
+export function getItemIdsInInventory(store, inventoryName) {
     let inventory = getInventory(store, inventoryName);
     if (!inventory) return [];
     return inventory.items;
 }
 
+export function getItemsInInventory(store, inventoryName) {
+    let inventory = getInventory(store, inventoryName);
+    if (!inventory) return [];
+    return inventory.items.map(itemId => getItem(store, itemId));
+}
+
 export function isItemInInventory(store, inventoryName, item) {
     let inventory = getInventory(store, inventoryName);
     if (!inventory) return false;
-    for(let item of inventory.items) {
-        if (item.itemId === item.itemId) {
+    for(let itemId of inventory.items) {
+        if (itemId === item.itemId) {
             return true;
         }
     }
@@ -153,7 +175,7 @@ export function isItemInInventory(store, inventoryName, item) {
 export function addItemToInventory(store, toInventoryName, item) {
     let inventory = getInventory(store, toInventoryName);
     if (!inventory) throw new Error(`Cannot put item in for non-existant inventory '${toInventoryName}'.`);
-    inventory.items.push(item);
+    inventory.items.push(item.itemId);
     dispatchInventoryChange(store, toInventoryName);
 }
 
@@ -161,8 +183,8 @@ export function deleteItemFromInventory(store, fromInventoryName, item) {
     let inventory = getInventory(store, fromInventoryName);
     if (!inventory) throw new Error(`Cannot take item out of non-existant inventory '${fromInventoryName}'.`);
     for(let i = 0; i < inventory.items.length; ++i) {
-        let invItem = inventory.items[i];
-        if (invItem.itemId === item.itemId) {
+        let invItemId = inventory.items[i];
+        if (invItemId === item.itemId) {
             inventory.items.splice(i, 1);
         }
     }
@@ -184,6 +206,22 @@ export function removeInventoryChangeListener(store, inventoryName, callback) {
 }
 
 
+
+export function dispatchInventoryListChange(store) {
+    dispatchInventoryEvent(store, 'container', 'all');
+}
+
+export function addInventoryListChangeListener(store, callback) {
+    addInventoryEventListener(store, 'container', 'all', callback);
+}
+
+export function removeInventoryListChangeListener(store, callback) {
+    removeInventoryEventListener(store, 'container', 'all', callback);
+}
+
+export function getInventoryList(store) {
+    return Object.keys(store.containers).map(inventoryName => getInventory(store, inventoryName));
+}
 
 
 export function resolveItem(store, itemId) {

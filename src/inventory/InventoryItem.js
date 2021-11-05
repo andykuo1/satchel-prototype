@@ -151,17 +151,23 @@ export class InventoryItem extends HTMLElement {
         this.shadowRoot.appendChild(this.constructor[Symbol.for('templateNode')].content.cloneNode(true));
         this.shadowRoot.appendChild(this.constructor[Symbol.for('styleNode')].cloneNode(true));
 
+        /** @private */
         this._itemId = itemId;
 
+        /** @private */
         this._image = this.shadowRoot.querySelector('img');
+        /** @private */
         this._caption = this.shadowRoot.querySelector('figcaption');
 
         this.container = null;
 
+        /** @protected */
         this.onItemChange = this.onItemChange.bind(this);
+        /** @protected */
         this.onMouseDown = this.onMouseDown.bind(this);
     }
 
+    /** @protected */
     connectedCallback() {
         upgradeProperty(this, 'itemId');
 
@@ -172,10 +178,12 @@ export class InventoryItem extends HTMLElement {
         }
     }
 
+    /** @protected */
     disconnectedCallback() {
         this.removeEventListener('mousedown', this.onMouseDown);
     }
 
+    /** @protected */
     attributeChangedCallback(attribute, prev, value) {
         switch(attribute) {
             case 'itemId': {
@@ -194,6 +202,7 @@ export class InventoryItem extends HTMLElement {
         }
     }
 
+    /** @protected */
     onItemChange(store, itemId) {
         let item = getItem(store, itemId);
         this.style.setProperty('--itemX', item.x);
@@ -205,6 +214,7 @@ export class InventoryItem extends HTMLElement {
         this._caption.textContent = item.displayName;
     }
 
+    /** @protected */
     onMouseDown(e) {
         if (e.button === 2) return;
         return itemMouseDownCallback(e, this, 48);
