@@ -28,7 +28,7 @@ const INNER_STYLE = `
     margin: 0;
     user-select: none;
     box-shadow: 0 0 0 rgba(0, 0, 0, 0);
-    transition: box-shadow 0.3s ease;
+    transition: box-shadow 0.1s ease;
 }
 .container:hover {
     background-color: rgba(0, 0, 0, 0.2);

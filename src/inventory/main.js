@@ -3,7 +3,7 @@ import { setGroundContainer, dropOnGround } from './GroundHelper.js';
 import { createInventoryView } from './InventoryView.js';
 import { createItem, getInventoryStore, createInventory } from './InventoryStore.js';
 import { BACKPACK } from './Items.js';
-import RopeImage from '../../res/rope.js';
+import { loadFromLocalStorage, saveToLocalStorage } from './InventoryLoader.js';
 
 window.addEventListener('DOMContentLoaded', () => {
     document.querySelector('#itemBuilder').addEventListener('submit', onItemBuild);
@@ -15,7 +15,7 @@ function onItemBuild(e) {
         w: 1,
         h: 1,
         displayName: 'Item',
-        imgSrc: RopeImage,
+        imgSrc: 'res/images/potion.png',
         metadata: {
             detail: 'A mundane item.',
             category: 'Container',
@@ -32,6 +32,7 @@ function onItemBuild(e) {
                 break;
             case 'itemTrait':
                 result.metadata.traits.push(value);
+                break;
             case 'itemName':
                 result.displayName = value;
                 break;
@@ -48,17 +49,21 @@ function onItemBuild(e) {
     if (result.metadata.traits.includes('heavy')) {
         size = getNextItemSize(size);
     }
+    let imgSrc = 'res/images/potion.png';
     let [width, height] = getDefaultItemSizeDimensions(size);
     if (result.metadata.traits.includes('long')) {
         width = Math.ceil(width / 2);
         height = height + 1;
+        imgSrc = 'res/images/blade.png';
     }
     if (result.metadata.traits.includes('flat')) {
         width = width + 1;
         height = Math.ceil(height / 2);
+        imgSrc = 'res/images/scroll.png';
     }
     result.w = width;
     result.h = height;
+    result.imgSrc = imgSrc;
 
     spawnItem(result);
 
@@ -114,9 +119,16 @@ window.addEventListener('DOMContentLoaded', () => {
     setCursorElement(cursorElement);
     setGroundContainer(ground);
 
-    let mainInventory = createInventory(store, 'main', 'grid', 4, 4);
+    let mainInventory = createInventory(store, 'main', 'grid', 12, 9);
     let mainElement = createInventoryView(store, mainInventory.name);
     workspace.appendChild(mainElement);
 
     spawnDefaultBackpack();
+
+    loadFromLocalStorage(store);
+
+    setInterval(() => {
+        console.log('Autosave...');
+        saveToLocalStorage(store);
+    }, 5000);
 });

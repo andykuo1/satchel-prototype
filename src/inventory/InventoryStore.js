@@ -26,6 +26,41 @@ export function setInventoryStore(store) {
     GLOBAL_STORE = store;
 }
 
+export function resetInventoryStore(prevStore, nextStore) {
+    let prevItemList = Object.keys(prevStore.data.item);
+    let prevInventoryList = Object.keys(prevStore.data.inventory);
+    let nextItemList = Object.keys(nextStore.data.item);
+    let nextInventoryList = Object.keys(nextStore.data.inventory);
+    // Copy data over
+    prevStore.data.item = { ...nextStore.data.item };
+    prevStore.data.inventory = { ...nextStore.data.inventory };
+
+    // Dispatch all events
+    dispatchInventoryListChange(prevStore);
+    let visitedItems = new Set();
+    let visitedInventories = new Set();
+    // Dispatch for old objects
+    for(let itemId of prevItemList) {
+        visitedItems.add(itemId);
+        dispatchItemChange(prevStore, itemId);
+    }
+    for(let invName of prevInventoryList) {
+        visitedInventories.add(invName);
+        dispatchInventoryChange(prevStore, invName);
+    }
+    // Dispatch for new objects
+    for(let itemId of nextItemList) {
+        if (!visitedItems.has(itemId)) {
+            dispatchItemChange(prevStore, itemId);
+        }
+    }
+    for(let inventoryName of nextInventoryList) {
+        if (!visitedInventories.has(inventoryName)) {
+            dispatchInventoryChange(prevStore, inventoryName);
+        }
+    }
+}
+
 export function getInventoryStore() {
     return GLOBAL_STORE;
 }
