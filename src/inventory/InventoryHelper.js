@@ -1,6 +1,6 @@
 import { dijkstra2d } from '../util.js';
 import { freeFromCursor, getCursorContext, getCursorElement, getCursorItem, storeToCursor } from './CursorHelper.js';
-import { addItemToInventory, deleteItemFromInventory, getInventoryList, getInventoryStore, getItemAtInventory, getItemsInInventory, isEmptyInventory } from './InventoryStore.js';
+import { addItemToInventory, deleteItemFromInventory, getInventoryList, getInventoryStore, getItemAtInventory, getItems, getItemsInInventory, isEmptyInventory } from './InventoryStore.js';
 
 /**
  * Pick up from target inventory to cursor.
@@ -180,9 +180,8 @@ export function storeToString(store) {
         result += '\n\t' + inventory.name + ': ' + inventoryToString(inventory) + '\n';
     }
     result += '\nitems:\n';
-    for(let itemId of Object.keys(store.items)) {
-        let item = store.items[itemId];
-        result += '\n\t' + itemId + ': ' + itemToString(item) + '\n';
+    for(let item of getItems(store)) {
+        result += '\n\t' + item.itemId + ': ' + itemToString(item) + '\n';
     }
     return result;
 }
@@ -194,5 +193,5 @@ export function inventoryToString(inventory) {
 
 export function itemToString(item) {
     if (!item) return '[Item#null]';
-    return `[${item.itemId}#${item.w}x${item.h}@${item.x},${item.y}]`
+    return `[Item#${item.w}x${item.h}@${item.x},${item.y}]`
 }

@@ -11,10 +11,9 @@ let GLOBAL_STORE = createInventoryStore();
 export function createInventoryStore() {
     return {
         data: {
+            item: {},
             inventory: {},
         },
-        items: {},
-        containers: {},
         listeners: {
             item: {},
             inventory: {},
@@ -210,26 +209,30 @@ export function createItem(store, state, itemId = uuid()) {
         metadata: {},
         ...state,
     };
-    store.items[itemId] = item;
+    store.data.item[itemId] = item;
     return item;
 }
 
 export function deleteItem(store, itemId) {
-    store.items[itemId] = null;
+    delete store.data.item[itemId];
 }
 
 export function isItem(store, itemId) {
-    return Boolean(store.items[itemId]);
+    return Boolean(store.data.item[itemId]);
 }
 
 export function getItem(store, itemId) {
-    return store.items[itemId];
+    return store.data.item[itemId];
+}
+
+export function getItems(store) {
+    return Object.values(store.data.item);
 }
 
 export function updateItem(store, itemId, state) {
-    let item = store.items[itemId];
+    let item = store.data.item[itemId];
     if (!item) throw new Error('Cannot update null item.');
-    store.items[itemId] = {
+    store.data.item[itemId] = {
         ...item,
         ...state,
     };
