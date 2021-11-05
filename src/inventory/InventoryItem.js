@@ -43,11 +43,11 @@ figcaption {
     position: absolute;
     left: 0;
     right: 0;
-    bottom: 10px;
-    opacity: 1;
+    bottom: calc(var(--item-unit-size, 48px) / 4);
+    opacity: 0;
     text-align: center;
-    transition: opacity 0.1s ease, bottom 0.1s ease;
     color: white;
+    font-size: 1.2em;
     background-color: rgba(0, 0, 0, 0.7);
 }
 .container:hover figcaption:not(.active), figcaption.active {
