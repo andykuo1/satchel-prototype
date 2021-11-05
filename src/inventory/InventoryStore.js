@@ -124,8 +124,8 @@ export function getItemAtInventory(store, inventoryName, coordX, coordY) {
                 return item;
             }
         }
-        return null;
     }
+    return null;
 }
 
 export function getItemsInInventory(store, inventoryName) {
@@ -137,7 +137,12 @@ export function getItemsInInventory(store, inventoryName) {
 export function isItemInInventory(store, inventoryName, item) {
     let inventory = getInventory(store, inventoryName);
     if (!inventory) return false;
-    return inventory.items.includes(item);
+    for(let item of inventory.items) {
+        if (item.itemId === item.itemId) {
+            return true;
+        }
+    }
+    return false;
 }
 
 export function addItemToInventory(store, toInventoryName, item) {
@@ -150,8 +155,12 @@ export function addItemToInventory(store, toInventoryName, item) {
 export function deleteItemFromInventory(store, fromInventoryName, item) {
     let inventory = getInventory(store, fromInventoryName);
     if (!inventory) throw new Error(`Cannot take item out of non-existant inventory '${fromInventoryName}'.`);
-    let i = inventory.items.indexOf(item);
-    inventory.items.splice(i, 1);
+    for(let i = 0; i < inventory.items.length; ++i) {
+        let invItem = inventory.items[i];
+        if (invItem.itemId === item.itemId) {
+            inventory.items.splice(i, 1);
+        }
+    }
     dispatchInventoryChange(store, fromInventoryName);
 }
 

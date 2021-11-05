@@ -170,24 +170,24 @@ export class InventoryGrid extends HTMLElement {
     attributeChangedCallback(attribute, prev, value) {
         switch(attribute) {
             case 'name': {
-                    let store = getInventoryStore();
-                    let prevName = this._name;
-                    let nextName = value;
-                    this._name = nextName;
-                    if (prevName) {
-                        removeInventoryChangeListener(store, prevName, this.onInventoryChange);
-                    }
-                    if (nextName) {
-                        addInventoryChangeListener(store, nextName, this.onInventoryChange);
-                    }
-                } break;
+                let store = getInventoryStore();
+                let prevName = this._name;
+                let nextName = value;
+                this._name = nextName;
+                if (prevName) {
+                    removeInventoryChangeListener(store, prevName, this.onInventoryChange);
+                }
+                if (nextName) {
+                    addInventoryChangeListener(store, nextName, this.onInventoryChange);
+                }
+            } break;
             case 'rows':
                 this._rows = Number(value);
-                this.style.setProperty('--container-width', value);
+                this.style.setProperty('--container-height', value);
                 break;
             case 'cols':
                 this._cols = Number(value);
-                this.style.setProperty('--container-height', value);
+                this.style.setProperty('--container-width', value);
                 break;
             case 'type':
                 this._type = value;
@@ -199,8 +199,8 @@ export class InventoryGrid extends HTMLElement {
         if (this.type === 'socket') {
             let item = getItemAtInventory(store, inventoryName, 0, 0);
             if (item) {
-                this.rows = item.w;
-                this.cols = item.h;
+                this.rows = item.h;
+                this.cols = item.w;
             } else {
                 this.rows = 1;
                 this.cols = 1;
@@ -214,26 +214,25 @@ export class InventoryGrid extends HTMLElement {
                 preservedItems[itemId] = node;
             }
         }
-        // Clear items in slot
-        this._itemSlot.innerHTML = '';
         // Add new items into slot.
+        let emptySlot = /** @type {HTMLSlotElement} */ (this._itemSlot.cloneNode(false));
         for(let item of getItemsInInventory(store, inventoryName)) {
             let itemId = item.itemId;
+            let element;
             if (itemId in preservedItems) {
-                let element = preservedItems[itemId];
-                element.container = this;
-                this._itemSlot.appendChild(element);
+                element = preservedItems[itemId];
             } else {
-                let element = new InventoryItem(itemId);
-                element.container = this;
-                this._itemSlot.appendChild(element);
+                element = new InventoryItem(itemId);
             }
+            element.container = this;
+            emptySlot.appendChild(element);
         }
+        this._itemSlot.replaceWith(emptySlot);
+        this._itemSlot = emptySlot;
         this.dispatchEvent(new CustomEvent('itemchange', { composed: true, bubbles: false }));
     }
 
-    onMouseUp(e)
-    {
+    onMouseUp(e) {
         return containerMouseUpCallback(e, this, 48);
     }
 }

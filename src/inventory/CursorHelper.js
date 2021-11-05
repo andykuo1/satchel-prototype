@@ -8,17 +8,21 @@ const PLACE_BUFFER_TIMEOUT_MILLIS = 300;
 const CURSOR_CONTEXT = {
     element: null,
     ground: null,
+    clientX: 0, clientY: 0,
     x: 0, y: 0,
     pickX: 0, pickY: 0,
     pickOffsetX: 0, pickOffsetY: 0,
     placeDownBuffer: true,
     placeDownBufferTimeoutHandle: null,
+    cursorAnimationFrameHandle: null,
 };
 
 export function setCursorElement(inventoryElement) {
     let ctx = getCursorContext();
     if (ctx.element) {
         document.removeEventListener('mousemove', onMouseMove);
+        cancelAnimationFrame(ctx.cursorAnimationFrameHandle);
+        ctx.cursorAnimationFrameHandle = null;
         ctx.element = null;
     }
     if (inventoryElement) {
@@ -26,6 +30,7 @@ export function setCursorElement(inventoryElement) {
         inventoryElement.style.display = 'none';
         ctx.element = inventoryElement;
         document.addEventListener('mousemove', onMouseMove);
+        ctx.cursorAnimationFrameHandle = requestAnimationFrame(onAnimationFrame);
     }
 }
 
@@ -43,8 +48,16 @@ export function updateCursorPosition(clientX, clientY, unitSize) {
     }
 }
 
+function onAnimationFrame() {
+    let ctx = getCursorContext();
+    updateCursorPosition(ctx.clientX, ctx.clientY, 48);
+    ctx.cursorAnimationFrameHandle = requestAnimationFrame(onAnimationFrame);
+}
+
 function onMouseMove(e) {
-    updateCursorPosition(e.clientX, e.clientY, 48);
+    let ctx = getCursorContext();
+    ctx.clientX = e.clientX;
+    ctx.clientY = e.clientY;
 }
 
 export function getCursorContext() {

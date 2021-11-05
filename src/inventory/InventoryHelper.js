@@ -9,11 +9,12 @@ import { addItemToInventory, deleteItemFromInventory, getInventoryStore, getItem
  * @returns 
  */
 export function pickUp(storedItem, fromInventory, fromCoordX = 0, fromCoordY = 0) {
+    let store = getInventoryStore();
     let ctx = getCursorContext();
     let element = getCursorElement(ctx);
     if (!element) return false;
-    if (!isEmptyInventory(getInventoryStore(), ctx.element.name)) return false;
-    deleteItemFromInventory(getInventoryStore(), fromInventory.name, storedItem);
+    if (!isEmptyInventory(store, ctx.element.name)) return false;
+    deleteItemFromInventory(store, fromInventory.name, storedItem);
     let prevX = storedItem.x;
     let prevY = storedItem.y;
     storedItem.x = 0;
@@ -35,8 +36,8 @@ export function putDown(toInventory, toCoordX, toCoordY, allowSwap = true) {
     let item = getCursorItem(ctx);
     if (!item || !ctx.placeDownBuffer) return false;
 
-    let invWidth = toInventory.rows;
-    let invHeight = toInventory.cols;
+    let invWidth = toInventory.cols;
+    let invHeight = toInventory.rows;
     let itemWidth = item.w;
     let itemHeight = item.h;
     let coordX = toCoordX + ctx.pickOffsetX;
@@ -51,12 +52,16 @@ export function putDown(toInventory, toCoordX, toCoordY, allowSwap = true) {
     if (allowSwap && canSwapAt(toInventory, coordX, coordY, targetCoordX, targetCoordY, itemWidth, itemHeight)) {
         freeFromCursor(ctx);
         let storedItem = getItemAtInventory(getInventoryStore(), toInventory.name, coordX, coordY);
+        let prevX = storedItem.x;
+        let prevY = storedItem.y;
         let result = pickUp(storedItem, toInventory);
         if (!result) {
             throw new Error('Failed to pick up item on swap.');
         }
         item.x = targetCoordX;
         item.y = targetCoordY;
+        ctx.pickOffsetX = prevX - targetCoordX;
+        ctx.pickOffsetY = prevY - targetCoordY;
         addItemToInventory(getInventoryStore(), toInventory.name, item);
         return true;
     } else {
@@ -166,4 +171,29 @@ function getNeighborsFromCoords(coordX, coordY, out) {
     out[2] = fromCoordsToNode(coordX + 1, coordY);
     out[3] = fromCoordsToNode(coordX, coordY + 1);
     return out;
+}
+
+function storeToString(store) {
+    let result = '';
+    result += 'containers:\n';
+    for(let containerName of Object.keys(store.containers)) {
+        let container = store.containers[containerName];
+        result += '\n\t' + containerName + ': ' + containerToString(container) + '\n';
+    }
+    result += '\nitems:\n';
+    for(let itemId of Object.keys(store.items)) {
+        let item = store.items[itemId];
+        result += '\n\t' + itemId + ': ' + itemToString(item) + '\n';
+    }
+    return result;
+}
+
+function containerToString(container) {
+    if (!container) return '[Container#null::{}]'
+    return `[Container#${container.inventory.width}x${container.inventory.height}@${container.active?'active':'inactive'}::{${container.inventory.items.map(item => itemToString(item) + ',')}}]`
+}
+
+function itemToString(item) {
+    if (!item) return '[Item#null]';
+    return `[${item.itemId}#${item.w}x${item.h}@${item.x},${item.y}]`
 }
