@@ -1,4 +1,4 @@
-import { dijkstra2d } from '../util.js';
+import { dijkstra2d } from '../util/dijkstra2d.js';
 import { freeFromCursor, getCursorContext, getCursorElement, getCursorItem, storeToCursor } from './CursorHelper.js';
 import { addItemToInventory, deleteItemFromInventory, getInventoryList, getInventoryStore, getItemAtInventory, getItems, getItemsInInventory, isEmptyInventory } from './InventoryStore.js';
 

@@ -1,7 +1,7 @@
 import { clearGround } from './GroundHelper.js';
 import { openItemBuilder } from './ItemBuilder.js';
-import { downloadText } from '../Downloader.js';
-import { saveToJSON, loadFromJSON, saveToLocalStorage, loadFromLocalStorage } from './InventoryLoader.js';
+import { downloadText } from '../util/downloader.js';
+import { saveToJSON, loadFromJSON } from './InventoryLoader.js';
 import { getInventoryStore } from './InventoryStore.js';
 import { connectAsClient, connectAsServer, isServerSide } from './PeerSatchel.js';
 import { getCursorContext } from './CursorHelper.js';

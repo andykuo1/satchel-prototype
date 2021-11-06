@@ -1,6 +1,6 @@
 // Textbook RSA for digital signatures (NOT secure for ACTUAL use, just fun)
 
-function millerRabinPrimalityTest(n, t = 64)
+export function millerRabinPrimalityTest(n, t = 64)
 {
     // SOURCE: Handbook of Applied Cryptography [4.24] (A. Menezes, P. van Oorschot, S. Vanstone)
     if (n <= 0) throw new Error('n must be a positive odd integer.');

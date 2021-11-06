@@ -2,7 +2,7 @@ import { freeFromCursor, getCursorContext, getCursorItem } from './CursorHelper.
 import { insertIn } from './InventoryHelper.js';
 import { clearInventory, createInventory, getInventoryStore } from './InventoryStore.js';
 import { createTemporaryInventoryView } from './InventoryView.js';
-import { uuid } from './util.js';
+import { uuid } from '../util/uuid.js';
 
 export function setGroundContainer(ground) {
     let ctx = getCursorContext();

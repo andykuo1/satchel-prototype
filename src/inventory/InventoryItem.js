@@ -1,4 +1,4 @@
-import { upgradeProperty } from './util.js';
+import { upgradeProperty } from '../util/wc.js';
 import { itemMouseDownCallback } from './ContainerHelper.js';
 import { addItemChangeListener, getInventoryStore, getItem, removeItemChangeListener, resolveItem, updateItem } from './InventoryStore.js';
 

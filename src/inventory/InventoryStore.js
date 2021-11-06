@@ -1,4 +1,4 @@
-import { uuid } from './util.js';
+import { uuid } from '../util/uuid.js';
 
 /**
  * @typedef {object} InventoryStore

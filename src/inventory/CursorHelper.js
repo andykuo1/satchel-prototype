@@ -1,5 +1,5 @@
 import { addItemToInventory, clearInventory, getInventoryStore, getItemAtInventory } from './InventoryStore.js';
-import { distanceSquared } from './util.js';
+import { distanceSquared } from '../util/math.js';
 
 const CURSOR_OFFSET_PIXELS = 24;
 const PLACE_BUFFER_RANGE_SQUARED = 8 * 8;
