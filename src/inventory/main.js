@@ -6,6 +6,7 @@ import { applyItemBuilder, openItemBuilder, resetItemBuilder } from './ItemBuild
 import { loadFromLocalStorage, saveToLocalStorage } from './InventoryLoader.js';
 
 window.addEventListener('DOMContentLoaded', () => {
+    document.querySelector('#appVersion').textContent = 'v1.0.1';
     document.querySelector('#itemBuilder').addEventListener('submit', (e) => {
         e.preventDefault();
 
