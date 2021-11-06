@@ -379,7 +379,7 @@ export class PeerfulRemoteConnection extends PeerfulConnection {
   /**
    * @override
    * @param {'offer'} type
-   * @param {RTCSessionDescriptionInit} sdp
+   * @param {RTCSessionDescriptionInit|RTCIceCandidate} sdp
    * @param {string} src
    * @param {string} dst
    */
@@ -400,6 +400,13 @@ export class PeerfulRemoteConnection extends PeerfulConnection {
           debug('[REMOTE]', 'Failed to set remote/local description.', e)
         );
       // Wait for ICE to complete before sending answer...
+    } else if (type === 'candidate') {
+      // TODO: This will never be called since no signals are of type 'candidate'
+      const candidate = /** @type {RTCIceCandidate} */ (sdp);
+      this.peerConnection
+        .addIceCandidate(candidate)
+        .then(() => debug('[REMOTE]', 'Successfully add candidate.'))
+        .catch((e) => debug('[REMOTE]', 'Failed to add candidate.', e));
     } else {
       throw new Error(
         `Received invalid response type '${type}' on remote connection.`
