@@ -14,7 +14,6 @@ module.exports = {
   },
   plugins: [],
   rules: {
-    'linebreak-style': ['error', 'unix'],
     'no-unused-vars': [
       'error',
       { vars: 'all', args: 'none', ignoreRestSiblings: false }
