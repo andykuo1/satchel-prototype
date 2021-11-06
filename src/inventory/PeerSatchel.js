@@ -5,7 +5,7 @@ import { saveToJSON } from './InventoryLoader.js';
 import { getInventoryStore, resetInventoryStore } from './InventoryStore.js';
 
 // const BASE_URL = 'http://127.0.0.1:5500';
-const BASE_URL = 'https://andykuo1.github.io/satchel/';
+const BASE_URL = 'https://andykuo1.github.io/satchel';
 
 export async function connectAsClient() {
     let remoteId = tryGetRemotePeerId(window.location);
