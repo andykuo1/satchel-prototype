@@ -182,7 +182,6 @@ export class PeerJsSignaling {
         this.opened = true;
         resolvePromiseStatus(this.activeStatus, this);
       }
-
       break;
     case 'ERROR':
       this.callback(
@@ -267,13 +266,41 @@ export class PeerJsSignaling {
   }
 
   /**
+   * 
+   * @param {string} src 
+   * @param {string} dst 
+   * @param {RTCIceCandidate} candidate 
+   */
+  sendCandidateMessage(src, dst, candidate) {
+    debug('[SIGNAL]', 'Sending candidate from', src, 'to', dst);
+    if (this.closed) {
+      return;
+    }
+
+    if (!isWebSocketOpen(this.webSocket)) {
+      this.callback(
+        new Error('Cannot send candidate message to un-opened connection.'),
+        null
+      );
+      return;
+    }
+
+    const message = JSON.stringify({
+      type: 'CANDIDATE',
+      payload: candidate,
+      dst,
+    });
+    this.webSocket.send(message);
+  }
+
+  /**
    * @param {string} src
    * @param {string} dst
    * @param {RTCSessionDescriptionInit} signal
    */
   sendSignalMessage(src, dst, signal) {
     const { type } = signal;
-    console.log('[SIGNAL]', 'Sending', type, 'from', src, 'to', dst);
+    debug('[SIGNAL]', 'Sending', type, 'from', src, 'to', dst);
     if (this.closed) {
       return;
     }
@@ -316,7 +343,7 @@ export class PeerJsSignaling {
   }
 
   sendHeartbeatMessage() {
-    console.log('[SIGNAL]', 'Sending heartbeat');
+    debug('[SIGNAL]', 'Sending heartbeat');
     if (this.closed) {
       return;
     }

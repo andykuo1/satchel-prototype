@@ -120,7 +120,6 @@ export class Peerful extends Eventable {
       if (conn) {
         conn.close();
       }
-
       this.emit('error', error);
     } else {
       switch (sdp.type) {
@@ -142,10 +141,11 @@ export class Peerful extends Eventable {
             console.warn('Received signaling attempt when not listening.');
             return;
           }
-
           conn.onSignalingResponse('answer', sdp, src, dst);
         }
         break;
+      default:
+        console.warn('Received unknown signal:', sdp);
       }
     }
   }
