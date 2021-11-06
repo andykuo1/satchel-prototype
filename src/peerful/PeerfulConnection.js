@@ -189,7 +189,7 @@ export class PeerfulConnection extends Eventable {
   /**
    * @abstract
    * @param {string} type
-   * @param {RTCSessionDescriptionInit} sdp
+   * @param {RTCSessionDescriptionInit|RTCIceCandidate} sdp
    * @param {string} src
    * @param {string} dst
    */
