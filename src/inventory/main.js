@@ -9,8 +9,8 @@ window.addEventListener('DOMContentLoaded', () => {
     document.querySelector('#itemBuilder').addEventListener('submit', (e) => {
         e.preventDefault();
 
-        let settings = document.querySelector('#settingsContent');
-        settings.classList.toggle('open', false);
+        let editor = document.querySelector('#editor');
+        editor.classList.toggle('open', false);
 
         let target = e.target;
         applyItemBuilder(target);
@@ -19,8 +19,8 @@ window.addEventListener('DOMContentLoaded', () => {
     document.querySelector('#itemResetButton').addEventListener('click', (e) => {
         e.preventDefault();
 
-        let settings = document.querySelector('#settingsContent');
-        settings.classList.toggle('open', false);
+        let editor = document.querySelector('#editor');
+        editor.classList.toggle('open', false);
 
         let itemBuilder = document.querySelector('#itemBuilder');
         resetItemBuilder(itemBuilder);
@@ -31,13 +31,13 @@ window.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         e.stopPropagation();
 
-        let settings = document.querySelector('#settingsContent');
-        settings.classList.toggle('open', false);
+        let editor = document.querySelector('#editor');
+        editor.classList.toggle('open', false);
         let itemId = e.detail.itemId;
         if (itemId) {
             openItemBuilder(document.querySelector('#itemBuilder'), itemId);
             // Animate open/close transition
-            setTimeout(() => settings.classList.toggle('open', true), 100);
+            setTimeout(() => editor.classList.toggle('open', true), 100);
         }
 
         return false;

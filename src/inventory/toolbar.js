@@ -7,7 +7,7 @@ import { connectAsClient, connectAsServer, isServerSide } from './PeerSatchel.js
 import { getCursorContext } from './CursorHelper.js';
 
 window.addEventListener('DOMContentLoaded', () => {
-    document.querySelector('#settingsButton').addEventListener('click', onSettingsClick);
+    document.querySelector('#editButton').addEventListener('click', onEditClick);
     document.querySelector('#deleteButton').addEventListener('click', onDeleteClick);
     document.querySelector('#cloudButton').addEventListener('click', onCloudClick);
     document.querySelector('#downloadButton').addEventListener('click', onDownloadClick);
@@ -15,13 +15,13 @@ window.addEventListener('DOMContentLoaded', () => {
     document.querySelector('#uploadInput').addEventListener('change', onUploadChange);
 });
 
-function onSettingsClick() {
-    let settings = document.querySelector('#settingsContent');
-    if (settings.classList.contains('open')) {
-        settings.classList.remove('open');
+function onEditClick() {
+    let editor = document.querySelector('#editor');
+    if (editor.classList.contains('open')) {
+        editor.classList.remove('open');
     } else {
         openItemBuilder(document.querySelector('#itemBuilder'));
-        document.querySelector('#settingsContent').classList.add('open');
+        document.querySelector('#editor').classList.add('open');
     }
 }
 

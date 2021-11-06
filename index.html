@@ -116,8 +116,8 @@
             <button id="deleteButton">
                 <img src="res/delete.svg" alt="delete" width="40">
             </button>
-            <button id="settingsButton">
-                <img src="res/settings.svg" alt="settings" width="40">
+            <button id="editButton">
+                <img src="res/edit.svg" alt="edit" width="40">
             </button>
             <script type="module" src="src/inventory/toolbar.js"></script>
         </div>
@@ -154,7 +154,7 @@
             </div>
             <div id="ground"></div>
         </main>
-        <div class="sidebar" id="settingsContent">
+        <div class="sidebar" id="editor">
             <style>
                 #itemDetailSet, #itemFinishSet {
                     display: flex;
@@ -198,7 +198,7 @@
                     <legend>Details</legend>
                     <input type="hidden" id="itemId" name="itemId">
                     <label for="itemName">Name</label>
-                    <input type="text" id="itemName" name="itemName" value="Item">
+                    <input type="text" id="itemName" name="itemName" value="">
                     <label for="itemDetail">Description</label>
                     <textarea id="itemDetail" name="itemDetail"></textarea>
                 </fieldset>
