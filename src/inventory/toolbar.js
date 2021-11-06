@@ -13,19 +13,6 @@ window.addEventListener('DOMContentLoaded', () => {
     document.querySelector('#downloadButton').addEventListener('click', onDownloadClick);
     document.querySelector('#uploadButton').addEventListener('click', onUploadClick);
     document.querySelector('#uploadInput').addEventListener('change', onUploadChange);
-
-    // Try connect the client
-    connectAsClient().then(result => {
-        if (result) {
-            document.querySelector('#cloudButton').toggleAttribute('disabled', true);
-            setInterval(() => {
-                console.log('Autosave...');
-                saveToLocalStorage(getInventoryStore());
-            }, 5000);
-        } else {
-            loadFromLocalStorage(getInventoryStore());
-        }
-    });
 });
 
 function onSettingsClick() {
@@ -45,8 +32,20 @@ function onDeleteClick() {
 }
 
 function onCloudClick() {
-    // Try connect the server
-    connectAsServer();
+    // Try connect the client
+    connectAsClient().then(result => {
+        if (result) {
+            document.querySelector('#cloudButton').toggleAttribute('disabled', true);
+            // Auto save to local storage every 1 second
+            setInterval(() => {
+                console.log('Autosave...');
+                saveToLocalStorage(getInventoryStore());
+            }, 1000);
+        } else {
+            // Try connect the server
+            connectAsServer();
+        }
+    });
 }
 
 function onDownloadClick() {

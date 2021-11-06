@@ -83,11 +83,24 @@
             }
         </style>
         <h1>Satchel</h1>
+        <small id="onlineStatus"></small>
         <div class="spacer"></div>
         <div class="toolbar">
             <style>
                 .toolbar button:disabled {
                     opacity: 0.3;
+                }
+                #onlineStatus {
+                    color: red;
+                }
+                #onlineStatus::after {
+                    content: 'OFFLINE';
+                }
+                #onlineStatus.active {
+                    color: green;
+                }
+                #onlineStatus.active::after {
+                    content: 'ONLINE';
                 }
             </style>
             <button id="uploadButton">

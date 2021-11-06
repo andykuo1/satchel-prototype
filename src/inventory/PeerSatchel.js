@@ -30,6 +30,7 @@ export async function connectAsClient() {
         throw e;
     }
     window.alert('Hooray! Connected to server!');
+    document.querySelector('#onlineStatus').classList.toggle('active', true);
     return true;
 }
 
@@ -65,11 +66,12 @@ export async function connectAsServer() {
     let shareable = generateShareableLink(peerful);
     await copyToClipboard(shareable);
     window.alert('Link copied!\n' + shareable);
-    // Save to local storage every 5 seconds
+    document.querySelector('#onlineStatus').classList.toggle('active', true);
+    // Save to local storage every 1 seconds
     setInterval(() => {
         let ctx = getCursorContext();
         localStorage.setItem('server_data', JSON.stringify(ctx.server.data));
-    }, 5000);
+    }, 1000);
 }
 
 function onLocalClientConnection(conn) {
@@ -129,7 +131,7 @@ function onLocalClientConnection(conn) {
         message: name,
     }));
 
-    // Send to server every 5 seconds
+    // Send to server every 1 seconds
     setInterval(() => {
         let store = getInventoryStore();
         let jsonData = saveToJSON(store);
@@ -139,7 +141,7 @@ function onLocalClientConnection(conn) {
         };
         let string = JSON.stringify(wrappedData);
         conn.send(string);
-    }, 5000);
+    }, 1000);
 }
 
 function onRemoteClientConnection(conn) {

@@ -3,6 +3,7 @@ import { setGroundContainer } from './GroundHelper.js';
 import { createInventoryView } from './InventoryView.js';
 import { getInventoryStore, createInventory } from './InventoryStore.js';
 import { applyItemBuilder, openItemBuilder, resetItemBuilder } from './ItemBuilder.js';
+import { loadFromLocalStorage } from './InventoryLoader.js';
 
 window.addEventListener('DOMContentLoaded', () => {
     document.querySelector('#itemBuilder').addEventListener('submit', (e) => {
@@ -59,4 +60,6 @@ window.addEventListener('DOMContentLoaded', () => {
     let mainInventory = createInventory(store, 'main', 'grid', 12, 9);
     let mainElement = createInventoryView(store, mainInventory.name);
     workspace.appendChild(mainElement);
+
+    loadFromLocalStorage(getInventoryStore());
 });
