@@ -145,7 +145,16 @@ export class Peerful extends Eventable {
           }
           break;
         default:
-          console.warn('Received unknown signal:', sdp);
+          if ('candidate' in sdp) {
+            const conn = this.connections[src];
+            if (!conn) {
+              console.warn('Received candidate attempt when not listening.');
+              return;
+            }
+            conn.onSignalingResponse('candidiate', sdp.candidate, src, dst);
+          } else {
+            console.warn('Received unknown signal:', sdp);
+          }
       }
     }
   }
