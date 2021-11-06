@@ -1,9 +1,11 @@
-import { downloadText } from '../Downloader.js';
 import { Peerful } from '../peerful/Peerful.js';
 import { copyToClipboard } from '../util/clipboard.js';
 import { getCursorContext } from './CursorHelper.js';
 import { saveToJSON } from './InventoryLoader.js';
 import { getInventoryStore, resetInventoryStore } from './InventoryStore.js';
+
+// const BASE_URL = 'http://127.0.0.1:5500';
+const BASE_URL = 'https://andykuo1.github.io/satchel/';
 
 export async function connectAsClient() {
     let remoteId = tryGetRemotePeerId(window.location);
@@ -204,5 +206,5 @@ function tryGetRemotePeerId(url) {
  * @returns {string}
  */
 function generateShareableLink(peerful) {
-    return `http://127.0.0.1:5500/extra.html?id=${peerful.id}`;
+    return `${BASE_URL}/index.html?id=${peerful.id}`;
 }
