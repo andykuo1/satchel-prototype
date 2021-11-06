@@ -40,6 +40,6 @@ export function dropOnGround(freedItem) {
 export function clearGround() {
     let ground = getGroundContainer();
     for(let grid of ground.querySelectorAll('inventory-grid')) {
-        clearInventory(getInventoryStore(), grid.name);
+        clearInventory(getInventoryStore(), grid.name, true);
     }
 }

@@ -98,13 +98,15 @@ export function getInventory(store, inventoryName) {
     }
 }
 
-export function clearInventory(store, inventoryName) {
+export function clearInventory(store, inventoryName, deleteItems = true) {
     let inventory = getInventory(store, inventoryName);
     if (inventory) {
         let prevLength = inventory.items.length;
         if (prevLength > 0) {
-            for(let itemId of inventory.items) {
-                deleteItem(store, itemId);
+            if (deleteItems) {
+                for(let itemId of inventory.items) {
+                    deleteItem(store, itemId);
+                }
             }
             inventory.items.length = 0;
             dispatchInventoryChange(store, inventoryName);

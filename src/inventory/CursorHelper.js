@@ -86,7 +86,7 @@ export function storeToCursor(ctx, freedItem) {
 }
 
 export function freeFromCursor(ctx) {
-    clearInventory(getInventoryStore(), ctx.element.name);
+    clearInventory(getInventoryStore(), ctx.element.name, false);
     ctx.element.style.display = 'none';
     clearPlaceDownBuffer();
 }
