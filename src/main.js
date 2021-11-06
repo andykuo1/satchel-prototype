@@ -9,7 +9,7 @@ import {
 } from './inventory/ItemBuilder.js';
 import { loadFromLocalStorage, saveToLocalStorage } from './inventory/InventoryLoader.js';
 
-const APP_VERSION = '1.0.7';
+const APP_VERSION = '1.0.8';
 
 window.addEventListener('DOMContentLoaded', () => {
   document.querySelector('#appVersion').textContent = `v${APP_VERSION}`;
@@ -77,9 +77,9 @@ window.addEventListener('DOMContentLoaded', () => {
   // Load from storage...
   loadFromLocalStorage(getInventoryStore());
 
-  // Auto save to local storage every 1 second
+  // Auto save to local storage every 5 second
   setInterval(() => {
     console.log('Autosave...');
     saveToLocalStorage(getInventoryStore());
-  }, 1000);
+  }, 5000);
 });

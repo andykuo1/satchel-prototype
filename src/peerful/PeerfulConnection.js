@@ -78,6 +78,11 @@ export class PeerfulConnection extends Eventable {
     this.peerConnection = null;
     /**
      * @protected
+     * @type {Array<RTCIceCandidate>}
+     */
+    this.pendingCandidates = [];
+    /**
+     * @protected
      * @type {RTCDataChannel}
      */
     this.dataChannel = null;
@@ -184,6 +189,28 @@ export class PeerfulConnection extends Eventable {
       this.onIceConnectionStateChange
     );
     peerConnection.close();
+  }
+
+  /** @protected */
+  flushPendingCandidates() {
+    let candidates = this.pendingCandidates.slice();
+    this.pendingCandidates.length = 0;
+    for(let pending of candidates) {
+      this.peerConnection
+        .addIceCandidate(pending)
+        .then(() => debug('[CHANNEL]', 'Received candidate.'))
+        .catch((e) => debug('[CHANNEL]', 'Failed to add candidate.', e));
+    }
+  }
+
+  /**
+   * @param {RTCIceCandidate} candidate
+   */
+  onSignalingCandidate(candidate) {
+    this.pendingCandidates.push(candidate);
+    if (this.peerConnection.remoteDescription) {
+      this.flushPendingCandidates();
+    }
   }
 
   /**
@@ -316,28 +343,20 @@ export class PeerfulLocalConnection extends PeerfulConnection {
   /**
    * @override
    * @param {'answer'} type
-   * @param {RTCSessionDescriptionInit|RTCIceCandidate} sdp
+   * @param {RTCSessionDescription} description
    * @param {string} src
    * @param {string} dst
    */
-  onSignalingResponse(type, sdp, src, dst) {
+  onSignalingResponse(type, description, src, dst) {
     debug('[LOCAL]', 'Received signal', type, src, dst);
     if (type === 'answer') {
       // Process answer
-      const descriptionInit = /** @type {RTCSessionDescriptionInit} */ (sdp);
-      const answer = new RTCSessionDescription(descriptionInit);
       this.peerConnection
-        .setRemoteDescription(answer)
+        .setRemoteDescription(description)
+        .then(() => this.flushPendingCandidates())
         .then(() => debug('[LOCAL]', 'Successfully set remote description.'))
         .catch((e) => debug('[LOCAL]', 'Failed to set remote description.', e));
       // Wait for channel to open...
-    } else if (type === 'candidate') {
-      // TODO: This will never be called since no signals are of type 'candidate'
-      const candidate = /** @type {RTCIceCandidate} */ (sdp);
-      this.peerConnection
-        .addIceCandidate(candidate)
-        .then(() => debug('[LOCAL]', 'Successfully add candidate.'))
-        .catch((e) => debug('[LOCAL]', 'Failed to add candidate.', e));
     } else {
       throw new Error(
         `Received invalid response type '${type}' on local connection.`
@@ -379,18 +398,18 @@ export class PeerfulRemoteConnection extends PeerfulConnection {
   /**
    * @override
    * @param {'offer'} type
-   * @param {RTCSessionDescriptionInit|RTCIceCandidate} sdp
+   * @param {RTCSessionDescription} description
    * @param {string} src
    * @param {string} dst
    */
-  onSignalingResponse(type, sdp, src, dst) {
+  onSignalingResponse(type, description, src, dst) {
     debug('[REMOTE]', 'Received signal', type, src, dst);
     if (type === 'offer') {
       this.remoteId = src;
       // Receive offer
-      const offer = new RTCSessionDescription(sdp);
       this.peerConnection
-        .setRemoteDescription(offer)
+        .setRemoteDescription(description)
+        .then(() => this.flushPendingCandidates())
         .then(() => this.peerConnection.createAnswer())
         .then((answer) => this.peerConnection.setLocalDescription(answer))
         .then(() =>
@@ -400,13 +419,6 @@ export class PeerfulRemoteConnection extends PeerfulConnection {
           debug('[REMOTE]', 'Failed to set remote/local description.', e)
         );
       // Wait for ICE to complete before sending answer...
-    } else if (type === 'candidate') {
-      // TODO: This will never be called since no signals are of type 'candidate'
-      const candidate = /** @type {RTCIceCandidate} */ (sdp);
-      this.peerConnection
-        .addIceCandidate(candidate)
-        .then(() => debug('[REMOTE]', 'Successfully add candidate.'))
-        .catch((e) => debug('[REMOTE]', 'Failed to add candidate.', e));
     } else {
       throw new Error(
         `Received invalid response type '${type}' on remote connection.`

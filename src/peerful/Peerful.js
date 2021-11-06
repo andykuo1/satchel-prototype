@@ -131,7 +131,8 @@ export class Peerful extends Eventable {
             ).open();
             this.connections[dst] = conn;
             conn.listen().then(this.onPeerfulRemoteConnectionOpen);
-            conn.onSignalingResponse('offer', sdp, src, dst);
+            const description = new RTCSessionDescription(sdp);
+            conn.onSignalingResponse('offer', description, src, dst);
           }
           break;
         case 'answer':
@@ -141,21 +142,22 @@ export class Peerful extends Eventable {
               console.warn('Received signaling attempt when not listening.');
               return;
             }
-            conn.onSignalingResponse('answer', sdp, src, dst);
+            const description = new RTCSessionDescription(sdp);
+            conn.onSignalingResponse('answer', description, src, dst);
           }
           break;
         default:
           if ('candidate' in sdp) {
-            let conn = this.connections[src];
+            let conn = this.connections[dst];
             if (!conn) {
               conn = new PeerfulRemoteConnection(
                 this.id,
                 this.signaling
               ).open();
-              this.connections[src] = conn;
+              this.connections[dst] = conn;
             }
-            let candidate = new RTCIceCandidate(sdp);
-            conn.onSignalingResponse('candidate', candidate, src, dst);
+            const candidate = new RTCIceCandidate(sdp);
+            conn.onSignalingCandidate(candidate);
           } else {
             console.warn('Received unknown signal:', sdp);
           }
