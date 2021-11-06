@@ -2,7 +2,6 @@ import { setCursorElement } from './CursorHelper.js';
 import { setGroundContainer } from './GroundHelper.js';
 import { createInventoryView } from './InventoryView.js';
 import { getInventoryStore, createInventory } from './InventoryStore.js';
-import { loadFromLocalStorage, saveToLocalStorage } from './InventoryLoader.js';
 import { applyItemBuilder, openItemBuilder, resetItemBuilder } from './ItemBuilder.js';
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -60,11 +59,4 @@ window.addEventListener('DOMContentLoaded', () => {
     let mainInventory = createInventory(store, 'main', 'grid', 12, 9);
     let mainElement = createInventoryView(store, mainInventory.name);
     workspace.appendChild(mainElement);
-
-    loadFromLocalStorage(store);
-
-    setInterval(() => {
-        console.log('Autosave...');
-        saveToLocalStorage(store);
-    }, 5000);
 });

@@ -90,6 +90,10 @@
                     opacity: 0.3;
                 }
             </style>
+            <button id="uploadButton">
+                <img src="res/upload.svg" alt="upload" width="40" for="uploadInput">
+            </button>
+            <input type="file" id="uploadInput" hidden accept="json">
             <button id="downloadButton">
                 <img src="res/download.svg" alt="download" width="40">
             </button>
@@ -102,75 +106,7 @@
             <button id="settingsButton">
                 <img src="res/settings.svg" alt="settings" width="40">
             </button>
-            <script type="module">
-                import { clearGround } from './src/inventory/GroundHelper.js';
-                import { openItemBuilder } from './src/inventory/ItemBuilder.js';
-                import { downloadText } from './src/Downloader.js';
-                import { saveToJSON } from './src/inventory/InventoryLoader.js';
-                import { getInventoryStore } from './src/inventory/InventoryStore.js';
-                import { connectAsClient, connectAsServer, isServerSide } from './src/inventory/PeerSatchel.js';
-                
-                window.addEventListener('DOMContentLoaded', () => {
-                    document.querySelector('#settingsButton').addEventListener('click', onSettingsClick);
-                    document.querySelector('#deleteButton').addEventListener('click', onDeleteClick);
-                    document.querySelector('#cloudButton').addEventListener('click', onCloudClick);
-                    document.querySelector('#downloadButton').addEventListener('click', onDownloadClick);
-
-                    // Try connect the client
-                    connectAsClient().then(result => {
-                        if (result) {
-                            document.querySelector('#cloudButton').toggleAttribute('disabled', true);
-                        }
-                    });
-                });
-
-                function onSettingsClick() {
-                    let settings = document.querySelector('#settingsContent');
-                    if (settings.classList.contains('open')) {
-                        settings.classList.remove('open');
-                    } else {
-                        openItemBuilder(document.querySelector('#itemBuilder'));
-                        document.querySelector('#settingsContent').classList.add('open');
-                    }
-                }
-
-                function onDeleteClick() {
-                    if (window.confirm('Clear all items on the ground?')) {
-                        clearGround();
-                    }
-                }
-
-                function onCloudClick() {
-                    // Try connect the server
-                    connectAsServer();
-                }
-
-                function onDownloadClick() {
-                    let timestamp = Date.now();
-                    if (isServerSide()) {
-                        let serverData;
-                        try {
-                            serverData = JSON.parse(localStorage.getItem('server_data'));
-                        } catch(e) {
-                            serverData = {};
-                        }
-                        let wrappedData = {
-                            timestamp,
-                            data: serverData,
-                        };
-                        let dataString = JSON.stringify(wrappedData, null, 4);
-                        downloadText(`server-data-${timestamp}.json`, dataString);
-                    } else {
-                        let jsonData = saveToJSON(getInventoryStore());
-                        let wrappedData = {
-                            timestamp,
-                            data: jsonData,
-                        };
-                        let dataString = JSON.stringify(wrappedData, null, 4);
-                        downloadText(`satchel-data-${timestamp}.json`, dataString);
-                    }
-                }
-            </script>
+            <script type="module" src="src/inventory/toolbar.js"></script>
         </div>
     </header>
     <div class="content">

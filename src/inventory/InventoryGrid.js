@@ -17,7 +17,7 @@ const INNER_STYLE = `
 :host {
     --background-color: #6b6051;
     --outline-color: #352e25;
-    --grid-color: rgba(0, 0, 0, 0.1);
+    --grid-color: rgba(0, 0, 0, 0.2);
     --container-width: 1;
     --container-height: 1;
     --item-unit-size: ${DEFAULT_ITEM_UNIT_SIZE}px;
