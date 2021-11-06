@@ -110,7 +110,7 @@ export class Peerful extends Eventable {
   /**
    * @private
    * @param {Error} error
-   * @param {RTCSessionDescriptionInit} sdp
+   * @param {RTCSessionDescriptionInit|RTCIceCandidateInit} sdp
    * @param {string} src
    * @param {string} dst
    */
@@ -131,7 +131,8 @@ export class Peerful extends Eventable {
             ).open();
             this.connections[dst] = conn;
             conn.listen().then(this.onPeerfulRemoteConnectionOpen);
-            const description = new RTCSessionDescription(sdp);
+            const init = /** @type {RTCSessionDescriptionInit} */ (sdp);
+            const description = new RTCSessionDescription(init);
             conn.onSignalingResponse('offer', description, src, dst);
           }
           break;
@@ -142,7 +143,8 @@ export class Peerful extends Eventable {
               console.warn('Received signaling attempt when not listening.');
               return;
             }
-            const description = new RTCSessionDescription(sdp);
+            const init = /** @type {RTCSessionDescriptionInit} */ (sdp);
+            const description = new RTCSessionDescription(init);
             conn.onSignalingResponse('answer', description, src, dst);
           }
           break;
@@ -156,8 +158,9 @@ export class Peerful extends Eventable {
               ).open();
               this.connections[dst] = conn;
             }
-            const candidate = new RTCIceCandidate(sdp);
-            conn.onSignalingCandidate(candidate);
+            const init = /** @type {RTCIceCandidateInit} */ (sdp);
+            const candidate = new RTCIceCandidate(init);
+            conn.onSignalingResponse('candidate', candidate, src, dst);
           } else {
             console.warn('Received unknown signal:', sdp);
           }

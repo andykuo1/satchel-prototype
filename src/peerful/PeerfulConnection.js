@@ -191,7 +191,10 @@ export class PeerfulConnection extends Eventable {
     peerConnection.close();
   }
 
-  /** @protected */
+  /**
+   * Flushes any pending candidates. This is dependent on remote description.
+   * @protected
+   */
   flushPendingCandidates() {
     let candidates = this.pendingCandidates.slice();
     this.pendingCandidates.length = 0;
@@ -204,23 +207,21 @@ export class PeerfulConnection extends Eventable {
   }
 
   /**
-   * @param {RTCIceCandidate} candidate
-   */
-  onSignalingCandidate(candidate) {
-    this.pendingCandidates.push(candidate);
-    if (this.peerConnection.remoteDescription) {
-      this.flushPendingCandidates();
-    }
-  }
-
-  /**
-   * @abstract
    * @param {string} type
-   * @param {RTCSessionDescriptionInit|RTCIceCandidate} sdp
+   * @param {RTCSessionDescription|RTCIceCandidate} sdp
    * @param {string} src
    * @param {string} dst
    */
-  onSignalingResponse(type, sdp, src, dst) {}
+  onSignalingResponse(type, sdp, src, dst) {
+    debug('[CHANNEL]', 'Received signal', type, src, dst);
+    if (type === 'candidate') {
+      const candidate = /** @type {RTCIceCandidate} */ (sdp);
+      this.pendingCandidates.push(candidate);
+      if (this.peerConnection.remoteDescription) {
+        this.flushPendingCandidates();
+      }
+    }
+  }
 
   /**
    * @private
@@ -342,14 +343,15 @@ export class PeerfulLocalConnection extends PeerfulConnection {
 
   /**
    * @override
-   * @param {'answer'} type
-   * @param {RTCSessionDescription} description
+   * @param {'answer'|'candidate'} type
+   * @param {RTCSessionDescription|RTCIceCandidate} sdp
    * @param {string} src
    * @param {string} dst
    */
-  onSignalingResponse(type, description, src, dst) {
-    debug('[LOCAL]', 'Received signal', type, src, dst);
+  onSignalingResponse(type, sdp, src, dst) {
+    super.onSignalingResponse(type, sdp, src, dst);
     if (type === 'answer') {
+      const description = /** @type {RTCSessionDescription} */ (sdp);
       // Process answer
       this.peerConnection
         .setRemoteDescription(description)
@@ -397,15 +399,16 @@ export class PeerfulRemoteConnection extends PeerfulConnection {
 
   /**
    * @override
-   * @param {'offer'} type
-   * @param {RTCSessionDescription} description
+   * @param {'offer'|'candidate'} type
+   * @param {RTCSessionDescription|RTCIceCandidate} sdp
    * @param {string} src
    * @param {string} dst
    */
-  onSignalingResponse(type, description, src, dst) {
-    debug('[REMOTE]', 'Received signal', type, src, dst);
+  onSignalingResponse(type, sdp, src, dst) {
+    super.onSignalingResponse(type, sdp, src, dst);
     if (type === 'offer') {
       this.remoteId = src;
+      const description = /** @type {RTCSessionDescription} */ (sdp);
       // Receive offer
       this.peerConnection
         .setRemoteDescription(description)
