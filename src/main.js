@@ -9,8 +9,10 @@ import {
 } from './inventory/ItemBuilder.js';
 import { loadFromLocalStorage, saveToLocalStorage } from './inventory/InventoryLoader.js';
 
+const APP_VERSION = '1.0.2';
+
 window.addEventListener('DOMContentLoaded', () => {
-  document.querySelector('#appVersion').textContent = 'v1.0.1';
+  document.querySelector('#appVersion').textContent = `v${APP_VERSION}`;
   document.querySelector('#itemBuilder').addEventListener('submit', (e) => {
     e.preventDefault();
 
