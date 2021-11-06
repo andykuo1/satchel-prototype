@@ -146,12 +146,15 @@ export class Peerful extends Eventable {
           break;
         default:
           if ('candidate' in sdp) {
-            const conn = this.connections[src];
+            let conn = this.connections[src];
             if (!conn) {
-              console.warn('Received candidate attempt when not listening.');
-              return;
+              conn = new PeerfulRemoteConnection(
+                this.id,
+                this.signaling
+              ).open();
+              this.connections[src] = conn;
             }
-            conn.onSignalingResponse('candidiate', sdp.candidate, src, dst);
+            conn.onSignalingResponse('candidate', sdp.candidate, src, dst);
           } else {
             console.warn('Received unknown signal:', sdp);
           }

@@ -316,7 +316,7 @@ export class PeerfulLocalConnection extends PeerfulConnection {
   /**
    * @override
    * @param {'answer'} type
-   * @param {RTCSessionDescriptionInit} sdp
+   * @param {RTCSessionDescriptionInit|RTCIceCandidate} sdp
    * @param {string} src
    * @param {string} dst
    */
@@ -324,7 +324,8 @@ export class PeerfulLocalConnection extends PeerfulConnection {
     debug('[LOCAL]', 'Received signal', type, src, dst);
     if (type === 'answer') {
       // Process answer
-      const answer = new RTCSessionDescription(sdp);
+      const descriptionInit = /** @type {RTCSessionDescriptionInit} */ (sdp);
+      const answer = new RTCSessionDescription(descriptionInit);
       this.peerConnection
         .setRemoteDescription(answer)
         .then(() => debug('[LOCAL]', 'Successfully set remote description.'))
@@ -332,7 +333,7 @@ export class PeerfulLocalConnection extends PeerfulConnection {
       // Wait for channel to open...
     } else if (type === 'candidate') {
       // TODO: This will never be called since no signals are of type 'candidate'
-      const candidate = /** @type {any|RTCIceCandidate} */ (sdp);
+      const candidate = /** @type {RTCIceCandidate} */ (sdp);
       this.peerConnection
         .addIceCandidate(candidate)
         .then(() => debug('[LOCAL]', 'Successfully add candidate.'))
