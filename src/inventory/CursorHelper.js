@@ -68,9 +68,6 @@ export function updateCursorPosition(clientX, clientY, unitSize) {
   }
 }
 
-/**
- *
- */
 function onAnimationFrame() {
   const ctx = getCursorContext();
   updateCursorPosition(ctx.clientX, ctx.clientY, 48);
@@ -86,9 +83,6 @@ function onMouseMove(e) {
   ctx.clientY = e.clientY;
 }
 
-/**
- *
- */
 export function getCursorContext() {
   return CURSOR_CONTEXT;
 }
@@ -132,9 +126,6 @@ export function freeFromCursor(ctx) {
   clearPlaceDownBuffer();
 }
 
-/**
- *
- */
 export function startPlaceDownBuffer() {
   const ctx = getCursorContext();
   ctx.placeDownBuffer = false;
@@ -146,17 +137,11 @@ export function startPlaceDownBuffer() {
   );
 }
 
-/**
- *
- */
 function onPlaceDownBufferTimeout() {
   const ctx = getCursorContext();
   ctx.placeDownBuffer = true;
 }
 
-/**
- *
- */
 export function clearPlaceDownBuffer() {
   const ctx = getCursorContext();
   ctx.placeDownBuffer = true;

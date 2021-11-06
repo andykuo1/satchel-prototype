@@ -39,9 +39,6 @@ function onMouseUp(e) {
   }
 }
 
-/**
- *
- */
 export function getGroundContainer() {
   return getCursorContext().ground;
 }
@@ -61,9 +58,6 @@ export function dropOnGround(freedItem) {
   ground.append(invElement);
 }
 
-/**
- *
- */
 export function clearGround() {
   const ground = getGroundContainer();
   for (const grid of ground.querySelectorAll('inventory-grid')) {

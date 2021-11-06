@@ -190,7 +190,6 @@ function onRemoteClientConnection(conn) {
             conn.send(JSON.stringify({ type: 'new' }));
           }
         }
-
         break;
       case 'sync':
         {
@@ -202,7 +201,6 @@ function onRemoteClientConnection(conn) {
           const clientDataName = `remote_data#${client.name}`;
           ctx.server.data[clientDataName] = jsonData.message;
         }
-
         break;
       default:
         console.error(`Found unknown message from client - ${data}`);

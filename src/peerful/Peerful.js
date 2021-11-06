@@ -134,7 +134,6 @@ export class Peerful extends Eventable {
           conn.listen().then(this.onPeerfulRemoteConnectionOpen);
           conn.onSignalingResponse('offer', sdp, src, dst);
         }
-
         break;
       case 'answer':
         {
@@ -146,7 +145,6 @@ export class Peerful extends Eventable {
 
           conn.onSignalingResponse('answer', sdp, src, dst);
         }
-
         break;
       }
     }
