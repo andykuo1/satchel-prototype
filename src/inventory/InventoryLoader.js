@@ -1,4 +1,4 @@
-import { resetInventoryStore } from './InventoryStore.js';
+import { getInventory, getItemsInInventory, resetInventoryStore } from './InventoryStore.js';
 
 export function loadFromLocalStorage(store) {
     let dataString = localStorage.getItem('satchel_data_v1');
@@ -8,7 +8,7 @@ export function loadFromLocalStorage(store) {
     } catch(e) {
         return;
     }
-    if (jsonData && typeof jsonData.item === 'object' && typeof jsonData.inventory === 'object') {
+    if (jsonData && typeof jsonData.data === 'object') {
         loadFromJSON(store, jsonData);
     }
 }
@@ -22,21 +22,33 @@ export function saveToLocalStorage(store) {
 export function loadFromJSON(store, jsonData) {
     let nextStore = {
         data: {
-            item: jsonData.item,
-            inventory: jsonData.inventory,
+            item: jsonData.data.item,
+            inventory: jsonData.data.inventory,
         }
     };
     resetInventoryStore(store, nextStore);
 }
 
 export function saveToJSON(store) {
-    return store.data;
+    let result = {
+        data: store.data,
+    };
+    return result;
 }
 
-function saveItemToJSON(item) {
-    return JSON.stringify(item);
-}
-
-function saveInventoryToJSON(inventory) {
-    return JSON.stringify(inventory);
+export function saveInventoryToJSON(store, inventoryName) {
+    let inv = getInventory(store, inventoryName);
+    let result = {
+        data: {
+            item: {},
+            inventory: {
+                [inventoryName]: inv,
+            },
+        }
+    };
+    let items = getItemsInInventory(store, inventoryName);
+    for(let item of items) {
+        result.data.item[item.itemId] = item;
+    }
+    return result;
 }

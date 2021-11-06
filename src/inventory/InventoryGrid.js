@@ -15,7 +15,9 @@ const INNER_HTML = `
 `;
 const INNER_STYLE = `
 :host {
-    --background-color: dodgerblue;
+    --background-color: #6b6051;
+    --outline-color: #352e25;
+    --grid-color: rgba(0, 0, 0, 0.1);
     --container-width: 1;
     --container-height: 1;
     --item-unit-size: ${DEFAULT_ITEM_UNIT_SIZE}px;
@@ -52,9 +54,9 @@ h2:empty {
     width: 100%;
     height: calc(var(--container-height) * var(--item-unit-size));
     background-color: var(--background-color);
-    border: 1px solid black;
+    border: 1px solid var(--outline-color);
     border-radius: 1rem;
-    box-shadow: 0.2rem 0.2rem 0 0 black;
+    box-shadow: 0.2rem 0.2rem 0 0 var(--outline-color);
     overflow: hidden;
     transition: height var(--transition-duration) ease;
 }
@@ -62,8 +64,8 @@ h2:empty {
     background-size: var(--item-unit-size) var(--item-unit-size);
     background-position: -1px -1px;
     background-image:
-        linear-gradient(to right, black, transparent 1px),
-        linear-gradient(to bottom, black, transparent 1px);
+        linear-gradient(to right, var(--grid-color), transparent 1px),
+        linear-gradient(to bottom, var(--grid-color), transparent 1px);
 }
 .hidden {
     display: none;

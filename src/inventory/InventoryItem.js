@@ -11,6 +11,8 @@ const INNER_HTML = `
 `;
 const INNER_STYLE = `
 :host {
+    --background-color: rgba(0, 0, 0, 0.1);
+    --hover-color: rgba(0, 0, 0, 0.2);
     --itemX: 0;
     --itemY: 0;
     --itemWidth: 1;
@@ -29,10 +31,10 @@ const INNER_STYLE = `
     user-select: none;
     box-shadow: 0 0 0 rgba(0, 0, 0, 0);
     transition: box-shadow 0.1s ease;
+    background-color: var(--background-color);
 }
 .container:hover {
-    background-color: rgba(0, 0, 0, 0.2);
-    box-shadow: 0 0 0.7rem rgba(0, 0, 0, 0.6);
+    background-color: var(--hover-color);
     z-index: 1;
 }
 img {
