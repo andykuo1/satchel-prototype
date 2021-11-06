@@ -108,7 +108,7 @@ function onLocalClientConnection(conn) {
                     break;
             }
         } catch(e) {
-            console.error('Found invalid message from server - ' + data);
+            console.error('Found invalid message from server - ' + data, e);
         }
     });
     conn.on('error', (err) => {
@@ -179,7 +179,7 @@ function onRemoteClientConnection(conn) {
             }
         } catch(e) {
             console.error(e);
-            console.error('Found invalid message from client - ' + data);
+            console.error('Found invalid message from client - ' + data, e);
         }
     });
     conn.on('error', (err) => {
