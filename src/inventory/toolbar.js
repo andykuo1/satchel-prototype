@@ -4,6 +4,7 @@ import { downloadText } from '../Downloader.js';
 import { saveToJSON, loadFromJSON, saveToLocalStorage, loadFromLocalStorage } from './InventoryLoader.js';
 import { getInventoryStore } from './InventoryStore.js';
 import { connectAsClient, connectAsServer, isServerSide } from './PeerSatchel.js';
+import { getCursorContext } from './CursorHelper.js';
 
 window.addEventListener('DOMContentLoaded', () => {
     document.querySelector('#settingsButton').addEventListener('click', onSettingsClick);
@@ -82,9 +83,19 @@ function onUploadClick() {
 
 async function onUploadChange(e) {
     let file = e.target.files[0];
-    let jsonData = await file.json();
+
+    let jsonData;
+    try {
+        jsonData = JSON.parse(await file.text());
+    } catch(e) {
+        window.alert('Failed to load file.');
+    }
     if (jsonData.datatype === 'server') {
         localStorage.setItem('server_data', JSON.stringify(jsonData.data));
+        let ctx = getCursorContext();
+        if (ctx.server) {
+            ctx.server.data = jsonData.data;
+        }
     }
     if (jsonData.datatype === 'client') {
         loadFromJSON(getInventoryStore(), jsonData.data);

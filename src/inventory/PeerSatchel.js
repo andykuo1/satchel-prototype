@@ -46,6 +46,7 @@ export async function connectAsServer() {
         } catch(e) {
             serverData = {};
         }
+        console.log('Loading server data...');
         ctx.server = {
             peerful: null,
             clients: [],
@@ -152,7 +153,7 @@ function onRemoteClientConnection(conn) {
             let jsonData = JSON.parse(data);
             switch(jsonData.type) {
                 case 'name': {
-                    client.name = jsonData.message;
+                    client.name = jsonData.message.toLowerCase().replace(/\s/g, '_');
                     let clientDataName = `remote_data#${client.name}`;
                     // Send to client their first data store
                     let clientData = ctx.server.data[clientDataName] || null;
