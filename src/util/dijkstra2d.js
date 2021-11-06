@@ -31,7 +31,7 @@
  * Performs Dijkstra's on a 2d coordinate system with the passed-in callback functions. It assumes that every
  * coordinate can be translated to an uniquely identifying number to represent node uniqueness. It also assumes
  * the reverse is also easily computable (from node to coordinates). This does NOT use a priority queue.
- * 
+ *
  * @param {number} x The starting x coordinate.
  * @param {number} y The starting y coordinate.
  * @param {number} minX The minimum x coordinate.
@@ -45,42 +45,68 @@
  * @returns {Array<number>} An array of x and y coordinates of the found end coordinates. If none are found, then
  * it will return [ -1, -1 ].
  */
-export function dijkstra2d(x, y, minX, minY, maxX, maxY, isEnd, getNeighbors, fromCoord, toCoord)
-{
-    if (Number.isNaN(maxX) || Number.isNaN(maxY)) throw new Error('Maximum coordinates must be a number.');
-    if (minX < 0 || minY < 0 || maxX < 0 || maxY < 0) throw new Error('Coordinates must be non-negative.');
-    if (minX > maxX || minY > maxY) throw new Error('Minimum coordinates must be less than maximum coordinates.');
-    if (maxX !== (maxX & 0xFFFF) || maxY !== (maxY & 0xFFFF)) throw new Error('Cannot find coordinates in dimensions larger than 2^16.');
-    
-    let outNeighbors = new Array(4);
-    let outCoord = new Array(2);
+export function dijkstra2d(
+  x,
+  y,
+  minX,
+  minY,
+  maxX,
+  maxY,
+  isEnd,
+  getNeighbors,
+  fromCoord,
+  toCoord
+) {
+  if (Number.isNaN(maxX) || Number.isNaN(maxY)) {
+    throw new TypeError('Maximum coordinates must be a number.');
+  }
 
-    let visited = new Set();
-    let unvisited = [
-        fromCoord(x, y)
-    ];
-    while(unvisited.length > 0)
-    {
-        let node = unvisited.shift();
-        let [ nodeX, nodeY ] = toCoord(node, outCoord);
-        if (isEnd(nodeX, nodeY)) return outCoord;
+  if (minX < 0 || minY < 0 || maxX < 0 || maxY < 0) {
+    throw new Error('Coordinates must be non-negative.');
+  }
 
-        visited.add(node);
+  if (minX > maxX || minY > maxY) {
+    throw new Error(
+      'Minimum coordinates must be less than maximum coordinates.'
+    );
+  }
 
-        for(let neighbor of getNeighbors(nodeX, nodeY, outNeighbors))
-        {
-            if (visited.has(neighbor)) continue;
+  if (maxX !== (maxX & 0xff_ff) || maxY !== (maxY & 0xff_ff)) {
+    throw new Error('Cannot find coordinates in dimensions larger than 2^16.');
+  }
 
-            let [ neighborX, neighborY ] = toCoord(neighbor, outCoord);
-            if (neighborX >= minX && neighborY >= minY && neighborX <= maxX && neighborY <= maxY)
-            {
-                unvisited.push(neighbor);
-            }
-        }
+  const outNeighbors = Array.from({ length: 4 });
+  const outCoord = Array.from({ length: 2 });
+
+  const visited = new Set();
+  const unvisited = [fromCoord(x, y)];
+  while (unvisited.length > 0) {
+    const node = unvisited.shift();
+    const [nodeX, nodeY] = toCoord(node, outCoord);
+    if (isEnd(nodeX, nodeY)) {
+      return outCoord;
     }
 
-    outCoord[0] = -1;
-    outCoord[1] = -1;
-    return outCoord;
+    visited.add(node);
+
+    for (const neighbor of getNeighbors(nodeX, nodeY, outNeighbors)) {
+      if (visited.has(neighbor)) {
+        continue;
+      }
+
+      const [neighborX, neighborY] = toCoord(neighbor, outCoord);
+      if (
+        neighborX >= minX &&
+        neighborY >= minY &&
+        neighborX <= maxX &&
+        neighborY <= maxY
+      ) {
+        unvisited.push(neighbor);
+      }
+    }
+  }
+
+  outCoord[0] = -1;
+  outCoord[1] = -1;
+  return outCoord;
 }
- 

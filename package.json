@@ -3,15 +3,19 @@
   "version": "1.0.0",
   "description": "Somewhere to store your precious loot.",
   "private": true,
+  "type": "module",
   "main": "index.js",
   "scripts": {
+    "lint": "eslint src/**/*.js",
+    "format": "prettier --write src/**/*.js && eslint src/**/*.js --fix",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "Andrew Kuo",
   "license": "MIT",
-  "dependencies": {
-    "haunted": "^4.8.2",
-    "yjs": "^13.5.12"
+  "dependencies": {},
+  "devDependencies": {
+    "eslint": "^8.2.0",
+    "prettier": "^2.4.1"
   }
 }

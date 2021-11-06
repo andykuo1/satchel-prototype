@@ -1,45 +1,72 @@
-import { freeFromCursor, getCursorContext, getCursorItem } from './CursorHelper.js';
-import { insertIn } from './InventoryHelper.js';
-import { clearInventory, createInventory, getInventoryStore } from './InventoryStore.js';
-import { createTemporaryInventoryView } from './InventoryView.js';
 import { uuid } from '../util/uuid.js';
+import {
+  freeFromCursor,
+  getCursorContext,
+  getCursorItem,
+} from './CursorHelper.js';
+import { insertIn } from './InventoryHelper.js';
+import {
+  clearInventory,
+  createInventory,
+  getInventoryStore,
+} from './InventoryStore.js';
+import { createTemporaryInventoryView } from './InventoryView.js';
 
+/**
+ * @param ground
+ */
 export function setGroundContainer(ground) {
-    let ctx = getCursorContext();
-    if (ctx.ground) {
-        document.removeEventListener('mouseup', onMouseUp);
-    }
-    if (ground) {
-        ctx.ground = ground;
-        document.addEventListener('mouseup', onMouseUp);
-    }
+  const ctx = getCursorContext();
+  if (ctx.ground) {
+    document.removeEventListener('mouseup', onMouseUp);
+  }
+
+  if (ground) {
+    ctx.ground = ground;
+    document.addEventListener('mouseup', onMouseUp);
+  }
 }
 
+/**
+ * @param {MouseEvent} e
+ */
 function onMouseUp(e) {
-    let ctx = getCursorContext();
-    let item = getCursorItem(ctx);
-    if (item && ctx.placeDownBuffer) {
-        freeFromCursor(ctx);
-        dropOnGround(item);
-    }
+  const ctx = getCursorContext();
+  const item = getCursorItem(ctx);
+  if (item && ctx.placeDownBuffer) {
+    freeFromCursor(ctx);
+    dropOnGround(item);
+  }
 }
 
+/**
+ *
+ */
 export function getGroundContainer() {
-    return getCursorContext().ground;
+  return getCursorContext().ground;
 }
 
+/**
+ * @param freedItem
+ */
 export function dropOnGround(freedItem) {
-    let ground = getGroundContainer();
-    let inventory = createInventory(getInventoryStore(), uuid(), 'socket');
-    insertIn(inventory, freedItem);
+  const ground = getGroundContainer();
+  const inventory = createInventory(getInventoryStore(), uuid(), 'socket');
+  insertIn(inventory, freedItem);
 
-    let invElement = createTemporaryInventoryView(getInventoryStore(), inventory.name);
-    ground.appendChild(invElement);
+  const invElement = createTemporaryInventoryView(
+    getInventoryStore(),
+    inventory.name
+  );
+  ground.append(invElement);
 }
 
+/**
+ *
+ */
 export function clearGround() {
-    let ground = getGroundContainer();
-    for(let grid of ground.querySelectorAll('inventory-grid')) {
-        clearInventory(getInventoryStore(), grid.name, true);
-    }
+  const ground = getGroundContainer();
+  for (const grid of ground.querySelectorAll('inventory-grid')) {
+    clearInventory(getInventoryStore(), grid.name, true);
+  }
 }

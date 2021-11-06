@@ -1,54 +1,77 @@
-import { getInventory, getItemsInInventory, resetInventoryStore } from './InventoryStore.js';
+import {
+  getInventory,
+  getItemsInInventory,
+  resetInventoryStore,
+} from './InventoryStore.js';
 
+/**
+ * @param store
+ */
 export function loadFromLocalStorage(store) {
-    let dataString = localStorage.getItem('satchel_data_v1');
-    let jsonData;
-    try {
-        jsonData = JSON.parse(dataString);
-    } catch(e) {
-        return;
-    }
-    if (jsonData && typeof jsonData.data === 'object') {
-        loadFromJSON(store, jsonData);
-    }
+  const dataString = localStorage.getItem('satchel_data_v1');
+  let jsonData;
+  try {
+    jsonData = JSON.parse(dataString);
+  } catch {
+    return;
+  }
+
+  if (jsonData && typeof jsonData.data === 'object') {
+    loadFromJSON(store, jsonData);
+  }
 }
 
+/**
+ * @param store
+ */
 export function saveToLocalStorage(store) {
-    let jsonData = saveToJSON(store);
-    localStorage.removeItem('satchel_data_v1');
-    localStorage.setItem('satchel_data_v1', JSON.stringify(jsonData));
+  const jsonData = saveToJSON(store);
+  localStorage.removeItem('satchel_data_v1');
+  localStorage.setItem('satchel_data_v1', JSON.stringify(jsonData));
 }
 
+/**
+ * @param store
+ * @param jsonData
+ */
 export function loadFromJSON(store, jsonData) {
-    let nextStore = {
-        data: {
-            item: jsonData.data.item,
-            inventory: jsonData.data.inventory,
-        }
-    };
-    resetInventoryStore(store, nextStore);
+  const nextStore = {
+    data: {
+      item: jsonData.data.item,
+      inventory: jsonData.data.inventory,
+    },
+  };
+  resetInventoryStore(store, nextStore);
 }
 
+/**
+ * @param store
+ */
 export function saveToJSON(store) {
-    let result = {
-        data: store.data,
-    };
-    return result;
+  const result = {
+    data: store.data,
+  };
+  return result;
 }
 
+/**
+ * @param store
+ * @param inventoryName
+ */
 export function saveInventoryToJSON(store, inventoryName) {
-    let inv = getInventory(store, inventoryName);
-    let result = {
-        data: {
-            item: {},
-            inventory: {
-                [inventoryName]: inv,
-            },
-        }
-    };
-    let items = getItemsInInventory(store, inventoryName);
-    for(let item of items) {
-        result.data.item[item.itemId] = item;
-    }
-    return result;
+  const inv = getInventory(store, inventoryName);
+  const result = {
+    data: {
+      item: {},
+      inventory: {
+        [inventoryName]: inv,
+      },
+    },
+  };
+  const items = getItemsInInventory(store, inventoryName);
+  for (const item of items) {
+    result.data.item[item.itemId] = item;
+  }
+
+  return result;
 }

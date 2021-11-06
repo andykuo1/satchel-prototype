@@ -1,6 +1,12 @@
 import { upgradeProperty } from '../util/wc.js';
 import { itemMouseDownCallback } from './ContainerHelper.js';
-import { addItemChangeListener, getInventoryStore, getItem, removeItemChangeListener, resolveItem, updateItem } from './InventoryStore.js';
+import {
+  addItemChangeListener,
+  getInventoryStore,
+  getItem,
+  removeItemChangeListener,
+  updateItem,
+} from './InventoryStore.js';
 
 const INNER_HTML = `
 <figure class="container">
@@ -57,185 +63,212 @@ figcaption {
 `;
 
 export class InventoryItem extends HTMLElement {
+  /** @private */
+  static get [Symbol.for('templateNode')]() {
+    const t = document.createElement('template');
+    t.innerHTML = INNER_HTML;
+    Object.defineProperty(this, Symbol.for('templateNode'), { value: t });
+    return t;
+  }
+
+  /** @private */
+  static get [Symbol.for('styleNode')]() {
+    const t = document.createElement('style');
+    t.innerHTML = INNER_STYLE;
+    Object.defineProperty(this, Symbol.for('styleNode'), { value: t });
+    return t;
+  }
+
+  static define(customElements = window.customElements) {
+    customElements.define('inventory-item', this);
+  }
+
+  static get observedAttributes() {
+    return ['itemId'];
+  }
+
+  get itemId() {
+    return this._itemId;
+  }
+
+  set itemId(value) {
+    this.setAttribute('itemId', value);
+  }
+
+  get x() {
+    const item = getItem(getInventoryStore(), this.itemId);
+    return item.x;
+  }
+
+  set x(value) {
+    updateItem(getInventoryStore(), this.itemId, { x: value });
+  }
+
+  get y() {
+    const item = getItem(getInventoryStore(), this.itemId);
+    return item.y;
+  }
+
+  set y(value) {
+    updateItem(getInventoryStore(), this.itemId, { y: value });
+  }
+
+  get w() {
+    const item = getItem(getInventoryStore(), this.itemId);
+    return item.w;
+  }
+
+  set w(value) {
+    updateItem(getInventoryStore(), this.itemId, { w: value });
+  }
+
+  get h() {
+    const item = getItem(getInventoryStore(), this.itemId);
+    return item.h;
+  }
+
+  set h(value) {
+    updateItem(getInventoryStore(), this.itemId, { h: value });
+  }
+
+  get src() {
+    const item = getItem(getInventoryStore(), this.itemId);
+    return item.imgSrc;
+  }
+
+  set src(value) {
+    updateItem(getInventoryStore(), this.itemId, { imgSrc: value });
+  }
+
+  get name() {
+    const item = getItem(getInventoryStore(), this.itemId);
+    return item.displayName;
+  }
+
+  set name(value) {
+    updateItem(getInventoryStore(), this.itemId, { displayName: value });
+  }
+
+  constructor(itemId = undefined) {
+    super();
+    this.attachShadow({ mode: 'open' });
+    this.shadowRoot.append(
+      this.constructor[Symbol.for('templateNode')].content.cloneNode(true)
+    );
+    this.shadowRoot.append(
+      this.constructor[Symbol.for('styleNode')].cloneNode(true)
+    );
 
     /** @private */
-    static get [Symbol.for('templateNode')]() {
-        let t = document.createElement('template');
-        t.innerHTML = INNER_HTML;
-        Object.defineProperty(this, Symbol.for('templateNode'), { value: t });
-        return t;
-    }
+    this._itemId = itemId;
 
     /** @private */
-    static get [Symbol.for('styleNode')]() {
-        let t = document.createElement('style');
-        t.innerHTML = INNER_STYLE;
-        Object.defineProperty(this, Symbol.for('styleNode'), { value: t });
-        return t;
-    }
+    this._image = this.shadowRoot.querySelector('img');
+    /** @private */
+    this._caption = this.shadowRoot.querySelector('figcaption');
 
-    static define(customElements = window.customElements) {
-        customElements.define('inventory-item', this);
-    }
-
-    static get observedAttributes() {
-        return [
-            'itemId'
-        ];
-    }
-
-    get itemId() {
-        return this._itemId;
-    }
-
-    set itemId(value) {
-        this.setAttribute('itemId', value);
-    }
-
-    get x() {
-        let item = getItem(getInventoryStore(), this.itemId);
-        return item.x;
-    }
-
-    set x(value) {
-        updateItem(getInventoryStore(), this.itemId, { x: value });
-    }
-
-    get y() {
-        let item = getItem(getInventoryStore(), this.itemId);
-        return item.y;
-    }
-
-    set y(value) {
-        updateItem(getInventoryStore(), this.itemId, { y: value });
-    }
-
-    get w() {
-        let item = getItem(getInventoryStore(), this.itemId);
-        return item.w;
-    }
-
-    set w(value) {
-        updateItem(getInventoryStore(), this.itemId, { w: value });
-    }
-
-    get h() {
-        let item = getItem(getInventoryStore(), this.itemId);
-        return item.h;
-    }
-
-    set h(value) {
-        updateItem(getInventoryStore(), this.itemId, { h: value });
-    }
-
-    get src() {
-        let item = getItem(getInventoryStore(), this.itemId);
-        return item.imgSrc;
-    }
-
-    set src(value) {
-        updateItem(getInventoryStore(), this.itemId, { imgSrc: value });
-    }
-
-    get name() {
-        let item = getItem(getInventoryStore(), this.itemId);
-        return item.displayName;
-    }
-
-    set name(value) {
-        updateItem(getInventoryStore(), this.itemId, { displayName: value });
-    }
-
-    constructor(itemId = undefined) {
-        super();
-        this.attachShadow({ mode: 'open' });
-        this.shadowRoot.appendChild(this.constructor[Symbol.for('templateNode')].content.cloneNode(true));
-        this.shadowRoot.appendChild(this.constructor[Symbol.for('styleNode')].cloneNode(true));
-
-        /** @private */
-        this._itemId = itemId;
-
-        /** @private */
-        this._image = this.shadowRoot.querySelector('img');
-        /** @private */
-        this._caption = this.shadowRoot.querySelector('figcaption');
-
-        this.container = null;
-
-        /** @protected */
-        this.onItemChange = this.onItemChange.bind(this);
-        /** @protected */
-        this.onMouseDown = this.onMouseDown.bind(this);
-        /** @protected */
-        this.onContextMenu = this.onContextMenu.bind(this);
-    }
+    this.container = null;
 
     /** @protected */
-    connectedCallback() {
-        this.addEventListener('mousedown', this.onMouseDown);
-        this.addEventListener('contextmenu', this.onContextMenu);
-        if (this._itemId) {
-            let itemId = this._itemId;
-            addItemChangeListener(getInventoryStore(), itemId, this.onItemChange);
-            this.onItemChange(getInventoryStore(), itemId);
+    this.onItemChange = this.onItemChange.bind(this);
+    /** @protected */
+    this.onMouseDown = this.onMouseDown.bind(this);
+    /** @protected */
+    this.onContextMenu = this.onContextMenu.bind(this);
+  }
+
+  /** @protected */
+  connectedCallback() {
+    this.addEventListener('mousedown', this.onMouseDown);
+    this.addEventListener('contextmenu', this.onContextMenu);
+    if (this._itemId) {
+      const itemId = this._itemId;
+      addItemChangeListener(getInventoryStore(), itemId, this.onItemChange);
+      this.onItemChange(getInventoryStore(), itemId);
+    }
+
+    upgradeProperty(this, 'itemId');
+  }
+
+  /** @protected */
+  disconnectedCallback() {
+    this.removeEventListener('mousedown', this.onMouseDown);
+    this.removeEventListener('contextmenu', this.onContextMenu);
+    if (this._itemId) {
+      const itemId = this._itemId;
+      removeItemChangeListener(getInventoryStore(), itemId, this.onItemChange);
+    }
+  }
+
+  /**
+   * @param attribute
+   * @param previous
+   * @param value
+   * @protected
+   */
+  attributeChangedCallback(attribute, previous, value) {
+    switch (attribute) {
+    case 'itemId':
+      {
+        const store = getInventoryStore();
+        const previousId = this._itemId;
+        const nextId = value;
+        this._itemId = nextId;
+        if (previousId) {
+          removeItemChangeListener(store, previousId, this.onItemChange);
         }
-        upgradeProperty(this, 'itemId');
-    }
 
-    /** @protected */
-    disconnectedCallback() {
-        this.removeEventListener('mousedown', this.onMouseDown);
-        this.removeEventListener('contextmenu', this.onContextMenu);
-        if (this._itemId) {
-            let itemId = this._itemId;
-            removeItemChangeListener(getInventoryStore(), itemId, this.onItemChange);
+        if (nextId) {
+          addItemChangeListener(store, nextId, this.onItemChange);
+          this.onItemChange(store, nextId);
         }
-    }
+      }
 
-    /** @protected */
-    attributeChangedCallback(attribute, prev, value) {
-        switch(attribute) {
-            case 'itemId': {
-                let store = getInventoryStore();
-                let prevId = this._itemId;
-                let nextId = value;
-                this._itemId = nextId;
-                if (prevId) {
-                    removeItemChangeListener(store, prevId, this.onItemChange);
-                }
-                if (nextId) {
-                    addItemChangeListener(store, nextId, this.onItemChange);
-                    this.onItemChange(store, nextId);
-                }
-            } break;
-        }
+      break;
     }
+  }
 
-    /** @protected */
-    onItemChange(store, itemId) {
-        let item = getItem(store, itemId);
-        this.style.setProperty('--itemX', item.x);
-        this.style.setProperty('--itemY', item.y);
-        this.style.setProperty('--itemWidth', item.w);
-        this.style.setProperty('--itemHeight', item.h);
-        this._image.src = item.imgSrc;
-        this._image.alt = item.displayName;
-        this._caption.textContent = item.displayName;
-    }
+  /**
+   * @param store
+   * @param itemId
+   * @protected
+   */
+  onItemChange(store, itemId) {
+    const item = getItem(store, itemId);
+    this.style.setProperty('--itemX', item.x);
+    this.style.setProperty('--itemY', item.y);
+    this.style.setProperty('--itemWidth', item.w);
+    this.style.setProperty('--itemHeight', item.h);
+    this._image.src = item.imgSrc;
+    this._image.alt = item.displayName;
+    this._caption.textContent = item.displayName;
+  }
 
-    /** @protected */
-    onMouseDown(e) {
-        if (e.button === 0) {
-            return itemMouseDownCallback(e, this, 48);
-        }
+  /**
+   * @param e
+   * @protected
+   */
+  onMouseDown(e) {
+    if (e.button === 0) {
+      return itemMouseDownCallback(e, this, 48);
     }
+  }
 
-    /** @protected */
-    onContextMenu(e) {
-        this.dispatchEvent(new CustomEvent('itemcontext', { bubbles: true, composed: true, detail: { itemId: this.itemId } }))
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-    }
+  /**
+   * @param e
+   * @protected
+   */
+  onContextMenu(e) {
+    this.dispatchEvent(
+      new CustomEvent('itemcontext', {
+        bubbles: true,
+        composed: true,
+        detail: { itemId: this.itemId },
+      })
+    );
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+  }
 }
 InventoryItem.define();

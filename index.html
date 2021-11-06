@@ -1,227 +1,248 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
+  <head>
     <title>Satchel</title>
     <style>
-        html, body {
-            margin: 0;
-        }
+      html,
+      body {
+        margin: 0;
+      }
 
-        body {
-            display: flex;
-            flex-direction: column;
-            width: 100vw;
-            height: 100vh;
-            background-image: url("res/images/wood.jpg");
-            background-size: 30rem;
-            background-repeat: repeat;
-            background-color: #211B1C;
-            color: #FFFFFF;
-            overflow: hidden;
-            font-family: Georgia, 'Times New Roman', Times, serif;
-            box-shadow: inset 0 0 16rem #000000;
-        }
+      body {
+        display: flex;
+        flex-direction: column;
+        width: 100vw;
+        height: 100vh;
+        background-image: url('res/images/wood.jpg');
+        background-size: 30rem;
+        background-repeat: repeat;
+        background-color: #211b1c;
+        color: #ffffff;
+        overflow: hidden;
+        font-family: Georgia, 'Times New Roman', Times, serif;
+        box-shadow: inset 0 0 16rem #000000;
+      }
 
-        .foreground {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            pointer-events: none;
-            overflow: hidden;
-            z-index: 5;
-        }
+      .foreground {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        pointer-events: none;
+        overflow: hidden;
+        z-index: 5;
+      }
 
-        #ground {
-            position: relative;
-            padding: 1rem;
-            border: 1rem dashed rgba(0, 0, 0, 0.2);
-        }
+      #ground {
+        position: relative;
+        padding: 1rem;
+        border: 1rem dashed rgba(0, 0, 0, 0.2);
+      }
 
-        #cursor > inventory-grid {
-            filter: brightness(70%);
-        }
+      #cursor > inventory-grid {
+        filter: brightness(70%);
+      }
     </style>
-    
+
     <script type="module" src="./src/inventory/InventoryGrid.js"></script>
     <script type="module" src="./src/inventory/InventoryItem.js"></script>
-</head>
-<body>
+  </head>
+  <body>
     <style>
-        body {
-            display: flex;
-            flex-direction: column;
-        }
-        .content {
-            flex: 1;
-            height: 0;
-        }
-        header, footer {
-            z-index: 1;
-        }
+      body {
+        display: flex;
+        flex-direction: column;
+      }
+      .content {
+        flex: 1;
+        height: 0;
+      }
+      header,
+      footer {
+        z-index: 1;
+      }
     </style>
     <header>
+      <style>
+        header {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          padding: 0 2em;
+        }
+        .spacer {
+          flex: 1;
+        }
+        .toolbar {
+          overflow-x: auto;
+        }
+        .toolbar button {
+          background: none;
+          border: none;
+        }
+      </style>
+      <h1>Satchel</h1>
+      <small id="onlineStatus"></small>
+      <small id="appVersion">v-.-.-</small>
+      <div class="spacer"></div>
+      <div class="toolbar">
         <style>
-            header {
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                padding: 0 2em;
-            }
-            .spacer {
-                flex: 1;
-            }
-            .toolbar {
-                overflow-x: auto;
-            }
-            .toolbar button {
-                background: none;
-                border: none;
-            }
+          .toolbar button:disabled {
+            opacity: 0.3;
+          }
+          #onlineStatus {
+            color: red;
+          }
+          #onlineStatus::after {
+            content: 'OFFLINE';
+          }
+          #onlineStatus.active {
+            color: green;
+          }
+          #onlineStatus.active::after {
+            content: 'ONLINE';
+          }
         </style>
-        <h1>Satchel</h1>
-        <small id="onlineStatus"></small>
-        <small id="appVersion">v-.-.-</small>
-        <div class="spacer"></div>
-        <div class="toolbar">
-            <style>
-                .toolbar button:disabled {
-                    opacity: 0.3;
-                }
-                #onlineStatus {
-                    color: red;
-                }
-                #onlineStatus::after {
-                    content: 'OFFLINE';
-                }
-                #onlineStatus.active {
-                    color: green;
-                }
-                #onlineStatus.active::after {
-                    content: 'ONLINE';
-                }
-            </style>
-            <button id="uploadButton">
-                <img src="res/upload.svg" alt="upload" width="40" for="uploadInput">
-            </button>
-            <input type="file" id="uploadInput" hidden accept="json">
-            <button id="downloadButton">
-                <img src="res/download.svg" alt="download" width="40">
-            </button>
-            <button id="cloudButton">
-                <img src="res/cloud.svg" alt="cloud" width="40">
-            </button>
-            <button id="deleteButton">
-                <img src="res/delete.svg" alt="delete" width="40">
-            </button>
-            <button id="editButton">
-                <img src="res/edit.svg" alt="edit" width="40">
-            </button>
-            <script type="module" src="src/inventory/toolbar.js"></script>
-        </div>
+        <button id="uploadButton">
+          <img src="res/upload.svg" alt="upload" width="40" for="uploadInput" />
+        </button>
+        <input type="file" id="uploadInput" hidden accept="json" />
+        <button id="downloadButton">
+          <img src="res/download.svg" alt="download" width="40" />
+        </button>
+        <button id="cloudButton">
+          <img src="res/cloud.svg" alt="cloud" width="40" />
+        </button>
+        <button id="deleteButton">
+          <img src="res/delete.svg" alt="delete" width="40" />
+        </button>
+        <button id="editButton">
+          <img src="res/edit.svg" alt="edit" width="40" />
+        </button>
+        <script type="module" src="src/inventory/toolbar.js"></script>
+      </div>
     </header>
     <div class="content">
-        <main>
-            <style>
-                .content {
-                    position: relative;
-                    text-align: center;
-                    display: flex;
-                }
-                main {
-                    overflow: auto;
-                    flex: 1;
-                }
-                .sidebar {
-                    background: #333333;
-                    position: absolute;
-                    top: 0;
-                    right: 0;
-                    max-height: 100%;
-                    overflow-y: auto;
-                    transform: translateX(100%);
-                    transition: transform 0.3s ease;
-                    border-left: 0.5em solid black;
-                }
-                .sidebar.open {
-                    transform: translateX(0%);
-                }
-            </style>
-            <div id="workspace">
-                <!-- MAIN -->
-            </div>
-            <div id="ground"></div>
-        </main>
-        <div class="sidebar" id="editor">
-            <style>
-                #itemDetailSet, #itemFinishSet {
-                    display: flex;
-                    flex-direction: column;
-                }
-                fieldset:disabled {
-                    opacity: 0.3;
-                }
-                #itemName {
-                    text-align: center;
-                }
-                input[type="text"], textarea {
-                    font-family: 'Times New Roman', Times, serif;
-                }
-            </style>
-            <form id="itemBuilder" autocomplete="off">
-                <legend>Item Builder</legend>
-                <fieldset id="itemSizeSet">
-                    <legend>Size</legend>
-                    <input type="radio" id="itemSize0" name="itemSize" value="tiny">
-                    <label for="itemSize0">Tiny</label>
-                    <input type="radio" id="itemSize1" name="itemSize" value="small" checked>
-                    <label for="itemSize1">Small</label>
-                    <input type="radio" id="itemSize2" name="itemSize" value="medium">
-                    <label for="itemSize2">Medium</label>
-                    <input type="radio" id="itemSize3" name="itemSize" value="large">
-                    <label for="itemSize3">Large</label>
-                    <input type="radio" id="itemSize4" name="itemSize" value="huge">
-                    <label for="itemSize4">Huge</label>
-                </fieldset>
-                <fieldset id="itemTraitSet">
-                    <legend>Traits</legend>
-                    <input type="checkbox" id="itemTrait0" name="itemTrait" value="flat">
-                    <label for="itemTrait0">Flat</label>
-                    <input type="checkbox" id="itemTrait1" name="itemTrait" value="long">
-                    <label for="itemTrait1">Long</label>
-                    <input type="checkbox" id="itemTrait2" name="itemTrait" value="heavy">
-                    <label for="itemTrait2">Heavy</label>
-                </fieldset>
-                <fieldset id="itemDetailSet">
-                    <legend>Details</legend>
-                    <input type="hidden" id="itemId" name="itemId">
-                    <label for="itemName">Name</label>
-                    <input type="text" id="itemName" name="itemName" value="">
-                    <label for="itemDetail">Description</label>
-                    <textarea id="itemDetail" name="itemDetail"></textarea>
-                </fieldset>
-                <br>
-                <fieldset id="itemFinishSet">
-                    <input type="submit" value="Build">
-                    <button id="itemResetButton">Cancel</button>
-                </fieldset>
-            </form>
+      <main>
+        <style>
+          .content {
+            position: relative;
+            text-align: center;
+            display: flex;
+          }
+          main {
+            overflow: auto;
+            flex: 1;
+          }
+          .sidebar {
+            background: #333333;
+            position: absolute;
+            top: 0;
+            right: 0;
+            max-height: 100%;
+            overflow-y: auto;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            border-left: 0.5em solid black;
+          }
+          .sidebar.open {
+            transform: translateX(0%);
+          }
+        </style>
+        <div id="workspace">
+          <!-- MAIN -->
         </div>
+        <div id="ground"></div>
+      </main>
+      <div class="sidebar" id="editor">
+        <style>
+          #itemDetailSet,
+          #itemFinishSet {
+            display: flex;
+            flex-direction: column;
+          }
+          fieldset:disabled {
+            opacity: 0.3;
+          }
+          #itemName {
+            text-align: center;
+          }
+          input[type='text'],
+          textarea {
+            font-family: 'Times New Roman', Times, serif;
+          }
+        </style>
+        <form id="itemBuilder" autocomplete="off">
+          <legend>Item Builder</legend>
+          <fieldset id="itemSizeSet">
+            <legend>Size</legend>
+            <input type="radio" id="itemSize0" name="itemSize" value="tiny" />
+            <label for="itemSize0">Tiny</label>
+            <input
+              type="radio"
+              id="itemSize1"
+              name="itemSize"
+              value="small"
+              checked
+            />
+            <label for="itemSize1">Small</label>
+            <input type="radio" id="itemSize2" name="itemSize" value="medium" />
+            <label for="itemSize2">Medium</label>
+            <input type="radio" id="itemSize3" name="itemSize" value="large" />
+            <label for="itemSize3">Large</label>
+            <input type="radio" id="itemSize4" name="itemSize" value="huge" />
+            <label for="itemSize4">Huge</label>
+          </fieldset>
+          <fieldset id="itemTraitSet">
+            <legend>Traits</legend>
+            <input
+              type="checkbox"
+              id="itemTrait0"
+              name="itemTrait"
+              value="flat"
+            />
+            <label for="itemTrait0">Flat</label>
+            <input
+              type="checkbox"
+              id="itemTrait1"
+              name="itemTrait"
+              value="long"
+            />
+            <label for="itemTrait1">Long</label>
+            <input
+              type="checkbox"
+              id="itemTrait2"
+              name="itemTrait"
+              value="heavy"
+            />
+            <label for="itemTrait2">Heavy</label>
+          </fieldset>
+          <fieldset id="itemDetailSet">
+            <legend>Details</legend>
+            <input type="hidden" id="itemId" name="itemId" />
+            <label for="itemName">Name</label>
+            <input type="text" id="itemName" name="itemName" value="" />
+            <label for="itemDetail">Description</label>
+            <textarea id="itemDetail" name="itemDetail"></textarea>
+          </fieldset>
+          <br />
+          <fieldset id="itemFinishSet">
+            <input type="submit" value="Build" />
+            <button id="itemResetButton">Cancel</button>
+          </fieldset>
+        </form>
+      </div>
     </div>
-    <footer style="font-family: monospace; opacity: 0.6;">
-        <a href="https://github.com/andykuo1/satchel" target="_blank">
-            <small>
-                Made with ❤ by Andrew Kuo.
-            </small>
-        </a>
+    <footer style="font-family: monospace; opacity: 0.6">
+      <a href="https://github.com/andykuo1/satchel" target="_blank">
+        <small> Made with ❤ by Andrew Kuo. </small>
+      </a>
     </footer>
     <div class="foreground" id="cursor">
-        <!-- CURSOR -->
+      <!-- CURSOR -->
     </div>
 
     <script type="module" src="src/inventory/main.js"></script>
-</body>
-
+  </body>
 </html>

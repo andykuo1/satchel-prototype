@@ -1,6 +1,15 @@
-import { containerMouseUpCallback } from './ContainerHelper.js';
 import { upgradeProperty } from '../util/wc.js';
-import { addInventoryChangeListener, changeInventorySize, changeInventoryType, getInventory, getInventoryStore, getItemAtInventory, getItemsInInventory, removeInventoryChangeListener } from './InventoryStore.js';
+import { containerMouseUpCallback } from './ContainerHelper.js';
+import {
+  addInventoryChangeListener,
+  changeInventorySize,
+  changeInventoryType,
+  getInventory,
+  getInventoryStore,
+  getItemAtInventory,
+  getItemsInInventory,
+  removeInventoryChangeListener,
+} from './InventoryStore.js';
 import { InventoryItem } from './InventoryItem.js';
 
 const DEFAULT_ITEM_UNIT_SIZE = 48;
@@ -73,198 +82,240 @@ h2:empty {
 `;
 
 export class InventoryGrid extends HTMLElement {
+  /** @private */
+  static get [Symbol.for('templateNode')]() {
+    const t = document.createElement('template');
+    t.innerHTML = INNER_HTML;
+    Object.defineProperty(this, Symbol.for('templateNode'), { value: t });
+    return t;
+  }
+
+  /** @private */
+  static get [Symbol.for('styleNode')]() {
+    const t = document.createElement('style');
+    t.innerHTML = INNER_STYLE;
+    Object.defineProperty(this, Symbol.for('styleNode'), { value: t });
+    return t;
+  }
+
+  static define(customElements = window.customElements) {
+    customElements.define('inventory-grid', this);
+  }
+
+  static get observedAttributes() {
+    return ['name'];
+  }
+
+  get name() {
+    return this._name;
+  }
+
+  set name(value) {
+    this.setAttribute('name', value);
+  }
+
+  get rows() {
+    const inventory = getInventory(getInventoryStore(), this.name);
+    return inventory.height;
+  }
+
+  set rows(value) {
+    changeInventorySize(getInventoryStore(), this.name, this.cols, value);
+  }
+
+  get cols() {
+    const inventory = getInventory(getInventoryStore(), this.name);
+    return inventory.width;
+  }
+
+  set cols(value) {
+    changeInventorySize(getInventoryStore(), this.name, value, this.rows);
+  }
+
+  get type() {
+    const inventory = getInventory(getInventoryStore(), this.name);
+    return inventory.type;
+  }
+
+  set type(value) {
+    changeInventoryType(getInventoryStore(), this.name, value);
+  }
+
+  constructor(inventoryName = undefined) {
+    super();
+    this.attachShadow({ mode: 'open' });
+    this.shadowRoot.append(
+      this.constructor[Symbol.for('templateNode')].content.cloneNode(true)
+    );
+    this.shadowRoot.append(
+      this.constructor[Symbol.for('styleNode')].cloneNode(true)
+    );
 
     /** @private */
-    static get [Symbol.for('templateNode')]() {
-        let t = document.createElement('template');
-        t.innerHTML = INNER_HTML;
-        Object.defineProperty(this, Symbol.for('templateNode'), { value: t });
-        return t;
-    }
+    this._name = inventoryName;
 
     /** @private */
-    static get [Symbol.for('styleNode')]() {
-        let t = document.createElement('style');
-        t.innerHTML = INNER_STYLE;
-        Object.defineProperty(this, Symbol.for('styleNode'), { value: t });
-        return t;
-    }
-
-    static define(customElements = window.customElements) {
-        customElements.define('inventory-grid', this);
-    }
-
-    static get observedAttributes() {
-        return [
-            'name'
-        ];
-    }
-
-    get name() {
-        return this._name;
-    }
-
-    set name(value) {
-        this.setAttribute('name', value);
-    }
-
-    get rows() {
-        let inventory = getInventory(getInventoryStore(), this.name);
-        return inventory.height;
-    }
-
-    set rows(value) {
-        changeInventorySize(getInventoryStore(), this.name, this.cols, value);
-    }
-
-    get cols() {
-        let inventory = getInventory(getInventoryStore(), this.name);
-        return inventory.width;
-    }
-
-    set cols(value) {
-        changeInventorySize(getInventoryStore(), this.name, value, this.rows);
-    }
-
-    get type() {
-        let inventory = getInventory(getInventoryStore(), this.name);
-        return inventory.type;
-    }
-
-    set type(value) {
-        changeInventoryType(getInventoryStore(), this.name, value);
-    }
-
-    constructor(inventoryName = undefined) {
-        super();
-        this.attachShadow({ mode: 'open' });
-        this.shadowRoot.appendChild(this.constructor[Symbol.for('templateNode')].content.cloneNode(true));
-        this.shadowRoot.appendChild(this.constructor[Symbol.for('styleNode')].cloneNode(true));
-
-        /** @private */
-        this._name = inventoryName;
-
-        /** @private */
-        this._root = this.shadowRoot.querySelector('article');
-        /** @private */
-        this._itemSlot = /** @type {HTMLSlotElement} */ (this.shadowRoot.querySelector('.container slot'));
-        /** @private */
-        this._container = this.shadowRoot.querySelector('.container');
-        /** @private */
-        this._containerTitle = this.shadowRoot.querySelector('h2');
-
-        /** @protected */
-        this.onInventoryChange = this.onInventoryChange.bind(this);
-        /** @protected */
-        this.onMouseUp = this.onMouseUp.bind(this);
-        /** @protected */
-        this.onContextMenu = this.onContextMenu.bind(this);
-    }
+    this._root = this.shadowRoot.querySelector('article');
+    /** @private */
+    this._itemSlot = /** @type {HTMLSlotElement} */ (
+      this.shadowRoot.querySelector('.container slot')
+    );
+    this._container = this.shadowRoot.querySelector('.container');
+    /** @private */
+    this._containerTitle = this.shadowRoot.querySelector('h2');
 
     /** @protected */
-    connectedCallback() {
-        this._container.addEventListener('mouseup', this.onMouseUp);
-        this._container.addEventListener('contextmenu', this.onContextMenu);
-        if (this._name) {
-            let name = this._name;
-            addInventoryChangeListener(getInventoryStore(), name, this.onInventoryChange);
-            this.onInventoryChange(getInventoryStore(), name);
-        }
-        upgradeProperty(this, 'name');
-    }
-
+    this.onInventoryChange = this.onInventoryChange.bind(this);
     /** @protected */
-    disconnectedCallback() {
-        this._container.removeEventListener('mouseup', this.onMouseUp);
-        this._container.removeEventListener('contextmenu', this.onContextMenu);
-        if (this._name) {
-            let name = this._name;
-            removeInventoryChangeListener(getInventoryStore(), name, this.onInventoryChange);
-        }
-    }
-
+    this.onMouseUp = this.onMouseUp.bind(this);
     /** @protected */
-    attributeChangedCallback(attribute, prev, value) {
-        switch(attribute) {
-            case 'name': {
-                let store = getInventoryStore();
-                let prevName = this._name;
-                let nextName = value;
-                this._name = nextName;
-                if (prevName) {
-                    removeInventoryChangeListener(store, prevName, this.onInventoryChange);
-                }
-                if (nextName) {
-                    addInventoryChangeListener(store, nextName, this.onInventoryChange);
-                    this.onInventoryChange(store, nextName);
-                }
-            } break;
-        }
+    this.onContextMenu = this.onContextMenu.bind(this);
+  }
+
+  /** @protected */
+  connectedCallback() {
+    this._container.addEventListener('mouseup', this.onMouseUp);
+    this._container.addEventListener('contextmenu', this.onContextMenu);
+    if (this._name) {
+      const name = this._name;
+      addInventoryChangeListener(
+        getInventoryStore(),
+        name,
+        this.onInventoryChange
+      );
+      this.onInventoryChange(getInventoryStore(), name);
     }
 
-    /** @protected */
-    onInventoryChange(store, inventoryName) {
-        let inv = getInventory(getInventoryStore(), inventoryName);
-        if (!inv) {
-            // The inventory has been deleted.
-            this.style.setProperty('--container-width', '0');
-            this.style.setProperty('--container-height', '0');
-            return;
-        }
-        let invType = inv.type;
-        let invWidth = inv.width;
-        let invHeight = inv.height;
-        if (invType === 'socket') {
-            let item = getItemAtInventory(store, inventoryName, 0, 0);
-            if (item) {
-                invWidth = item.w;
-                invHeight = item.h;
-            } else {
-                invWidth = 1;
-                invHeight = 1;
-            }
-        }
-        this.style.setProperty('--container-width', invWidth);
-        this.style.setProperty('--container-height', invHeight);
+    upgradeProperty(this, 'name');
+  }
 
-        // Preserve unchanged items in slot
-        let preservedItems = {};
-        for(let node of this._itemSlot.assignedNodes()) {
-            let itemId = node['itemId'];
-            if (typeof itemId === 'string') {
-                preservedItems[itemId] = node;
-            }
+  /** @protected */
+  disconnectedCallback() {
+    this._container.removeEventListener('mouseup', this.onMouseUp);
+    this._container.removeEventListener('contextmenu', this.onContextMenu);
+    if (this._name) {
+      const name = this._name;
+      removeInventoryChangeListener(
+        getInventoryStore(),
+        name,
+        this.onInventoryChange
+      );
+    }
+  }
+
+  /**
+   * @param attribute
+   * @param previous
+   * @param value
+   * @protected
+   */
+  attributeChangedCallback(attribute, previous, value) {
+    switch (attribute) {
+    case 'name':
+      {
+        const store = getInventoryStore();
+        const previousName = this._name;
+        const nextName = value;
+        this._name = nextName;
+        if (previousName) {
+          removeInventoryChangeListener(
+            store,
+            previousName,
+            this.onInventoryChange
+          );
         }
-        // Add new items into slot.
-        let emptySlot = /** @type {HTMLSlotElement} */ (this._itemSlot.cloneNode(false));
-        for(let item of getItemsInInventory(store, inventoryName)) {
-            let itemId = item.itemId;
-            let element;
-            if (itemId in preservedItems) {
-                element = preservedItems[itemId];
-            } else {
-                element = new InventoryItem(itemId);
-            }
-            element.container = this;
-            emptySlot.appendChild(element);
+
+        if (nextName) {
+          addInventoryChangeListener(store, nextName, this.onInventoryChange);
+          this.onInventoryChange(store, nextName);
         }
-        this._itemSlot.replaceWith(emptySlot);
-        this._itemSlot = emptySlot;
-        this.dispatchEvent(new CustomEvent('itemchange', { composed: true, bubbles: false }));
+      }
+
+      break;
+    }
+  }
+
+  /**
+   * @param store
+   * @param inventoryName
+   * @protected
+   */
+  onInventoryChange(store, inventoryName) {
+    const inv = getInventory(getInventoryStore(), inventoryName);
+    if (!inv) {
+      // The inventory has been deleted.
+      this.style.setProperty('--container-width', '0');
+      this.style.setProperty('--container-height', '0');
+      return;
     }
 
-    /** @protected */
-    onMouseUp(e) {
-        if (e.button === 0) {
-            return containerMouseUpCallback(e, this, 48);
-        }
+    const invType = inv.type;
+    let invWidth = inv.width;
+    let invHeight = inv.height;
+    if (invType === 'socket') {
+      const item = getItemAtInventory(store, inventoryName, 0, 0);
+      if (item) {
+        invWidth = item.w;
+        invHeight = item.h;
+      } else {
+        invWidth = 1;
+        invHeight = 1;
+      }
     }
 
-    /** @protected */
-    onContextMenu(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
+    this.style.setProperty('--container-width', invWidth);
+    this.style.setProperty('--container-height', invHeight);
+
+    // Preserve unchanged items in slot
+    const preservedItems = {};
+    for (const node of this._itemSlot.assignedNodes()) {
+      const { itemId } = node;
+      if (typeof itemId === 'string') {
+        preservedItems[itemId] = node;
+      }
     }
+
+    // Add new items into slot.
+    const emptySlot = /** @type {HTMLSlotElement} */ (
+      this._itemSlot.cloneNode(false)
+    );
+    for (const item of getItemsInInventory(store, inventoryName)) {
+      const { itemId } = item;
+      let element;
+      element =
+        itemId in preservedItems
+          ? preservedItems[itemId]
+          : new InventoryItem(itemId);
+
+      element.container = this;
+      emptySlot.append(element);
+    }
+
+    this._itemSlot.replaceWith(emptySlot);
+    this._itemSlot = emptySlot;
+    this.dispatchEvent(
+      new CustomEvent('itemchange', { composed: true, bubbles: false })
+    );
+  }
+
+  /**
+   * @param e
+   * @protected
+   */
+  onMouseUp(e) {
+    if (e.button === 0) {
+      return containerMouseUpCallback(e, this, 48);
+    }
+  }
+
+  /**
+   * @param e
+   * @protected
+   */
+  onContextMenu(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+  }
 }
 InventoryGrid.define();

@@ -1,27 +1,43 @@
-import { deleteInventory, getInventory, getInventoryStore, isEmptyInventory } from './InventoryStore.js';
+import {
+  deleteInventory,
+  getInventory,
+  getInventoryStore,
+  isEmptyInventory,
+} from './InventoryStore.js';
 
+/**
+ * @param store
+ * @param inventoryName
+ */
 export function createInventoryView(store, inventoryName) {
-    let inv = getInventory(store, inventoryName);
-    let element = document.createElement('inventory-grid');
-    element.name = inv.name;
-    return element;
+  const inv = getInventory(store, inventoryName);
+  const element = document.createElement('inventory-grid');
+  element.name = inv.name;
+  return element;
 }
 
+/**
+ * @param store
+ * @param inventoryName
+ */
 export function createTemporaryInventoryView(store, inventoryName) {
-    let inv = getInventory(store, inventoryName);
-    let element = document.createElement('inventory-grid');
-    element.name = inv.name;
-    element.addEventListener('itemchange', onTemporaryInventoryItemChange);
-    return element;
+  const inv = getInventory(store, inventoryName);
+  const element = document.createElement('inventory-grid');
+  element.name = inv.name;
+  element.addEventListener('itemchange', onTemporaryInventoryItemChange);
+  return element;
 }
 
+/**
+ * @param e
+ */
 function onTemporaryInventoryItemChange(e) {
-    let target = e.target;
-    let inventoryName = target.name;
-    let store = getInventoryStore();
-    if (isEmptyInventory(store, inventoryName)) {
-        target.removeEventListener('itemchange', onTemporaryInventoryItemChange);
-        target.parentNode.removeChild(target);
-        deleteInventory(store, inventoryName);
-    }
+  const { target } = e;
+  const inventoryName = target.name;
+  const store = getInventoryStore();
+  if (isEmptyInventory(store, inventoryName)) {
+    target.removeEventListener('itemchange', onTemporaryInventoryItemChange);
+    target.remove();
+    deleteInventory(store, inventoryName);
+  }
 }
