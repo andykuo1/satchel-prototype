@@ -1,13 +1,13 @@
-import { setCursorElement } from './CursorHelper.js';
-import { setGroundContainer } from './GroundHelper.js';
-import { createInventoryView } from './InventoryView.js';
-import { getInventoryStore, createInventory } from './InventoryStore.js';
+import { setCursorElement } from './inventory/CursorHelper.js';
+import { setGroundContainer } from './inventory/GroundHelper.js';
+import { createInventoryView } from './inventory/InventoryView.js';
+import { getInventoryStore, createInventory } from './inventory/InventoryStore.js';
 import {
   applyItemBuilder,
   openItemBuilder,
   resetItemBuilder,
-} from './ItemBuilder.js';
-import { loadFromLocalStorage, saveToLocalStorage } from './InventoryLoader.js';
+} from './inventory/ItemBuilder.js';
+import { loadFromLocalStorage, saveToLocalStorage } from './inventory/InventoryLoader.js';
 
 window.addEventListener('DOMContentLoaded', () => {
   document.querySelector('#appVersion').textContent = 'v1.0.1';

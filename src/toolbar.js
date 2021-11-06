@@ -1,14 +1,14 @@
-import { downloadText } from '../util/downloader.js';
-import { clearGround } from './GroundHelper.js';
-import { openItemBuilder } from './ItemBuilder.js';
-import { saveToJSON, loadFromJSON } from './InventoryLoader.js';
-import { getInventoryStore } from './InventoryStore.js';
+import { downloadText } from './util/downloader.js';
+import { clearGround } from './inventory/GroundHelper.js';
+import { openItemBuilder } from './inventory/ItemBuilder.js';
+import { saveToJSON, loadFromJSON } from './inventory/InventoryLoader.js';
+import { getInventoryStore } from './inventory/InventoryStore.js';
 import {
   connectAsClient,
   connectAsServer,
   isServerSide,
-} from './PeerSatchel.js';
-import { getCursorContext } from './CursorHelper.js';
+} from './inventory/PeerSatchel.js';
+import { getCursorContext } from './inventory/CursorHelper.js';
 
 window.addEventListener('DOMContentLoaded', () => {
   document.querySelector('#editButton').addEventListener('click', onEditClick);
