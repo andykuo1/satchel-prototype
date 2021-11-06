@@ -80,6 +80,8 @@ export class PeerfulConnection extends Eventable
         /** @private */
         this.onIceCandidate = this.onIceCandidate.bind(this);
         /** @private */
+        this.onIceCandidateError = this.onIceCandidateError.bind(this);
+        /** @private */
         this.onIceConnectionStateChange = this.onIceConnectionStateChange.bind(this);
         /** @private */
         this.onDataChannelClose = this.onDataChannelClose.bind(this);
@@ -143,6 +145,7 @@ export class PeerfulConnection extends Eventable
         let peerConnection = new RTCPeerConnection(opts);
         this.peerConnection = peerConnection;
         peerConnection.addEventListener('icecandidate', this.onIceCandidate);
+        peerConnection.addEventListener('icecandidateerror', this.onIceCandidateError);
         peerConnection.addEventListener('iceconnectionstatechange', this.onIceConnectionStateChange);
         return this;
     }
@@ -222,6 +225,15 @@ export class PeerfulConnection extends Eventable
             this.signaling.sendSignalMessage(this.localId, this.remoteId, this.peerConnection.localDescription);
             // Wait for peer response...
         }
+    }
+
+    /**
+     * @private
+     * @param {RTCPeerConnectionIceErrorEvent|Event} e
+     */
+    onIceCandidateError(e)
+    {
+        debug('[CHANNEL]', 'ICE Error!', e);
     }
 
     /**
