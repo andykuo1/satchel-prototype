@@ -1,11 +1,10 @@
-import { DEFAULT_ITEM } from '../assets.js';
-import { upgradeProperty, uuid } from './util.js';
+import { upgradeProperty } from './util.js';
 import { itemMouseDownCallback } from './ContainerHelper.js';
 import { addItemChangeListener, getInventoryStore, getItem, removeItemChangeListener, resolveItem, updateItem } from './InventoryStore.js';
 
 const INNER_HTML = `
 <figure class="container">
-    <img src="${DEFAULT_ITEM}">
+    <img src="res/images/scroll.png">
     <figcaption></figcaption>
 </figure>
 `;
