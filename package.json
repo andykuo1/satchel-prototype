@@ -1,6 +1,6 @@
 {
   "name": "satchel",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Somewhere to store your precious loot.",
   "private": true,
   "main": "index.js",
@@ -10,5 +10,8 @@
   "keywords": [],
   "author": "",
   "license": "MIT",
-  "dependencies": {}
+  "dependencies": {
+    "haunted": "^4.8.2",
+    "yjs": "^13.5.12"
+  }
 }
