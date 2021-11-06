@@ -117,6 +117,7 @@ function onLocalClientConnection(conn) {
     });
     conn.on('close', () => {
         window.alert('Server connection closed!');
+        document.querySelector('#onlineStatus').classList.toggle('active', false);
     });
 
     let name;
