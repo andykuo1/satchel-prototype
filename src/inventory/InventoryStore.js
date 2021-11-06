@@ -103,6 +103,9 @@ export function clearInventory(store, inventoryName) {
     if (inventory) {
         let prevLength = inventory.items.length;
         if (prevLength > 0) {
+            for(let itemId of inventory.items) {
+                deleteItem(store, itemId);
+            }
             inventory.items.length = 0;
             dispatchInventoryChange(store, inventoryName);
         }
