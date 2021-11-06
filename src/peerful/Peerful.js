@@ -154,7 +154,7 @@ export class Peerful extends Eventable {
               ).open();
               this.connections[src] = conn;
             }
-            let candidate = new RTCIceCandidate(sdp.candidate);
+            let candidate = new RTCIceCandidate(sdp);
             conn.onSignalingResponse('candidate', candidate, src, dst);
           } else {
             console.warn('Received unknown signal:', sdp);
