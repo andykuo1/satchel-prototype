@@ -87,7 +87,8 @@ export class PeerfulConnection extends Eventable {
     /** @private */
     this.onIceCandidateError = this.onIceCandidateError.bind(this);
     /** @private */
-    this.onIceConnectionStateChange = this.onIceConnectionStateChange.bind(this);
+    this.onIceConnectionStateChange =
+      this.onIceConnectionStateChange.bind(this);
     /** @private */
     this.onDataChannelClose = this.onDataChannelClose.bind(this);
     /** @private */
@@ -149,7 +150,10 @@ export class PeerfulConnection extends Eventable {
     const peerConnection = new RTCPeerConnection(options);
     this.peerConnection = peerConnection;
     peerConnection.addEventListener('icecandidate', this.onIceCandidate);
-    peerConnection.addEventListener('icecandidateerror', this.onIceCandidateError);
+    peerConnection.addEventListener(
+      'icecandidateerror',
+      this.onIceCandidateError
+    );
     peerConnection.addEventListener(
       'iceconnectionstatechange',
       this.onIceConnectionStateChange
@@ -170,12 +174,15 @@ export class PeerfulConnection extends Eventable {
 
     const { peerConnection } = this;
     this.peerConnection = null;
-    peerConnection
-      .removeEventListener('icecandidate', this.onIceCandidate);
-    peerConnection
-      .removeEventListener('icecandidateerror', this.onIceCandidateError);
-    peerConnection
-      .removeEventListener('iceconnectionstatechange', this.onIceConnectionStateChange);
+    peerConnection.removeEventListener('icecandidate', this.onIceCandidate);
+    peerConnection.removeEventListener(
+      'icecandidateerror',
+      this.onIceCandidateError
+    );
+    peerConnection.removeEventListener(
+      'iceconnectionstatechange',
+      this.onIceConnectionStateChange
+    );
     peerConnection.close();
   }
 
@@ -236,7 +243,11 @@ export class PeerfulConnection extends Eventable {
       );
       // Wait for peer response...
     } else {
-      this.signaling.sendCandidateMessage(this.localId, this.remoteId, e.candidate);
+      this.signaling.sendCandidateMessage(
+        this.localId,
+        this.remoteId,
+        e.candidate
+      );
     }
   }
 
@@ -247,7 +258,7 @@ export class PeerfulConnection extends Eventable {
   onIceCandidateError(e) {
     debug('[CHANNEL]', 'ICE Error!', e);
   }
-  
+
   /**
    * @private
    * @param {Event} e
@@ -256,13 +267,13 @@ export class PeerfulConnection extends Eventable {
     const state = /** @type {RTCPeerConnection} */ (e.target)
       .iceConnectionState;
     switch (state) {
-    case 'failed':
-      throw new Error('Ice connection failed.');
-    case 'closed':
-      throw new Error('Ice connection closed.');
-    default:
-      // Progress along as usual...
-      break;
+      case 'failed':
+        throw new Error('Ice connection failed.');
+      case 'closed':
+        throw new Error('Ice connection closed.');
+      default:
+        // Progress along as usual...
+        break;
     }
   }
 }
@@ -314,16 +325,18 @@ export class PeerfulLocalConnection extends PeerfulConnection {
     if (type === 'answer') {
       // Process answer
       const answer = new RTCSessionDescription(sdp);
-      this.peerConnection.setRemoteDescription(answer)
+      this.peerConnection
+        .setRemoteDescription(answer)
         .then(() => debug('[LOCAL]', 'Successfully set remote description.'))
-        .catch(e => debug('[LOCAL]', 'Failed to set remote description.', e));
+        .catch((e) => debug('[LOCAL]', 'Failed to set remote description.', e));
       // Wait for channel to open...
     } else if (type === 'candidate') {
       // TODO: This will never be called since no signals are of type 'candidate'
       const candidate = /** @type {any|RTCIceCandidate} */ (sdp);
-      this.peerConnection.addIceCandidate(candidate)
+      this.peerConnection
+        .addIceCandidate(candidate)
         .then(() => debug('[LOCAL]', 'Successfully add candidate.'))
-        .catch(e => debug('[LOCAL]', 'Failed to add candidate.', e));
+        .catch((e) => debug('[LOCAL]', 'Failed to add candidate.', e));
     } else {
       throw new Error(
         `Received invalid response type '${type}' on local connection.`
@@ -379,8 +392,12 @@ export class PeerfulRemoteConnection extends PeerfulConnection {
         .setRemoteDescription(offer)
         .then(() => this.peerConnection.createAnswer())
         .then((answer) => this.peerConnection.setLocalDescription(answer))
-        .then(() => debug('[REMOTE]', 'Successfully set remote/local description.'))
-        .catch(e => debug('[REMOTE]', 'Failed to set remote/local description.', e));
+        .then(() =>
+          debug('[REMOTE]', 'Successfully set remote/local description.')
+        )
+        .catch((e) =>
+          debug('[REMOTE]', 'Failed to set remote/local description.', e)
+        );
       // Wait for ICE to complete before sending answer...
     } else {
       throw new Error(

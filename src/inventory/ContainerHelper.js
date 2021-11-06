@@ -8,7 +8,7 @@ import { pickUp, putDown } from './InventoryHelper.js';
 
 /**
  * Perform pickup logic for item elements.
- * 
+ *
  * @param {MouseEvent} mouseEvent The triggering mouse event.
  * @param {InventoryItem} itemElement The target element.
  * @param {number} unitSize The item unit size.

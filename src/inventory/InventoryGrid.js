@@ -211,27 +211,27 @@ export class InventoryGrid extends HTMLElement {
    */
   attributeChangedCallback(attribute, previous, value) {
     switch (attribute) {
-    case 'name':
-      {
-        const store = getInventoryStore();
-        const previousName = this._name;
-        const nextName = value;
-        this._name = nextName;
-        if (previousName) {
-          removeInventoryChangeListener(
-            store,
-            previousName,
-            this.onInventoryChange
-          );
+      case 'name':
+        {
+          const store = getInventoryStore();
+          const previousName = this._name;
+          const nextName = value;
+          this._name = nextName;
+          if (previousName) {
+            removeInventoryChangeListener(
+              store,
+              previousName,
+              this.onInventoryChange
+            );
+          }
+
+          if (nextName) {
+            addInventoryChangeListener(store, nextName, this.onInventoryChange);
+            this.onInventoryChange(store, nextName);
+          }
         }
 
-        if (nextName) {
-          addInventoryChangeListener(store, nextName, this.onInventoryChange);
-          this.onInventoryChange(store, nextName);
-        }
-      }
-
-      break;
+        break;
     }
   }
 

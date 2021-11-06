@@ -208,23 +208,23 @@ export class InventoryItem extends HTMLElement {
    */
   attributeChangedCallback(attribute, previous, value) {
     switch (attribute) {
-    case 'itemId':
-      {
-        const store = getInventoryStore();
-        const previousId = this._itemId;
-        const nextId = value;
-        this._itemId = nextId;
-        if (previousId) {
-          removeItemChangeListener(store, previousId, this.onItemChange);
+      case 'itemId':
+        {
+          const store = getInventoryStore();
+          const previousId = this._itemId;
+          const nextId = value;
+          this._itemId = nextId;
+          if (previousId) {
+            removeItemChangeListener(store, previousId, this.onItemChange);
+          }
+
+          if (nextId) {
+            addItemChangeListener(store, nextId, this.onItemChange);
+            this.onItemChange(store, nextId);
+          }
         }
 
-        if (nextId) {
-          addItemChangeListener(store, nextId, this.onItemChange);
-          this.onItemChange(store, nextId);
-        }
-      }
-
-      break;
+        break;
     }
   }
 

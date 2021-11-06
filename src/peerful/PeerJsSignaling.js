@@ -177,76 +177,76 @@ export class PeerJsSignaling {
 
     const { type, payload, src, dst } = data;
     switch (type) {
-    case 'OPEN':
-      if (!this.opened) {
-        this.opened = true;
-        resolvePromiseStatus(this.activeStatus, this);
-      }
-      break;
-    case 'ERROR':
-      this.callback(
-        new PeerJsSignalingError(
-          PeerJsSignalingErrorCode.ERROR,
-          JSON.stringify(payload)
-        ),
-        null
-      );
-      break;
-    case 'ID-TAKEN':
-      this.callback(
-        new PeerJsSignalingError(
-          PeerJsSignalingErrorCode.ID_TAKEN,
-          'The requested signaling id is unavailable.'
-        ),
-        null
-      );
-      break;
-    case 'INVALID-KEY':
-      this.callback(
-        new PeerJsSignalingError(
-          PeerJsSignalingErrorCode.INVALID_KEY,
-          'The given signaling api key is invalid.'
-        ),
-        null
-      );
-      break;
-    case 'LEAVE':
-      this.callback(
-        new PeerJsSignalingError(
-          PeerJsSignalingErrorCode.LEAVE,
-          'Signaling connection left.'
-        ),
-        null
-      );
-      break;
-    case 'EXPIRE':
-      this.callback(
-        new PeerJsSignalingError(
-          PeerJsSignalingErrorCode.EXPIRE,
-          'Signaling connection expired.'
-        ),
-        null
-      );
-      break;
-    case 'OFFER':
-      this.callback(undefined, payload, src, dst);
-      break;
-    case 'ANSWER':
-      this.callback(undefined, payload, src, dst);
-      break;
-    case 'CANDIDATE':
-      this.callback(undefined, payload, src, dst);
-      break;
-    default:
-      this.callback(
-        new PeerJsSignalingError(
-          PeerJsSignalingErrorCode.UNKNOWN,
-          `Unknown signaling message from peerjs server: ${JSON.stringify(
-            data
-          )}`
-        ),
-        null
-      );
+      case 'OPEN':
+        if (!this.opened) {
+          this.opened = true;
+          resolvePromiseStatus(this.activeStatus, this);
+        }
+        break;
+      case 'ERROR':
+        this.callback(
+          new PeerJsSignalingError(
+            PeerJsSignalingErrorCode.ERROR,
+            JSON.stringify(payload)
+          ),
+          null
+        );
+        break;
+      case 'ID-TAKEN':
+        this.callback(
+          new PeerJsSignalingError(
+            PeerJsSignalingErrorCode.ID_TAKEN,
+            'The requested signaling id is unavailable.'
+          ),
+          null
+        );
+        break;
+      case 'INVALID-KEY':
+        this.callback(
+          new PeerJsSignalingError(
+            PeerJsSignalingErrorCode.INVALID_KEY,
+            'The given signaling api key is invalid.'
+          ),
+          null
+        );
+        break;
+      case 'LEAVE':
+        this.callback(
+          new PeerJsSignalingError(
+            PeerJsSignalingErrorCode.LEAVE,
+            'Signaling connection left.'
+          ),
+          null
+        );
+        break;
+      case 'EXPIRE':
+        this.callback(
+          new PeerJsSignalingError(
+            PeerJsSignalingErrorCode.EXPIRE,
+            'Signaling connection expired.'
+          ),
+          null
+        );
+        break;
+      case 'OFFER':
+        this.callback(undefined, payload, src, dst);
+        break;
+      case 'ANSWER':
+        this.callback(undefined, payload, src, dst);
+        break;
+      case 'CANDIDATE':
+        this.callback(undefined, payload, src, dst);
+        break;
+      default:
+        this.callback(
+          new PeerJsSignalingError(
+            PeerJsSignalingErrorCode.UNKNOWN,
+            `Unknown signaling message from peerjs server: ${JSON.stringify(
+              data
+            )}`
+          ),
+          null
+        );
     }
   }
 
@@ -266,10 +266,10 @@ export class PeerJsSignaling {
   }
 
   /**
-   * 
-   * @param {string} src 
-   * @param {string} dst 
-   * @param {RTCIceCandidate} candidate 
+   *
+   * @param {string} src
+   * @param {string} dst
+   * @param {RTCIceCandidate} candidate
    */
   sendCandidateMessage(src, dst, candidate) {
     debug('[SIGNAL]', 'Sending candidate from', src, 'to', dst);
@@ -315,27 +315,27 @@ export class PeerJsSignaling {
 
     let message;
     switch (type) {
-    case 'offer':
-      message = JSON.stringify({
-        type: 'OFFER',
-        payload: signal,
-        dst,
-      });
-      break;
-    case 'answer':
-      message = JSON.stringify({
-        type: 'ANSWER',
-        payload: signal,
-        dst,
-      });
-      break;
-    case 'pranswer':
-      // TODO: What is this?
-      break;
-    case 'rollback':
-      // TODO: What is this?
-      break;
-    default:
+      case 'offer':
+        message = JSON.stringify({
+          type: 'OFFER',
+          payload: signal,
+          dst,
+        });
+        break;
+      case 'answer':
+        message = JSON.stringify({
+          type: 'ANSWER',
+          payload: signal,
+          dst,
+        });
+        break;
+      case 'pranswer':
+        // TODO: What is this?
+        break;
+      case 'rollback':
+        // TODO: What is this?
+        break;
+      default:
       // TODO: Unknown signal type?
     }
 

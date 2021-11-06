@@ -11,9 +11,7 @@ import {
 import { getCursorContext } from './CursorHelper.js';
 
 window.addEventListener('DOMContentLoaded', () => {
-  document
-    .querySelector('#editButton')
-    .addEventListener('click', onEditClick);
+  document.querySelector('#editButton').addEventListener('click', onEditClick);
   document
     .querySelector('#deleteButton')
     .addEventListener('click', onDeleteClick);
@@ -89,7 +87,9 @@ function onDownloadClick() {
 }
 
 function onUploadClick() {
-  let input = /** @type {HTMLInputElement} */ (document.querySelector('#uploadInput'));
+  let input = /** @type {HTMLInputElement} */ (
+    document.querySelector('#uploadInput')
+  );
   input.click();
 }
 

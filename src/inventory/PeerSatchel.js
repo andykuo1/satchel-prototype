@@ -91,34 +91,34 @@ function onLocalClientConnection(conn) {
     try {
       const jsonData = JSON.parse(data);
       switch (jsonData.type) {
-      case 'new':
-        {
-          const defaultInv = {
-            name: 'main',
-            items: [],
-            width: 12,
-            height: 9,
-            type: 'grid',
-          };
-          resetInventoryStore(getInventoryStore(), {
-            data: {
-              inventory: {
-                main: defaultInv,
+        case 'new':
+          {
+            const defaultInv = {
+              name: 'main',
+              items: [],
+              width: 12,
+              height: 9,
+              type: 'grid',
+            };
+            resetInventoryStore(getInventoryStore(), {
+              data: {
+                inventory: {
+                  main: defaultInv,
+                },
               },
-            },
-          });
-        }
-        break;
-      case 'reset':
-        {
-          resetInventoryStore(getInventoryStore(), jsonData.message);
-        }
-        break;
-      default:
-        console.error(`Found unknown message from server - ${data}`);
-        break;
+            });
+          }
+          break;
+        case 'reset':
+          {
+            resetInventoryStore(getInventoryStore(), jsonData.message);
+          }
+          break;
+        default:
+          console.error(`Found unknown message from server - ${data}`);
+          break;
       }
-    } catch {
+    } catch (e) {
       console.error('Found invalid message from server - ' + data, e);
     }
   });
@@ -173,38 +173,38 @@ function onRemoteClientConnection(conn) {
     try {
       const jsonData = JSON.parse(data);
       switch (jsonData.type) {
-      case 'name':
-        {
-          client.name = jsonData.message.toLowerCase().replace(/\s/g, '_');
-          const clientDataName = `remote_data#${client.name}`;
-          // Send to client their first data store
-          const clientData = ctx.server.data[clientDataName] || null;
-          if (clientData) {
-            conn.send(
-              JSON.stringify({
-                type: 'reset',
-                message: clientData,
-              })
-            );
-          } else {
-            conn.send(JSON.stringify({ type: 'new' }));
+        case 'name':
+          {
+            client.name = jsonData.message.toLowerCase().replace(/\s/g, '_');
+            const clientDataName = `remote_data#${client.name}`;
+            // Send to client their first data store
+            const clientData = ctx.server.data[clientDataName] || null;
+            if (clientData) {
+              conn.send(
+                JSON.stringify({
+                  type: 'reset',
+                  message: clientData,
+                })
+              );
+            } else {
+              conn.send(JSON.stringify({ type: 'new' }));
+            }
           }
-        }
-        break;
-      case 'sync':
-        {
-          // Update server's copy of client data
-          if (!client.name) {
-            return;
-          }
+          break;
+        case 'sync':
+          {
+            // Update server's copy of client data
+            if (!client.name) {
+              return;
+            }
 
-          const clientDataName = `remote_data#${client.name}`;
-          ctx.server.data[clientDataName] = jsonData.message;
-        }
-        break;
-      default:
-        console.error(`Found unknown message from client - ${data}`);
-        break;
+            const clientDataName = `remote_data#${client.name}`;
+            ctx.server.data[clientDataName] = jsonData.message;
+          }
+          break;
+        default:
+          console.error(`Found unknown message from client - ${data}`);
+          break;
       }
     } catch (error) {
       console.error(`Found invalid message from client - ${data}`, error);

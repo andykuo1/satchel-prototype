@@ -123,29 +123,29 @@ export class Peerful extends Eventable {
       this.emit('error', error);
     } else {
       switch (sdp.type) {
-      case 'offer':
-        {
-          const conn = new PeerfulRemoteConnection(
-            this.id,
-            this.signaling
-          ).open();
-          this.connections[dst] = conn;
-          conn.listen().then(this.onPeerfulRemoteConnectionOpen);
-          conn.onSignalingResponse('offer', sdp, src, dst);
-        }
-        break;
-      case 'answer':
-        {
-          const conn = this.connections[src];
-          if (!conn) {
-            console.warn('Received signaling attempt when not listening.');
-            return;
+        case 'offer':
+          {
+            const conn = new PeerfulRemoteConnection(
+              this.id,
+              this.signaling
+            ).open();
+            this.connections[dst] = conn;
+            conn.listen().then(this.onPeerfulRemoteConnectionOpen);
+            conn.onSignalingResponse('offer', sdp, src, dst);
           }
-          conn.onSignalingResponse('answer', sdp, src, dst);
-        }
-        break;
-      default:
-        console.warn('Received unknown signal:', sdp);
+          break;
+        case 'answer':
+          {
+            const conn = this.connections[src];
+            if (!conn) {
+              console.warn('Received signaling attempt when not listening.');
+              return;
+            }
+            conn.onSignalingResponse('answer', sdp, src, dst);
+          }
+          break;
+        default:
+          console.warn('Received unknown signal:', sdp);
       }
     }
   }

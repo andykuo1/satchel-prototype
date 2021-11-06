@@ -69,17 +69,17 @@ function editItem(formData) {
   for (const entry of formData) {
     const [key, value] = entry;
     switch (key) {
-    case 'itemId':
-      itemId = value;
-      break;
-    case 'itemName':
-      result.displayName = value;
-      break;
-    case 'itemDetail':
-      result.metadata = {
-        detail: value,
-      };
-      break;
+      case 'itemId':
+        itemId = value;
+        break;
+      case 'itemName':
+        result.displayName = value;
+        break;
+      case 'itemDetail':
+        result.metadata = {
+          detail: value,
+        };
+        break;
     }
   }
 
@@ -105,21 +105,21 @@ function buildItem(formData) {
   for (const entry of formData) {
     const [key, value] = entry;
     switch (key) {
-    case 'itemSize':
-      result.metadata.size = value;
-      break;
-    case 'itemTrait':
-      result.metadata.traits.push(value);
-      break;
-    case 'itemName':
-      result.displayName = value;
-      break;
-    case 'itemPortrait':
-      result.imgSrc = value;
-      break;
-    case 'itemDetail':
-      result.metadata.detail = value;
-      break;
+      case 'itemSize':
+        result.metadata.size = value;
+        break;
+      case 'itemTrait':
+        result.metadata.traits.push(value);
+        break;
+      case 'itemName':
+        result.displayName = value;
+        break;
+      case 'itemPortrait':
+        result.imgSrc = value;
+        break;
+      case 'itemDetail':
+        result.metadata.detail = value;
+        break;
     }
   }
 
@@ -162,18 +162,18 @@ function spawnItem(options) {
  */
 function getNextItemSize(itemSize) {
   switch (itemSize) {
-  case 'tiny':
-    return 'small';
-  case 'small':
-    return 'medium';
-  case 'medium':
-    return 'large';
-  case 'large':
-    return 'huge';
-  case 'huge':
-    throw new Error('No item size bigger than huge.');
-  default:
-    throw new Error(`Unknown item size '${itemSize}'`);
+    case 'tiny':
+      return 'small';
+    case 'small':
+      return 'medium';
+    case 'medium':
+      return 'large';
+    case 'large':
+      return 'huge';
+    case 'huge':
+      throw new Error('No item size bigger than huge.');
+    default:
+      throw new Error(`Unknown item size '${itemSize}'`);
   }
 }
 
@@ -182,17 +182,17 @@ function getNextItemSize(itemSize) {
  */
 function getDefaultItemSizeDimensions(itemSize) {
   switch (itemSize) {
-  case 'tiny':
-    return [1, 1];
-  case 'small':
-    return [1, 1];
-  case 'medium':
-    return [2, 2];
-  case 'large':
-    return [4, 4];
-  case 'huge':
-    return [6, 6];
-  default:
-    throw new Error(`Unknown item size '${itemSize}'`);
+    case 'tiny':
+      return [1, 1];
+    case 'small':
+      return [1, 1];
+    case 'medium':
+      return [2, 2];
+    case 'large':
+      return [4, 4];
+    case 'huge':
+      return [6, 6];
+    default:
+      throw new Error(`Unknown item size '${itemSize}'`);
   }
 }

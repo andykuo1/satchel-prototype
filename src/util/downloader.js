@@ -19,45 +19,45 @@ export function downloadText(filename, textData) {
 export function downloadImageFromSVG(filename, filetype, svg, width, height) {
   const blob = createBlobFromSVG(svg);
   switch (filetype) {
-  case FILE_TYPE_PNG:
-    {
-      const url = URL.createObjectURL(blob);
+    case FILE_TYPE_PNG:
+      {
+        const url = URL.createObjectURL(blob);
 
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      const pixelRatio = window.devicePixelRatio || 1;
-      canvas.width = width * pixelRatio;
-      canvas.height = height * pixelRatio;
-      canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
-      ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const pixelRatio = window.devicePixelRatio || 1;
+        canvas.width = width * pixelRatio;
+        canvas.height = height * pixelRatio;
+        canvas.style.width = `${width}px`;
+        canvas.style.height = `${height}px`;
+        ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
 
-      const image = new Image();
-      image.addEventListener('load', () => {
-        ctx.drawImage(image, 0, 0);
-        URL.revokeObjectURL(url);
+        const image = new Image();
+        image.addEventListener('load', () => {
+          ctx.drawImage(image, 0, 0);
+          URL.revokeObjectURL(url);
 
-        const imageURI = canvas
-          .toDataURL(`image/${filetype}`)
-          .replace(`image/${filetype}`, 'image/octet-stream');
-        downloadURL(filename, imageURI);
-      });
+          const imageURI = canvas
+            .toDataURL(`image/${filetype}`)
+            .replace(`image/${filetype}`, 'image/octet-stream');
+          downloadURL(filename, imageURI);
+        });
 
-      image.src = url;
-    }
-    break;
-  case FILE_TYPE_SVG:
-    {
-      const reader = new FileReader();
-      reader.addEventListener('load', () => {
-        downloadURL(filename, reader.result.toString());
-      });
+        image.src = url;
+      }
+      break;
+    case FILE_TYPE_SVG:
+      {
+        const reader = new FileReader();
+        reader.addEventListener('load', () => {
+          downloadURL(filename, reader.result.toString());
+        });
 
-      reader.readAsDataURL(blob);
-    }
-    break;
-  default:
-    throw new Error(`Unknown file type '${filetype}'`);
+        reader.readAsDataURL(blob);
+      }
+      break;
+    default:
+      throw new Error(`Unknown file type '${filetype}'`);
   }
 }
 
