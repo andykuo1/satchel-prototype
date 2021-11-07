@@ -44,6 +44,9 @@ export class Peerful extends Eventable {
     this.signaling = new PeerJsSignaling(id, this.onSignaling);
     /** @private */
     this.signalingPromise = this.signaling.open();
+
+    /** @private */
+    this.pendingRemoteConnection = null;
   }
 
   close() {
@@ -64,17 +67,18 @@ export class Peerful extends Eventable {
     if (this.id === remoteId) {
       throw new Error('Cannot connect to peer with the same id.');
     }
-
     if (this.closed) {
       throw new Error('Cannot connect to peers when already closed.');
     }
-
     await this.signalingPromise;
+
     const conn = new PeerfulLocalConnection(this.id, this.signaling).open();
     this.connections[remoteId] = conn;
+    // Try connecting to remote now
     try {
       await conn.connect(remoteId);
-    } catch {
+    } catch(e) {
+      console.error('Failed to connect to peer.', e);
       delete this.connections[remoteId];
     }
 
@@ -86,23 +90,27 @@ export class Peerful extends Eventable {
     if (this.closed) {
       throw new Error('Cannot listen for peers when already closed.');
     }
-
     await this.signalingPromise;
+
+    const conn = new PeerfulRemoteConnection(this.id, this.signaling).open();
+    // Wait for remote to start connecting
+    this.pendingRemoteConnection = conn;
     return this;
   }
 
-  /** 
-   * @private 
+  /**
+   * @private
+   * @param {string} dst 
    * @returns {PeerfulRemoteConnection}
    */
-  resolveRemoteConnection(dst, force = false) {
+  resolveRemoteConnection(dst) {
     let conn = /** @type {PeerfulRemoteConnection} */ (this.connections[dst]);
-    if (force || !conn) {
-      conn = new PeerfulRemoteConnection(
-        this.id,
-        this.signaling
-      ).open();
-      this.connections[dst] = conn;
+    if (!conn) {
+      let prev = this.pendingRemoteConnection;
+      this.connections[dst] = prev;
+      let next = new PeerfulRemoteConnection(this.id, this.signaling).open();
+      this.pendingRemoteConnection = next;
+      conn = prev;
     }
     return conn;
   }
@@ -138,37 +146,39 @@ export class Peerful extends Eventable {
       }
       this.emit('error', error);
     } else {
-      switch (sdp.type) {
-        case 'offer':
+      if ('type' in sdp) {
+        const init = /** @type {RTCSessionDescriptionInit} */ (sdp);
+        switch (init.type) {
+          case 'offer':
           {
-            const conn = this.resolveRemoteConnection(dst, true);
+            const conn = this.resolveRemoteConnection(dst);
             conn.listen().then(this.onPeerfulRemoteConnectionOpen);
-            const init = /** @type {RTCSessionDescriptionInit} */ (sdp);
             const description = new RTCSessionDescription(init);
             conn.onSignalingResponse('offer', description, src, dst);
           }
           break;
-        case 'answer':
+          case 'answer':
           {
             const conn = this.connections[src];
             if (!conn) {
               console.warn('Received signaling attempt when not listening.');
               return;
             }
-            const init = /** @type {RTCSessionDescriptionInit} */ (sdp);
             const description = new RTCSessionDescription(init);
             conn.onSignalingResponse('answer', description, src, dst);
           }
           break;
-        default:
-          if ('candidate' in sdp) {
-            const conn = this.resolveRemoteConnection(dst, false);
-            const init = /** @type {RTCIceCandidateInit} */ (sdp);
-            const candidate = new RTCIceCandidate(init);
-            conn.onSignalingResponse('candidate', candidate, src, dst);
-          } else {
-            console.warn('Received unknown signal:', sdp);
-          }
+          default:
+            console.warn('Received unknown signal:', init);
+            break;
+        }
+      } else if ('candidate' in sdp) {
+        const init = /** @type {RTCIceCandidateInit} */ (sdp);
+        const conn = this.resolveRemoteConnection(dst);
+        const candidate = new RTCIceCandidate(init);
+        conn.onSignalingResponse('candidate', candidate, src, dst);
+      } else {
+        console.warn('Received unknown signal:', sdp);
       }
     }
   }

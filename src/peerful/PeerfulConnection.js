@@ -5,32 +5,9 @@ import {
   resolvePromiseStatus,
 } from './PromiseStatus.js';
 
+import { debug, DEFAULT_ICE_SERVERS } from './PeerfulUtil.js';
+
 /** @typedef {import('./PeerJsSignaling.js').PeerJsSignaling} PeerJsSignaling */
-
-const DEFAULT_CONNECTION_OPTS = {
-  iceServers: [
-    {
-      urls: [
-        'stun:stun.l.google.com:19302',
-        'stun:global.stun.twilio.com:3478',
-      ],
-    },
-  ],
-  sdpSemantics: 'unified-plan',
-};
-
-const SHOW_DEBUG = true;
-
-/**
- * @param  {...any} messages
- */
-function debug(...messages) {
-  if (!SHOW_DEBUG) {
-    return;
-  }
-
-  console.log(...messages);
-}
 
 /**
  * @typedef PeerfulConnectionEvents
@@ -50,11 +27,7 @@ export class PeerfulConnection extends Eventable {
    */
   constructor(id, signaling, options = undefined) {
     super();
-    options = {
-      ...DEFAULT_CONNECTION_OPTS,
-      ...options,
-    };
-
+    
     /** @protected */
     this.opened = false;
     /** @protected */
@@ -152,7 +125,10 @@ export class PeerfulConnection extends Eventable {
     this.closed = false;
     this.connectedStatus = createPromiseStatus();
 
-    const peerConnection = new RTCPeerConnection(DEFAULT_CONNECTION_OPTS);
+    const peerConnection = new RTCPeerConnection({
+      iceServers: DEFAULT_ICE_SERVERS,
+      ...(options || {}),
+    });
     this.peerConnection = peerConnection;
     peerConnection.addEventListener('icecandidate', this.onIceCandidate);
     peerConnection.addEventListener(

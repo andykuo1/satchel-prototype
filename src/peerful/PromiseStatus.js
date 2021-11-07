@@ -37,6 +37,13 @@ export function createPromiseStatus() {
 }
 
 /**
+ * @returns {boolean}
+ */
+export function isPromiseStatusPending(promiseStatus) {
+  return promiseStatus.pending;
+}
+
+/**
  * @template T
  * @param {PromiseStatusResult<T>} promiseStatus
  * @returns {Promise<T>}
