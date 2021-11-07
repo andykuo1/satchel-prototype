@@ -152,7 +152,7 @@ export class PeerfulConnection extends Eventable {
     this.closed = false;
     this.connectedStatus = createPromiseStatus();
 
-    const peerConnection = new RTCPeerConnection(options);
+    const peerConnection = new RTCPeerConnection(DEFAULT_CONNECTION_OPTS);
     this.peerConnection = peerConnection;
     peerConnection.addEventListener('icecandidate', this.onIceCandidate);
     peerConnection.addEventListener(
