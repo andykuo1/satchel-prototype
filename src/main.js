@@ -9,7 +9,7 @@ import {
 } from './inventory/ItemBuilder.js';
 import { loadFromLocalStorage, saveToLocalStorage } from './inventory/InventoryLoader.js';
 
-const APP_VERSION = '1.0.13';
+const APP_VERSION = '1.0.14';
 
 window.addEventListener('DOMContentLoaded', () => {
   document.querySelector('#appVersion').textContent = `v${APP_VERSION}`;
