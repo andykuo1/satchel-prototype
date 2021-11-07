@@ -254,7 +254,7 @@ export class PeerfulConnection extends Eventable {
    */
   onIceCandidate(e) {
     if (!e.candidate) {
-      debug('[CHANNEL]', 'ICE complete');
+      debug('[CHANNEL]', 'End of ICE candidates.');
       this.signaling.sendSignalMessage(
         this.localId,
         this.remoteId,
@@ -262,6 +262,7 @@ export class PeerfulConnection extends Eventable {
       );
       // Wait for peer response...
     } else {
+      debug('[CHANNEL]', 'Sending an ICE candidate.');
       this.signaling.sendCandidateMessage(
         this.localId,
         this.remoteId,
@@ -275,7 +276,7 @@ export class PeerfulConnection extends Eventable {
    * @param {RTCPeerConnectionIceErrorEvent|Event} e
    */
   onIceCandidateError(e) {
-    debug('[CHANNEL]', 'ICE Error!', e);
+    debug('[CHANNEL]', 'ICE error!', e);
   }
 
   /**
@@ -283,9 +284,18 @@ export class PeerfulConnection extends Eventable {
    * @param {Event} e
    */
   onIceConnectionStateChange(e) {
-    const state = /** @type {RTCPeerConnection} */ (e.target)
-      .iceConnectionState;
+    const conn = /** @type {RTCPeerConnection} */ (e.target);
+    const state = conn.iceConnectionState;
     switch (state) {
+      case 'checking':
+        debug('[CHANNEL]', 'ICE checking...');
+        break;
+      case 'connected':
+        debug('[CHANNEL]', 'ICE connected!');
+        break;
+      case 'completed':
+        debug('[CHANNEL]', 'ICE completed!');
+        break;
       case 'failed':
         throw new Error('Ice connection failed.');
       case 'closed':
