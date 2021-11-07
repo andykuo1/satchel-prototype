@@ -212,16 +212,7 @@ export class PeerfulConnection extends Eventable {
    * @param {string} src
    * @param {string} dst
    */
-  onSignalingResponse(type, sdp, src, dst) {
-    debug('[CHANNEL]', 'Received signal', type, src, dst);
-    if (type === 'candidate') {
-      const candidate = /** @type {RTCIceCandidate} */ (sdp);
-      this.pendingCandidates.push(candidate);
-      if (this.peerConnection.remoteDescription) {
-        this.flushPendingCandidates();
-      }
-    }
-  }
+  onSignalingResponse(type, sdp, src, dst) {}
 
   /**
    * @private
@@ -349,7 +340,7 @@ export class PeerfulLocalConnection extends PeerfulConnection {
    * @param {string} dst
    */
   onSignalingResponse(type, sdp, src, dst) {
-    super.onSignalingResponse(type, sdp, src, dst);
+    debug('[LOCAL]', 'Received signal', type, src, dst);
     if (type === 'answer') {
       const description = /** @type {RTCSessionDescription} */ (sdp);
       // Process answer
@@ -359,6 +350,12 @@ export class PeerfulLocalConnection extends PeerfulConnection {
         .then(() => debug('[LOCAL]', 'Successfully set remote description.'))
         .catch((e) => debug('[LOCAL]', 'Failed to set remote description.', e));
       // Wait for channel to open...
+    } else if (type === 'candidate') {
+      const candidate = /** @type {RTCIceCandidate} */ (sdp);
+      this.pendingCandidates.push(candidate);
+      if (this.peerConnection.remoteDescription) {
+        this.flushPendingCandidates();
+      }
     } else {
       throw new Error(
         `Received invalid response type '${type}' on local connection.`
@@ -405,7 +402,7 @@ export class PeerfulRemoteConnection extends PeerfulConnection {
    * @param {string} dst
    */
   onSignalingResponse(type, sdp, src, dst) {
-    super.onSignalingResponse(type, sdp, src, dst);
+    debug('[REMOTE]', 'Received signal', type, src, dst);
     if (type === 'offer') {
       this.remoteId = src;
       const description = /** @type {RTCSessionDescription} */ (sdp);
@@ -422,6 +419,12 @@ export class PeerfulRemoteConnection extends PeerfulConnection {
           debug('[REMOTE]', 'Failed to set remote/local description.', e)
         );
       // Wait for ICE to complete before sending answer...
+    } else if (type === 'candidate') {
+      const candidate = /** @type {RTCIceCandidate} */ (sdp);
+      this.pendingCandidates.push(candidate);
+      if (this.peerConnection.remoteDescription) {
+        this.flushPendingCandidates();
+      }
     } else {
       throw new Error(
         `Received invalid response type '${type}' on remote connection.`
