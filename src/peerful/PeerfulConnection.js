@@ -360,6 +360,14 @@ export class PeerfulLocalConnection extends PeerfulConnection {
         .then(() => debug('[LOCAL]', 'Successfully set remote description.'))
         .catch((e) => debug('[LOCAL]', 'Failed to set remote description.', e));
       // Wait for channel to open...
+      // TODO: Check data channel ready state
+      let handler = () => {
+        debug('[LOCAL]', this.dataChannel.readyState);
+        if (this.dataChannel.readyState !== 'open') {
+          setTimeout(handler, 1000);
+        }
+      };
+      handler();
     } else if (type === 'candidate') {
       const candidate = /** @type {RTCIceCandidate} */ (sdp);
       this.pendingCandidates.push(candidate);
