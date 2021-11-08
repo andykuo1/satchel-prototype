@@ -105,13 +105,6 @@ export class PeerfulNegotiator {
     }
   }
 
-  skipNegotiation() {
-    if (!this.completed) {
-      this.completed = true;
-      resolvePromiseStatus(this.iceStatus, undefined);
-    }
-  }
-
   async negotiate() {
     if (!this.completed) {
       return createPromiseStatusPromise(this.iceStatus);
@@ -174,8 +167,7 @@ export class PeerfulNegotiator {
     let connectionState = this.peerConnection.iceConnectionState;
     let gatheringState = this.peerConnection.iceGatheringState;
     debug(
-      '[NEGOTIATOR]',
-      'connection:',
+      '[NEGOTIATOR] ICE connection:',
       connectionState,
       ', gathering:',
       gatheringState
@@ -185,7 +177,7 @@ export class PeerfulNegotiator {
   /** @private */
   onSignalingStateChange() {
     let signalingState = this.peerConnection.signalingState;
-    debug('[NEGOTIATOR]', 'signaling:', signalingState);
+    debug('[NEGOTIATOR]', 'ICE signaling:', signalingState);
   }
 
   /**
@@ -232,6 +224,15 @@ export class PeerfulNegotiator {
     const conn = /** @type {RTCPeerConnection} */ (e.target);
     let connectionState = conn.iceConnectionState;
     switch (connectionState) {
+      case 'checking':
+        debug('[NEGOTIATOR]', 'ICE checking...');
+        break;
+      case 'connected':
+        debug('[NEGOTIATOR]', 'ICE connected!');
+        break;
+      case 'completed':
+        debug('[NEGOTIATOR]', 'ICE completed!');
+        break;
       case 'failed':
         throw new Error('Ice connection failed.');
       case 'closed':

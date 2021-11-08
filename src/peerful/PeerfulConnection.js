@@ -2,6 +2,7 @@ import { Eventable } from '../util/Eventable.js';
 import {
   createPromiseStatus,
   createPromiseStatusPromise,
+  rejectPromiseStatus,
   resolvePromiseStatus,
 } from './PromiseStatus.js';
 
@@ -10,6 +11,7 @@ import {
   DEFAULT_ICE_SERVERS,
   FILTER_TRICKLE_SDP_PATTERN,
 } from './PeerfulUtil.js';
+import { PeerfulNegotiator } from './PeerfulNegotiator.js';
 
 /** @typedef {import('./PeerJsSignaling.js').PeerJsSignaling} PeerJsSignaling */
 
@@ -31,6 +33,14 @@ export class PeerfulConnection extends Eventable {
    */
   constructor(id, signaling, options = undefined) {
     super();
+
+    options = {
+      trickle: false,
+      ...(options || {})
+    };
+
+    /** @protected */
+    this.trickle = options.trickle;
 
     /** @protected */
     this.opened = false;
@@ -55,22 +65,15 @@ export class PeerfulConnection extends Eventable {
     this.peerConnection = null;
     /**
      * @protected
-     * @type {Array<RTCIceCandidate>}
+     * @type {PeerfulNegotiator}
      */
-    this.pendingCandidates = [];
+    this.negotiator = null;
     /**
      * @protected
      * @type {RTCDataChannel}
      */
     this.dataChannel = null;
 
-    /** @private */
-    this.onIceCandidate = this.onIceCandidate.bind(this);
-    /** @private */
-    this.onIceCandidateError = this.onIceCandidateError.bind(this);
-    /** @private */
-    this.onIceConnectionStateChange =
-      this.onIceConnectionStateChange.bind(this);
     /** @private */
     this.onDataChannelClose = this.onDataChannelClose.bind(this);
     /** @private */
@@ -128,21 +131,11 @@ export class PeerfulConnection extends Eventable {
     this.opened = true;
     this.closed = false;
     this.connectedStatus = createPromiseStatus();
-
-    const peerConnection = new RTCPeerConnection({
+    this.peerConnection = new RTCPeerConnection({
       iceServers: DEFAULT_ICE_SERVERS,
       ...(options || {}),
     });
-    this.peerConnection = peerConnection;
-    peerConnection.addEventListener('icecandidate', this.onIceCandidate);
-    peerConnection.addEventListener(
-      'icecandidateerror',
-      this.onIceCandidateError
-    );
-    peerConnection.addEventListener(
-      'iceconnectionstatechange',
-      this.onIceConnectionStateChange
-    );
+    this.negotiator = new PeerfulNegotiator(this.signaling, this.localId, this.peerConnection);
     return this;
   }
 
@@ -153,36 +146,20 @@ export class PeerfulConnection extends Eventable {
 
     this.closed = true;
     this.opened = false;
-    this.connectedStatus = null;
-
-    this.setDataChannel(null);
-
-    const { peerConnection } = this;
-    this.peerConnection = null;
-    peerConnection.removeEventListener('icecandidate', this.onIceCandidate);
-    peerConnection.removeEventListener(
-      'icecandidateerror',
-      this.onIceCandidateError
-    );
-    peerConnection.removeEventListener(
-      'iceconnectionstatechange',
-      this.onIceConnectionStateChange
-    );
-    peerConnection.close();
-  }
-
-  /**
-   * Flushes any pending candidates. This is dependent on remote description.
-   * @protected
-   */
-  flushPendingCandidates() {
-    let candidates = this.pendingCandidates.slice();
-    this.pendingCandidates.length = 0;
-    for (let pending of candidates) {
-      this.peerConnection
-        .addIceCandidate(pending)
-        .then(() => debug('[CHANNEL]', 'Received candidate.'))
-        .catch((e) => debug('[CHANNEL]', 'Failed to add candidate.', e));
+    if (this.connectedStatus) {
+      rejectPromiseStatus(this.connectedStatus, new Error('Connection closed.'));
+      this.connectedStatus = null;
+    }
+    if (this.dataChannel) {
+      this.setDataChannel(null);
+    }
+    if (this.negotiator) {
+      this.negotiator.destroy();
+      this.negotiator = null;
+    }
+    if (this.peerConnection) {
+      this.peerConnection.close();
+      this.peerConnection = null;
     }
   }
 
@@ -227,60 +204,6 @@ export class PeerfulConnection extends Eventable {
     debug('[CHANNEL]', 'Error!', e);
     this.emit('error', e);
   }
-
-  /**
-   * @private
-   * @param {RTCPeerConnectionIceEvent} e
-   */
-  onIceCandidate(e) {
-    if (!e.candidate) {
-      debug('[CHANNEL]', 'End of ICE candidates.');
-      this.signaling.sendSignalMessage(this.localId, this.remoteId, this.peerConnection.localDescription);
-      // Wait for peer response...
-    } else {
-      debug('[CHANNEL]', 'Sending an ICE candidate.');
-      this.signaling.sendCandidateMessage(
-        this.localId,
-        this.remoteId,
-        e.candidate
-      );
-    }
-  }
-
-  /**
-   * @private
-   * @param {RTCPeerConnectionIceErrorEvent|Event} e
-   */
-  onIceCandidateError(e) {
-    debug('[CHANNEL]', 'ICE error!', e);
-  }
-
-  /**
-   * @private
-   * @param {Event} e
-   */
-  onIceConnectionStateChange(e) {
-    const conn = /** @type {RTCPeerConnection} */ (e.target);
-    const state = conn.iceConnectionState;
-    switch (state) {
-      case 'checking':
-        debug('[CHANNEL]', 'ICE checking...');
-        break;
-      case 'connected':
-        debug('[CHANNEL]', 'ICE connected!');
-        break;
-      case 'completed':
-        debug('[CHANNEL]', 'ICE completed!');
-        break;
-      case 'failed':
-        throw new Error('Ice connection failed.');
-      case 'closed':
-        throw new Error('Ice connection closed.');
-      default:
-        // Progress along as usual...
-        break;
-    }
-  }
 }
 
 export class PeerfulLocalConnection extends PeerfulConnection {
@@ -299,7 +222,6 @@ export class PeerfulLocalConnection extends PeerfulConnection {
   async connect(remoteId) {
     debug('[LOCAL]', 'Connecting to', remoteId, '...');
     let channelOptions;
-    let offerOptions;
 
     this.remoteId = remoteId;
 
@@ -310,11 +232,9 @@ export class PeerfulLocalConnection extends PeerfulConnection {
     );
     this.setDataChannel(channel);
 
-    // Create offer
-    const offer = await this.peerConnection.createOffer(offerOptions);
-    await this.peerConnection.setLocalDescription(offer);
-
-    // Wait for ICE to complete before sending offer...
+    // Send offer
+    await this.performOffer();
+    // Wait to be connected...
     return createPromiseStatusPromise(this.connectedStatus);
   }
 
@@ -332,21 +252,39 @@ export class PeerfulLocalConnection extends PeerfulConnection {
       // Process answer
       this.peerConnection
         .setRemoteDescription(description)
-        .then(() => this.flushPendingCandidates())
+        .then(() => this.negotiator.onRemoteDescription(this.remoteId))
         .then(() => debug('[LOCAL]', 'Successfully set remote description.'))
         .catch((e) => debug('[LOCAL]', 'Failed to set remote description.', e));
       // Wait for channel to open...
     } else if (type === 'candidate') {
       const candidate = /** @type {RTCIceCandidate} */ (sdp);
-      this.pendingCandidates.push(candidate);
-      if (this.peerConnection.remoteDescription) {
-        this.flushPendingCandidates();
-      }
+      this.negotiator.addCandidate(candidate);
     } else {
       throw new Error(
         `Received invalid response type '${type}' on local connection.`
       );
     }
+  }
+
+  /**
+   * @private
+   * @param {RTCOfferOptions} [options]
+   */
+  async performOffer(options = undefined) {
+    // Create offer
+    const offer = await this.peerConnection.createOffer(options);
+    await this.peerConnection.setLocalDescription(offer);
+    if (this.trickle) {
+      // Just negotiate in the background...
+      this.negotiator.negotiate();
+    } else {
+      // Remove trickle request from sdp
+      offer.sdp = offer.sdp.replace(FILTER_TRICKLE_SDP_PATTERN, '');
+      // Wait for negotiation
+      await this.negotiator.negotiate();
+    }
+    // Send offer
+    this.signaling.sendSignalMessage(this.localId, this.remoteId, this.peerConnection.localDescription || offer);
   }
 }
 
@@ -395,26 +333,47 @@ export class PeerfulRemoteConnection extends PeerfulConnection {
       // Receive offer
       this.peerConnection
         .setRemoteDescription(description)
-        .then(() => this.flushPendingCandidates())
-        .then(() => this.peerConnection.createAnswer())
-        .then((answer) => this.peerConnection.setLocalDescription(answer))
+        .then(() => this.negotiator.onRemoteDescription(this.remoteId))
         .then(() =>
-          debug('[REMOTE]', 'Successfully set remote/local description.')
+          debug('[REMOTE]', 'Successfully set remote description from offer.')
         )
         .catch((e) =>
-          debug('[REMOTE]', 'Failed to set remote/local description.', e)
-        );
-      // Wait for ICE to complete before sending answer...
+          debug('[REMOTE]', 'Failed to set remote description from offer.', e)
+        )
+        .then(() => {
+          // Send answer
+          this.performAnswer();
+          // Wait to be connected...
+          return createPromiseStatusPromise(this.connectedStatus);
+        });
     } else if (type === 'candidate') {
       const candidate = /** @type {RTCIceCandidate} */ (sdp);
-      this.pendingCandidates.push(candidate);
-      if (this.peerConnection.remoteDescription) {
-        this.flushPendingCandidates();
-      }
+      this.negotiator.addCandidate(candidate);
     } else {
       throw new Error(
         `Received invalid response type '${type}' on remote connection.`
       );
     }
+  }
+
+  /**
+   * @private
+   * @param {RTCOfferAnswerOptions} [options]
+   */
+  async performAnswer(options = undefined) {
+    // Create answer
+    const answer = await this.peerConnection.createAnswer(options);
+    await this.peerConnection.setLocalDescription(answer);
+    if (this.trickle) {
+      // Just negotiate in the background...
+      this.negotiator.negotiate();
+    } else {
+      // Remove trickle request from sdp
+      answer.sdp = answer.sdp.replace(FILTER_TRICKLE_SDP_PATTERN, '');
+      // Wait for negotiation
+      await this.negotiator.negotiate();
+    }
+    // Send answer
+    this.signaling.sendSignalMessage(this.localId, this.remoteId, this.peerConnection.localDescription || answer);
   }
 }
