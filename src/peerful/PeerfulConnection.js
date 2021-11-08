@@ -5,7 +5,11 @@ import {
   resolvePromiseStatus,
 } from './PromiseStatus.js';
 
-import { debug, DEFAULT_ICE_SERVERS } from './PeerfulUtil.js';
+import {
+  debug,
+  DEFAULT_ICE_SERVERS,
+  FILTER_TRICKLE_SDP_PATTERN,
+} from './PeerfulUtil.js';
 
 /** @typedef {import('./PeerJsSignaling.js').PeerJsSignaling} PeerJsSignaling */
 
@@ -27,7 +31,7 @@ export class PeerfulConnection extends Eventable {
    */
   constructor(id, signaling, options = undefined) {
     super();
-    
+
     /** @protected */
     this.opened = false;
     /** @protected */
@@ -174,7 +178,7 @@ export class PeerfulConnection extends Eventable {
   flushPendingCandidates() {
     let candidates = this.pendingCandidates.slice();
     this.pendingCandidates.length = 0;
-    for(let pending of candidates) {
+    for (let pending of candidates) {
       this.peerConnection
         .addIceCandidate(pending)
         .then(() => debug('[CHANNEL]', 'Received candidate.'))
@@ -231,11 +235,7 @@ export class PeerfulConnection extends Eventable {
   onIceCandidate(e) {
     if (!e.candidate) {
       debug('[CHANNEL]', 'End of ICE candidates.');
-      this.signaling.sendSignalMessage(
-        this.localId,
-        this.remoteId,
-        this.peerConnection.localDescription
-      );
+      this.signaling.sendSignalMessage(this.localId, this.remoteId, this.peerConnection.localDescription);
       // Wait for peer response...
     } else {
       debug('[CHANNEL]', 'Sending an ICE candidate.');
@@ -336,14 +336,6 @@ export class PeerfulLocalConnection extends PeerfulConnection {
         .then(() => debug('[LOCAL]', 'Successfully set remote description.'))
         .catch((e) => debug('[LOCAL]', 'Failed to set remote description.', e));
       // Wait for channel to open...
-      // TODO: Check data channel ready state
-      let handler = () => {
-        debug('[LOCAL]', this.dataChannel.readyState);
-        if (this.dataChannel.readyState !== 'open') {
-          setTimeout(handler, 1000);
-        }
-      };
-      handler();
     } else if (type === 'candidate') {
       const candidate = /** @type {RTCIceCandidate} */ (sdp);
       this.pendingCandidates.push(candidate);

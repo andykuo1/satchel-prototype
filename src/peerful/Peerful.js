@@ -77,7 +77,7 @@ export class Peerful extends Eventable {
     // Try connecting to remote now
     try {
       await conn.connect(remoteId);
-    } catch(e) {
+    } catch (e) {
       console.error('Failed to connect to peer.', e);
       delete this.connections[remoteId];
     }
@@ -100,7 +100,7 @@ export class Peerful extends Eventable {
 
   /**
    * @private
-   * @param {string} dst 
+   * @param {string} dst
    * @returns {PeerfulRemoteConnection}
    */
   resolveRemoteConnection(dst) {
@@ -150,24 +150,24 @@ export class Peerful extends Eventable {
         const init = /** @type {RTCSessionDescriptionInit} */ (sdp);
         switch (init.type) {
           case 'offer':
-          {
-            const conn = this.resolveRemoteConnection(dst);
-            conn.listen().then(this.onPeerfulRemoteConnectionOpen);
-            const description = new RTCSessionDescription(init);
-            conn.onSignalingResponse('offer', description, src, dst);
-          }
-          break;
-          case 'answer':
-          {
-            const conn = this.connections[src];
-            if (!conn) {
-              console.warn('Received signaling attempt when not listening.');
-              return;
+            {
+              const conn = this.resolveRemoteConnection(dst);
+              conn.listen().then(this.onPeerfulRemoteConnectionOpen);
+              const description = new RTCSessionDescription(init);
+              conn.onSignalingResponse('offer', description, src, dst);
             }
-            const description = new RTCSessionDescription(init);
-            conn.onSignalingResponse('answer', description, src, dst);
-          }
-          break;
+            break;
+          case 'answer':
+            {
+              const conn = this.connections[src];
+              if (!conn) {
+                console.warn('Received signaling attempt when not listening.');
+                return;
+              }
+              const description = new RTCSessionDescription(init);
+              conn.onSignalingResponse('answer', description, src, dst);
+            }
+            break;
           default:
             console.warn('Received unknown signal:', init);
             break;
