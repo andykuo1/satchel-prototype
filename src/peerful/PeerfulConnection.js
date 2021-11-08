@@ -272,18 +272,22 @@ export class PeerfulLocalConnection extends PeerfulConnection {
    */
   async performOffer(options = undefined) {
     // Create offer
+    debug('[LOCAL]', 'Creating offer...');
     const offer = await this.peerConnection.createOffer(options);
     await this.peerConnection.setLocalDescription(offer);
     if (this.trickle) {
+      debug('[LOCAL]', 'Trickling ICE...');
       // Just negotiate in the background...
       this.negotiator.negotiate();
     } else {
+      debug('[LOCAL]', 'Waiting for ICE to complete...');
       // Remove trickle request from sdp
       offer.sdp = offer.sdp.replace(FILTER_TRICKLE_SDP_PATTERN, '');
       // Wait for negotiation
       await this.negotiator.negotiate();
     }
     // Send offer
+    debug('[LOCAL]', 'Sending offer...');
     this.signaling.sendSignalMessage(this.localId, this.remoteId, this.peerConnection.localDescription || offer);
   }
 }
@@ -313,8 +317,7 @@ export class PeerfulRemoteConnection extends PeerfulConnection {
   onDataChannel(e) {
     debug('[REMOTE]', 'Received data channel');
     // Create channel
-    const { channel } = e;
-    this.setDataChannel(channel);
+    this.setDataChannel(e.channel);
     // Wait for channel to open...
   }
 
@@ -362,18 +365,22 @@ export class PeerfulRemoteConnection extends PeerfulConnection {
    */
   async performAnswer(options = undefined) {
     // Create answer
+    debug('[REMOTE]', 'Creating answer...');
     const answer = await this.peerConnection.createAnswer(options);
     await this.peerConnection.setLocalDescription(answer);
     if (this.trickle) {
+      debug('[REMOTE]', 'Trickling ICE...');
       // Just negotiate in the background...
       this.negotiator.negotiate();
     } else {
+      debug('[REMOTE]', 'Waiting for ICE to complete...');
       // Remove trickle request from sdp
       answer.sdp = answer.sdp.replace(FILTER_TRICKLE_SDP_PATTERN, '');
       // Wait for negotiation
       await this.negotiator.negotiate();
     }
     // Send answer
+    debug('[REMOTE]', 'Sending answer...');
     this.signaling.sendSignalMessage(this.localId, this.remoteId, this.peerConnection.localDescription || answer);
   }
 }
