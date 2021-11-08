@@ -135,7 +135,7 @@ export class PeerfulConnection extends Eventable {
       iceServers: DEFAULT_ICE_SERVERS,
       ...(options || {}),
     });
-    this.negotiator = new PeerfulNegotiator(this.signaling, this.localId, this.peerConnection);
+    this.negotiator = new PeerfulNegotiator(this.signaling, this.localId, this.peerConnection, this.trickle);
     return this;
   }
 

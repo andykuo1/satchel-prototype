@@ -54,7 +54,7 @@ export async function connectAsServer() {
       serverData = {};
     }
 
-    console.log('Loading server data...');
+    console.log('Loading server data...', serverData);
     ctx.server = {
       peerful: null,
       clients: [],
@@ -78,7 +78,7 @@ export async function connectAsServer() {
   setInterval(() => {
     const ctx = getCursorContext();
     localStorage.setItem('server_data', JSON.stringify(ctx.server.data));
-  }, 1000);
+  }, 5000);
 }
 
 function onLocalClientConnection(conn) {
@@ -175,6 +175,7 @@ function onRemoteClientConnection(conn) {
       switch (jsonData.type) {
         case 'name':
           {
+            console.log('Setting up client...', client.name);
             client.name = jsonData.message.toLowerCase().replace(/\s/g, '_');
             const clientDataName = `remote_data#${client.name}`;
             // Send to client their first data store
@@ -193,6 +194,7 @@ function onRemoteClientConnection(conn) {
           break;
         case 'sync':
           {
+            console.log('Syncing client...', client.name);
             // Update server's copy of client data
             if (!client.name) {
               return;

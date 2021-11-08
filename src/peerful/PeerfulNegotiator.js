@@ -13,9 +13,10 @@ export class PeerfulNegotiator {
    * @param {PeerJsSignaling} signaling
    * @param {string} localId
    * @param {RTCPeerConnection} peerConnection
+   * @param {boolean} trickle
    * @param {number} timeout
    */
-  constructor(signaling, localId, peerConnection, timeout = 5_000) {
+  constructor(signaling, localId, peerConnection, trickle = false, timeout = 5_000) {
     /** @private */
     this.signaling = signaling;
     /** @private */
@@ -26,6 +27,8 @@ export class PeerfulNegotiator {
     this.remoteId = null;
     /** @private */
     this.timeout = timeout;
+    /** @private */
+    this.trickle = trickle;
 
     /**
      * @protected
@@ -151,15 +154,17 @@ export class PeerfulNegotiator {
 
   /** @private */
   onIceComplete() {
-    debug('[NEGOTIATOR]', 'Negotiated ICE candidates.');
+    debug('[NEGOTIATOR]', 'Completed ICE candidate negotiation.');
     this.completed = true;
     resolvePromiseStatus(this.iceStatus, undefined);
   }
 
   /** @private */
   onIceTimeout() {
-    debug('[NEGOTIATOR]', 'Timed out negotiation for ICE candidates.');
-    this.onIceComplete();
+    if (!this.completed) {
+      debug('[NEGOTIATOR]', 'Timed out negotiation for ICE candidates.');
+      this.onIceComplete();
+    }
   }
 
   /** @private */
@@ -185,22 +190,21 @@ export class PeerfulNegotiator {
    * @param {RTCPeerConnectionIceEvent} e
    */
   onIceCandidate(e) {
-    if (this.completed) {
-      debug(
-        '[NEGOTIATOR]',
-        'Received ICE candidate after negotiations completed.'
-      );
-      return;
-    } else if (!e.candidate) {
+    if (!e.candidate) {
       debug('[NEGOTIATOR]', 'End of ICE candidates.');
-      this.onIceComplete();
+      if (!this.completed) {
+        this.onIceComplete();
+      }
     } else {
-      debug('[NEGOTIATOR]', 'Sending an ICE candidate.');
-      this.signaling.sendCandidateMessage(
-        this.localId,
-        this.remoteId,
-        e.candidate
-      );
+      // TODO: This means that only when trickling do we send candidates over...
+      if (this.trickle) {
+        debug('[NEGOTIATOR]', 'Sending an ICE candidate.');
+        this.signaling.sendCandidateMessage(
+          this.localId,
+          this.remoteId,
+          e.candidate
+        );
+      }
       // Start ice timeout if not yet started
       if (!this.iceTimeoutHandle) {
         this.iceTimeoutHandle = setTimeout(this.onIceTimeout, this.timeout);
