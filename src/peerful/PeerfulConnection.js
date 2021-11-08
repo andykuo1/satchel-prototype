@@ -201,8 +201,9 @@ export class PeerfulConnection extends Eventable {
    * @param {Event} e
    */
   onDataChannelError(e) {
-    debug('[CHANNEL]', 'Error!', e);
-    this.emit('error', e);
+    let error = e.error; // NOTE: This is an RTCErrorEvent.
+    debug('[CHANNEL]', 'Error!', error);
+    this.emit('error', error);
   }
 }
 

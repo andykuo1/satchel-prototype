@@ -44,9 +44,6 @@ export class Peerful extends Eventable {
     this.signaling = new PeerJsSignaling(id, this.onSignaling);
     /** @private */
     this.signalingPromise = this.signaling.open();
-
-    /** @private */
-    this.pendingRemoteConnection = null;
   }
 
   close() {
@@ -91,10 +88,6 @@ export class Peerful extends Eventable {
       throw new Error('Cannot listen for peers when already closed.');
     }
     await this.signalingPromise;
-
-    const conn = new PeerfulRemoteConnection(this.id, this.signaling).open();
-    // Wait for remote to start connecting
-    this.pendingRemoteConnection = conn;
     return this;
   }
 
@@ -105,14 +98,10 @@ export class Peerful extends Eventable {
    */
   resolveRemoteConnection(dst) {
     let conn = /** @type {PeerfulRemoteConnection} */ (this.connections[dst]);
-    if (!conn) {
-      let prev = this.pendingRemoteConnection;
-      this.connections[dst] = prev;
-      let next = new PeerfulRemoteConnection(this.id, this.signaling).open();
-      this.pendingRemoteConnection = next;
-      conn = prev;
-    }
-    return conn;
+    if (conn) return conn;
+    let next = new PeerfulRemoteConnection(this.id, this.signaling).open();
+    this.connections[dst] = next;
+    return next;
   }
 
   /**
