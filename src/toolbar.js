@@ -47,13 +47,16 @@ function onDeleteClick() {
 
 function onCloudClick() {
   // Try connect the client
+  document.querySelector('#cloudButton').toggleAttribute('disabled', true);
   connectAsClient().then((result) => {
-    if (result) {
-      document.querySelector('#cloudButton').toggleAttribute('disabled', true);
-    } else {
+    if (!result) {
       // Try connect the server
+      document.querySelector('#cloudButton').toggleAttribute('disabled', false);
       connectAsServer();
     }
+  }).catch(e => {
+    window.alert('Could not connect: ' + e);
+    document.querySelector('#cloudButton').toggleAttribute('disabled', false);
   });
 }
 
