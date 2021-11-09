@@ -82,6 +82,7 @@ export async function connectAsServer() {
 }
 
 function onLocalClientConnection(conn) {
+  console.log('Local connection established.');
   const ctx = getCursorContext();
   const server = {
     connection: conn,
@@ -125,9 +126,11 @@ function onLocalClientConnection(conn) {
   conn.on('error', (error) => {
     console.error(error);
     window.alert('Server connection failed due to error!');
+    conn.close();
   });
   conn.on('close', () => {
     window.alert('Server connection closed!');
+    conn.close();
   });
 
   let name;
@@ -159,9 +162,10 @@ function onLocalClientConnection(conn) {
 }
 
 /**
- * @param conn
+ * @param {import('../peerful/PeerfulConnection.js').PeerfulConnection} conn 
  */
 function onRemoteClientConnection(conn) {
+  console.log('Remote connection established.');
   const ctx = getCursorContext();
   const client = {
     connection: conn,
@@ -214,9 +218,11 @@ function onRemoteClientConnection(conn) {
   });
   conn.on('error', (error) => {
     console.error(`client errored: ${error}`);
+    conn.close();
   });
   conn.on('close', () => {
     console.error('client closed.');
+    conn.close();
   });
 }
 

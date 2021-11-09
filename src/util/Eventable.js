@@ -13,12 +13,7 @@ export class Eventable {
    * @returns {Eventable}
    */
   on(event, callback) {
-    const eventListeners = this.listeners[event];
-    if (eventListeners) {
-      eventListeners.push(callback);
-    } else {
-      this.listeners[event] = [callback];
-    }
+    this.addEventListener(event, callback);
     return this;
   }
 
@@ -28,13 +23,7 @@ export class Eventable {
    * @returns {Eventable}
    */
   off(event, callback) {
-    const eventListeners = this.listeners[event];
-    if (eventListeners) {
-      const i = eventListeners.indexOf(callback);
-      if (i >= 0) {
-        eventListeners.splice(i, 1);
-      }
-    }
+    this.removeEventListener(event, callback);
     return this;
   }
 
@@ -47,9 +36,9 @@ export class Eventable {
     const f = /** @type {Function} */ (/** @type {unknown} */ (callback));
     const wrapper = function () {
       f.apply(undefined, arguments);
-      this.off(event, wrapper);
+      this.removeEventListener(event, wrapper);
     }.bind(this);
-    this.on(event, wrapper);
+    this.addEventListener(event, wrapper);
     return this;
   }
 
@@ -59,6 +48,59 @@ export class Eventable {
    * @returns {Eventable}
    */
   emit(event, ...args) {
+    this.dispatchEvent(event, args);
+    return this;
+  }
+
+  /**
+   * @protected
+   * @param {keyof T} event
+   * @param {T[keyof T]} callback
+   */
+  addEventListener(event, callback) {
+    const eventListeners = this.listeners[event];
+    if (eventListeners) {
+      eventListeners.push(callback);
+    } else {
+      this.listeners[event] = [callback];
+    }
+  }
+
+  
+  /**
+   * @protected
+   * @param {keyof T} event
+   * @param {T[keyof T]} callback
+   */
+  removeEventListener(event, callback) {
+    const eventListeners = this.listeners[event];
+    if (eventListeners) {
+      const i = eventListeners.indexOf(callback);
+      if (i >= 0) {
+        eventListeners.splice(i, 1);
+      }
+    }
+  }
+
+  /**
+   * @protected
+   * @param {keyof T} event 
+   * @returns {Array<T[keyof T]>}
+   */
+  getEventListeners(event) {
+    const eventListeners = this.listeners[event];
+    if (eventListeners) {
+      return eventListeners.slice();
+    }
+    return [];
+  }
+
+  /**
+   * @protected
+   * @param {keyof T} event
+   * @param {Array<any>} args
+   */
+  dispatchEvent(event, args) {
     const eventListeners = this.listeners[event];
     if (eventListeners) {
       for (const callback of eventListeners) {
@@ -66,6 +108,12 @@ export class Eventable {
         f.apply(undefined, args);
       }
     }
-    return this;
+  }
+
+  /**
+   * @protected
+   */
+  clearEventListeners() {
+    this.listeners = /** @type {Record<keyof T, Array<T[keyof T]>>} */ ({});
   }
 }

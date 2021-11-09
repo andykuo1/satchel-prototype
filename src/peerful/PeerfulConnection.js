@@ -19,6 +19,7 @@ import { PeerfulNegotiator } from './PeerfulNegotiator.js';
  * @typedef PeerfulConnectionEvents
  * @property {(data: string) => void} data
  * @property {(error: Error) => void} error
+ * @property {(conn: PeerfulConnection) => void} open Same as waiting on the returned promise when connecting.
  * @property {() => void} close
  */
 
@@ -34,18 +35,25 @@ export class PeerfulConnection extends Eventable {
   constructor(id, signaling, options = undefined) {
     super();
 
-    options = {
-      trickle: false,
-      ...(options || {})
-    };
-
     /** @protected */
-    this.trickle = options.trickle;
+    this.options = {
+      trickle: false,
+      rtcConfig: {},
+      answerOptions: {},
+      offerOptions: {},
+      channelOptions: {},
+    };
+    if (options) {
+      Object.assign(this.options, options);
+    }
 
     /** @protected */
     this.opened = false;
     /** @protected */
     this.closed = false;
+
+    this.channelReady = false;
+    this.negotiatorReady = false;
 
     this.localId = id;
     this.remoteId = null;
@@ -120,25 +128,6 @@ export class PeerfulConnection extends Eventable {
     this.dataChannel.send(data);
   }
 
-  /**
-   * @param {RTCConfiguration} [options]
-   */
-  open(options = undefined) {
-    if (this.opened) {
-      throw new Error('Cannot open already opened connection.');
-    }
-
-    this.opened = true;
-    this.closed = false;
-    this.connectedStatus = createPromiseStatus();
-    this.peerConnection = new RTCPeerConnection({
-      iceServers: DEFAULT_ICE_SERVERS,
-      ...(options || {}),
-    });
-    this.negotiator = new PeerfulNegotiator(this.signaling, this.localId, this.peerConnection, this.trickle);
-    return this;
-  }
-
   close() {
     if (this.closed) {
       throw new Error('Cannot close already closed connection.');
@@ -161,6 +150,7 @@ export class PeerfulConnection extends Eventable {
       this.peerConnection.close();
       this.peerConnection = null;
     }
+    this.clearEventListeners();
   }
 
   /**
@@ -193,7 +183,8 @@ export class PeerfulConnection extends Eventable {
    */
   onDataChannelOpen() {
     debug('[CHANNEL]', 'Open!');
-    resolvePromiseStatus(this.connectedStatus, this);
+    this.channelReady = true;
+    this.tryConnectionReady();
   }
 
   /**
@@ -201,9 +192,52 @@ export class PeerfulConnection extends Eventable {
    * @param {Event} e
    */
   onDataChannelError(e) {
-    let error = e.error; // NOTE: This is an RTCErrorEvent.
+    // NOTE: This is an RTCErrorEvent.
+    let errorEvent = /** @type {unknown} */(e);
+    let error = /** @type {{error: DOMException}} */(errorEvent).error;
     debug('[CHANNEL]', 'Error!', error);
     this.emit('error', error);
+  }
+
+  /** @protected */
+  tryConnectionStart() {
+    if (this.opened) {
+      throw new Error('Cannot open already opened connection.');
+    }
+    this.opened = false;
+    this.closed = false;
+    this.connectedStatus = createPromiseStatus();
+    this.peerConnection = new RTCPeerConnection({
+      iceServers: DEFAULT_ICE_SERVERS,
+      ...this.options.rtcConfig,
+    });
+    this.negotiator = new PeerfulNegotiator(
+      this.signaling,
+      this.localId,
+      this.peerConnection,
+      this.options.trickle
+    );
+    this.negotiator.on('ready', () => {
+      this.negotiatorReady = true;
+      this.tryConnectionReady();
+    });
+    return this;
+  }
+
+  /** @protected */
+  tryConnectionReady() {
+    if (this.opened) {
+      // Already opened.
+      return;
+    }
+    if (!this.channelReady || !this.negotiatorReady) {
+      // Not yet finished connecting.
+      return;
+    }
+    this.opened = true;
+    resolvePromiseStatus(this.connectedStatus, this);
+    this.emit('open', this);
+    return this;
   }
 }
 
@@ -222,17 +256,16 @@ export class PeerfulLocalConnection extends PeerfulConnection {
    */
   async connect(remoteId) {
     debug('[LOCAL]', 'Connecting to', remoteId, '...');
-    let channelOptions;
-
     this.remoteId = remoteId;
 
+    // Start connection
+    this.tryConnectionStart();
     // Create channel
     const channel = this.peerConnection.createDataChannel(
       'data',
-      channelOptions
+      this.options.channelOptions
     );
     this.setDataChannel(channel);
-
     // Send offer
     await this.performOffer();
     // Wait to be connected...
@@ -276,7 +309,7 @@ export class PeerfulLocalConnection extends PeerfulConnection {
     debug('[LOCAL]', 'Creating offer...');
     const offer = await this.peerConnection.createOffer(options);
     await this.peerConnection.setLocalDescription(offer);
-    if (this.trickle) {
+    if (this.options.trickle) {
       debug('[LOCAL]', 'Trickling ICE...');
       // Just negotiate in the background...
       this.negotiator.negotiate();
@@ -307,7 +340,12 @@ export class PeerfulRemoteConnection extends PeerfulConnection {
 
   async listen() {
     debug('[REMOTE]', 'Listening...');
+
+    // Start connection
+    this.tryConnectionStart();
+    // Listen for data channels...
     this.peerConnection.addEventListener('datachannel', this.onDataChannel);
+    // Wait to be connected...
     return createPromiseStatusPromise(this.connectedStatus);
   }
 
@@ -344,9 +382,9 @@ export class PeerfulRemoteConnection extends PeerfulConnection {
         .catch((e) =>
           debug('[REMOTE]', 'Failed to set remote description from offer.', e)
         )
-        .then(() => {
+        .then(async () => {
           // Send answer
-          this.performAnswer();
+          await this.performAnswer();
           // Wait to be connected...
           return createPromiseStatusPromise(this.connectedStatus);
         });
@@ -369,7 +407,7 @@ export class PeerfulRemoteConnection extends PeerfulConnection {
     debug('[REMOTE]', 'Creating answer...');
     const answer = await this.peerConnection.createAnswer(options);
     await this.peerConnection.setLocalDescription(answer);
-    if (this.trickle) {
+    if (this.options.trickle) {
       debug('[REMOTE]', 'Trickling ICE...');
       // Just negotiate in the background...
       this.negotiator.negotiate();

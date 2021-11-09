@@ -30,6 +30,7 @@ export class Peerful extends Eventable {
 
     /** @type {Record<string, PeerfulConnection>} */
     this.connections = {};
+    this.connectionOptions = {};
 
     /** @private */
     this.onPeerfulLocalConnectionOpen =
@@ -53,7 +54,6 @@ export class Peerful extends Eventable {
     for (const conn of conns) {
       conn.close();
     }
-
     this.signaling.close();
   }
 
@@ -69,7 +69,7 @@ export class Peerful extends Eventable {
     }
     await this.signalingPromise;
 
-    const conn = new PeerfulLocalConnection(this.id, this.signaling).open();
+    const conn = new PeerfulLocalConnection(this.id, this.signaling, this.connectionOptions);
     this.connections[remoteId] = conn;
     // Try connecting to remote now
     try {
@@ -99,14 +99,15 @@ export class Peerful extends Eventable {
   resolveRemoteConnection(dst) {
     let conn = /** @type {PeerfulRemoteConnection} */ (this.connections[dst]);
     if (conn) return conn;
-    let next = new PeerfulRemoteConnection(this.id, this.signaling).open();
+    let next = new PeerfulRemoteConnection(this.id, this.signaling, this.connectionOptions);
+    next.listen().then(this.onPeerfulRemoteConnectionOpen);
     this.connections[dst] = next;
     return next;
   }
 
   /**
    * @private
-   * @param {PeerfulLocalConnection} conn
+   * @param {PeerfulConnection} conn
    */
   onPeerfulLocalConnectionOpen(conn) {
     this.emit('connect', conn);
@@ -114,7 +115,7 @@ export class Peerful extends Eventable {
 
   /**
    * @private
-   * @param {PeerfulRemoteConnection} conn
+   * @param {PeerfulConnection} conn
    */
   onPeerfulRemoteConnectionOpen(conn) {
     this.emit('connect', conn);
@@ -124,8 +125,8 @@ export class Peerful extends Eventable {
    * @private
    * @param {Error} error
    * @param {RTCSessionDescriptionInit|RTCIceCandidateInit} sdp
-   * @param {string} src
-   * @param {string} dst
+   * @param {string} src The source id of the signal (the remote instance)
+   * @param {string} dst The destination id for the signal (the local instance)
    */
   onSignaling(error, sdp, src, dst) {
     if (error) {
@@ -140,8 +141,7 @@ export class Peerful extends Eventable {
         switch (init.type) {
           case 'offer':
             {
-              const conn = this.resolveRemoteConnection(dst);
-              conn.listen().then(this.onPeerfulRemoteConnectionOpen);
+              const conn = this.resolveRemoteConnection(src);
               const description = new RTCSessionDescription(init);
               conn.onSignalingResponse('offer', description, src, dst);
             }
@@ -163,7 +163,7 @@ export class Peerful extends Eventable {
         }
       } else if ('candidate' in sdp) {
         const init = /** @type {RTCIceCandidateInit} */ (sdp);
-        const conn = this.resolveRemoteConnection(dst);
+        const conn = this.resolveRemoteConnection(src);
         const candidate = new RTCIceCandidate(init);
         conn.onSignalingResponse('candidate', candidate, src, dst);
       } else {

@@ -1,9 +1,11 @@
 import {
   createPromiseStatus,
   createPromiseStatusPromise,
+  isPromiseStatusPending,
   rejectPromiseStatus,
   resolvePromiseStatus,
 } from './PromiseStatus.js';
+import { debug } from './PeerfulUtil.js';
 
 /**
  * @typedef {(error: Error|null, data: object|null, src?: string, dst?: string) => void} PeerJsSignalingHandler
@@ -50,24 +52,11 @@ const DEFAULT_OPTS = {
   pingIntervalMillis: 5000,
 };
 
-const SHOW_DEBUG = false;
-
-/**
- * @param  {...any} messages
- */
-function debug(...messages) {
-  if (!SHOW_DEBUG) {
-    return;
-  }
-
-  console.log(...messages);
-}
-
 export class PeerJsSignaling {
   /**
    * @param {string} id
    * @param {PeerJsSignalingHandler} callback
-   * @param {PeerJsSignalingOptions} [opts]
+   * @param {PeerJsSignalingOptions} [options]
    * @param options
    */
   constructor(id, callback, options = undefined) {
@@ -127,7 +116,7 @@ export class PeerJsSignaling {
       throw new Error('Already opened connection to peerjs server.');
     }
 
-    if (this.activeStatus.pending) {
+    if (isPromiseStatusPending(this.activeStatus)) {
       throw new Error('Already trying to open connection to peerjs server.');
     }
 
@@ -412,7 +401,7 @@ export class PeerJsSignaling {
     }
 
     const { activeStatus } = this;
-    if (activeStatus.pending) {
+    if (isPromiseStatusPending(activeStatus)) {
       rejectPromiseStatus(
         activeStatus,
         new Error('Signaling connection closed.')

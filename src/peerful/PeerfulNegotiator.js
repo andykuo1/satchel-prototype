@@ -1,3 +1,4 @@
+import { Eventable } from '../util/Eventable.js';
 import {
   createPromiseStatus,
   resolvePromiseStatus,
@@ -8,7 +9,16 @@ import { debug } from './PeerfulUtil.js';
 
 /** @typedef {import('./PeerJsSignaling.js').PeerJsSignaling} PeerJsSignaling */
 
-export class PeerfulNegotiator {
+/**
+ * @typedef PeerfulNegotiatorEvents
+ * @property {() => void} ready
+ * @property {(error: Error) => void} error
+ */
+
+/**
+ * @augments Eventable<PeerfulNegotiatorEvents>
+ */
+export class PeerfulNegotiator extends Eventable {
   /**
    * @param {PeerJsSignaling} signaling
    * @param {string} localId
@@ -17,6 +27,8 @@ export class PeerfulNegotiator {
    * @param {number} timeout
    */
   constructor(signaling, localId, peerConnection, trickle = false, timeout = 5_000) {
+    super();
+
     /** @private */
     this.signaling = signaling;
     /** @private */
@@ -106,6 +118,7 @@ export class PeerfulNegotiator {
       this.completed = true;
       rejectPromiseStatus(this.iceStatus, new Error('Negotiator closed.'));
     }
+    this.clearEventListeners();
   }
 
   async negotiate() {
@@ -192,7 +205,7 @@ export class PeerfulNegotiator {
   onIceCandidate(e) {
     if (!e.candidate) {
       debug('[NEGOTIATOR]', 'End of ICE candidates.');
-      if (!this.completed) {
+      if (!this.completed)  {
         this.onIceComplete();
       }
     } else {
@@ -233,9 +246,11 @@ export class PeerfulNegotiator {
         break;
       case 'connected':
         debug('[NEGOTIATOR]', 'ICE connected!');
+        this.emit('ready');
         break;
       case 'completed':
         debug('[NEGOTIATOR]', 'ICE completed!');
+        this.emit('ready');
         break;
       case 'failed':
         throw new Error('Ice connection failed.');
