@@ -53,7 +53,6 @@ export class Peerful extends Eventable {
     for (const conn of conns) {
       conn.close();
     }
-
     this.signaling.close();
   }
 
@@ -69,7 +68,7 @@ export class Peerful extends Eventable {
     }
     await this.signalingPromise;
 
-    const conn = new PeerfulLocalConnection(this.id, this.signaling).open();
+    const conn = new PeerfulLocalConnection(this.id, this.signaling);
     this.connections[remoteId] = conn;
     // Try connecting to remote now
     try {
@@ -99,7 +98,8 @@ export class Peerful extends Eventable {
   resolveRemoteConnection(dst) {
     let conn = /** @type {PeerfulRemoteConnection} */ (this.connections[dst]);
     if (conn) return conn;
-    let next = new PeerfulRemoteConnection(this.id, this.signaling).open();
+    let next = new PeerfulRemoteConnection(this.id, this.signaling);
+    next.listen().then(this.onPeerfulRemoteConnectionOpen);
     this.connections[dst] = next;
     return next;
   }
@@ -141,7 +141,6 @@ export class Peerful extends Eventable {
           case 'offer':
             {
               const conn = this.resolveRemoteConnection(dst);
-              conn.listen().then(this.onPeerfulRemoteConnectionOpen);
               const description = new RTCSessionDescription(init);
               conn.onSignalingResponse('offer', description, src, dst);
             }

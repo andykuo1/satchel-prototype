@@ -12,6 +12,6 @@ export function debug(...messages) {
 
 export const FILTER_TRICKLE_SDP_PATTERN = /a=ice-options:trickle\s\n/g;
 export const DEFAULT_ICE_SERVERS = [
-  { urls: 'stun:stun.l.google.com:19302' },
+  { urls: [ 'stun:stun.l.google.com:19302', 'stun:global.stun.twilio.com:3478' ] },
   { urls: 'turn:0.peerjs.com:3478', username: 'peerjs', credential: 'peerjsp' },
 ];

@@ -68,4 +68,12 @@ export class Eventable {
     }
     return this;
   }
+
+  /**
+   * @returns {Eventable}
+   */
+  clearEventListeners() {
+    this.listeners = /** @type {Record<keyof T, Array<T[keyof T]>>} */ ({});
+    return this;
+  }
 }
