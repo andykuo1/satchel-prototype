@@ -1,5 +1,9 @@
-import { Peerful } from '../peerful/Peerful.js';
+// import { Peerful } from '../peerful/Peerful.js';
+// import { PeerfulPeerJs as Peerful } from '../peerjs/PeerfulPeerJs.js';
+// import SimplePeer from 'simple-peer';
+import { PeerJsSignaling } from '../peerful/PeerJsSignaling.js';
 import { copyToClipboard } from '../util/clipboard.js';
+import { uuid } from '../util/uuid.js';
 import { getCursorContext } from './CursorHelper.js';
 import { saveToJSON } from './InventoryLoader.js';
 import { getInventoryStore, resetInventoryStore } from './InventoryStore.js';
@@ -16,25 +20,42 @@ export async function connectAsClient() {
   const ctx = getCursorContext();
   if (!ctx.client) {
     // Initialize client
+    let id = uuid();
     ctx.client = {
-      peerful: null,
+      peer: null,
+      src: id,
+      dst: remoteId,
       server: null,
     };
-    const peerful = new Peerful();
-    ctx.client.peerful = peerful;
-    peerful.on('connect', onLocalClientConnection);
   }
 
-  const { peerful } = ctx.client;
-  try {
-    await peerful.connect(remoteId);
-  } catch (error) {
-    window.alert('Failed to connect to server!');
-    throw error;
-  }
+  let signaling = new PeerJsSignaling(ctx.client.src, (error, data, src, dst) => {
+    if (error) {
+      console.error(error);
+    } else {
+      ctx.client.dst = dst;
+      peer.signal(data);
+    }
+  });
+  await signaling.open();
+  ctx.client.signaling = signaling;
+  console.log('Done signaling.');
 
-  window.alert('Hooray! Connected to server!');
-  document.querySelector('#onlineStatus').classList.toggle('active', true);
+  console.log('Trying to connect to', remoteId);
+  const peer = new SimplePeer({
+    initiator: true,
+    trickle: false,
+  });
+  peer.id = ctx.client.src;
+  ctx.client.peer = peer;
+  peer.on('signal', data => {
+    console.log(data);
+    ctx.client.signaling.sendSignalMessage(ctx.client.src, ctx.client.dst, data);
+  });
+  peer.on('connect', () => {
+    console.log('connected');
+    onLocalClientConnection(peer);
+  });
   return true;
 }
 
@@ -56,21 +77,43 @@ export async function connectAsServer() {
 
     console.log('Loading server data...', serverData);
     ctx.server = {
-      peerful: null,
+      peer: null,
+      src: uuid(),
+      dst: null,
       clients: [],
       data: serverData,
     };
-    const peerful = new Peerful();
-    ctx.server.peerful = peerful;
-    peerful.on('connect', onRemoteClientConnection);
-    peerful
-      .listen()
-      .then(() => window.alert('Server started!'))
-      .catch((error) => window.alert(error));
+    let signaling = new PeerJsSignaling(ctx.server.src, (error, data, src, dst) => {
+      if (error) {
+        console.error(error);
+      } else {
+        ctx.server.dst = src;
+        ctx.server.peer.signal(data);
+      }
+    });
+    await signaling.open();
+    ctx.server.signaling = signaling;
+    console.log('DONE signaling');
+
+    const peer = new SimplePeer({
+      initiator: false,
+      trickle: false,
+    });
+    peer.id = ctx.server.src;
+    ctx.server.peer = peer;
+    peer.on('signal', data => {
+      if (data.renegotiate || data.transceiverRequest) return;
+      console.log(data);
+      ctx.server.signaling.sendSignalMessage(ctx.server.src, ctx.server.dst, data);
+    });
+    peer.on('connect', () => {
+      console.log('FOUND CLIENT!');
+      onRemoteClientConnection(peer);
+    });
   }
 
-  const { peerful } = ctx.server;
-  const shareable = generateShareableLink(peerful);
+  const { peer } = ctx.server;
+  const shareable = generateShareableLink(peer);
   await copyToClipboard(shareable);
   window.alert(`Link copied!\n${shareable}`);
   document.querySelector('#onlineStatus').classList.toggle('active', true);
@@ -82,6 +125,8 @@ export async function connectAsServer() {
 }
 
 function onLocalClientConnection(conn) {
+  document.querySelector('#onlineStatus').classList.toggle('active', true);
+  console.log('Local connection established.');
   const ctx = getCursorContext();
   const server = {
     connection: conn,
@@ -89,6 +134,7 @@ function onLocalClientConnection(conn) {
   ctx.client.server = server;
   conn.on('data', (data) => {
     try {
+      console.log(data);
       const jsonData = JSON.parse(data);
       switch (jsonData.type) {
         case 'new':
@@ -162,6 +208,7 @@ function onLocalClientConnection(conn) {
  * @param conn
  */
 function onRemoteClientConnection(conn) {
+  console.log('Remote connection established.');
   const ctx = getCursorContext();
   const client = {
     connection: conn,

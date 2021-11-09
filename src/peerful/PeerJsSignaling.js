@@ -4,6 +4,7 @@ import {
   rejectPromiseStatus,
   resolvePromiseStatus,
 } from './PromiseStatus.js';
+import { debug } from './PeerfulUtil.js';
 
 /**
  * @typedef {(error: Error|null, data: object|null, src?: string, dst?: string) => void} PeerJsSignalingHandler
@@ -49,19 +50,6 @@ const DEFAULT_OPTS = {
   key: 'peerjs',
   pingIntervalMillis: 5000,
 };
-
-const SHOW_DEBUG = false;
-
-/**
- * @param  {...any} messages
- */
-function debug(...messages) {
-  if (!SHOW_DEBUG) {
-    return;
-  }
-
-  console.log(...messages);
-}
 
 export class PeerJsSignaling {
   /**
@@ -300,6 +288,7 @@ export class PeerJsSignaling {
    */
   sendSignalMessage(src, dst, signal) {
     const { type } = signal;
+    console.log(src, dst, signal);
     debug('[SIGNAL]', 'Sending', type, 'from', src, 'to', dst);
     if (this.closed) {
       return;
