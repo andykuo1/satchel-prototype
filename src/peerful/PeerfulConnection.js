@@ -214,8 +214,7 @@ export class PeerfulConnection extends Eventable {
     this.negotiator = new PeerfulNegotiator(
       this.signaling,
       this.localId,
-      this.peerConnection,
-      this.options.trickle
+      this.peerConnection
     );
     this.negotiator.on('ready', () => {
       this.negotiatorReady = true;
@@ -249,6 +248,8 @@ export class PeerfulLocalConnection extends PeerfulConnection {
    */
   constructor(id, signaling, options = undefined) {
     super(id, signaling, options);
+
+    this.onNegotiationNeeded = this.onNegotiationNeeded.bind(this);
   }
 
   /**
@@ -260,16 +261,22 @@ export class PeerfulLocalConnection extends PeerfulConnection {
 
     // Start connection
     this.tryConnectionStart();
+    // Listen for negotiations...
+    this.peerConnection.addEventListener('negotiationneeded', this.onNegotiationNeeded);
     // Create channel
     const channel = this.peerConnection.createDataChannel(
       'data',
       this.options.channelOptions
     );
     this.setDataChannel(channel);
-    // Send offer
-    await this.performOffer();
     // Wait to be connected...
     return createPromiseStatusPromise(this.connectedStatus);
+  }
+
+  onNegotiationNeeded() {
+    debug('[LOCAL]', 'Negotiation needed.');
+    // Send offer
+    this.performOffer();
   }
 
   /**
