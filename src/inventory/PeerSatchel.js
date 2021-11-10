@@ -26,13 +26,17 @@ export async function connectAsClient() {
   try {
     await peerful.connect(remoteId);
   } catch (error) {
-    window.alert('Failed to connect to server!');
+    window.alert('Oh no! Failed to connect to server!');
     throw error;
   }
 
   window.alert('Hooray! Connected to server!');
   document.querySelector('#onlineStatus').classList.toggle('active', true);
   return true;
+}
+
+export function shouldConnnectAsClient() {
+  return Boolean(tryGetRemotePeerId(window.location));
 }
 
 export function isServerSide() {
@@ -232,7 +236,6 @@ function tryGetRemotePeerId(url) {
   if (parameters.has('id')) {
     return parameters.get('id');
   }
-
   return null;
 }
 

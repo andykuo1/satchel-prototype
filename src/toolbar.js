@@ -7,6 +7,7 @@ import {
   connectAsClient,
   connectAsServer,
   isServerSide,
+  shouldConnnectAsClient,
 } from './inventory/PeerSatchel.js';
 import { getCursorContext } from './inventory/CursorHelper.js';
 
@@ -46,18 +47,19 @@ function onDeleteClick() {
 }
 
 function onCloudClick() {
-  // Try connect the client
   document.querySelector('#cloudButton').toggleAttribute('disabled', true);
-  connectAsClient().then((result) => {
-    if (!result) {
-      // Try connect the server
+  if (shouldConnnectAsClient()) {
+    connectAsClient().catch(e => {
+      window.alert('Could not connect: ' + e);
       document.querySelector('#cloudButton').toggleAttribute('disabled', false);
-      connectAsServer();
-    }
-  }).catch(e => {
-    window.alert('Could not connect: ' + e);
-    document.querySelector('#cloudButton').toggleAttribute('disabled', false);
-  });
+    });
+  } else {
+    connectAsServer().catch(e => {
+      window.alert('Could not connect: ' + e);
+    }).finally(() => {
+      document.querySelector('#cloudButton').toggleAttribute('disabled', false);
+    });
+  }
 }
 
 function onDownloadClick() {
