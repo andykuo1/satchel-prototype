@@ -4,7 +4,6 @@ import { uuid } from '../util/uuid.js';
  * @typedef {object} InventoryStore
  * @typedef {object} Container
  * @typedef {object} Inventory
- * @property
  */
 
 let GLOBAL_STORE = createInventoryStore();

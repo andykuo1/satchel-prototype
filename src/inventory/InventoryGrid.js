@@ -24,7 +24,7 @@ const INNER_HTML = `
 `;
 const INNER_STYLE = `
 :host {
-    --background-color: #6b6051;
+    --background-color: #7f6b50;
     --outline-color: #352e25;
     --grid-color: rgba(0, 0, 0, 0.2);
     --container-width: 1;
