@@ -130,7 +130,7 @@ export class Peerful extends Eventable {
    */
   onSignaling(error, sdp, src, dst) {
     if (error) {
-      const conn = this.connections[dst] || this.connections[src];
+      const conn = this.connections[src] || this.connections[dst];
       if (conn) {
         conn.close();
       }

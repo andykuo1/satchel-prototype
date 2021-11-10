@@ -4,9 +4,6 @@ import { getCursorContext } from './CursorHelper.js';
 import { saveToJSON } from './InventoryLoader.js';
 import { getInventoryStore, resetInventoryStore } from './InventoryStore.js';
 
-// Const BASE_URL = 'http://127.0.0.1:5500';
-const BASE_URL = 'https://andykuo1.github.io/satchel';
-
 export async function connectAsClient() {
   const remoteId = tryGetRemotePeerId(window.location);
   if (!remoteId) {
@@ -244,5 +241,5 @@ function tryGetRemotePeerId(url) {
  * @returns {string}
  */
 function generateShareableLink(peerful) {
-  return `${BASE_URL}/index.html?id=${peerful.id}`;
+  return `${location.origin}${location.pathname}?id=${peerful.id}`;
 }
