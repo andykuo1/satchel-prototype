@@ -18,10 +18,14 @@ import {
 } from './InventoryStore.js';
 
 /**
+ * @typedef {import('./InventoryStore.js').Inventory} Inventory
+ */
+
+/**
  * Pick up from target inventory to cursor.
  *
  * @param {*} storedItem
- * @param {*} fromInventory
+ * @param {Inventory} fromInventory
  * @param fromCoordX
  * @param fromCoordY
  * @returns
@@ -57,7 +61,7 @@ export function pickUp(
 /**
  * Put down from cursor to destination.
  *
- * @param {*} toInventory
+ * @param {Inventory} toInventory
  * @param {*} toCoordX
  * @param {*} toCoordY
  * @param allowSwap
@@ -69,8 +73,8 @@ export function putDown(toInventory, toCoordX, toCoordY, allowSwap = true) {
     return false;
   }
 
-  const invWidth = toInventory.cols;
-  const invHeight = toInventory.rows;
+  const invWidth = toInventory.width;
+  const invHeight = toInventory.height;
   const itemWidth = item.w;
   const itemHeight = item.h;
   const coordX = toCoordX + ctx.pickOffsetX;
@@ -197,7 +201,7 @@ export function insertIn(toInventory, freedItem) {
 }
 
 /**
- * @param inv
+ * @param {Inventory} inv
  * @param coordX
  * @param coordY
  * @param itemX
@@ -216,7 +220,7 @@ function canSwapAt(inv, coordX, coordY, itemX, itemY, itemWidth, itemHeight) {
 }
 
 /**
- * @param inv
+ * @param {Inventory} inv
  * @param coordX
  * @param coordY
  * @param itemWidth

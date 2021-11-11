@@ -10,7 +10,7 @@ import {
   getItemsInInventory,
   removeInventoryChangeListener,
 } from './InventoryStore.js';
-import { InventoryItem } from './InventoryItem.js';
+import { InventoryItemElement } from './InventoryItem.js';
 
 const DEFAULT_ITEM_UNIT_SIZE = 48;
 
@@ -81,7 +81,7 @@ h2:empty {
 }
 `;
 
-export class InventoryGrid extends HTMLElement {
+export class InventoryGridElement extends HTMLElement {
   /** @private */
   static get [Symbol.for('templateNode')]() {
     const t = document.createElement('template');
@@ -269,7 +269,8 @@ export class InventoryGrid extends HTMLElement {
     // Preserve unchanged items in slot
     const preservedItems = {};
     for (const node of this._itemSlot.assignedNodes()) {
-      const { itemId } = node;
+      const itemNode = /** @type {import('./InventoryItem.js').InventoryItem} */ (node);
+      const itemId = itemNode.itemId;
       if (typeof itemId === 'string') {
         preservedItems[itemId] = node;
       }
@@ -285,9 +286,7 @@ export class InventoryGrid extends HTMLElement {
       element =
         itemId in preservedItems
           ? preservedItems[itemId]
-          : new InventoryItem(itemId);
-
-      element.container = this;
+          : new InventoryItemElement(this, inventoryName, itemId);
       emptySlot.append(element);
     }
 
@@ -318,4 +317,4 @@ export class InventoryGrid extends HTMLElement {
     return false;
   }
 }
-InventoryGrid.define();
+InventoryGridElement.define();

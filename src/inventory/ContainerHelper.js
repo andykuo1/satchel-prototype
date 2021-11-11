@@ -1,16 +1,17 @@
 import { updateCursorPosition } from './CursorHelper.js';
 import { pickUp, putDown } from './InventoryHelper.js';
+import { getInventory, getInventoryStore, getItem } from './InventoryStore.js';
 
 /**
- * @typedef {import('./InventoryItem.js').InventoryItem} InventoryItem
- * @typedef {import('./InventoryGrid.js').InventoryGrid} InventoryGrid
+ * @typedef {import('./InventoryItem.js').InventoryItemElement} InventoryItemElement
+ * @typedef {import('./InventoryGrid.js').InventoryGridElement} InventoryGridElement
  */
 
 /**
  * Perform pickup logic for item elements.
  *
  * @param {MouseEvent} mouseEvent The triggering mouse event.
- * @param {InventoryItem} itemElement The target element.
+ * @param {InventoryItemElement} itemElement The target element.
  * @param {number} unitSize The item unit size.
  * @returns {boolean} Whether to allow the event to propagate.
  */
@@ -27,9 +28,11 @@ export function itemMouseDownCallback(mouseEvent, itemElement, unitSize) {
     mouseEvent.clientY,
     unitSize
   );
+  const item = getItem(getInventoryStore(), itemElement.itemId);
+  const inv = getInventory(getInventoryStore(), containerElement.name);
   const result = pickUp(
-    itemElement,
-    containerElement,
+    item,
+    inv,
     clientCoordX,
     clientCoordY
   );
@@ -45,7 +48,7 @@ export function itemMouseDownCallback(mouseEvent, itemElement, unitSize) {
  * Perform pickup logic for container elements.
  *
  * @param {MouseEvent} mouseEvent The triggering mouse event.
- * @param {InventoryGrid} containerElement The target container element.
+ * @param {InventoryGridElement} containerElement The target container element.
  * @param {number} unitSize The item unit size.
  * @returns {boolean} Whether to allow the event to propagate.
  */
@@ -65,7 +68,8 @@ export function containerMouseUpCallback(
     mouseEvent.clientY,
     unitSize
   );
-  const result = putDown(containerElement, clientCoordX, clientCoordY);
+  const inventory = getInventory(getInventoryStore(), containerElement.name);
+  const result = putDown(inventory, clientCoordX, clientCoordY);
   if (result) {
     mouseEvent.preventDefault();
     mouseEvent.stopPropagation();

@@ -89,7 +89,7 @@ export function getCursorContext() {
 
 /**
  * @param ctx
- * @returns {import('./InventoryGrid.js').InventoryGrid}
+ * @returns {import('./InventoryGrid.js').InventoryGridElement}
  */
 export function getCursorElement(ctx) {
   return ctx.element;
@@ -97,7 +97,7 @@ export function getCursorElement(ctx) {
 
 /**
  * @param ctx
- * @returns {import('./InventoryItem.js').InventoryItem}
+ * @returns {import('./InventoryStore.js').Item}
  */
 export function getCursorItem(ctx) {
   return getItemAtInventory(getInventoryStore(), ctx.element.name, 0, 0);

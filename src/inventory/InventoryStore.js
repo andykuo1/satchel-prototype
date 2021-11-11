@@ -2,8 +2,6 @@ import { uuid } from '../util/uuid.js';
 
 /**
  * @typedef {object} InventoryStore
- * @typedef {object} Container
- * @typedef {object} Inventory
  */
 
 let GLOBAL_STORE = createInventoryStore();
@@ -74,39 +72,21 @@ export function resetInventoryStore(previousStore, nextStore) {
   }
 }
 
-/**
- *
- */
 export function getInventoryStore() {
   return GLOBAL_STORE;
 }
 
 /**
- * @param store
- * @param inventoryName
- * @param inventoryType
- * @param inventoryWidth
- * @param inventoryHeight
+ * @typedef {string} ItemId
+ * @typedef {'grid'|'socket'} InventoryType
+ * 
+ * @typedef Inventory
+ * @property {string} name
+ * @property {InventoryType} type
+ * @property {Array<ItemId>} items
+ * @property {number} width
+ * @property {number} height
  */
-export function createInventory(
-  store,
-  inventoryName = uuid(),
-  inventoryType = 'grid',
-  inventoryWidth = 1,
-  inventoryHeight = 1
-) {
-  const inventory = {
-    name: inventoryName,
-    items: [],
-    width: inventoryWidth,
-    height: inventoryHeight,
-    type: inventoryType,
-  };
-  store.data.inventory[inventoryName] = inventory;
-  dispatchInventoryListChange(store);
-  dispatchInventoryChange(store, inventoryName);
-  return inventory;
-}
 
 /**
  * @param store
@@ -250,16 +230,16 @@ export function getItemsInInventory(store, inventoryName) {
 /**
  * @param store
  * @param inventoryName
- * @param item
+ * @param {string} itemId
  */
-export function isItemInInventory(store, inventoryName, item) {
+export function isItemInInventory(store, inventoryName, itemId) {
   const inventory = getInventory(store, inventoryName);
   if (!inventory) {
     return false;
   }
 
-  for (const itemId of inventory.items) {
-    if (itemId === item.itemId) {
+  for (const invItemId of inventory.items) {
+    if (invItemId === itemId) {
       return true;
     }
   }
@@ -364,6 +344,18 @@ export function getInventoryList(store) {
 }
 
 /**
+ * @typedef Item
+ * @property {ItemId} itemId
+ * @property {number} x
+ * @property {number} y
+ * @property {number} w
+ * @property {number} h
+ * @property {string} imgSrc
+ * @property {string} displayName
+ * @property {object} metadata
+ */
+
+/**
  * @param store
  * @param itemId
  */
@@ -378,7 +370,8 @@ export function resolveItem(store, itemId) {
 /**
  * @param store
  * @param state
- * @param itemId
+ * @param {ItemId} itemId
+ * @returns {Item}
  */
 export function createItem(store, state, itemId = uuid()) {
   const item = {
