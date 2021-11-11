@@ -89,6 +89,34 @@ export function getInventoryStore() {
  */
 
 /**
+ * @param {InventoryStore} store 
+ * @param {string} inventoryName 
+ * @param {InventoryType} inventoryType 
+ * @param {number} inventoryWidth 
+ * @param {number} inventoryHeight 
+ * @returns {Inventory}
+ */
+export function createInventory(
+  store,
+  inventoryName = uuid(),
+  inventoryType = 'grid',
+  inventoryWidth = 1,
+  inventoryHeight = 1
+) {
+  const inventory = {
+    name: inventoryName,
+    items: [],
+    width: inventoryWidth,
+    height: inventoryHeight,
+    type: inventoryType,
+  };
+  store.data.inventory[inventoryName] = inventory;
+  dispatchInventoryListChange(store);
+  dispatchInventoryChange(store, inventoryName);
+  return inventory;
+}
+
+/**
  * @param store
  * @param inventoryName
  */
