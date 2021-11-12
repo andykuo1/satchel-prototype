@@ -1,8 +1,8 @@
 import {
   getInventory,
-  getItemsInInventory,
   resetInventoryStore,
 } from './InventoryStore.js';
+import { getInventoryItems } from './InventoryTransfer.js';
 
 /**
  * @param store
@@ -68,7 +68,7 @@ export function saveInventoryToJSON(store, inventoryName) {
       },
     },
   };
-  const items = getItemsInInventory(store, inventoryName);
+  const items = getInventoryItems(store, inventoryName);
   for (const item of items) {
     result.data.item[item.itemId] = item;
   }

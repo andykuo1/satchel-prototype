@@ -3,9 +3,9 @@ import {
   addItemChangeListener,
   getInventoryStore,
   getItem,
-  isItemInInventory,
   removeItemChangeListener,
 } from './InventoryStore.js';
+import { hasItem } from './InventoryTransfer.js';
 
 const INNER_HTML = `
 <figure class="container">
@@ -114,7 +114,7 @@ export class InventoryItemElement extends HTMLElement {
     if (containerElement.name !== inventoryName) {
       throw new Error('Cannot create item element with mismatched container and inventory name.');
     }
-    if (!isItemInInventory(getInventoryStore(), inventoryName, itemId)) {
+    if (!hasItem(getInventoryStore(), itemId, inventoryName)) {
       throw new Error('Cannot create item element with item id not in given inventory.');
     }
     this.attachShadow({ mode: 'open' });

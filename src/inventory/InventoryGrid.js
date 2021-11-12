@@ -6,11 +6,10 @@ import {
   changeInventoryType,
   getInventory,
   getInventoryStore,
-  getItemAtInventory,
-  getItemsInInventory,
   removeInventoryChangeListener,
 } from './InventoryStore.js';
 import { InventoryItemElement } from './InventoryItem.js';
+import { getInventoryItemAt, getInventoryItemIds } from './InventoryTransfer.js';
 
 const DEFAULT_ITEM_UNIT_SIZE = 48;
 
@@ -253,7 +252,7 @@ export class InventoryGridElement extends HTMLElement {
     let invWidth = inv.width;
     let invHeight = inv.height;
     if (invType === 'socket') {
-      const item = getItemAtInventory(store, inventoryName, 0, 0);
+      const item = getInventoryItemAt(store, inventoryName, 0, 0);
       if (item) {
         invWidth = item.w;
         invHeight = item.h;
@@ -269,7 +268,7 @@ export class InventoryGridElement extends HTMLElement {
     // Preserve unchanged items in slot
     const preservedItems = {};
     for (const node of this._itemSlot.assignedNodes()) {
-      const itemNode = /** @type {import('./InventoryItem.js').InventoryItem} */ (node);
+      const itemNode = /** @type {import('./InventoryItem.js').InventoryItemElement} */ (node);
       const itemId = itemNode.itemId;
       if (typeof itemId === 'string') {
         preservedItems[itemId] = node;
@@ -280,8 +279,7 @@ export class InventoryGridElement extends HTMLElement {
     const emptySlot = /** @type {HTMLSlotElement} */ (
       this._itemSlot.cloneNode(false)
     );
-    for (const item of getItemsInInventory(store, inventoryName)) {
-      const { itemId } = item;
+    for (const itemId of getInventoryItemIds(store, inventoryName)) {
       let element;
       element =
         itemId in preservedItems

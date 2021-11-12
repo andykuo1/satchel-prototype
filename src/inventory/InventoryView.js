@@ -2,8 +2,8 @@ import {
   deleteInventory,
   getInventory,
   getInventoryStore,
-  isEmptyInventory,
 } from './InventoryStore.js';
+import { isInventoryEmpty } from './InventoryTransfer.js';
 
 /** @typedef {import('./InventoryGrid.js').InventoryGridElement} InventoryGridElement */
 
@@ -37,7 +37,7 @@ function onTemporaryInventoryItemChange(e) {
   const { target } = e;
   const inventoryName = target.name;
   const store = getInventoryStore();
-  if (isEmptyInventory(store, inventoryName)) {
+  if (isInventoryEmpty(store, inventoryName)) {
     target.removeEventListener('itemchange', onTemporaryInventoryItemChange);
     target.remove();
     deleteInventory(store, inventoryName);

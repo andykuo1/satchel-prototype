@@ -7,34 +7,33 @@ import {
   storeToCursor,
 } from './CursorHelper.js';
 import {
-  addItemToInventory,
-  deleteItemFromInventory,
   getInventoryList,
   getInventoryStore,
-  getItemAtInventory,
+  getItem,
   getItems,
-  getItemsInInventory,
-  isEmptyInventory,
 } from './InventoryStore.js';
+import { getInventoryItemAt, getInventoryItems, isInventoryEmpty, putItem, removeItem } from './InventoryTransfer.js';
 
 /**
  * @typedef {import('./InventoryStore.js').Inventory} Inventory
+ * @typedef {import('./InventoryStore.js').ItemId} ItemId
+ * @typedef {import('./InventoryStore.js').InventoryId} InventoryId
  */
 
 /**
  * Pick up from target inventory to cursor.
- *
- * @param {*} storedItem
- * @param {Inventory} fromInventory
- * @param fromCoordX
- * @param fromCoordY
- * @returns
+ * 
+ * @param {ItemId} fromItemId 
+ * @param {InventoryId} fromInventoryName 
+ * @param {number} fromCoordX 
+ * @param {number} fromCoordY 
+ * @returns {boolean} Whether the transfer to cursor was successful.
  */
-export function pickUp(
-  storedItem,
-  fromInventory,
-  fromCoordX = 0,
-  fromCoordY = 0
+ export function pickUpItem(
+  fromItemId,
+  fromInventoryName,
+  fromCoordX,
+  fromCoordY
 ) {
   const store = getInventoryStore();
   const ctx = getCursorContext();
@@ -42,19 +41,17 @@ export function pickUp(
   if (!element) {
     return false;
   }
-
-  if (!isEmptyInventory(store, ctx.element.name)) {
+  const cursorInventoryName = element.name;
+  if (!isInventoryEmpty(store, cursorInventoryName)) {
     return false;
   }
-
-  deleteItemFromInventory(store, fromInventory.name, storedItem);
-  const previousX = storedItem.x;
-  const previousY = storedItem.y;
-  storedItem.x = 0;
-  storedItem.y = 0;
-  storeToCursor(ctx, storedItem);
-  ctx.pickOffsetX = previousX - fromCoordX;
-  ctx.pickOffsetY = previousY - fromCoordY;
+  const fromItem = getItem(store, fromItemId);
+  const fromItemX = fromItem.x;
+  const fromItemY = fromItem.y;
+  const item = removeItem(store, fromItemId, fromInventoryName);
+  storeToCursor(ctx, item);
+  ctx.pickOffsetX = fromItemX - fromCoordX;
+  ctx.pickOffsetY = fromItemY - fromCoordY;
   return true;
 }
 
@@ -62,9 +59,9 @@ export function pickUp(
  * Put down from cursor to destination.
  *
  * @param {Inventory} toInventory
- * @param {*} toCoordX
- * @param {*} toCoordY
- * @param allowSwap
+ * @param {number} toCoordX
+ * @param {number} toCoordY
+ * @param {boolean} allowSwap
  */
 export function putDown(toInventory, toCoordX, toCoordY, allowSwap = true) {
   const ctx = getCursorContext();
@@ -102,7 +99,7 @@ export function putDown(toInventory, toCoordX, toCoordY, allowSwap = true) {
     )
   ) {
     freeFromCursor(ctx);
-    const storedItem = getItemAtInventory(
+    const storedItem = getInventoryItemAt(
       getInventoryStore(),
       toInventory.name,
       coordX,
@@ -110,17 +107,13 @@ export function putDown(toInventory, toCoordX, toCoordY, allowSwap = true) {
     );
     const previousX = storedItem.x;
     const previousY = storedItem.y;
-    const result = pickUp(storedItem, toInventory);
+    const result = pickUpItem(storedItem.itemId, toInventory.name, previousX, previousY);
     if (!result) {
       throw new Error('Failed to pick up item on swap.');
     }
-
-    item.x = targetCoordX;
-    item.y = targetCoordY;
     ctx.pickOffsetX = previousX - targetCoordX;
     ctx.pickOffsetY = previousY - targetCoordY;
-    addItemToInventory(getInventoryStore(), toInventory.name, item);
-    return true;
+    return putItem(getInventoryStore(), toInventory.name, item, targetCoordX, targetCoordY);
   }
 
   const [x, y] = findEmptyCoords(
@@ -132,10 +125,7 @@ export function putDown(toInventory, toCoordX, toCoordY, allowSwap = true) {
   );
   if (x >= 0 && y >= 0) {
     freeFromCursor(ctx);
-    item.x = x;
-    item.y = y;
-    addItemToInventory(getInventoryStore(), toInventory.name, item);
-    return true;
+    return putItem(getInventoryStore(), toInventory.name, item, x, y);
   }
 
   return false;
@@ -147,10 +137,10 @@ export function putDown(toInventory, toCoordX, toCoordY, allowSwap = true) {
  */
 export function extractOut(fromInventory, filter) {
   const result = [];
-  const items = getItemsInInventory(getInventoryStore(), fromInventory.name);
+  const items = getInventoryItems(getInventoryStore(), fromInventory.name);
   for (const item of items) {
     if (filter(item, fromInventory)) {
-      deleteItemFromInventory(getInventoryStore(), fromInventory.name, item);
+      removeItem(getInventoryStore(), item.itemId, fromInventory.name);
       item.x = 0;
       item.y = 0;
       result.push(item);
@@ -167,12 +157,9 @@ export function extractOut(fromInventory, filter) {
 export function insertIn(toInventory, freedItem) {
   if (
     toInventory.type === 'socket' &&
-    isEmptyInventory(getInventoryStore(), toInventory.name)
+    isInventoryEmpty(getInventoryStore(), toInventory.name)
   ) {
-    freedItem.x = 0;
-    freedItem.y = 0;
-    addItemToInventory(getInventoryStore(), toInventory.name, freedItem);
-    return true;
+    return putItem(getInventoryStore(), toInventory.name, freedItem, 0, 0);
   }
 
   const ctx = getCursorContext();
@@ -191,10 +178,7 @@ export function insertIn(toInventory, freedItem) {
   );
   if (x >= 0 && y >= 0) {
     freeFromCursor(ctx);
-    freedItem.x = x;
-    freedItem.y = y;
-    addItemToInventory(getInventoryStore(), toInventory.name, freedItem);
-    return true;
+    return putItem(getInventoryStore(), toInventory.name, freedItem, x, y);
   }
 
   return false;
@@ -210,7 +194,7 @@ export function insertIn(toInventory, freedItem) {
  * @param itemHeight
  */
 function canSwapAt(inv, coordX, coordY, itemX, itemY, itemWidth, itemHeight) {
-  const item = getItemAtInventory(
+  const item = getInventoryItemAt(
     getInventoryStore(),
     inv.name,
     coordX,
@@ -237,7 +221,7 @@ function canPlaceAt(
 ) {
   for (let y = 0; y < itemHeight; ++y) {
     for (let x = 0; x < itemWidth; ++x) {
-      const item = getItemAtInventory(
+      const item = getInventoryItemAt(
         getInventoryStore(),
         inv.name,
         coordX + x,

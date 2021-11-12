@@ -6,9 +6,6 @@ import { uuid } from '../util/uuid.js';
 
 let GLOBAL_STORE = createInventoryStore();
 
-/**
- *
- */
 export function createInventoryStore() {
   return {
     data: {
@@ -77,6 +74,7 @@ export function getInventoryStore() {
 }
 
 /**
+ * @typedef {string} InventoryId
  * @typedef {string} ItemId
  * @typedef {'grid'|'socket'} InventoryType
  * 
@@ -195,130 +193,6 @@ export function changeInventorySize(store, inventoryName, width, height) {
  * @param store
  * @param inventoryName
  */
-export function isEmptyInventory(store, inventoryName) {
-  const inventory = getInventory(store, inventoryName);
-  if (inventory) {
-    return inventory.items.length === 0;
-  }
-
-  return true;
-}
-
-/**
- * @param store
- * @param inventoryName
- * @param coordX
- * @param coordY
- */
-export function getItemAtInventory(store, inventoryName, coordX, coordY) {
-  const inventory = getInventory(store, inventoryName);
-  if (inventory) {
-    for (const itemId of inventory.items) {
-      const item = getItem(store, itemId);
-      if (
-        coordX >= item.x &&
-        coordX < item.x + item.w &&
-        coordY >= item.y &&
-        coordY < item.y + item.h
-      ) {
-        return item;
-      }
-    }
-  }
-
-  return null;
-}
-
-/**
- * @param store
- * @param inventoryName
- */
-export function getItemIdsInInventory(store, inventoryName) {
-  const inventory = getInventory(store, inventoryName);
-  if (!inventory) {
-    return [];
-  }
-
-  return inventory.items;
-}
-
-/**
- * @param store
- * @param inventoryName
- */
-export function getItemsInInventory(store, inventoryName) {
-  const inventory = getInventory(store, inventoryName);
-  if (!inventory) {
-    return [];
-  }
-
-  return inventory.items.map((itemId) => getItem(store, itemId));
-}
-
-/**
- * @param store
- * @param inventoryName
- * @param {string} itemId
- */
-export function isItemInInventory(store, inventoryName, itemId) {
-  const inventory = getInventory(store, inventoryName);
-  if (!inventory) {
-    return false;
-  }
-
-  for (const invItemId of inventory.items) {
-    if (invItemId === itemId) {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-/**
- * @param store
- * @param toInventoryName
- * @param item
- */
-export function addItemToInventory(store, toInventoryName, item) {
-  const inventory = getInventory(store, toInventoryName);
-  if (!inventory) {
-    throw new Error(
-      `Cannot put item in for non-existant inventory '${toInventoryName}'.`
-    );
-  }
-
-  inventory.items.push(item.itemId);
-  dispatchInventoryChange(store, toInventoryName);
-}
-
-/**
- * @param store
- * @param fromInventoryName
- * @param item
- */
-export function deleteItemFromInventory(store, fromInventoryName, item) {
-  const inventory = getInventory(store, fromInventoryName);
-  if (!inventory) {
-    throw new Error(
-      `Cannot take item out of non-existant inventory '${fromInventoryName}'.`
-    );
-  }
-
-  for (let i = 0; i < inventory.items.length; ++i) {
-    const invItemId = inventory.items[i];
-    if (invItemId === item.itemId) {
-      inventory.items.splice(i, 1);
-    }
-  }
-
-  dispatchInventoryChange(store, fromInventoryName);
-}
-
-/**
- * @param store
- * @param inventoryName
- */
 export function dispatchInventoryChange(store, inventoryName) {
   dispatchInventoryEvent(store, 'inventory', inventoryName);
 }
@@ -387,12 +261,11 @@ export function getInventoryList(store) {
  * @param store
  * @param itemId
  */
-export function resolveItem(store, itemId) {
+export function resolveItem(store, itemId, state = undefined) {
   if (isItem(store, itemId)) {
     return getItem(store, itemId);
   }
-
-  return createItem(store, itemId);
+  return createItem(store, state, itemId);
 }
 
 /**

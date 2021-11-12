@@ -1,10 +1,9 @@
 import { distanceSquared } from '../util/math.js';
 import {
-  addItemToInventory,
   clearInventory,
   getInventoryStore,
-  getItemAtInventory,
 } from './InventoryStore.js';
+import { getInventoryItemAt, putItem } from './InventoryTransfer.js';
 
 const CURSOR_OFFSET_PIXELS = 24;
 const PLACE_BUFFER_RANGE_SQUARED = 8 * 8;
@@ -100,7 +99,8 @@ export function getCursorElement(ctx) {
  * @returns {import('./InventoryStore.js').Item}
  */
 export function getCursorItem(ctx) {
-  return getItemAtInventory(getInventoryStore(), ctx.element.name, 0, 0);
+  const cursorInventoryName = ctx.element.name;
+  return getInventoryItemAt(getInventoryStore(), cursorInventoryName, 0, 0);
 }
 
 /**
@@ -111,8 +111,8 @@ export function storeToCursor(ctx, freedItem) {
   if (!freedItem) {
     return;
   }
-
-  addItemToInventory(getInventoryStore(), ctx.element.name, freedItem);
+  const cursorInventoryName = ctx.element.name;
+  putItem(getInventoryStore(), cursorInventoryName, freedItem, 0, 0);
   ctx.element.style.display = 'unset';
   startPlaceDownBuffer();
 }
