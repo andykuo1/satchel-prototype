@@ -1,6 +1,4 @@
-import { getCursorContext, getCursorElement, storeToCursor } from './CursorHelper.js';
 import {
-  getInventoryStore,
   getItem,
   deleteItem,
   getInventory,
@@ -45,6 +43,52 @@ export function removeItem(store, fromItemId, fromInventoryName) {
     }
   }
   return null;
+}
+
+export function removeItems(store, fromItemIds, fromInventoryName) {
+  let inventory = getInventory(store, fromInventoryName);
+  if (!inventory) {
+    throw new Error(
+      `Cannot remove item from non-existant inventory '${fromInventoryName}'.`
+    );
+  }
+  let result = [];
+  for (let i = 0; i < inventory.items.length; ++i) {
+    let itemId = inventory.items[i];
+    if (fromItemIds.includes(itemId)) {
+      let item = getItem(store, itemId);
+      inventory.items[i] = null;
+      deleteItem(store, itemId);
+      result.push(item);
+    }
+  }
+  dispatchInventoryChange(store, fromInventoryName);
+  return result;
+}
+
+export function clearItems(store, inventoryName) {
+  let inventory = getInventory(store, inventoryName);
+  if (!inventory) {
+    throw new Error(
+      `Cannot clear items from non-existant inventory '${inventoryName}'.`
+    );
+  }
+  let keys = new Set();
+  for (let i = 0; i < inventory.items.length; ++i) {
+    let itemId = inventory.items[i];
+    if (itemId && !keys.has(itemId)) {
+      keys.add(itemId);
+    }
+    inventory.items[i] = null;
+  }
+  let result = [];
+  for(let itemId of keys) {
+    let item = getItem(store, itemId);
+    result.push(item);
+    deleteItem(store, itemId);
+  }
+  dispatchInventoryChange(store, inventoryName);
+  return result;
 }
 
 /**

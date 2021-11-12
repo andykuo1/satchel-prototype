@@ -49,19 +49,16 @@ export function resetInventoryStore(previousStore, nextStore) {
     visitedItems.add(itemId);
     dispatchItemChange(previousStore, itemId);
   }
-
   for (const invName of previousInventoryList) {
     visitedInventories.add(invName);
     dispatchInventoryChange(previousStore, invName);
   }
-
   // Dispatch for new objects
   for (const itemId of nextItemList) {
     if (!visitedItems.has(itemId)) {
       dispatchItemChange(previousStore, itemId);
     }
   }
-
   for (const inventoryName of nextInventoryList) {
     if (!visitedInventories.has(inventoryName)) {
       dispatchInventoryChange(previousStore, inventoryName);
@@ -103,7 +100,7 @@ export function createInventory(
 ) {
   const inventory = {
     name: inventoryName,
-    items: [],
+    items: new Array(inventoryWidth * inventoryHeight),
     width: inventoryWidth,
     height: inventoryHeight,
     type: inventoryType,
@@ -137,28 +134,6 @@ export function getInventory(store, inventoryName) {
   }
 
   return null;
-}
-
-/**
- * @param store
- * @param inventoryName
- * @param deleteItems
- */
-export function clearInventory(store, inventoryName, deleteItems = true) {
-  const inventory = getInventory(store, inventoryName);
-  if (inventory) {
-    const previousLength = inventory.items.length;
-    if (previousLength > 0) {
-      if (deleteItems) {
-        for (const itemId of inventory.items) {
-          deleteItem(store, itemId);
-        }
-      }
-
-      inventory.items.length = 0;
-      dispatchInventoryChange(store, inventoryName);
-    }
-  }
 }
 
 /**

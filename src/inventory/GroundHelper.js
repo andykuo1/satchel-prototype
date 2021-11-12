@@ -6,10 +6,10 @@ import {
 } from './CursorHelper.js';
 import { insertIn } from './InventoryHelper.js';
 import {
-  clearInventory,
   createInventory,
   getInventoryStore,
 } from './InventoryStore.js';
+import { clearItems } from './InventoryTransfer.js';
 import { createTemporaryInventoryView } from './InventoryView.js';
 
 /**
@@ -61,6 +61,6 @@ export function dropOnGround(freedItem) {
 export function clearGround() {
   const ground = getGroundContainer();
   for (const grid of ground.querySelectorAll('inventory-grid')) {
-    clearInventory(getInventoryStore(), grid.name, true);
+    clearItems(getInventoryStore(), grid.name);
   }
 }

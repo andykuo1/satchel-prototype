@@ -1,9 +1,8 @@
 import { distanceSquared } from '../util/math.js';
 import {
-  clearInventory,
   getInventoryStore,
 } from './InventoryStore.js';
-import { getInventoryItemAt, putItem } from './InventoryTransfer.js';
+import { clearItems, getInventoryItemAt, putItem } from './InventoryTransfer.js';
 
 const CURSOR_OFFSET_PIXELS = 24;
 const PLACE_BUFFER_RANGE_SQUARED = 8 * 8;
@@ -121,7 +120,7 @@ export function storeToCursor(ctx, freedItem) {
  * @param ctx
  */
 export function freeFromCursor(ctx) {
-  clearInventory(getInventoryStore(), ctx.element.name, false);
+  clearItems(getInventoryStore(), ctx.element.name);
   ctx.element.style.display = 'none';
   clearPlaceDownBuffer();
 }
