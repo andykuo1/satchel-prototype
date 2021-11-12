@@ -95,10 +95,10 @@ export class InventoryItemElement extends HTMLElement {
   }
 
   /**
-   * 
-   * @param {import('./InventoryGrid.js').InventoryGridElement} containerElement 
-   * @param {string} inventoryName 
-   * @param {string} itemId 
+   *
+   * @param {import('./InventoryGrid.js').InventoryGridElement} containerElement
+   * @param {string} inventoryName
+   * @param {string} itemId
    */
   constructor(containerElement, inventoryName, itemId) {
     super();
@@ -112,10 +112,14 @@ export class InventoryItemElement extends HTMLElement {
       throw new Error('Missing item id for item element.');
     }
     if (containerElement.name !== inventoryName) {
-      throw new Error('Cannot create item element with mismatched container and inventory name.');
+      throw new Error(
+        'Cannot create item element with mismatched container and inventory name.'
+      );
     }
     if (!hasItem(getInventoryStore(), itemId, inventoryName)) {
-      throw new Error('Cannot create item element with item id not in given inventory.');
+      throw new Error(
+        'Cannot create item element with item id not in given inventory.'
+      );
     }
     this.attachShadow({ mode: 'open' });
     this.shadowRoot.append(
@@ -157,7 +161,11 @@ export class InventoryItemElement extends HTMLElement {
   disconnectedCallback() {
     this.removeEventListener('mousedown', this.onMouseDown);
     this.removeEventListener('contextmenu', this.onContextMenu);
-    removeItemChangeListener(getInventoryStore(), this.itemId, this.onItemChange);
+    removeItemChangeListener(
+      getInventoryStore(),
+      this.itemId,
+      this.onItemChange
+    );
   }
 
   /**
@@ -199,7 +207,7 @@ export class InventoryItemElement extends HTMLElement {
           element: this,
           container: this.container,
           inventoryName: this.inventoryName,
-          itemId: this.itemId
+          itemId: this.itemId,
         },
       })
     );

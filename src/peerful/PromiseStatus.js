@@ -40,7 +40,10 @@ export function createPromiseStatus() {
  * @returns {boolean}
  */
 export function isPromiseStatusPending(promiseStatus) {
-  return !promiseStatus.complete && (promiseStatus.resolve.length > 0 || promiseStatus.reject.length > 0);
+  return (
+    !promiseStatus.complete &&
+    (promiseStatus.resolve.length > 0 || promiseStatus.reject.length > 0)
+  );
 }
 
 /**
@@ -76,7 +79,7 @@ export function resolvePromiseStatus(promiseStatus, reason) {
     promiseStatus.reject = [];
     promiseStatus.result = true;
     promiseStatus.reason = reason;
-    for(let resolver of resolvers) {
+    for (let resolver of resolvers) {
       resolver(reason);
     }
   } else {
@@ -97,7 +100,7 @@ export function rejectPromiseStatus(promiseStatus, reason) {
     promiseStatus.reject = [];
     promiseStatus.result = false;
     promiseStatus.reason = reason;
-    for(let rejector of rejectors) {
+    for (let rejector of rejectors) {
       rejector(reason);
     }
   } else {

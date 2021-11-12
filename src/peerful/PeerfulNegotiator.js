@@ -202,7 +202,7 @@ export class PeerfulNegotiator extends Eventable {
   onIceCandidate(e) {
     if (!e.candidate) {
       debug('[NEGOTIATOR]', 'End of ICE candidates.');
-      if (!this.completed)  {
+      if (!this.completed) {
         this.onIceComplete();
       }
     } else {

@@ -5,10 +5,7 @@ import {
   getCursorItem,
 } from './CursorHelper.js';
 import { insertIn } from './InventoryHelper.js';
-import {
-  createInventory,
-  getInventoryStore,
-} from './InventoryStore.js';
+import { createInventory, getInventoryStore } from './InventoryStore.js';
 import { clearItems } from './InventoryTransfer.js';
 import { createTemporaryInventoryView } from './InventoryView.js';
 

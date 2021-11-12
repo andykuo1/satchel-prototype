@@ -1,7 +1,4 @@
-import {
-  getInventory,
-  resetInventoryStore,
-} from './InventoryStore.js';
+import { getInventory, resetInventoryStore } from './InventoryStore.js';
 import { getInventoryItems } from './InventoryTransfer.js';
 
 /**

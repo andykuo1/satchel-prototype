@@ -74,7 +74,7 @@ export function getInventoryStore() {
  * @typedef {string} InventoryId
  * @typedef {string} ItemId
  * @typedef {'grid'|'socket'} InventoryType
- * 
+ *
  * @typedef Inventory
  * @property {string} name
  * @property {InventoryType} type
@@ -84,11 +84,11 @@ export function getInventoryStore() {
  */
 
 /**
- * @param {InventoryStore} store 
- * @param {string} inventoryName 
- * @param {InventoryType} inventoryType 
- * @param {number} inventoryWidth 
- * @param {number} inventoryHeight 
+ * @param {InventoryStore} store
+ * @param {string} inventoryName
+ * @param {InventoryType} inventoryType
+ * @param {number} inventoryWidth
+ * @param {number} inventoryHeight
  * @returns {Inventory}
  */
 export function createInventory(

@@ -69,7 +69,11 @@ export class Peerful extends Eventable {
     }
     await this.signalingPromise;
 
-    const conn = new PeerfulLocalConnection(this.id, this.signaling, this.connectionOptions);
+    const conn = new PeerfulLocalConnection(
+      this.id,
+      this.signaling,
+      this.connectionOptions
+    );
     this.connections[remoteId] = conn;
     // Try connecting to remote now
     try {
@@ -99,7 +103,11 @@ export class Peerful extends Eventable {
   resolveRemoteConnection(dst) {
     let conn = /** @type {PeerfulRemoteConnection} */ (this.connections[dst]);
     if (conn) return conn;
-    let next = new PeerfulRemoteConnection(this.id, this.signaling, this.connectionOptions);
+    let next = new PeerfulRemoteConnection(
+      this.id,
+      this.signaling,
+      this.connectionOptions
+    );
     next.listen().then(this.onPeerfulRemoteConnectionOpen);
     this.connections[dst] = next;
     return next;

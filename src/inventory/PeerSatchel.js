@@ -163,7 +163,7 @@ function onLocalClientConnection(conn) {
 }
 
 /**
- * @param {import('../peerful/PeerfulConnection.js').PeerfulConnection} conn 
+ * @param {import('../peerful/PeerfulConnection.js').PeerfulConnection} conn
  */
 function onRemoteClientConnection(conn) {
   console.log('Remote connection established.');

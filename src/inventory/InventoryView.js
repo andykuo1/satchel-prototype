@@ -13,7 +13,9 @@ import { isInventoryEmpty } from './InventoryTransfer.js';
  */
 export function createInventoryView(store, inventoryName) {
   const inv = getInventory(store, inventoryName);
-  const element = /** @type {InventoryGridElement} */ (document.createElement('inventory-grid'));
+  const element = /** @type {InventoryGridElement} */ (
+    document.createElement('inventory-grid')
+  );
   element.name = inv.name;
   return element;
 }
@@ -24,7 +26,9 @@ export function createInventoryView(store, inventoryName) {
  */
 export function createTemporaryInventoryView(store, inventoryName) {
   const inv = getInventory(store, inventoryName);
-  const element = /** @type {InventoryGridElement} */ (document.createElement('inventory-grid'));
+  const element = /** @type {InventoryGridElement} */ (
+    document.createElement('inventory-grid')
+  );
   element.name = inv.name;
   element.addEventListener('itemchange', onTemporaryInventoryItemChange);
   return element;

@@ -136,7 +136,10 @@ export class PeerfulConnection extends Eventable {
     this.closed = true;
     this.opened = false;
     if (this.connectedStatus) {
-      rejectPromiseStatus(this.connectedStatus, new Error('Connection closed.'));
+      rejectPromiseStatus(
+        this.connectedStatus,
+        new Error('Connection closed.')
+      );
       this.connectedStatus = null;
     }
     if (this.dataChannel) {
@@ -193,8 +196,8 @@ export class PeerfulConnection extends Eventable {
    */
   onDataChannelError(e) {
     // NOTE: This is an RTCErrorEvent.
-    let errorEvent = /** @type {unknown} */(e);
-    let error = /** @type {{error: DOMException}} */(errorEvent).error;
+    let errorEvent = /** @type {unknown} */ (e);
+    let error = /** @type {{error: DOMException}} */ (errorEvent).error;
     debug('[CHANNEL]', 'Error!', error);
     this.emit('error', error);
   }
@@ -262,7 +265,10 @@ export class PeerfulLocalConnection extends PeerfulConnection {
     // Start connection
     this.tryConnectionStart();
     // Listen for negotiations...
-    this.peerConnection.addEventListener('negotiationneeded', this.onNegotiationNeeded);
+    this.peerConnection.addEventListener(
+      'negotiationneeded',
+      this.onNegotiationNeeded
+    );
     // Create channel
     const channel = this.peerConnection.createDataChannel(
       'data',
@@ -329,7 +335,11 @@ export class PeerfulLocalConnection extends PeerfulConnection {
     }
     // Send offer
     debug('[LOCAL]', 'Sending offer...');
-    this.signaling.sendSignalMessage(this.localId, this.remoteId, this.peerConnection.localDescription || offer);
+    this.signaling.sendSignalMessage(
+      this.localId,
+      this.remoteId,
+      this.peerConnection.localDescription || offer
+    );
   }
 }
 
@@ -427,6 +437,10 @@ export class PeerfulRemoteConnection extends PeerfulConnection {
     }
     // Send answer
     debug('[REMOTE]', 'Sending answer...');
-    this.signaling.sendSignalMessage(this.localId, this.remoteId, this.peerConnection.localDescription || answer);
+    this.signaling.sendSignalMessage(
+      this.localId,
+      this.remoteId,
+      this.peerConnection.localDescription || answer
+    );
   }
 }

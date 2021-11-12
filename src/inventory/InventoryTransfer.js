@@ -3,7 +3,7 @@ import {
   deleteItem,
   getInventory,
   dispatchInventoryChange,
-  resolveItem
+  resolveItem,
 } from './InventoryStore.js';
 
 /**
@@ -16,10 +16,10 @@ import {
 
 /**
  * Remove and delete item from inventory.
- * 
- * @param {InventoryStore} store 
- * @param {ItemId} fromItemId 
- * @param {InventoryId} fromInventoryName 
+ *
+ * @param {InventoryStore} store
+ * @param {ItemId} fromItemId
+ * @param {InventoryId} fromInventoryName
  * @returns {Item} The removed item.
  */
 export function removeItem(store, fromItemId, fromInventoryName) {
@@ -45,6 +45,14 @@ export function removeItem(store, fromItemId, fromInventoryName) {
   return null;
 }
 
+/**
+ * Remove and delete items from inventory.
+ *
+ * @param {InventoryStore} store
+ * @param {Array<ItemId>} fromItemIds
+ * @param {InventoryId} fromInventoryName
+ * @returns {Array<Item>} The removed items.
+ */
 export function removeItems(store, fromItemIds, fromInventoryName) {
   let inventory = getInventory(store, fromInventoryName);
   if (!inventory) {
@@ -66,6 +74,13 @@ export function removeItems(store, fromItemIds, fromInventoryName) {
   return result;
 }
 
+/**
+ * Clear items from inventory.
+ *
+ * @param {InventoryStore} store
+ * @param {InventoryId} inventoryName
+ * @returns {Array<Item>} The cleared items.
+ */
 export function clearItems(store, inventoryName) {
   let inventory = getInventory(store, inventoryName);
   if (!inventory) {
@@ -82,7 +97,7 @@ export function clearItems(store, inventoryName) {
     inventory.items[i] = null;
   }
   let result = [];
-  for(let itemId of keys) {
+  for (let itemId of keys) {
     let item = getItem(store, itemId);
     result.push(item);
     deleteItem(store, itemId);
@@ -93,12 +108,12 @@ export function clearItems(store, inventoryName) {
 
 /**
  * Put and create item in inventory.
- * 
- * @param {InventoryStore} store 
- * @param {InventoryId} toInventoryName 
- * @param {Item} item 
- * @param {number} coordX 
- * @param {number} coordY 
+ *
+ * @param {InventoryStore} store
+ * @param {InventoryId} toInventoryName
+ * @param {Item} item
+ * @param {number} coordX
+ * @param {number} coordY
  * @returns {boolean} Whether the item placed successfully.
  */
 export function putItem(store, toInventoryName, item, coordX, coordY) {
@@ -124,7 +139,7 @@ export function putItem(store, toInventoryName, item, coordX, coordY) {
 
 function getSlotIndex(inventory, coordX, coordY) {
   // TODO: For now, it just gets the nearest free slot.
-  for(let i = 0; i < inventory.items.length; ++i) {
+  for (let i = 0; i < inventory.items.length; ++i) {
     if (!inventory.items[i]) {
       return i;
     }
@@ -151,10 +166,23 @@ export function hasItem(store, itemId, inventoryName) {
   return false;
 }
 
+export function isInventoryEmpty(store, inventoryName) {
+  const inventory = getInventory(store, inventoryName);
+  if (inventory) {
+    for (let i = 0; i < inventory.items.length; ++i) {
+      let itemId = inventory.items[i];
+      if (itemId) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
 export function getInventoryItemAt(store, inventoryName, coordX, coordY) {
   const inventory = getInventory(store, inventoryName);
   if (inventory) {
-    for(let i = 0; i < inventory.items.length; ++i) {
+    for (let i = 0; i < inventory.items.length; ++i) {
       const itemId = inventory.items[i];
       if (itemId) {
         const item = getItem(store, itemId);
@@ -172,27 +200,6 @@ export function getInventoryItemAt(store, inventoryName, coordX, coordY) {
   return null;
 }
 
-export function isInventoryEmpty(store, inventoryName) {
-  const inventory = getInventory(store, inventoryName);
-  if (inventory) {
-    for(let i = 0; i < inventory.items.length; ++i) {
-      let itemId = inventory.items[i];
-      if (itemId) {
-        return false;
-      }
-    }
-  }
-  return true;
-}
-
-export function getInventoryItems(store, inventoryName) {
-  let result = [];
-  for(let itemId of getInventoryItemIds(store, inventoryName)) {
-    result.push(getItem(store, itemId));
-  }
-  return result;
-}
-
 export function getInventoryItemIds(store, inventoryName) {
   const inventory = getInventory(store, inventoryName);
   if (!inventory) {
@@ -201,11 +208,19 @@ export function getInventoryItemIds(store, inventoryName) {
     );
   }
   let result = new Set();
-  for(let i = 0; i < inventory.items.length; ++i) {
+  for (let i = 0; i < inventory.items.length; ++i) {
     let itemId = inventory.items[i];
     if (itemId) {
       result.add(itemId);
     }
+  }
+  return result;
+}
+
+export function getInventoryItems(store, inventoryName) {
+  let result = [];
+  for (let itemId of getInventoryItemIds(store, inventoryName)) {
+    result.push(getItem(store, itemId));
   }
   return result;
 }

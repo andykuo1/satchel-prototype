@@ -9,7 +9,10 @@ import {
   removeInventoryChangeListener,
 } from './InventoryStore.js';
 import { InventoryItemElement } from './InventoryItem.js';
-import { getInventoryItemAt, getInventoryItemIds } from './InventoryTransfer.js';
+import {
+  getInventoryItemAt,
+  getInventoryItemIds,
+} from './InventoryTransfer.js';
 
 const DEFAULT_ITEM_UNIT_SIZE = 48;
 
@@ -268,7 +271,8 @@ export class InventoryGridElement extends HTMLElement {
     // Preserve unchanged items in slot
     const preservedItems = {};
     for (const node of this._itemSlot.assignedNodes()) {
-      const itemNode = /** @type {import('./InventoryItem.js').InventoryItemElement} */ (node);
+      const itemNode =
+        /** @type {import('./InventoryItem.js').InventoryItemElement} */ (node);
       const itemId = itemNode.itemId;
       if (typeof itemId === 'string') {
         preservedItems[itemId] = node;

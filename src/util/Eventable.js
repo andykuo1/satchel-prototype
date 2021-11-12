@@ -66,7 +66,6 @@ export class Eventable {
     }
   }
 
-  
   /**
    * @protected
    * @param {keyof T} event
@@ -84,7 +83,7 @@ export class Eventable {
 
   /**
    * @protected
-   * @param {keyof T} event 
+   * @param {keyof T} event
    * @returns {Array<T[keyof T]>}
    */
   getEventListeners(event) {
