@@ -268,7 +268,7 @@ export function getInventoryType(store, inventoryId, inventory) {
  * @returns {number}
  */
 export function getInventorySlotCount(store, inventoryId, inventory) {
-  return inventory.slots.length;
+  return inventory.length;
 }
 
 /**

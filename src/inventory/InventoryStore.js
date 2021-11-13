@@ -1,5 +1,7 @@
 import { uuid } from '../util/uuid.js';
 
+/************************************************** STORE */
+
 /**
  * @typedef {object} InventoryStore
  */
@@ -71,12 +73,51 @@ export function getInventoryStore() {
 }
 
 /**
+ * @param {InventoryStore} store 
+ * @param {InventoryId} invId 
+ * @param {Inventory} inventory 
+ */
+export function addInventoryToStore(store, invId, inventory) {
+  if (invId !== inventory.invId) {
+    throw new Error(`Cannot add inventory '${inventory.invId}' for mismatched id '${invId}'.`);
+  }
+  if (invId in store.data.inventory) {
+    return false;
+  }
+  store.data.inventory[invId] = inventory;
+  dispatchInventoryListChange(store);
+  dispatchInventoryChange(store, invId);
+  return true;
+}
+
+/**
+ * @param {InventoryStore} store 
+ * @param {InventoryId} invId 
+ * @param {Inventory} inventory 
+ */
+export function deleteInventoryFromStore(store, invId, inventory) {
+  if (invId !== inventory.invId) {
+    throw new Error(`Cannot delete inventory '${inventory.invId}' for mismatched id '${invId}'.`);
+  }
+  if (!(invId in store.data.inventory)) {
+    return false;
+  }
+  delete store.data.inventory[invId];
+  dispatchInventoryListChange(store);
+  dispatchInventoryChange(store, invId);
+  return true;
+}
+
+/************************************************** INVENTORY */
+
+/**
  * @typedef {string} InventoryId
  * @typedef {string} ItemId
  * @typedef {'grid'|'socket'} InventoryType
  *
  * @typedef Inventory
  * @property {string} name
+ * @property {InventoryId} invId
  * @property {InventoryType} type
  * @property {Array<ItemId>} slots
  * @property {number} width
@@ -87,7 +128,8 @@ export function getInventoryStore() {
  */
 
 /**
- * @param {InventoryStore} store
+ * Create an inventory.
+ * 
  * @param {InventoryId} invId 
  * @param {InventoryType} invType 
  * @param {number} slotCount 
@@ -95,7 +137,7 @@ export function getInventoryStore() {
  * @param {number} maxCoordY 
  * @returns {Inventory}
  */
-function createInventory(store, invId, invType, slotCount, maxCoordX, maxCoordY) {
+function createInventory(invId, invType, slotCount, maxCoordX, maxCoordY) {
   let inv = {
       invId, // TODO: Not used yet.
       name: invId,
@@ -105,22 +147,33 @@ function createInventory(store, invId, invType, slotCount, maxCoordX, maxCoordY)
       width: maxCoordX,
       height: maxCoordY,
       length: slotCount,
-      displayName: '',
-      metadata: {},
+      displayName: '', // TODO: Not used yet.
+      metadata: {}, // TODO: Not used yet.
   };
-  store.data.inventory[invId] = inv;
-  dispatchInventoryListChange(store);
-  dispatchInventoryChange(store, invId);
   return inv;
 }
 
-export function createGridInventory(store, invId, invWidth, invHeight) {
-  return createInventory(store, invId, 'grid', invWidth * invHeight, invWidth, invHeight);
+/**
+ * Create a grid inventory of given size.
+ * 
+ * @param {InventoryId} invId 
+ * @param {number} width 
+ * @param {number} height 
+ * @returns {Inventory}
+ */
+export function createGridInventory(invId, width, height) {
+  return createInventory(invId, 'grid', width * height, width, height);
 }
 
-export function createSocketInventory(store, invId) {
+/**
+ * Create a socket inventory.
+ * 
+ * @param {InventoryId} invId 
+ * @returns {Inventory}
+ */
+export function createSocketInventory(invId) {
   // TODO: width, height = Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY
-  return createInventory(store, invId, 'socket', 1, 1, 1);
+  return createInventory(invId, 'socket', 1, 1, 1);
 }
 
 /**

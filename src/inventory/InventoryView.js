@@ -1,5 +1,5 @@
 import {
-  deleteInventory,
+  deleteInventoryFromStore,
   getInventory,
   getInventoryStore,
 } from './InventoryStore.js';
@@ -44,6 +44,7 @@ function onTemporaryInventoryItemChange(e) {
   if (isInventoryEmpty(store, inventoryId)) {
     target.removeEventListener('itemchange', onTemporaryInventoryItemChange);
     target.remove();
-    deleteInventory(store, inventoryId);
+    const inventory = getInventory(store, inventoryId);
+    deleteInventoryFromStore(store, inventoryId, inventory);
   }
 }

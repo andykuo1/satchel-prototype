@@ -1,7 +1,7 @@
 import { setCursorElement } from './inventory/CursorHelper.js';
 import { setGroundContainer } from './inventory/GroundHelper.js';
 import { createInventoryView } from './inventory/InventoryView.js';
-import { getInventoryStore, createSocketInventory, createGridInventory } from './inventory/InventoryStore.js';
+import { getInventoryStore, createSocketInventory, createGridInventory, addInventoryToStore } from './inventory/InventoryStore.js';
 import {
   applyItemBuilder,
   openItemBuilder,
@@ -57,14 +57,16 @@ window.addEventListener('DOMContentLoaded', () => {
   const cursor = document.querySelector('#cursor');
   const ground = document.querySelector('#ground');
 
-  const cursorInventory = createSocketInventory(store, 'cursor');
+  const cursorInventory = createSocketInventory('cursor');
+  addInventoryToStore(store, cursorInventory.invId, cursorInventory);
   const cursorElement = createInventoryView(store, cursorInventory.name);
   cursor.append(cursorElement);
 
   setCursorElement(cursorElement);
   setGroundContainer(ground);
 
-  const mainInventory = createGridInventory(store, 'main', 12, 9);
+  const mainInventory = createGridInventory('main', 12, 9);
+  addInventoryToStore(store, mainInventory.invId, mainInventory);
   const mainElement = createInventoryView(store, mainInventory.name);
   workspace.append(mainElement);
 
