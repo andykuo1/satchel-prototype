@@ -81,34 +81,46 @@ export function getInventoryStore() {
  * @property {Array<ItemId>} slots
  * @property {number} width
  * @property {number} height
+ * @property {number} length
+ * @property {string} displayName
+ * @property {object} metadata
  */
 
 /**
  * @param {InventoryStore} store
- * @param {string} inventoryId
- * @param {InventoryType} inventoryType
- * @param {number} inventoryWidth
- * @param {number} inventoryHeight
+ * @param {InventoryId} invId 
+ * @param {InventoryType} invType 
+ * @param {number} slotCount 
+ * @param {number} maxCoordX 
+ * @param {number} maxCoordY 
  * @returns {Inventory}
  */
-export function createInventory(
-  store,
-  inventoryId = uuid(),
-  inventoryType = 'grid',
-  inventoryWidth = 1,
-  inventoryHeight = 1
-) {
-  const inventory = {
-    name: inventoryId,
-    slots: new Array(inventoryWidth * inventoryHeight),
-    width: inventoryWidth,
-    height: inventoryHeight,
-    type: inventoryType,
+function createInventory(store, invId, invType, slotCount, maxCoordX, maxCoordY) {
+  let inv = {
+      invId, // TODO: Not used yet.
+      name: invId,
+      type: invType,
+      items: {}, // TODO: Not used yet.
+      slots: new Array(slotCount),
+      width: maxCoordX,
+      height: maxCoordY,
+      length: slotCount,
+      displayName: '',
+      metadata: {},
   };
-  store.data.inventory[inventoryId] = inventory;
+  store.data.inventory[invId] = inv;
   dispatchInventoryListChange(store);
-  dispatchInventoryChange(store, inventoryId);
-  return inventory;
+  dispatchInventoryChange(store, invId);
+  return inv;
+}
+
+export function createGridInventory(store, invId, invWidth, invHeight) {
+  return createInventory(store, invId, 'grid', invWidth * invHeight, invWidth, invHeight);
+}
+
+export function createSocketInventory(store, invId) {
+  // TODO: width, height = Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY
+  return createInventory(store, invId, 'socket', 1, 1, 1);
 }
 
 /**

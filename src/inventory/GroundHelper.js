@@ -5,7 +5,7 @@ import {
   getCursorItem,
 } from './CursorHelper.js';
 import { insertIn } from './InventoryHelper.js';
-import { createInventory, getInventoryStore } from './InventoryStore.js';
+import { createSocketInventory, getInventoryStore } from './InventoryStore.js';
 import { clearItems } from './InventoryTransfer.js';
 import { createTemporaryInventoryView } from './InventoryView.js';
 
@@ -45,7 +45,7 @@ export function getGroundContainer() {
  */
 export function dropOnGround(freedItem) {
   const ground = getGroundContainer();
-  const inventory = createInventory(getInventoryStore(), uuid(), 'socket');
+  const inventory = createSocketInventory(getInventoryStore(), uuid());
   insertIn(inventory, freedItem);
 
   const invElement = createTemporaryInventoryView(
