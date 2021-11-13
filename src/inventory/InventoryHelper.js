@@ -48,8 +48,8 @@ export function pickUpItem(
   if (!element) {
     return false;
   }
-  const cursorInventoryName = element.name;
-  if (!isInventoryEmpty(store, cursorInventoryName)) {
+  const cursorInventoryId = element.name;
+  if (!isInventoryEmpty(store, cursorInventoryId)) {
     return false;
   }
   const [fromItemX, fromItemY] = getItemSlotCoords(store, fromInventoryId, fromItemId);
@@ -63,13 +63,13 @@ export function pickUpItem(
 /**
  * Put down from cursor to destination.
  *
- * @param {InventoryId} toInventoryName
+ * @param {InventoryId} toInventoryId
  * @param {number} toCoordX
  * @param {number} toCoordY
  * @param {boolean} allowSwap
  */
 export function putDownItem(
-  toInventoryName,
+  toInventoryId,
   toCoordX,
   toCoordY,
   allowSwap = true
@@ -80,7 +80,7 @@ export function putDownItem(
   if (!item || !ctx.placeDownBuffer) {
     return false;
   }
-  const toInventory = getInventory(store, toInventoryName);
+  const toInventory = getInventory(store, toInventoryId);
   const invWidth = toInventory.width;
   const invHeight = toInventory.height;
   const itemWidth = item.width;
@@ -112,14 +112,14 @@ export function putDownItem(
     freeFromCursor(ctx);
     const storedItem = getInventoryItemAt(
       store,
-      toInventoryName,
+      toInventoryId,
       coordX,
       coordY
     );
-    const [prevX, prevY] = getItemSlotCoords(store, toInventoryName, storedItem.itemId);
+    const [prevX, prevY] = getItemSlotCoords(store, toInventoryId, storedItem.itemId);
     const result = pickUpItem(
       storedItem.itemId,
-      toInventoryName,
+      toInventoryId,
       prevX,
       prevY
     );

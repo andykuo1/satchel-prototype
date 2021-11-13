@@ -59,9 +59,9 @@ export function resetInventoryStore(previousStore, nextStore) {
       dispatchItemChange(previousStore, itemId);
     }
   }
-  for (const inventoryName of nextInventoryList) {
-    if (!visitedInventories.has(inventoryName)) {
-      dispatchInventoryChange(previousStore, inventoryName);
+  for (const inventoryId of nextInventoryList) {
+    if (!visitedInventories.has(inventoryId)) {
+      dispatchInventoryChange(previousStore, inventoryId);
     }
   }
 }
@@ -85,7 +85,7 @@ export function getInventoryStore() {
 
 /**
  * @param {InventoryStore} store
- * @param {string} inventoryName
+ * @param {string} inventoryId
  * @param {InventoryType} inventoryType
  * @param {number} inventoryWidth
  * @param {number} inventoryHeight
@@ -93,96 +93,96 @@ export function getInventoryStore() {
  */
 export function createInventory(
   store,
-  inventoryName = uuid(),
+  inventoryId = uuid(),
   inventoryType = 'grid',
   inventoryWidth = 1,
   inventoryHeight = 1
 ) {
   const inventory = {
-    name: inventoryName,
+    name: inventoryId,
     slots: new Array(inventoryWidth * inventoryHeight),
     width: inventoryWidth,
     height: inventoryHeight,
     type: inventoryType,
   };
-  store.data.inventory[inventoryName] = inventory;
+  store.data.inventory[inventoryId] = inventory;
   dispatchInventoryListChange(store);
-  dispatchInventoryChange(store, inventoryName);
+  dispatchInventoryChange(store, inventoryId);
   return inventory;
 }
 
 /**
  * @param store
- * @param inventoryName
+ * @param inventoryId
  */
-export function deleteInventory(store, inventoryName) {
-  if (inventoryName in store.data.inventory) {
-    delete store.data.inventory[inventoryName];
+export function deleteInventory(store, inventoryId) {
+  if (inventoryId in store.data.inventory) {
+    delete store.data.inventory[inventoryId];
     dispatchInventoryListChange(store);
-    dispatchInventoryChange(store, inventoryName);
+    dispatchInventoryChange(store, inventoryId);
   }
 }
 
 /**
  * @param store
- * @param inventoryName
+ * @param inventoryId
  */
-export function getInventory(store, inventoryName) {
-  return store.data.inventory[inventoryName] || null;
+export function getInventory(store, inventoryId) {
+  return store.data.inventory[inventoryId] || null;
 }
 
 /**
  * @param store
- * @param inventoryName
+ * @param inventoryId
  * @param type
  */
-export function changeInventoryType(store, inventoryName, type) {
-  const inventory = getInventory(store, inventoryName);
+export function changeInventoryType(store, inventoryId, type) {
+  const inventory = getInventory(store, inventoryId);
   if (type !== inventory.type) {
     inventory.type = type;
-    dispatchInventoryChange(store, inventoryName);
+    dispatchInventoryChange(store, inventoryId);
   }
 }
 
 /**
  * @param store
- * @param inventoryName
+ * @param inventoryId
  * @param width
  * @param height
  */
-export function changeInventorySize(store, inventoryName, width, height) {
-  const inventory = getInventory(store, inventoryName);
+export function changeInventorySize(store, inventoryId, width, height) {
+  const inventory = getInventory(store, inventoryId);
   if (width !== inventory.width || height !== inventory.height) {
     inventory.width = width;
     inventory.height = height;
-    dispatchInventoryChange(store, inventoryName);
+    dispatchInventoryChange(store, inventoryId);
   }
 }
 
 /**
  * @param store
- * @param inventoryName
+ * @param inventoryId
  */
-export function dispatchInventoryChange(store, inventoryName) {
-  dispatchInventoryEvent(store, 'inventory', inventoryName);
+export function dispatchInventoryChange(store, inventoryId) {
+  dispatchInventoryEvent(store, 'inventory', inventoryId);
 }
 
 /**
  * @param store
- * @param inventoryName
+ * @param inventoryId
  * @param callback
  */
-export function addInventoryChangeListener(store, inventoryName, callback) {
-  addInventoryEventListener(store, 'inventory', inventoryName, callback);
+export function addInventoryChangeListener(store, inventoryId, callback) {
+  addInventoryEventListener(store, 'inventory', inventoryId, callback);
 }
 
 /**
  * @param store
- * @param inventoryName
+ * @param inventoryId
  * @param callback
  */
-export function removeInventoryChangeListener(store, inventoryName, callback) {
-  removeInventoryEventListener(store, 'inventory', inventoryName, callback);
+export function removeInventoryChangeListener(store, inventoryId, callback) {
+  removeInventoryEventListener(store, 'inventory', inventoryId, callback);
 }
 
 /**

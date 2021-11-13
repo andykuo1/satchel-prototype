@@ -9,10 +9,10 @@ import { isInventoryEmpty } from './InventoryTransfer.js';
 
 /**
  * @param store
- * @param inventoryName
+ * @param inventoryId
  */
-export function createInventoryView(store, inventoryName) {
-  const inv = getInventory(store, inventoryName);
+export function createInventoryView(store, inventoryId) {
+  const inv = getInventory(store, inventoryId);
   const element = /** @type {InventoryGridElement} */ (
     document.createElement('inventory-grid')
   );
@@ -22,10 +22,10 @@ export function createInventoryView(store, inventoryName) {
 
 /**
  * @param store
- * @param inventoryName
+ * @param inventoryId
  */
-export function createTemporaryInventoryView(store, inventoryName) {
-  const inv = getInventory(store, inventoryName);
+export function createTemporaryInventoryView(store, inventoryId) {
+  const inv = getInventory(store, inventoryId);
   const element = /** @type {InventoryGridElement} */ (
     document.createElement('inventory-grid')
   );
@@ -39,11 +39,11 @@ export function createTemporaryInventoryView(store, inventoryName) {
  */
 function onTemporaryInventoryItemChange(e) {
   const { target } = e;
-  const inventoryName = target.name;
+  const inventoryId = target.name;
   const store = getInventoryStore();
-  if (isInventoryEmpty(store, inventoryName)) {
+  if (isInventoryEmpty(store, inventoryId)) {
     target.removeEventListener('itemchange', onTemporaryInventoryItemChange);
     target.remove();
-    deleteInventory(store, inventoryName);
+    deleteInventory(store, inventoryId);
   }
 }

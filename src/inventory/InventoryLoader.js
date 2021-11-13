@@ -53,19 +53,19 @@ export function saveToJSON(store) {
 
 /**
  * @param store
- * @param inventoryName
+ * @param inventoryId
  */
-export function saveInventoryToJSON(store, inventoryName) {
-  const inv = getInventory(store, inventoryName);
+export function saveInventoryToJSON(store, inventoryId) {
+  const inv = getInventory(store, inventoryId);
   const result = {
     data: {
       item: {},
       inventory: {
-        [inventoryName]: inv,
+        [inventoryId]: inv,
       },
     },
   };
-  const items = getInventoryItems(store, inventoryName);
+  const items = getInventoryItems(store, inventoryId);
   for (const item of items) {
     result.data.item[item.itemId] = item;
   }

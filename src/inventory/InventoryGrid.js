@@ -143,7 +143,7 @@ export class InventoryGridElement extends HTMLElement {
     changeInventoryType(getInventoryStore(), this.name, value);
   }
 
-  constructor(inventoryName = undefined) {
+  constructor(inventoryId = undefined) {
     super();
     this.attachShadow({ mode: 'open' });
     this.shadowRoot.append(
@@ -154,7 +154,7 @@ export class InventoryGridElement extends HTMLElement {
     );
 
     /** @private */
-    this._name = inventoryName;
+    this._name = inventoryId;
 
     /** @private */
     this._root = this.shadowRoot.querySelector('article');
@@ -239,11 +239,11 @@ export class InventoryGridElement extends HTMLElement {
 
   /**
    * @param store
-   * @param inventoryName
+   * @param inventoryId
    * @protected
    */
-  onInventoryChange(store, inventoryName) {
-    const inv = getInventory(getInventoryStore(), inventoryName);
+  onInventoryChange(store, inventoryId) {
+    const inv = getInventory(getInventoryStore(), inventoryId);
     if (!inv) {
       // The inventory has been deleted.
       this.style.setProperty('--container-width', '0');
@@ -255,7 +255,7 @@ export class InventoryGridElement extends HTMLElement {
     let invWidth = inv.width;
     let invHeight = inv.height;
     if (invType === 'socket') {
-      const item = getInventoryItemAt(store, inventoryName, 0, 0);
+      const item = getInventoryItemAt(store, inventoryId, 0, 0);
       if (item) {
         invWidth = item.width;
         invHeight = item.height;
@@ -283,12 +283,12 @@ export class InventoryGridElement extends HTMLElement {
     const emptySlot = /** @type {HTMLSlotElement} */ (
       this._itemSlot.cloneNode(false)
     );
-    for (const itemId of getInventoryItemIds(store, inventoryName)) {
+    for (const itemId of getInventoryItemIds(store, inventoryId)) {
       let element;
       element =
         itemId in preservedItems
           ? preservedItems[itemId]
-          : new InventoryItemElement(this, inventoryName, itemId);
+          : new InventoryItemElement(this, inventoryId, itemId);
       emptySlot.append(element);
     }
 

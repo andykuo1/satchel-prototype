@@ -100,8 +100,8 @@ export function getCursorElement(ctx) {
  * @returns {import('./InventoryStore.js').Item}
  */
 export function getCursorItem(ctx) {
-  const cursorInventoryName = ctx.element.name;
-  return getInventoryItemAt(getInventoryStore(), cursorInventoryName, 0, 0);
+  const cursorInventoryId = ctx.element.name;
+  return getInventoryItemAt(getInventoryStore(), cursorInventoryId, 0, 0);
 }
 
 /**
@@ -112,8 +112,8 @@ export function storeToCursor(ctx, freedItem) {
   if (!freedItem) {
     return;
   }
-  const cursorInventoryName = ctx.element.name;
-  putItem(getInventoryStore(), cursorInventoryName, freedItem, 0, 0);
+  const cursorInventoryId = ctx.element.name;
+  putItem(getInventoryStore(), cursorInventoryId, freedItem, 0, 0);
   ctx.element.style.display = 'unset';
   startPlaceDownBuffer();
 }

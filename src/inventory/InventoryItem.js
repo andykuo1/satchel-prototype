@@ -82,8 +82,8 @@ export class InventoryItemElement extends HTMLElement {
     customElements.define('inventory-item', this);
   }
 
-  get inventoryName() {
-    return this._inventoryName;
+  get inventoryId() {
+    return this._inventoryId;
   }
 
   get itemId() {
@@ -97,26 +97,26 @@ export class InventoryItemElement extends HTMLElement {
   /**
    *
    * @param {import('./InventoryGrid.js').InventoryGridElement} containerElement
-   * @param {string} inventoryName
+   * @param {string} inventoryId
    * @param {string} itemId
    */
-  constructor(containerElement, inventoryName, itemId) {
+  constructor(containerElement, inventoryId, itemId) {
     super();
     if (!containerElement) {
       throw new Error('Missing container for item element.');
     }
-    if (!inventoryName) {
+    if (!inventoryId) {
       throw new Error('Missing inventory name for item element.');
     }
     if (!itemId) {
       throw new Error('Missing item id for item element.');
     }
-    if (containerElement.name !== inventoryName) {
+    if (containerElement.name !== inventoryId) {
       throw new Error(
         'Cannot create item element with mismatched container and inventory name.'
       );
     }
-    if (!hasItem(getInventoryStore(), itemId, inventoryName)) {
+    if (!hasItem(getInventoryStore(), itemId, inventoryId)) {
       throw new Error(
         'Cannot create item element with item id not in given inventory.'
       );
@@ -132,7 +132,7 @@ export class InventoryItemElement extends HTMLElement {
     /** @private */
     this._containerElement = containerElement;
     /** @private */
-    this._inventoryName = inventoryName;
+    this._inventoryId = inventoryId;
     /** @private */
     this._itemId = itemId;
 
@@ -207,7 +207,7 @@ export class InventoryItemElement extends HTMLElement {
         detail: {
           element: this,
           container: this.container,
-          inventoryName: this.inventoryName,
+          inventoryId: this.inventoryId,
           itemId: this.itemId,
         },
       })

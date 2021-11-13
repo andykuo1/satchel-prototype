@@ -204,9 +204,9 @@ export function getInventoryItemIds(store, inventoryId) {
   return result;
 }
 
-export function getInventoryItems(store, inventoryName) {
+export function getInventoryItems(store, inventoryId) {
   let result = [];
-  for (let itemId of getInventoryItemIds(store, inventoryName)) {
+  for (let itemId of getInventoryItemIds(store, inventoryId)) {
     result.push(getItem(store, itemId));
   }
   return result;
