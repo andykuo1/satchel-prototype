@@ -5,7 +5,7 @@ import {
 } from './InventoryStore.js';
 import { isInventoryEmpty } from './InventoryTransfer.js';
 
-/** @typedef {import('./InventoryGrid.js').InventoryGridElement} InventoryGridElement */
+/** @typedef {import('./element/InventoryGridElement.js').InventoryGridElement} InventoryGridElement */
 
 /**
  * @param store

@@ -1,18 +1,16 @@
-import { upgradeProperty } from '../util/wc.js';
-import { containerMouseUpCallback } from './UIHelper.js';
+import { upgradeProperty } from '../../util/wc.js';
+import { containerMouseUpCallback } from './InventoryElementHelper.js';
 import {
   addInventoryChangeListener,
-  changeInventorySize,
-  changeInventoryType,
   getInventory,
   getInventoryStore,
   removeInventoryChangeListener,
-} from './InventoryStore.js';
-import { InventoryItemElement } from './InventoryItem.js';
+} from '../InventoryStore.js';
+import { InventoryItemElement } from './InventoryItemElement.js';
 import {
   getInventoryItemAt,
   getInventoryItemIds,
-} from './InventoryTransfer.js';
+} from '../InventoryTransfer.js';
 
 const DEFAULT_ITEM_UNIT_SIZE = 48;
 
@@ -121,26 +119,14 @@ export class InventoryGridElement extends HTMLElement {
     return inventory.height;
   }
 
-  set rows(value) {
-    changeInventorySize(getInventoryStore(), this.name, this.cols, value);
-  }
-
   get cols() {
     const inventory = getInventory(getInventoryStore(), this.name);
     return inventory.width;
   }
 
-  set cols(value) {
-    changeInventorySize(getInventoryStore(), this.name, value, this.rows);
-  }
-
   get type() {
     const inventory = getInventory(getInventoryStore(), this.name);
     return inventory.type;
-  }
-
-  set type(value) {
-    changeInventoryType(getInventoryStore(), this.name, value);
   }
 
   constructor(inventoryId = undefined) {
@@ -272,7 +258,7 @@ export class InventoryGridElement extends HTMLElement {
     const preservedItems = {};
     for (const node of this._itemSlot.assignedNodes()) {
       const itemNode =
-        /** @type {import('./InventoryItem.js').InventoryItemElement} */ (node);
+        /** @type {import('./InventoryItemElement.js').InventoryItemElement} */ (node);
       const itemId = itemNode.itemId;
       if (typeof itemId === 'string') {
         preservedItems[itemId] = node;

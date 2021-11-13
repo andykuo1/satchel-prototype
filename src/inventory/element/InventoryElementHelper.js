@@ -1,9 +1,9 @@
-import { updateCursorPosition } from './CursorHelper.js';
-import { pickUpItem, putDownItem } from './InventoryHelper.js';
+import { updateCursorPosition } from '../CursorHelper.js';
+import { pickUpItem, putDownItem } from '../InventoryHelper.js';
 
 /**
- * @typedef {import('./InventoryItem.js').InventoryItemElement} InventoryItemElement
- * @typedef {import('./InventoryGrid.js').InventoryGridElement} InventoryGridElement
+ * @typedef {import('./InventoryItemElement.js').InventoryItemElement} InventoryItemElement
+ * @typedef {import('./InventoryGridElement.js').InventoryGridElement} InventoryGridElement
  */
 
 /**

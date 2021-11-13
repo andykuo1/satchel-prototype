@@ -1,11 +1,13 @@
-import { itemMouseDownCallback } from './UIHelper.js';
+import { itemMouseDownCallback } from './InventoryElementHelper.js';
 import {
   addItemChangeListener,
   getInventoryStore,
   getItem,
   removeItemChangeListener,
-} from './InventoryStore.js';
-import { getItemSlotCoords, hasItem } from './InventoryTransfer.js';
+} from '../InventoryStore.js';
+import { getItemSlotCoords, hasItem } from '../InventoryTransfer.js';
+
+/** @typedef {import('./InventoryGridElement.js').InventoryGridElement} InventoryGridElement */
 
 const INNER_HTML = `
 <figure class="container">
@@ -95,8 +97,7 @@ export class InventoryItemElement extends HTMLElement {
   }
 
   /**
-   *
-   * @param {import('./InventoryGrid.js').InventoryGridElement} containerElement
+   * @param {InventoryGridElement} containerElement
    * @param {string} inventoryId
    * @param {string} itemId
    */

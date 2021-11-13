@@ -89,7 +89,7 @@ export function getCursorContext() {
 
 /**
  * @param ctx
- * @returns {import('./InventoryGrid.js').InventoryGridElement}
+ * @returns {import('./element/InventoryGridElement.js').InventoryGridElement}
  */
 export function getCursorElement(ctx) {
   return ctx.element;
