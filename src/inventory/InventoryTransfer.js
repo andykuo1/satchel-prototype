@@ -1,9 +1,10 @@
 import {
-  getItem,
-  deleteItem,
   getInventory,
   dispatchInventoryChange,
-  resolveItem,
+  deleteItemFromStore,
+  isItemInStore,
+  addItemToStore,
+  getItemInStore,
 } from './InventoryStore.js';
 
 /**
@@ -26,13 +27,13 @@ import {
 export function removeItem(store, itemId, inventoryId) {
   let slotIndex = getItemSlotIndex(store, inventoryId, itemId);
   if (slotIndex >= 0) {
-    let item = getItem(store, itemId);
+    let item = getItemInStore(store, itemId);
     let [fromX, fromY] = getInventorySlotCoords(store, inventoryId, slotIndex);
     let toX = fromX + item.width - 1;
     let toY = fromY + item.height - 1;
     clearSlots(store, inventoryId, fromX, fromY, toX, toY);
     dispatchInventoryChange(store, inventoryId);
-    deleteItem(store, itemId);
+    deleteItemFromStore(store, itemId, item);
     return item;
   }
   return null;
@@ -93,9 +94,9 @@ export function clearItems(store, inventoryId) {
   }
   let result = [];
   for (let itemId of keys) {
-    let item = getItem(store, itemId);
+    let item = getItemInStore(store, itemId);
     result.push(item);
-    deleteItem(store, itemId);
+    deleteItemFromStore(store, itemId, item);
   }
   dispatchInventoryChange(store, inventoryId);
   return result;
@@ -114,7 +115,9 @@ export function clearItems(store, inventoryId) {
 export function putItem(store, inventoryId, item, coordX, coordY) {
   const itemId = item.itemId;
   // TODO: Since items are kept globally, create it here
-  resolveItem(store, itemId, item);
+  if (!isItemInStore(store, itemId)) {
+    addItemToStore(store, itemId, item);
+  }
   // Put in slots
   setSlots(store, inventoryId, coordX, coordY, coordX + item.width - 1, coordY + item.height - 1, itemId);
   dispatchInventoryChange(store, inventoryId);
@@ -182,7 +185,7 @@ export function getInventoryItemAt(store, inventoryId, coordX, coordY) {
   if (!itemId) {
     return null;
   }
-  const item = getItem(store, itemId);
+  const item = getItemInStore(store, itemId);
   return item;
 }
 
@@ -207,7 +210,7 @@ export function getInventoryItemIds(store, inventoryId) {
 export function getInventoryItems(store, inventoryId) {
   let result = [];
   for (let itemId of getInventoryItemIds(store, inventoryId)) {
-    result.push(getItem(store, itemId));
+    result.push(getItemInStore(store, itemId));
   }
   return result;
 }

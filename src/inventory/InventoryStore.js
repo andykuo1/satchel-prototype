@@ -1,4 +1,3 @@
-import { uuid } from '../util/uuid.js';
 import { createGridInventory, createSocketInventory } from './Inv.js';
 
 /**
@@ -233,59 +232,55 @@ export function getInventoryList(store) {
 /************************************************** INVENTORY */
 
 /**
- * @param store
- * @param itemId
+ * @param {InventoryStore} store 
+ * @param {ItemId} itemId 
+ * @returns {boolean}
  */
-export function resolveItem(store, itemId, state = undefined) {
-  if (isItem(store, itemId)) {
-    return getItem(store, itemId);
-  }
-  return createItem(store, state, itemId);
+export function isItemInStore(store, itemId) {
+  return itemId in store.data.item;
 }
 
 /**
- * @param store
- * @param state
- * @param {ItemId} itemId
+ * @param {InventoryStore} store 
+ * @param {ItemId} itemId 
  * @returns {Item}
  */
-export function createItem(store, state, itemId = uuid()) {
-  const item = {
-    itemId,
-    width: 1,
-    height: 1,
-    imgSrc: '',
-    displayName: 'Item',
-    description: 'A mundane item.',
-    metadata: {},
-    ...state,
-  };
-  store.data.item[itemId] = item;
-  return item;
-}
-
-/**
- * @param store
- * @param itemId
- */
-export function deleteItem(store, itemId) {
-  delete store.data.item[itemId];
-}
-
-/**
- * @param store
- * @param itemId
- */
-export function isItem(store, itemId) {
-  return Boolean(store.data.item[itemId]);
-}
-
-/**
- * @param store
- * @param itemId
- */
-export function getItem(store, itemId) {
+export function getItemInStore(store, itemId) {
   return store.data.item[itemId];
+}
+
+/**
+ * @param {InventoryStore} store 
+ * @param {ItemId} itemId 
+ * @param {Item} item 
+ * @returns {boolean}
+ */
+export function addItemToStore(store, itemId, item) {
+  if (itemId !== item.itemId) {
+    throw new Error(`Cannot add item '${item.itemId}' for mismatched id '${itemId}'.`);
+  }
+  if (itemId in store.data.item) {
+    return false;
+  }
+  store.data.item[itemId] = item;
+  return true;
+}
+
+/**
+ * @param {InventoryStore} store 
+ * @param {ItemId} itemId 
+ * @param {Item} item 
+ * @returns {boolean}
+ */
+export function deleteItemFromStore(store, itemId, item) {
+  if (itemId !== item.itemId) {
+    throw new Error(`Cannot delete item '${item.itemId}' for mismatched id '${itemId}'.`);
+  }
+  if (!(itemId in store.data.item)) {
+    return false;
+  }
+  delete store.data.item[itemId];
+  return true;
 }
 
 /**

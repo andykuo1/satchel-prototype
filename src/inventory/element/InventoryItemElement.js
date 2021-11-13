@@ -2,7 +2,7 @@ import { itemMouseDownCallback } from './InventoryElementHelper.js';
 import {
   addItemChangeListener,
   getInventoryStore,
-  getItem,
+  getItemInStore,
   removeItemChangeListener,
 } from '../InventoryStore.js';
 import { getItemSlotCoords, hasItem } from '../InventoryTransfer.js';
@@ -176,7 +176,7 @@ export class InventoryItemElement extends HTMLElement {
    */
   onItemChange(store, itemId) {
     const [x, y] = getItemSlotCoords(store, this._containerElement.name, itemId);
-    const item = getItem(store, itemId);
+    const item = getItemInStore(store, itemId);
     this.style.setProperty('--itemX', `${x}`);
     this.style.setProperty('--itemY', `${y}`);
     this.style.setProperty('--itemWidth', `${item.width}`);

@@ -1,10 +1,13 @@
 import { dropOnGround } from './GroundHelper.js';
 import {
   getInventoryStore,
-  getItem,
-  createItem,
   updateItem,
+  addItemToStore,
+  getItemInStore,
 } from './InventoryStore.js';
+import { ItemBuilder } from './Item.js';
+
+/** @typedef {import('./Item.js').Item} Item */
 
 /**
  * @param formElement
@@ -20,7 +23,7 @@ export function openItemBuilder(formElement, itemId = undefined) {
     formElement.querySelector('#itemId').value = itemId;
     formElement.querySelector('input[type="submit"]').value = 'Save';
 
-    const item = getItem(getInventoryStore(), itemId);
+    const item = getItemInStore(getInventoryStore(), itemId);
     formElement.querySelector('#itemName').value = item.displayName;
     formElement.querySelector('#itemDetail').value = item.description;
   } else {
@@ -43,7 +46,7 @@ export function applyItemBuilder(formElement) {
   const formData = new FormData(formElement);
   const itemId = formElement.querySelector('#itemId').value;
 
-  const item = getItem(getInventoryStore(), itemId);
+  const item = getItemInStore(getInventoryStore(), itemId);
   if (item) {
     // Editing
     editItem(formData);
@@ -88,70 +91,58 @@ function editItem(formData) {
  * @param formData
  */
 function buildItem(formData) {
-  const result = {
-    w: 1,
-    h: 1,
-    displayName: 'Item',
-    imgSrc: 'res/images/potion.png',
-    description: 'A mundane item.',
-    metadata: {
-      category: 'Container',
-      size: 'small',
-      traits: [],
-    },
-  };
+  const builder = new ItemBuilder();
+
+  let size;
+  let traits = [];
   for (const entry of formData) {
     const [key, value] = entry;
     switch (key) {
       case 'itemSize':
-        result.metadata.size = value;
+        size = value;
         break;
       case 'itemTrait':
-        result.metadata.traits.push(value);
+        traits.push(value);
         break;
       case 'itemName':
-        result.displayName = value;
+        builder.displayName(value);
         break;
       case 'itemPortrait':
-        result.imgSrc = value;
+        builder.imageSrc(value);
         break;
       case 'itemDetail':
-        result.description = value;
+        builder.description(value);
         break;
     }
   }
 
-  let { size } = result.metadata;
-  if (result.metadata.traits.includes('heavy')) {
+  if (traits.includes('heavy')) {
     size = getNextItemSize(size);
   }
 
   let imgSrc = 'res/images/potion.png';
   let [width, height] = getDefaultItemSizeDimensions(size);
-  if (result.metadata.traits.includes('long')) {
+  if (traits.includes('long')) {
     width = Math.ceil(width / 2);
     height += 1;
     imgSrc = 'res/images/blade.png';
   }
 
-  if (result.metadata.traits.includes('flat')) {
+  if (traits.includes('flat')) {
     width += 1;
     height = Math.ceil(height / 2);
     imgSrc = 'res/images/scroll.png';
   }
 
-  result.width = width;
-  result.height = height;
-  result.imgSrc = imgSrc;
-
-  spawnItem(result);
+  let item = builder.width(width).height(height).imageSrc(imgSrc).build();
+  spawnItem(item);
 }
 
 /**
- * @param options
+ * @param {Item} item 
  */
-function spawnItem(options) {
-  const item = createItem(getInventoryStore(), options);
+function spawnItem(item) {
+  addItemToStore(getInventoryStore(), item.itemId, item);
   dropOnGround(item);
 }
 
