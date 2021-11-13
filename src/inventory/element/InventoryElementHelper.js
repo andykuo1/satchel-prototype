@@ -1,4 +1,3 @@
-import { updateCursorPosition } from '../CursorHelper.js';
 import { pickUpItem, putDownItem } from '../InventoryHelper.js';
 
 /**
@@ -33,7 +32,6 @@ export function itemMouseDownCallback(mouseEvent, itemElement, unitSize) {
     clientCoordX,
     clientCoordY
   );
-  updateCursorPosition(mouseEvent.clientX, mouseEvent.clientY, unitSize);
   if (result) {
     mouseEvent.preventDefault();
     mouseEvent.stopPropagation();

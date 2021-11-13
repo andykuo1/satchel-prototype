@@ -55,8 +55,7 @@ export function pickUpItem(
   const [fromItemX, fromItemY] = getItemSlotCoords(store, fromInventoryId, fromItemId);
   const item = removeItem(store, fromItemId, fromInventoryId);
   storeToCursor(ctx, item);
-  ctx.pickOffsetX = fromItemX - fromCoordX;
-  ctx.pickOffsetY = fromItemY - fromCoordY;
+  ctx.element.setPickOffset(fromItemX - fromCoordX, fromItemY - fromCoordY);
   return true;
 }
 
@@ -77,16 +76,21 @@ export function putDownItem(
   const store = getInventoryStore();
   const ctx = getCursorContext();
   const item = getCursorItem(ctx);
-  if (!item || !ctx.placeDownBuffer) {
+  if (!item) {
     return false;
+  }
+  if (ctx.element.isPlaceDownBuffering()) {
+    ctx.element.clearPlaceDownBuffer();
+    return true;
   }
   const toInventory = getInventory(store, toInventoryId);
   const invWidth = toInventory.width;
   const invHeight = toInventory.height;
   const itemWidth = item.width;
   const itemHeight = item.height;
-  const coordX = toCoordX + ctx.pickOffsetX;
-  const coordY = toCoordY + ctx.pickOffsetY;
+  const [pickOffsetX, pickOffsetY] = ctx.element.getPickOffset();
+  const coordX = toCoordX + pickOffsetX;
+  const coordY = toCoordY + pickOffsetY;
 
   const maxCoordX = invWidth - itemWidth;
   const maxCoordY = invHeight - itemHeight;
@@ -126,8 +130,7 @@ export function putDownItem(
     if (!result) {
       throw new Error('Failed to pick up item on swap.');
     }
-    ctx.pickOffsetX = prevX - targetCoordX;
-    ctx.pickOffsetY = prevY - targetCoordY;
+    ctx.element.setPickOffset(prevX - targetCoordX, prevY - targetCoordY);
     return putItem(
       getInventoryStore(),
       toInventory.name,
