@@ -10,12 +10,12 @@ import {
   getInventory,
   getInventoryList,
   getInventoryStore,
-  getItem,
   getItems,
 } from './InventoryStore.js';
 import {
   getInventoryItemAt,
   getInventoryItems,
+  getItemSlotCoords,
   isInventoryEmpty,
   putItem,
   removeItem,
@@ -31,14 +31,14 @@ import {
  * Pick up from target inventory to cursor.
  *
  * @param {ItemId} fromItemId
- * @param {InventoryId} fromInventoryName
+ * @param {InventoryId} fromInventoryId
  * @param {number} fromCoordX
  * @param {number} fromCoordY
  * @returns {boolean} Whether the transfer to cursor was successful.
  */
 export function pickUpItem(
   fromItemId,
-  fromInventoryName,
+  fromInventoryId,
   fromCoordX,
   fromCoordY
 ) {
@@ -52,10 +52,8 @@ export function pickUpItem(
   if (!isInventoryEmpty(store, cursorInventoryName)) {
     return false;
   }
-  const fromItem = getItem(store, fromItemId);
-  const fromItemX = fromItem.x;
-  const fromItemY = fromItem.y;
-  const item = removeItem(store, fromItemId, fromInventoryName);
+  const [fromItemX, fromItemY] = getItemSlotCoords(store, fromInventoryId, fromItemId);
+  const item = removeItem(store, fromItemId, fromInventoryId);
   storeToCursor(ctx, item);
   ctx.pickOffsetX = fromItemX - fromCoordX;
   ctx.pickOffsetY = fromItemY - fromCoordY;
@@ -76,12 +74,13 @@ export function putDownItem(
   toCoordY,
   allowSwap = true
 ) {
+  const store = getInventoryStore();
   const ctx = getCursorContext();
   const item = getCursorItem(ctx);
   if (!item || !ctx.placeDownBuffer) {
     return false;
   }
-  const toInventory = getInventory(getInventoryStore(), toInventoryName);
+  const toInventory = getInventory(store, toInventoryName);
   const invWidth = toInventory.width;
   const invHeight = toInventory.height;
   const itemWidth = item.w;
@@ -112,24 +111,23 @@ export function putDownItem(
   ) {
     freeFromCursor(ctx);
     const storedItem = getInventoryItemAt(
-      getInventoryStore(),
-      toInventory.name,
+      store,
+      toInventoryName,
       coordX,
       coordY
     );
-    const previousX = storedItem.x;
-    const previousY = storedItem.y;
+    const [prevX, prevY] = getItemSlotCoords(store, toInventoryName, storedItem.itemId);
     const result = pickUpItem(
       storedItem.itemId,
-      toInventory.name,
-      previousX,
-      previousY
+      toInventoryName,
+      prevX,
+      prevY
     );
     if (!result) {
       throw new Error('Failed to pick up item on swap.');
     }
-    ctx.pickOffsetX = previousX - targetCoordX;
-    ctx.pickOffsetY = previousY - targetCoordY;
+    ctx.pickOffsetX = prevX - targetCoordX;
+    ctx.pickOffsetY = prevY - targetCoordY;
     return putItem(
       getInventoryStore(),
       toInventory.name,
@@ -164,8 +162,6 @@ export function extractOut(fromInventory, filter) {
   for (const item of items) {
     if (filter(item, fromInventory)) {
       removeItem(getInventoryStore(), item.itemId, fromInventory.name);
-      item.x = 0;
-      item.y = 0;
       result.push(item);
     }
   }
@@ -357,5 +353,5 @@ export function itemToString(item) {
     return '[Item#null]';
   }
 
-  return `[Item#${item.w}x${item.h}@${item.x},${item.y}]`;
+  return `[Item#${item.w}x${item.h}]`;
 }

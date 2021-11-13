@@ -1,11 +1,11 @@
-import { itemMouseDownCallback } from './ContainerHelper.js';
+import { itemMouseDownCallback } from './UIHelper.js';
 import {
   addItemChangeListener,
   getInventoryStore,
   getItem,
   removeItemChangeListener,
 } from './InventoryStore.js';
-import { hasItem } from './InventoryTransfer.js';
+import { getItemSlotCoords, hasItem } from './InventoryTransfer.js';
 
 const INNER_HTML = `
 <figure class="container">
@@ -174,11 +174,12 @@ export class InventoryItemElement extends HTMLElement {
    * @protected
    */
   onItemChange(store, itemId) {
+    const [x, y] = getItemSlotCoords(store, this._containerElement.name, itemId);
     const item = getItem(store, itemId);
-    this.style.setProperty('--itemX', item.x);
-    this.style.setProperty('--itemY', item.y);
-    this.style.setProperty('--itemWidth', item.w);
-    this.style.setProperty('--itemHeight', item.h);
+    this.style.setProperty('--itemX', `${x}`);
+    this.style.setProperty('--itemY', `${y}`);
+    this.style.setProperty('--itemWidth', `${item.w}`);
+    this.style.setProperty('--itemHeight', `${item.h}`);
     this._image.src = item.imgSrc;
     this._image.alt = item.displayName;
     this._caption.textContent = item.displayName;

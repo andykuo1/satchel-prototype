@@ -113,9 +113,6 @@ export function clearItems(store, inventoryId) {
  */
 export function putItem(store, inventoryId, item, coordX, coordY) {
   const itemId = item.itemId;
-  // TODO: Since items still keep position in state, set it here
-  item.x = coordX;
-  item.y = coordY;
   // TODO: Since items are kept globally, create it here
   resolveItem(store, itemId, item);
   // Put in slots
