@@ -1,8 +1,8 @@
 import { Peerful } from '../peerful/Peerful.js';
 import { copyToClipboard } from '../util/clipboard.js';
-import { getCursorContext } from './CursorHelper.js';
-import { saveToJSON } from './InventoryLoader.js';
-import { getInventoryStore, resetInventoryStore } from './InventoryStore.js';
+import { getCursorContext } from '../inventory/CursorHelper.js';
+import { saveToJSON } from '../inventory/InventoryLoader.js';
+import { getInventoryStore, resetInventoryStore } from '../inventory/InventoryStore.js';
 
 export async function connectAsClient() {
   const remoteId = tryGetRemotePeerId(window.location);

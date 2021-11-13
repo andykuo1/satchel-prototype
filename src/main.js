@@ -6,7 +6,7 @@ import {
   applyItemBuilder,
   openItemBuilder,
   resetItemBuilder,
-} from './inventory/ItemBuilder.js';
+} from './app/ItemBuilder.js';
 import { loadFromLocalStorage, saveToLocalStorage } from './inventory/InventoryLoader.js';
 
 const APP_VERSION = '1.0.18';

@@ -1,6 +1,6 @@
 import { downloadText } from './util/downloader.js';
 import { clearGround } from './inventory/GroundHelper.js';
-import { openItemBuilder } from './inventory/ItemBuilder.js';
+import { openItemBuilder } from './app/ItemBuilder.js';
 import { saveToJSON, loadFromJSON } from './inventory/InventoryLoader.js';
 import { getInventoryStore } from './inventory/InventoryStore.js';
 import {
@@ -8,7 +8,7 @@ import {
   connectAsServer,
   isServerSide,
   shouldConnnectAsClient,
-} from './inventory/PeerSatchel.js';
+} from './app/PeerSatchel.js';
 import { getCursorContext } from './inventory/CursorHelper.js';
 
 window.addEventListener('DOMContentLoaded', () => {

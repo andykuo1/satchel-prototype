@@ -1,13 +1,13 @@
-import { dropOnGround } from './GroundHelper.js';
+import { dropOnGround } from '../inventory/GroundHelper.js';
 import {
   getInventoryStore,
   updateItem,
   addItemToStore,
   getItemInStore,
-} from './InventoryStore.js';
-import { ItemBuilder } from './Item.js';
+} from '../inventory/InventoryStore.js';
+import { ItemBuilder } from '../inventory/Item.js';
 
-/** @typedef {import('./Item.js').Item} Item */
+/** @typedef {import('../inventory/Item.js').Item} Item */
 
 /**
  * @param formElement
