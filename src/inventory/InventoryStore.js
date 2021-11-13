@@ -78,7 +78,7 @@ export function getInventoryStore() {
  * @typedef Inventory
  * @property {string} name
  * @property {InventoryType} type
- * @property {Array<ItemId>} items
+ * @property {Array<ItemId>} slots
  * @property {number} width
  * @property {number} height
  */
@@ -100,7 +100,7 @@ export function createInventory(
 ) {
   const inventory = {
     name: inventoryName,
-    items: new Array(inventoryWidth * inventoryHeight),
+    slots: new Array(inventoryWidth * inventoryHeight),
     width: inventoryWidth,
     height: inventoryHeight,
     type: inventoryType,
@@ -128,12 +128,7 @@ export function deleteInventory(store, inventoryName) {
  * @param inventoryName
  */
 export function getInventory(store, inventoryName) {
-  const inventory = store.data.inventory[inventoryName];
-  if (inventory) {
-    return inventory;
-  }
-
-  return null;
+  return store.data.inventory[inventoryName] || null;
 }
 
 /**

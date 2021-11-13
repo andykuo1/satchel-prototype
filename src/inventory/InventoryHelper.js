@@ -186,8 +186,8 @@ export function insertIn(toInventory, freedItem) {
   }
 
   const ctx = getCursorContext();
-  const invWidth = toInventory.rows;
-  const invHeight = toInventory.cols;
+  const invWidth = toInventory.width;
+  const invHeight = toInventory.height;
   const itemWidth = freedItem.w;
   const itemHeight = freedItem.h;
   const maxCoordX = invWidth - itemWidth;
@@ -195,7 +195,9 @@ export function insertIn(toInventory, freedItem) {
   if (maxCoordX < 0 || maxCoordY < 0) {
     return false;
   }
-
+  if (invWidth <= itemWidth || invHeight <= itemHeight) {
+    return false;
+  }
   const [x, y] = findEmptyCoords(0, 0, maxCoordX, maxCoordY, (x, y) =>
     canPlaceAt(toInventory, x, y, itemWidth, itemHeight)
   );
@@ -344,7 +346,7 @@ export function inventoryToString(inventory) {
     return '[Inventory#null::{}]';
   }
 
-  return `[Inventory#${inventory.width}x${inventory.height}::{${inventory.items}}]`;
+  return `[Inventory#${inventory.width}x${inventory.height}::{${inventory.slots}}]`;
 }
 
 /**

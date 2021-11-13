@@ -97,7 +97,7 @@ function onLocalClientConnection(conn) {
           {
             const defaultInv = {
               name: 'main',
-              items: [],
+              slots: new Array(12 * 9),
               width: 12,
               height: 9,
               type: 'grid',
