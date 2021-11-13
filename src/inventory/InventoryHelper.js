@@ -83,8 +83,8 @@ export function putDownItem(
   const toInventory = getInventory(store, toInventoryName);
   const invWidth = toInventory.width;
   const invHeight = toInventory.height;
-  const itemWidth = item.w;
-  const itemHeight = item.h;
+  const itemWidth = item.width;
+  const itemHeight = item.height;
   const coordX = toCoordX + ctx.pickOffsetX;
   const coordY = toCoordY + ctx.pickOffsetY;
 
@@ -184,8 +184,8 @@ export function insertIn(toInventory, freedItem) {
   const ctx = getCursorContext();
   const invWidth = toInventory.width;
   const invHeight = toInventory.height;
-  const itemWidth = freedItem.w;
-  const itemHeight = freedItem.h;
+  const itemWidth = freedItem.width;
+  const itemHeight = freedItem.height;
   const maxCoordX = invWidth - itemWidth;
   const maxCoordY = invHeight - itemHeight;
   if (maxCoordX < 0 || maxCoordY < 0) {
@@ -353,5 +353,5 @@ export function itemToString(item) {
     return '[Item#null]';
   }
 
-  return `[Item#${item.w}x${item.h}]`;
+  return `[Item#${item.width}x${item.height}]`;
 }

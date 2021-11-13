@@ -28,8 +28,8 @@ export function removeItem(store, itemId, inventoryId) {
   if (slotIndex >= 0) {
     let item = getItem(store, itemId);
     let [fromX, fromY] = getInventorySlotCoords(store, inventoryId, slotIndex);
-    let toX = fromX + item.w - 1;
-    let toY = fromY + item.h - 1;
+    let toX = fromX + item.width - 1;
+    let toY = fromY + item.height - 1;
     clearSlots(store, inventoryId, fromX, fromY, toX, toY);
     dispatchInventoryChange(store, inventoryId);
     deleteItem(store, itemId);
@@ -116,7 +116,7 @@ export function putItem(store, inventoryId, item, coordX, coordY) {
   // TODO: Since items are kept globally, create it here
   resolveItem(store, itemId, item);
   // Put in slots
-  setSlots(store, inventoryId, coordX, coordY, coordX + item.w - 1, coordY + item.h - 1, itemId);
+  setSlots(store, inventoryId, coordX, coordY, coordX + item.width - 1, coordY + item.height - 1, itemId);
   dispatchInventoryChange(store, inventoryId);
   return true;
 }

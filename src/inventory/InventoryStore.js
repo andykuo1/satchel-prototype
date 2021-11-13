@@ -218,10 +218,11 @@ export function getInventoryList(store) {
 /**
  * @typedef Item
  * @property {ItemId} itemId
- * @property {number} w
- * @property {number} h
+ * @property {number} width
+ * @property {number} height
  * @property {string} imgSrc
  * @property {string} displayName
+ * @property {string} description
  * @property {object} metadata
  */
 
@@ -245,10 +246,11 @@ export function resolveItem(store, itemId, state = undefined) {
 export function createItem(store, state, itemId = uuid()) {
   const item = {
     itemId,
-    w: 1,
-    h: 1,
+    width: 1,
+    height: 1,
     imgSrc: '',
     displayName: 'Item',
+    description: 'A mundane item.',
     metadata: {},
     ...state,
   };

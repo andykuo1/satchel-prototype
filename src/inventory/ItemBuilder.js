@@ -22,7 +22,7 @@ export function openItemBuilder(formElement, itemId = undefined) {
 
     const item = getItem(getInventoryStore(), itemId);
     formElement.querySelector('#itemName').value = item.displayName;
-    formElement.querySelector('#itemDetail').value = item.metadata.detail;
+    formElement.querySelector('#itemDetail').value = item.description;
   } else {
     formElement.reset();
     formElement
@@ -76,9 +76,7 @@ function editItem(formData) {
         result.displayName = value;
         break;
       case 'itemDetail':
-        result.metadata = {
-          detail: value,
-        };
+        result.description = value;
         break;
     }
   }
@@ -95,8 +93,8 @@ function buildItem(formData) {
     h: 1,
     displayName: 'Item',
     imgSrc: 'res/images/potion.png',
+    description: 'A mundane item.',
     metadata: {
-      detail: 'A mundane item.',
       category: 'Container',
       size: 'small',
       traits: [],
@@ -118,7 +116,7 @@ function buildItem(formData) {
         result.imgSrc = value;
         break;
       case 'itemDetail':
-        result.metadata.detail = value;
+        result.description = value;
         break;
     }
   }
@@ -142,8 +140,8 @@ function buildItem(formData) {
     imgSrc = 'res/images/scroll.png';
   }
 
-  result.w = width;
-  result.h = height;
+  result.width = width;
+  result.height = height;
   result.imgSrc = imgSrc;
 
   spawnItem(result);

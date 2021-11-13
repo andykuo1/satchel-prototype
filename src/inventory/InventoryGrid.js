@@ -257,8 +257,8 @@ export class InventoryGridElement extends HTMLElement {
     if (invType === 'socket') {
       const item = getInventoryItemAt(store, inventoryName, 0, 0);
       if (item) {
-        invWidth = item.w;
-        invHeight = item.h;
+        invWidth = item.width;
+        invHeight = item.height;
       } else {
         invWidth = 1;
         invHeight = 1;
