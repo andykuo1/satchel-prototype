@@ -46,7 +46,7 @@ export function applyItemBuilder(formElement) {
   const item = getItem(getInventoryStore(), itemId);
   if (item) {
     // Editing
-    editItem(formData, itemId);
+    editItem(formData);
   } else {
     // Creating
     buildItem(formData);
