@@ -1,5 +1,5 @@
 import { upgradeProperty } from '../../util/wc.js';
-import { containerMouseUpCallback } from './InventoryElementHelper.js';
+import { containerMouseUpCallback } from './InventoryElementMouseHelper.js';
 import {
   addInventoryChangeListener,
   getInventory,

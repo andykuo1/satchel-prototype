@@ -1,4 +1,4 @@
-import { itemMouseDownCallback } from './InventoryElementHelper.js';
+import { itemMouseDownCallback } from './InventoryElementMouseHelper.js';
 import {
   addItemChangeListener,
   getInventoryStore,
