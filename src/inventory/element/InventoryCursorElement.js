@@ -150,7 +150,8 @@ export class InventoryCursorElement extends HTMLElement {
     const posX = clientX + this.heldOffsetX * this.unitSize;
     const posY = clientY + this.heldOffsetY * this.unitSize;
     this.style.setProperty('left', `${posX - CURSOR_OFFSET_PIXELS}px`);
-    this.style.setProperty('top', `${posY - CURSOR_OFFSET_PIXELS}px`);
+    // NOTE: Add 2rem from InventoryGridElement's title margin
+    this.style.setProperty('top', `calc(${posY - CURSOR_OFFSET_PIXELS}px - 2rem)`);
     if (
       this.ignoreFirstPutDown &&
       distanceSquared(clientX, clientY, this.startHeldX, this.startHeldY) >=

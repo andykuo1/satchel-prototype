@@ -16,6 +16,7 @@ export function createInventoryView(store, inventoryId) {
   const element = /** @type {InventoryGridElement} */ (
     document.createElement('inventory-grid')
   );
+  element.title = inv.invId;
   element.name = inv.invId;
   return element;
 }

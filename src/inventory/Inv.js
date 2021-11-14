@@ -30,7 +30,7 @@
  */
 function createInventory(invId, invType, slotCount, maxCoordX, maxCoordY) {
   let inv = {
-    invId, // TODO: Not used yet.
+    invId,
     name: invId,
     type: invType,
     items: {}, // TODO: Not used yet.
