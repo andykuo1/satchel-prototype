@@ -167,7 +167,6 @@ export class InventoryGridElement extends HTMLElement {
     if (invId) {
       let store = getInventoryStore();
       addInventoryChangeListener(
-        store,
         invId,
         this.onInventoryChange
       );
@@ -184,7 +183,6 @@ export class InventoryGridElement extends HTMLElement {
     const invId = this._invId;
     if (invId) {
       removeInventoryChangeListener(
-        getInventoryStore(),
         invId,
         this.onInventoryChange
       );
@@ -212,13 +210,12 @@ export class InventoryGridElement extends HTMLElement {
           this._invId = nextInvId;
           if (prevInvId) {
             removeInventoryChangeListener(
-              store,
               prevInvId,
               this.onInventoryChange
             );
           }
           if (nextInvId) {
-            addInventoryChangeListener(store, nextInvId, this.onInventoryChange);
+            addInventoryChangeListener(nextInvId, this.onInventoryChange);
             this.onInventoryChange(store, nextInvId);
           }
         }

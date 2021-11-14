@@ -3,12 +3,12 @@ import { copyToClipboard } from '../util/clipboard.js';
 import { getCursorContext } from '../inventory/CursorHelper.js';
 import { saveToJSON } from '../inventory/InventoryLoader.js';
 import {
+  copyInventoryStore,
   createGridInventoryInStore,
   createInventoryStore,
   createSocketInventoryInStore,
   getInventoryStore,
   isInventoryInStore,
-  resetInventoryStore,
 } from '../inventory/InventoryStore.js';
 
 export async function connectAsClient() {
@@ -102,14 +102,14 @@ function onLocalClientConnection(conn) {
       switch (jsonData.type) {
         case 'new':
           {
-            resetInventoryStore(getInventoryStore(), createInventoryStore());
+            copyInventoryStore(createInventoryStore(), getInventoryStore());
             createGridInventoryInStore(getInventoryStore(), 'main', 12, 9);
             createSocketInventoryInStore(getInventoryStore(), 'cursor');
           }
           break;
         case 'reset':
           {
-            resetInventoryStore(getInventoryStore(), jsonData.message);
+            copyInventoryStore(jsonData.message, getInventoryStore());
             if (!isInventoryInStore(getInventoryStore(), 'main')) {
               createGridInventoryInStore(getInventoryStore(), 'main', 12, 9);
             }

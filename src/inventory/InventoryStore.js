@@ -1,4 +1,5 @@
-import { createGridInventory, createSocketInventory } from './Inv.js';
+import { copyInventory, createGridInventory, createSocketInventory } from './Inv.js';
+import { copyItem } from './Item.js';
 
 /**
  * @typedef {import('./Inv.js').InventoryId} InventoryId
@@ -15,69 +16,67 @@ import { createGridInventory, createSocketInventory } from './Inv.js';
  */
 
 let GLOBAL_STORE = createInventoryStore();
+let GLOBAL_LISTENERS = {
+  item: {},
+  inventory: {},
+  container: {},
+};
+
+export function getInventoryStore() {
+  return GLOBAL_STORE;
+}
 
 export function createInventoryStore() {
   return {
     data: {
       item: {},
       inventory: {},
-    },
-    listeners: {
-      item: {},
-      inventory: {},
-      container: {},
-    },
+    }
   };
 }
 
 /**
- * @param store
+ * @param {InventoryStore} store
+ * @param {InventoryStore} [dst]
  */
-export function setInventoryStore(store) {
-  GLOBAL_STORE = store;
-}
-
-/**
- * @param previousStore
- * @param nextStore
- */
-export function resetInventoryStore(previousStore, nextStore) {
-  const previousItemList = Object.keys(previousStore.data.item);
-  const previousInventoryList = Object.keys(previousStore.data.inventory);
-  const nextItemList = Object.keys(nextStore.data.item);
-  const nextInventoryList = Object.keys(nextStore.data.inventory);
-  // Copy data over
-  previousStore.data.item = { ...nextStore.data.item };
-  previousStore.data.inventory = { ...nextStore.data.inventory };
-
-  // Dispatch all events
-  dispatchInventoryListChange(previousStore);
-  const visitedItems = new Set();
-  const visitedInventories = new Set();
-  // Dispatch for old objects
-  for (const itemId of previousItemList) {
-    visitedItems.add(itemId);
-    dispatchItemChange(previousStore, itemId);
+export function copyInventoryStore(store, dst = undefined) {
+  if (!dst) {
+    dst = createInventoryStore();
   }
-  for (const invId of previousInventoryList) {
-    visitedInventories.add(invId);
-    dispatchInventoryChange(previousStore, invId);
-  }
-  // Dispatch for new objects
-  for (const itemId of nextItemList) {
-    if (!visitedItems.has(itemId)) {
-      dispatchItemChange(previousStore, itemId);
+  if (typeof store.data === 'object') {
+    // Copy items
+    if (typeof store.data.item === 'object') {
+      for(let item of Object.values(store.data.item)) {
+        const itemId = item.itemId;
+        if (isItemInStore(dst, itemId)) {
+          let prevItem = getItemInStore(dst, itemId);
+          copyItem(item, prevItem);
+        } else {
+          let newItem = copyItem(item);
+          addItemToStore(dst, itemId, newItem);
+        }
+        if (dst === getInventoryStore()) {
+          dispatchItemChange(dst, itemId);
+        }
+      }
+    }
+    // Copy inventories
+    if (typeof store.data.inventory === 'object') {
+      for(let inventory of Object.values(store.data.inventory)) {
+        const invId = inventory.invId;
+        if (isInventoryInStore(dst, invId)) {
+          let prevInventory = getInventoryInStore(dst, invId);
+          copyInventory(inventory, prevInventory);
+        } else {
+          let newInventory = copyInventory(inventory);
+          addInventoryToStore(dst, invId, newInventory);
+        }
+        if (dst === getInventoryStore()) {
+          dispatchInventoryChange(dst, invId);
+        }
+      }
     }
   }
-  for (const inventoryId of nextInventoryList) {
-    if (!visitedInventories.has(inventoryId)) {
-      dispatchInventoryChange(previousStore, inventoryId);
-    }
-  }
-}
-
-export function getInventoryStore() {
-  return GLOBAL_STORE;
 }
 
 /**
@@ -182,21 +181,19 @@ export function dispatchInventoryChange(store, inventoryId) {
 }
 
 /**
- * @param store
  * @param inventoryId
  * @param callback
  */
-export function addInventoryChangeListener(store, inventoryId, callback) {
-  addInventoryEventListener(store, 'inventory', inventoryId, callback);
+export function addInventoryChangeListener(inventoryId, callback) {
+  addInventoryEventListener('inventory', inventoryId, callback);
 }
 
 /**
- * @param store
  * @param inventoryId
  * @param callback
  */
-export function removeInventoryChangeListener(store, inventoryId, callback) {
-  removeInventoryEventListener(store, 'inventory', inventoryId, callback);
+export function removeInventoryChangeListener(inventoryId, callback) {
+  removeInventoryEventListener('inventory', inventoryId, callback);
 }
 
 /**
@@ -207,19 +204,17 @@ export function dispatchInventoryListChange(store) {
 }
 
 /**
- * @param store
  * @param callback
  */
-export function addInventoryListChangeListener(store, callback) {
-  addInventoryEventListener(store, 'container', 'all', callback);
+export function addInventoryListChangeListener(callback) {
+  addInventoryEventListener('container', 'all', callback);
 }
 
 /**
- * @param store
  * @param callback
  */
-export function removeInventoryListChangeListener(store, callback) {
-  removeInventoryEventListener(store, 'container', 'all', callback);
+export function removeInventoryListChangeListener(callback) {
+  removeInventoryEventListener('container', 'all', callback);
 }
 
 /**
@@ -300,7 +295,6 @@ export function updateItem(store, itemId, state) {
   if (!item) {
     throw new Error('Cannot update null item.');
   }
-
   store.data.item[itemId] = {
     ...item,
     ...state,
@@ -317,55 +311,48 @@ export function dispatchItemChange(store, itemId) {
 }
 
 /**
- * @param store
  * @param itemId
  * @param callback
  */
-export function addItemChangeListener(store, itemId, callback) {
-  addInventoryEventListener(store, 'item', itemId, callback);
+export function addItemChangeListener(itemId, callback) {
+  addInventoryEventListener('item', itemId, callback);
 }
 
 /**
- * @param store
  * @param itemId
  * @param callback
  */
-export function removeItemChangeListener(store, itemId, callback) {
-  removeInventoryEventListener(store, 'item', itemId, callback);
+export function removeItemChangeListener(itemId, callback) {
+  removeInventoryEventListener('item', itemId, callback);
 }
 
 /**
- * @param store
  * @param event
  * @param key
  * @param callback
  */
-function addInventoryEventListener(store, event, key, callback) {
-  if (!(event in store.listeners)) {
+function addInventoryEventListener(event, key, callback) {
+  if (!(event in GLOBAL_LISTENERS)) {
     throw new Error(`Cannot manage listener for unknown inventory event '${event}'.`);
   }
-
-  let listeners = store.listeners[event][key];
+  let listeners = GLOBAL_LISTENERS[event][key];
   if (!listeners) {
     listeners = [];
-    store.listeners[event][key] = listeners;
+    GLOBAL_LISTENERS[event][key] = listeners;
   }
-
   listeners.push(callback);
 }
 
 /**
- * @param store
  * @param event
  * @param key
  * @param callback
  */
-function removeInventoryEventListener(store, event, key, callback) {
-  if (!(event in store.listeners)) {
+function removeInventoryEventListener(event, key, callback) {
+  if (!(event in GLOBAL_LISTENERS)) {
     throw new Error(`Cannot manage listener for unknown inventory event '${event}'.`);
   }
-
-  const listeners = store.listeners[event][key];
+  const listeners = GLOBAL_LISTENERS[event][key];
   if (listeners) {
     const i = listeners.indexOf(callback);
     if (i >= 0) {
@@ -380,11 +367,10 @@ function removeInventoryEventListener(store, event, key, callback) {
  * @param key
  */
 function dispatchInventoryEvent(store, event, key) {
-  if (!(event in store.listeners)) {
+  if (!(event in GLOBAL_LISTENERS)) {
     throw new Error(`Cannot dispatch event for unknown inventory event '${event}'.`);
   }
-
-  const listeners = store.listeners[event][key];
+  const listeners = GLOBAL_LISTENERS[event][key];
   if (listeners) {
     for (const listener of listeners) {
       listener.call(undefined, store, key);

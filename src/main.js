@@ -39,9 +39,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
     const editor = document.querySelector('#editor');
     editor.classList.toggle('open', false);
-    const { itemId } = e.detail;
-    if (itemId) {
-      openItemBuilder(document.querySelector('#itemBuilder'), itemId);
+    const { invId, itemId } = e.detail;
+    if (invId && itemId) {
+      openItemBuilder(document.querySelector('#itemBuilder'), invId, itemId);
       // Animate open/close transition
       setTimeout(() => editor.classList.toggle('open', true), 100);
     }

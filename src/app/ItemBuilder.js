@@ -13,12 +13,13 @@ import { ItemBuilder } from '../inventory/Item.js';
  * @param formElement
  * @param itemId
  */
-export function openItemBuilder(formElement, itemId = undefined) {
-  if (itemId) {
+export function openItemBuilder(formElement, invId = undefined, itemId = undefined) {
+  if (invId && itemId) {
     formElement.reset();
     formElement.querySelector('#itemSizeSet').toggleAttribute('disabled', true);
     formElement.querySelector('#itemTraitSet').toggleAttribute('disabled', true);
     formElement.querySelector('#itemId').value = itemId;
+    formElement.querySelector('#invId').value = invId;
     formElement.querySelector('input[type="submit"]').value = 'Save';
 
     const item = getItemInStore(getInventoryStore(), itemId);
@@ -29,6 +30,7 @@ export function openItemBuilder(formElement, itemId = undefined) {
     formElement.querySelector('#itemSizeSet').toggleAttribute('disabled', false);
     formElement.querySelector('#itemTraitSet').toggleAttribute('disabled', false);
     formElement.querySelector('#itemId').value = '';
+    formElement.querySelector('#invId').value = '';
     formElement.querySelector('input[type="submit"]').value = 'Create';
   }
 }
@@ -39,9 +41,8 @@ export function openItemBuilder(formElement, itemId = undefined) {
 export function applyItemBuilder(formElement) {
   const formData = new FormData(formElement);
   const itemId = formElement.querySelector('#itemId').value;
-
-  const item = getItemInStore(getInventoryStore(), itemId);
-  if (item) {
+  const invId = formElement.querySelector('#invId').value;
+  if (itemId && invId) {
     // Editing
     editItem(formData);
   } else {

@@ -162,7 +162,7 @@ export class InventoryItemElement extends HTMLElement {
   connectedCallback() {
     this.addEventListener('mousedown', this.onMouseDown);
     this.addEventListener('contextmenu', this.onContextMenu);
-    addItemChangeListener(getInventoryStore(), this.itemId, this.onItemChange);
+    addItemChangeListener(this.itemId, this.onItemChange);
     this.onItemChange(getInventoryStore(), this.itemId);
   }
 
@@ -171,7 +171,6 @@ export class InventoryItemElement extends HTMLElement {
     this.removeEventListener('mousedown', this.onMouseDown);
     this.removeEventListener('contextmenu', this.onContextMenu);
     removeItemChangeListener(
-      getInventoryStore(),
       this.itemId,
       this.onItemChange
     );
@@ -183,7 +182,8 @@ export class InventoryItemElement extends HTMLElement {
    * @protected
    */
   onItemChange(store, itemId) {
-    const [x, y] = getItemSlotCoords(store, this._containerElement.invId, itemId);
+    const invId = this._containerElement.invId;
+    const [x, y] = getItemSlotCoords(store, invId, itemId);
     const item = getItemInStore(store, itemId);
     this.style.setProperty('--itemX', `${x}`);
     this.style.setProperty('--itemY', `${y}`);
@@ -219,7 +219,7 @@ export class InventoryItemElement extends HTMLElement {
         detail: {
           element: this,
           container: this.container,
-          inventoryId: this.inventoryId,
+          invId: this.inventoryId,
           itemId: this.itemId,
         },
       })
