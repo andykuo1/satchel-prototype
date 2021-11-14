@@ -1,3 +1,5 @@
+import { getInventorySlotCount } from './Inv.js';
+
 /**
  * @typedef {import('./Inv.js').Inventory} Inventory
  * @typedef {import('./Item.js').ItemId} ItemId
@@ -110,4 +112,15 @@ export function getSlotCoordsByIndex(inv, slotIndex) {
     default:
       throw new Error('Unsupported inventory type for slot coords.');
   }
+}
+
+export function getSlotIndexByItemId(inv, itemId, startIndex = 0) {
+  const length = getInventorySlotCount(inv);
+  for(let i = startIndex; i < length; ++i) {
+    let invItemId = inv.slots[i];
+    if (invItemId && invItemId === itemId) {
+      return i;
+    }
+  }
+  return -1;
 }

@@ -1,6 +1,16 @@
-import { getInventorySlotCount } from './Inv.js';
-import { clearSlots, getSlotCoordsByIndex, setSlots } from './InvSlots.js';
+import { clearSlots, getSlotCoordsByIndex, getSlotIndexByCoords, getSlotIndexByItemId, setSlots } from './InvSlots.js';
 
+/**
+ * @typedef {import('./Inv.js').Inventory} Inventory
+ * @typedef {import('./Item.js').ItemId} ItemId
+ * @typedef {import('./Item.js').Item} Item
+ */
+
+/**
+ * @param {Inventory} inv 
+ * @param {ItemId} itemId 
+ * @returns {boolean}
+ */
 export function hasItem(inv, itemId) {
   let item = inv.items[itemId];
   if (item) {
@@ -10,6 +20,12 @@ export function hasItem(inv, itemId) {
   }
 }
 
+/**
+ * @param {Inventory} inv 
+ * @param {Item} item 
+ * @param {number} coordX 
+ * @param {number} coordY 
+ */
 export function putItem(inv, item, coordX, coordY) {
   if (!inv) {
     throw new Error('Cannot put item to non-existant inventory.');
@@ -25,6 +41,10 @@ export function putItem(inv, item, coordX, coordY) {
   setSlots(inv, coordX, coordY, coordX + item.width - 1, coordY + item.height - 1, itemId);
 }
 
+/**
+ * @param {Inventory} inv 
+ * @param {ItemId} itemId
+ */
 export function removeItem(inv, itemId) {
   if (!inv) {
     throw new Error('Cannot remove item from non-existant inventory.');
@@ -34,7 +54,7 @@ export function removeItem(inv, itemId) {
   }
   let slotIndex = getSlotIndexByItemId(inv, itemId);
   if (slotIndex < 0) {
-    return null;
+    throw new Error(`Failed to remove item '${itemId}' - missing slot index for item.`);
   }
   let item = getItemByItemId(inv, itemId);
   let [fromX, fromY] = getSlotCoordsByIndex(inv, slotIndex);
@@ -42,32 +62,58 @@ export function removeItem(inv, itemId) {
   let toY = fromY + item.height - 1;
   clearSlots(inv, fromX, fromY, toX, toY);
   delete inv.items[itemId];
+  return true;
 }
 
+/**
+ * @param {Inventory} inv 
+ */
 export function clearItems(inv) {
   clearSlots(inv, 0, 0, inv.width - 1, inv.height - 1);
   inv.items = {};
 }
 
-export function getItemByItemId(inv, itemId) {
-  return inv.items[itemId];
+/**
+ * @param {Inventory} inv 
+ * @param {number} coordX 
+ * @param {number} coordY 
+ * @returns {ItemId}
+ */
+export function getItemIdBySlotCoords(inv, coordX, coordY) {
+  let slotIndex = getSlotIndexByCoords(inv, coordX, coordY);
+  return getItemIdBySlotIndex(inv, slotIndex);
 }
 
+/**
+ * @param {Inventory} inv 
+ * @param {number} slotIndex 
+ * @returns {ItemId}
+ */
+export function getItemIdBySlotIndex(inv, slotIndex) {
+  return inv.slots[slotIndex];
+}
+
+/**
+ * @param {Inventory} inv 
+ * @returns {Array<ItemId>}
+ */
 export function getItemIds(inv) {
   return Object.keys(inv.items);
 }
 
-export function getItems(inv) {
-  return Object.values(inv.items);
+/**
+ * @param {Inventory} inv 
+ * @param {ItemId} itemId
+ * @returns {Item}
+ */
+export function getItemByItemId(inv, itemId) {
+  return inv.items[itemId];
 }
 
-function getSlotIndexByItemId(inv, itemId, startIndex = 0) {
-  const length = getInventorySlotCount(inv);
-  for(let i = startIndex; i < length; ++i) {
-    let invItemId = inv.slots[i];
-    if (invItemId && invItemId === itemId) {
-      return i;
-    }
-  }
-  return -1;
+/**
+ * @param {Inventory} inv 
+ * @returns {Array<Item>}
+ */
+export function getItems(inv) {
+  return Object.values(inv.items);
 }

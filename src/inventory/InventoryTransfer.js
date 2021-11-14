@@ -7,8 +7,9 @@ import {
   getItemInStore,
   dispatchItemChange,
 } from './InventoryStore.js';
-import { getSlotCoordsByIndex, getSlotIndexByCoords, isSlotCoordEmpty } from './InvSlots.js';
+import { getSlotCoordsByIndex, getSlotIndexByItemId, isSlotCoordEmpty } from './InvSlots.js';
 import * as InvItems from './InvItems.js';
+import { getInventorySlotCount } from './Inv.js';
 
 /**
  * @typedef {import('./InventoryStore.js').Item} Item
@@ -80,31 +81,26 @@ export function putItem(store, invId, item, coordX, coordY) {
   dispatchInventoryChange(store, invId);
 }
 
-export function getItemSlotIndex(store, inventoryId, itemId, startIndex = 0) {
-  const inventory = getExistingInventory(store, inventoryId);
-  const length = getInventorySlotCount(store, inventoryId, inventory);
-  for (let i = startIndex; i < length; ++i) {
-    let invItemId = inventory.slots[i];
-    if (invItemId && invItemId === itemId) {
-      return i;
-    }
-  }
-  return -1;
+export function getItemSlotIndex(store, invId, itemId, startIndex = 0) {
+  const inv = getExistingInventory(store, invId);
+  return getSlotIndexByItemId(inv, itemId, startIndex);
 }
 
 export function getItemSlotCoords(store, inventoryId, itemId) {
-  let slotIndex = getItemSlotIndex(store, inventoryId, itemId);
-  return getInventorySlotCoords(store, inventoryId, slotIndex);
+  const inv = getExistingInventory(store, inventoryId);
+  const slotIndex = getSlotIndexByItemId(inv, itemId, 0);
+  return getSlotCoordsByIndex(inv, slotIndex);
 }
 
 /**
  * @param {InventoryStore} store
  * @param {ItemId} itemId
- * @param {InventoryId} inventoryId
+ * @param {InventoryId} invId
  * @returns {boolean}
  */
-export function hasItem(store, itemId, inventoryId) {
-  return getItemSlotIndex(store, inventoryId, itemId) >= 0;
+export function hasItem(store, itemId, invId) {
+  let inv = getExistingInventory(store, invId);
+  return InvItems.hasItem(inv, itemId);
 }
 
 /**
@@ -113,10 +109,10 @@ export function hasItem(store, itemId, inventoryId) {
  * @returns {boolean}
  */
 export function isInventoryEmpty(store, inventoryId) {
-  const inventory = getExistingInventory(store, inventoryId);
-  const length = getInventorySlotCount(store, inventoryId, inventory);
+  const inv = getExistingInventory(store, inventoryId);
+  const length = getInventorySlotCount(inv);
   for (let i = 0; i < length; ++i) {
-    let itemId = inventory.slots[i];
+    let itemId = inv.slots[i];
     if (itemId) {
       return false;
     }
@@ -132,23 +128,17 @@ export function isInventoryEmpty(store, inventoryId) {
  * @returns {Item}
  */
 export function getInventoryItemAt(store, invId, coordX, coordY) {
-  const inventory = getExistingInventory(store, invId);
-  const slotIndex = getInventorySlotIndexByCoords(store, invId, coordX, coordY);
-  if (slotIndex < 0) {
+  const inv = getExistingInventory(store, invId);
+  if (isSlotCoordEmpty(inv, coordX, coordY)) {
     return null;
   }
-  const itemId = inventory.slots[slotIndex];
-  if (!itemId) {
-    return null;
-  }
-  const item = getItemInStore(store, itemId);
-  return item;
+  let itemId = InvItems.getItemIdBySlotCoords(inv, coordX, coordY);
+  return InvItems.getItemByItemId(inv, itemId);
 }
 
 export function getInventoryItemIdAt(store, inventoryId, coordX, coordY) {
-  let slotIndex = getInventorySlotIndexByCoords(store, inventoryId, coordX, coordY);
-  const inventory = getExistingInventory(store, inventoryId);
-  return inventory.slots[slotIndex];
+  const inv = getExistingInventory(store, inventoryId);
+  return InvItems.getItemIdBySlotCoords(inv, coordX, coordY);
 }
 
 export function isInventorySlotEmpty(store, inventoryId, coordX, coordY) {
@@ -162,11 +152,11 @@ export function isInventorySlotEmpty(store, inventoryId, coordX, coordY) {
  * @returns {Iterable<ItemId>}
  */
 export function getInventoryItemIds(store, inventoryId) {
-  const inventory = getExistingInventory(store, inventoryId);
-  const length = getInventorySlotCount(store, inventoryId, inventory);
+  const inv = getExistingInventory(store, inventoryId);
+  const length = getInventorySlotCount(inv);
   let result = new Set();
   for (let i = 0; i < length; ++i) {
-    let itemId = inventory.slots[i];
+    let itemId = inv.slots[i];
     if (itemId) {
       result.add(itemId);
     }
@@ -180,36 +170,6 @@ export function getInventoryItems(store, invId) {
     result.push(getItemInStore(store, itemId));
   }
   return result;
-}
-
-export function getInventorySlotCoords(store, invId, slotIndex) {
-  let inv = getExistingInventory(store, invId);
-  return getSlotCoordsByIndex(inv, slotIndex);
-}
-
-export function getInventorySlotIndexByCoords(store, inventoryId, slotX, slotY) {
-  const inventory = getExistingInventory(store, inventoryId);
-  return getSlotIndexByCoords(inventory, slotX, slotY);
-}
-
-/**
- * @param {InventoryStore} store
- * @param {InventoryId} inventoryId
- * @param {Inventory} inventory
- * @returns {InventoryType}
- */
-export function getInventoryType(store, inventoryId, inventory) {
-  return inventory.type;
-}
-
-/**
- * @param {InventoryStore} store
- * @param {InventoryId} inventoryId
- * @param {Inventory} inventory
- * @returns {number}
- */
-export function getInventorySlotCount(store, inventoryId, inventory) {
-  return inventory.length;
 }
 
 /**

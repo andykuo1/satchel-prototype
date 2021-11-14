@@ -11,7 +11,6 @@ import {
 import {
   clearItems,
   getInventoryItemAt,
-  getInventoryType,
   getItemSlotCoords,
   isInventorySlotEmpty,
   putItem,
@@ -211,7 +210,7 @@ export class InventoryCursorElement extends HTMLElement {
       return true;
     }
     const toInventory = getInventory(store, invId);
-    const invType = getInventoryType(store, invId, toInventory);
+    const invType = toInventory.type;
     switch (invType) {
       case 'socket':
         // TODO: Force fail placing items in sockets.
