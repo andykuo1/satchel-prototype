@@ -1,10 +1,3 @@
-import { getInventoryStore } from './InventoryStore.js';
-import {
-  clearItems,
-  getInventoryItemAt,
-  putItem,
-} from './InventoryTransfer.js';
-
 /**
  * @typedef CursorContext
  * @property {import('./element/InventoryCursorElement.js').InventoryCursorElement} element
@@ -41,36 +34,4 @@ export function getCursorContext() {
  */
 export function getCursorElement(ctx) {
   return ctx.element;
-}
-
-/**
- * @param ctx
- * @returns {import('./InventoryStore.js').Item}
- */
-export function getCursorItem(ctx) {
-  const cursorInventoryId = ctx.element.name;
-  return getInventoryItemAt(getInventoryStore(), cursorInventoryId, 0, 0);
-}
-
-/**
- * @param {CursorContext} ctx
- * @param freedItem
- */
-export function storeToCursor(ctx, freedItem) {
-  if (!freedItem) {
-    return;
-  }
-  const cursorInventoryId = ctx.element.name;
-  putItem(getInventoryStore(), cursorInventoryId, freedItem, 0, 0);
-  ctx.element.style.display = 'unset';
-  ctx.element.startPlaceDownBuffer();
-}
-
-/**
- * @param {CursorContext} ctx
- */
-export function freeFromCursor(ctx) {
-  clearItems(getInventoryStore(), ctx.element.name);
-  ctx.element.style.display = 'none';
-  ctx.element.clearPlaceDownBuffer();
 }

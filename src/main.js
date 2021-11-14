@@ -1,7 +1,7 @@
-import { getCursorContext, getCursorElement, setCursorElement } from './inventory/CursorHelper.js';
+import { setCursorElement } from './inventory/CursorHelper.js';
 import { setGroundContainer } from './inventory/GroundHelper.js';
 import { createInventoryView } from './inventory/InventoryView.js';
-import { getInventoryStore, createSocketInventoryInStore, createGridInventoryInStore } from './inventory/InventoryStore.js';
+import { getInventoryStore, createGridInventoryInStore } from './inventory/InventoryStore.js';
 import {
   applyItemBuilder,
   openItemBuilder,

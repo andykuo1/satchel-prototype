@@ -189,6 +189,23 @@ export function getInventoryItemAt(store, inventoryId, coordX, coordY) {
   return item;
 }
 
+export function getInventoryItemIdAt(store, inventoryId, coordX, coordY) {
+  let slotIndex = getInventorySlotIndexByCoords(store, inventoryId, coordX, coordY);
+  const inventory = getExistingInventory(store, inventoryId);
+  return inventory.slots[slotIndex];
+}
+
+export function isInventorySlotEmpty(store, inventoryId, coordX, coordY) {
+  let slotIndex = getInventorySlotIndexByCoords(store, inventoryId, coordX, coordY);
+  const inventory = getExistingInventory(store, inventoryId);
+  const itemId = inventory.slots[slotIndex];
+  if (itemId) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
 /**
  * @param {InventoryStore} store 
  * @param {InventoryId} inventoryId 

@@ -1,10 +1,11 @@
 import { distanceSquared } from '../../util/math.js';
 import { setCursorElement } from '../CursorHelper.js';
 import { createSocketInventoryInStore, deleteInventoryFromStore, getInventoryInStore, getInventoryStore, isInventoryInStore } from '../InventoryStore.js';
+import { clearItems, getInventoryItemAt, putItem } from '../InventoryTransfer.js';
 
 const CURSOR_OFFSET_PIXELS = 24;
-const PLACE_BUFFER_RANGE_SQUARED = 8 * 8;
-const PLACE_BUFFER_TIMEOUT_MILLIS = 300;
+const PLACE_BUFFER_RANGE = 10;
+const PLACE_BUFFER_RANGE_SQUARED = PLACE_BUFFER_RANGE * PLACE_BUFFER_RANGE;
 
 const INNER_HTML = `
 <inventory-grid name="cursor"></inventory-grid>
@@ -89,6 +90,10 @@ export class InventoryCursorElement extends HTMLElement {
     return this.inventoryElement.name;
   }
 
+  get invId() {
+    return this.name;
+  }
+
   /** @protected */
   connectedCallback() {
     let store = getInventoryStore();
@@ -139,6 +144,30 @@ export class InventoryCursorElement extends HTMLElement {
   onMouseMove(e) {
     this.clientX = e.clientX;
     this.clientY = e.clientY;
+  }
+
+  holdItem(item, offsetX = 0, offsetY = 0) {
+    let store = getInventoryStore();
+    if (putItem(store, this.invId, item, 0, 0)) {
+      this.style.display = 'unset';
+      this.startPlaceDownBuffer();
+      this.setPickOffset(offsetX, offsetY);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  releaseItem() {
+    let store = getInventoryStore();
+    clearItems(store, this.invId);
+    this.style.display = 'none';
+    this.clearPlaceDownBuffer();
+  }
+
+  getHeldItem() {
+    let store = getInventoryStore();
+    return getInventoryItemAt(store, this.invId, 0, 0);
   }
 
   getPickOffset() {

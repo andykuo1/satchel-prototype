@@ -1,10 +1,7 @@
 import { dijkstra2d } from '../util/dijkstra2d.js';
 import {
-  freeFromCursor,
   getCursorContext,
   getCursorElement,
-  getCursorItem,
-  storeToCursor,
 } from './CursorHelper.js';
 import {
   getInventory,
@@ -19,6 +16,7 @@ import {
   isInventoryEmpty,
   putItem,
   removeItem,
+  getInventoryItemIdAt
 } from './InventoryTransfer.js';
 
 /**
@@ -54,8 +52,7 @@ export function pickUpItem(
   }
   const [fromItemX, fromItemY] = getItemSlotCoords(store, fromInventoryId, fromItemId);
   const item = removeItem(store, fromItemId, fromInventoryId);
-  storeToCursor(ctx, item);
-  ctx.element.setPickOffset(fromItemX - fromCoordX, fromItemY - fromCoordY);
+  element.holdItem(item, fromItemX - fromCoordX, fromItemY - fromCoordY);
   return true;
 }
 
@@ -65,94 +62,94 @@ export function pickUpItem(
  * @param {InventoryId} toInventoryId
  * @param {number} toCoordX
  * @param {number} toCoordY
- * @param {boolean} allowSwap
  */
 export function putDownItem(
   toInventoryId,
   toCoordX,
-  toCoordY,
-  allowSwap = true
+  toCoordY
 ) {
   const store = getInventoryStore();
   const ctx = getCursorContext();
-  const item = getCursorItem(ctx);
-  if (!item) {
+  const element = getCursorElement(ctx);
+  const heldItem = element.getHeldItem();
+  if (!heldItem) {
     return false;
   }
-  if (ctx.element.isPlaceDownBuffering()) {
-    ctx.element.clearPlaceDownBuffer();
+  if (element.isPlaceDownBuffering()) {
+    element.clearPlaceDownBuffer();
     return true;
   }
   const toInventory = getInventory(store, toInventoryId);
   const invWidth = toInventory.width;
   const invHeight = toInventory.height;
-  const itemWidth = item.width;
-  const itemHeight = item.height;
-  const [pickOffsetX, pickOffsetY] = ctx.element.getPickOffset();
+  const itemWidth = heldItem.width;
+  const itemHeight = heldItem.height;
+  const [pickOffsetX, pickOffsetY] = element.getPickOffset();
   const coordX = toCoordX + pickOffsetX;
   const coordY = toCoordY + pickOffsetY;
-
   const maxCoordX = invWidth - itemWidth;
   const maxCoordY = invHeight - itemHeight;
   if (maxCoordX < 0 || maxCoordY < 0) {
     return false;
   }
-
   const targetCoordX = Math.min(Math.max(0, coordX), maxCoordX);
   const targetCoordY = Math.min(Math.max(0, coordY), maxCoordY);
 
-  if (
-    allowSwap &&
-    canSwapAt(
-      toInventory,
-      coordX,
-      coordY,
+  let swappable = true;
+  let prevItemId = null;
+  for(let y = 0; y < itemHeight; ++y) {
+    for(let x = 0; x < itemWidth; ++x) {
+      let itemId = getInventoryItemIdAt(store, toInventoryId, targetCoordX + x, targetCoordY + y);
+      if (itemId) {
+        if (prevItemId) {
+          if (itemId !== prevItemId) {
+            swappable = false;
+          } else {
+            // It's the same item, keep going...
+          }
+        } else {
+          prevItemId = itemId;
+        }
+      }
+    }
+  }
+
+  if (swappable) {
+    let prevItem = null;
+    let prevItemX = -1;
+    let prevItemY = -1;
+    if (prevItemId) {
+      // Has an item to swap. So pick up this one for later.
+      let [x, y] = getItemSlotCoords(store, toInventoryId, prevItemId);
+      prevItemX = x;
+      prevItemY = y;
+      prevItem = removeItem(store, prevItemId, toInventoryId);
+    }
+    // Now there are no items in the way. Place it down!
+    element.releaseItem();
+    putItem(getInventoryStore(), toInventoryId, heldItem, targetCoordX, targetCoordY);
+    // ...finally put the remaining item back now that there is space.
+    if (prevItem) {
+      element.holdItem(prevItem, Math.min(0, prevItemX - targetCoordX), Math.min(0, prevItemY - targetCoordY));
+    }
+    return true;
+  } else {
+    // Cannot swap here. Find somehwere close?
+    const [x, y] = findEmptyCoords(
       targetCoordX,
       targetCoordY,
-      itemWidth,
-      itemHeight
-    )
-  ) {
-    freeFromCursor(ctx);
-    const storedItem = getInventoryItemAt(
-      store,
-      toInventoryId,
-      coordX,
-      coordY
+      maxCoordX,
+      maxCoordY,
+      (x, y) => canPlaceAt(toInventory, x, y, itemWidth, itemHeight)
     );
-    const [prevX, prevY] = getItemSlotCoords(store, toInventoryId, storedItem.itemId);
-    const result = pickUpItem(
-      storedItem.itemId,
-      toInventoryId,
-      prevX,
-      prevY
-    );
-    if (!result) {
-      throw new Error('Failed to pick up item on swap.');
+    if (x >= 0 && y >= 0) {
+      element.releaseItem();
+      putItem(getInventoryStore(), toInventoryId, heldItem, x, y);
+      return true;
     }
-    ctx.element.setPickOffset(prevX - targetCoordX, prevY - targetCoordY);
-    return putItem(
-      getInventoryStore(),
-      toInventory.name,
-      item,
-      targetCoordX,
-      targetCoordY
-    );
+    // No can do :(
+    return false;
   }
-
-  const [x, y] = findEmptyCoords(
-    targetCoordX,
-    targetCoordY,
-    maxCoordX,
-    maxCoordY,
-    (x, y) => canPlaceAt(toInventory, x, y, itemWidth, itemHeight)
-  );
-  if (x >= 0 && y >= 0) {
-    freeFromCursor(ctx);
-    return putItem(getInventoryStore(), toInventory.name, item, x, y);
-  }
-
-  return false;
 }
 
 /**
@@ -183,8 +180,8 @@ export function insertIn(toInventory, freedItem) {
   ) {
     return putItem(getInventoryStore(), toInventory.name, freedItem, 0, 0);
   }
-
   const ctx = getCursorContext();
+  const element = getCursorElement(ctx);
   const invWidth = toInventory.width;
   const invHeight = toInventory.height;
   const itemWidth = freedItem.width;
@@ -201,30 +198,11 @@ export function insertIn(toInventory, freedItem) {
     canPlaceAt(toInventory, x, y, itemWidth, itemHeight)
   );
   if (x >= 0 && y >= 0) {
-    freeFromCursor(ctx);
+    element.releaseItem();
     return putItem(getInventoryStore(), toInventory.name, freedItem, x, y);
   }
 
   return false;
-}
-
-/**
- * @param {Inventory} inv
- * @param coordX
- * @param coordY
- * @param itemX
- * @param itemY
- * @param itemWidth
- * @param itemHeight
- */
-function canSwapAt(inv, coordX, coordY, itemX, itemY, itemWidth, itemHeight) {
-  const item = getInventoryItemAt(
-    getInventoryStore(),
-    inv.name,
-    coordX,
-    coordY
-  );
-  return item && canPlaceAt(inv, itemX, itemY, itemWidth, itemHeight, item);
 }
 
 /**

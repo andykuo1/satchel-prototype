@@ -1,8 +1,7 @@
 import { uuid } from '../util/uuid.js';
 import {
-  freeFromCursor,
   getCursorContext,
-  getCursorItem,
+  getCursorElement,
 } from './CursorHelper.js';
 import { insertIn } from './InventoryHelper.js';
 import { createSocketInventoryInStore, getInventoryStore } from './InventoryStore.js';
@@ -29,11 +28,12 @@ export function setGroundContainer(ground) {
  */
 function onMouseUp(e) {
   const ctx = getCursorContext();
-  const item = getCursorItem(ctx);
+  const element = getCursorElement(ctx);
+  const item = element.getHeldItem();
   if (!item) {
     return;
   }
-  freeFromCursor(ctx);
+  element.releaseItem();
   dropOnGround(item);
 }
 
