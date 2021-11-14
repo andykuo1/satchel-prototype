@@ -81,26 +81,26 @@ export function getInventoryStore() {
 }
 
 /**
- * @param {InventoryStore} store 
- * @param {InventoryId} invId 
+ * @param {InventoryStore} store
+ * @param {InventoryId} invId
  */
 export function isInventoryInStore(store, invId) {
   return invId in store.data.inventory;
 }
 
 /**
- * 
- * @param {InventoryStore} store 
- * @param {InventoryId} invId 
+ *
+ * @param {InventoryStore} store
+ * @param {InventoryId} invId
  */
 export function getInventoryInStore(store, invId) {
   return store.data.inventory[invId];
 }
 
 /**
- * @param {InventoryStore} store 
- * @param {InventoryId} invId 
- * @param {Inventory} inventory 
+ * @param {InventoryStore} store
+ * @param {InventoryId} invId
+ * @param {Inventory} inventory
  */
 export function addInventoryToStore(store, invId, inventory) {
   if (invId !== inventory.invId) {
@@ -116,9 +116,9 @@ export function addInventoryToStore(store, invId, inventory) {
 }
 
 /**
- * @param {InventoryStore} store 
- * @param {InventoryId} invId 
- * @param {Inventory} inventory 
+ * @param {InventoryStore} store
+ * @param {InventoryId} invId
+ * @param {Inventory} inventory
  */
 export function deleteInventoryFromStore(store, invId, inventory) {
   if (invId !== inventory.invId) {
@@ -134,10 +134,10 @@ export function deleteInventoryFromStore(store, invId, inventory) {
 }
 
 /**
- * @param {InventoryStore} store 
- * @param {InventoryId} invId 
- * @param {number} width 
- * @param {number} height 
+ * @param {InventoryStore} store
+ * @param {InventoryId} invId
+ * @param {number} width
+ * @param {number} height
  * @returns {Inventory}
  */
 export function createGridInventoryInStore(store, invId, width, height) {
@@ -149,8 +149,8 @@ export function createGridInventoryInStore(store, invId, width, height) {
 }
 
 /**
- * @param {InventoryStore} store 
- * @param {InventoryId} invId 
+ * @param {InventoryStore} store
+ * @param {InventoryId} invId
  * @returns {Inventory}
  */
 export function createSocketInventoryInStore(store, invId) {
@@ -165,7 +165,7 @@ export function createSocketInventoryInStore(store, invId) {
  * @param store
  * @param inventoryId
  */
- export function getInventory(store, inventoryId) {
+export function getInventory(store, inventoryId) {
   if (isInventoryInStore(store, inventoryId)) {
     return getInventoryInStore(store, inventoryId);
   } else {
@@ -177,7 +177,7 @@ export function createSocketInventoryInStore(store, invId) {
  * @param store
  * @param inventoryId
  */
- export function dispatchInventoryChange(store, inventoryId) {
+export function dispatchInventoryChange(store, inventoryId) {
   dispatchInventoryEvent(store, 'inventory', inventoryId);
 }
 
@@ -232,8 +232,8 @@ export function getInventoryList(store) {
 /************************************************** INVENTORY */
 
 /**
- * @param {InventoryStore} store 
- * @param {ItemId} itemId 
+ * @param {InventoryStore} store
+ * @param {ItemId} itemId
  * @returns {boolean}
  */
 export function isItemInStore(store, itemId) {
@@ -241,8 +241,8 @@ export function isItemInStore(store, itemId) {
 }
 
 /**
- * @param {InventoryStore} store 
- * @param {ItemId} itemId 
+ * @param {InventoryStore} store
+ * @param {ItemId} itemId
  * @returns {Item}
  */
 export function getItemInStore(store, itemId) {
@@ -250,9 +250,9 @@ export function getItemInStore(store, itemId) {
 }
 
 /**
- * @param {InventoryStore} store 
- * @param {ItemId} itemId 
- * @param {Item} item 
+ * @param {InventoryStore} store
+ * @param {ItemId} itemId
+ * @param {Item} item
  * @returns {boolean}
  */
 export function addItemToStore(store, itemId, item) {
@@ -267,9 +267,9 @@ export function addItemToStore(store, itemId, item) {
 }
 
 /**
- * @param {InventoryStore} store 
- * @param {ItemId} itemId 
- * @param {Item} item 
+ * @param {InventoryStore} store
+ * @param {ItemId} itemId
+ * @param {Item} item
  * @returns {boolean}
  */
 export function deleteItemFromStore(store, itemId, item) {
@@ -342,9 +342,7 @@ export function removeItemChangeListener(store, itemId, callback) {
  */
 function addInventoryEventListener(store, event, key, callback) {
   if (!(event in store.listeners)) {
-    throw new Error(
-      `Cannot manage listener for unknown inventory event '${event}'.`
-    );
+    throw new Error(`Cannot manage listener for unknown inventory event '${event}'.`);
   }
 
   let listeners = store.listeners[event][key];
@@ -364,9 +362,7 @@ function addInventoryEventListener(store, event, key, callback) {
  */
 function removeInventoryEventListener(store, event, key, callback) {
   if (!(event in store.listeners)) {
-    throw new Error(
-      `Cannot manage listener for unknown inventory event '${event}'.`
-    );
+    throw new Error(`Cannot manage listener for unknown inventory event '${event}'.`);
   }
 
   const listeners = store.listeners[event][key];
@@ -385,9 +381,7 @@ function removeInventoryEventListener(store, event, key, callback) {
  */
 function dispatchInventoryEvent(store, event, key) {
   if (!(event in store.listeners)) {
-    throw new Error(
-      `Cannot dispatch event for unknown inventory event '${event}'.`
-    );
+    throw new Error(`Cannot dispatch event for unknown inventory event '${event}'.`);
   }
 
   const listeners = store.listeners[event][key];

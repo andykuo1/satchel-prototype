@@ -60,30 +60,17 @@ export class PeerfulNegotiator extends Eventable {
     /** @private */
     this.onIceCandidateError = this.onIceCandidateError.bind(this);
     /** @private */
-    this.onIceConnectionStateChange =
-      this.onIceConnectionStateChange.bind(this);
+    this.onIceConnectionStateChange = this.onIceConnectionStateChange.bind(this);
     /** @private */
     this.onIceGatheringStateChange = this.onIceGatheringStateChange.bind(this);
     /** @private */
     this.onSignalingStateChange = this.onSignalingStateChange.bind(this);
 
     peerConnection.addEventListener('icecandidate', this.onIceCandidate);
-    peerConnection.addEventListener(
-      'icecandidateerror',
-      this.onIceCandidateError
-    );
-    peerConnection.addEventListener(
-      'iceconnectionstatechange',
-      this.onIceConnectionStateChange
-    );
-    peerConnection.addEventListener(
-      'icegatheringstatechange',
-      this.onIceGatheringStateChange
-    );
-    peerConnection.addEventListener(
-      'signalingstatechange',
-      this.onSignalingStateChange
-    );
+    peerConnection.addEventListener('icecandidateerror', this.onIceCandidateError);
+    peerConnection.addEventListener('iceconnectionstatechange', this.onIceConnectionStateChange);
+    peerConnection.addEventListener('icegatheringstatechange', this.onIceGatheringStateChange);
+    peerConnection.addEventListener('signalingstatechange', this.onSignalingStateChange);
   }
 
   destroy() {
@@ -94,22 +81,10 @@ export class PeerfulNegotiator extends Eventable {
     this.pendingCandidates.length = 0;
     let peerConnection = this.peerConnection;
     peerConnection.removeEventListener('icecandidate', this.onIceCandidate);
-    peerConnection.removeEventListener(
-      'icecandidateerror',
-      this.onIceCandidateError
-    );
-    peerConnection.removeEventListener(
-      'iceconnectionstatechange',
-      this.onIceConnectionStateChange
-    );
-    peerConnection.removeEventListener(
-      'icegatheringstatechange',
-      this.onIceGatheringStateChange
-    );
-    peerConnection.removeEventListener(
-      'signalingstatechange',
-      this.onSignalingStateChange
-    );
+    peerConnection.removeEventListener('icecandidateerror', this.onIceCandidateError);
+    peerConnection.removeEventListener('iceconnectionstatechange', this.onIceConnectionStateChange);
+    peerConnection.removeEventListener('icegatheringstatechange', this.onIceGatheringStateChange);
+    peerConnection.removeEventListener('signalingstatechange', this.onSignalingStateChange);
     this.peerConnection = null;
     if (!this.completed) {
       this.completed = true;
@@ -142,10 +117,7 @@ export class PeerfulNegotiator extends Eventable {
     if (this.completed) {
       return;
     } else if (this.remoteId && this.remoteId !== remoteId) {
-      debug(
-        '[NEGOTIATOR]',
-        'Already negotiating connection with another remote id.'
-      );
+      debug('[NEGOTIATOR]', 'Already negotiating connection with another remote id.');
       return;
     }
 
@@ -181,12 +153,7 @@ export class PeerfulNegotiator extends Eventable {
   onIceGatheringStateChange() {
     let connectionState = this.peerConnection.iceConnectionState;
     let gatheringState = this.peerConnection.iceGatheringState;
-    debug(
-      '[NEGOTIATOR] ICE connection:',
-      connectionState,
-      ', gathering:',
-      gatheringState
-    );
+    debug('[NEGOTIATOR] ICE connection:', connectionState, ', gathering:', gatheringState);
   }
 
   /** @private */
@@ -207,11 +174,7 @@ export class PeerfulNegotiator extends Eventable {
       }
     } else {
       debug('[NEGOTIATOR]', 'Sending an ICE candidate.');
-      this.signaling.sendCandidateMessage(
-        this.localId,
-        this.remoteId,
-        e.candidate
-      );
+      this.signaling.sendCandidateMessage(this.localId, this.remoteId, e.candidate);
       // Start ice timeout if not yet started
       if (!this.iceTimeoutHandle) {
         this.iceTimeoutHandle = setTimeout(this.onIceTimeout, this.timeout);

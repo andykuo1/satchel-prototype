@@ -1,10 +1,7 @@
 import { uuid } from '../util/uuid.js';
 import { Eventable } from '../util/Eventable.js';
 import { PeerJsSignaling } from './PeerJsSignaling.js';
-import {
-  PeerfulLocalConnection,
-  PeerfulRemoteConnection,
-} from './PeerfulConnection.js';
+import { PeerfulLocalConnection, PeerfulRemoteConnection } from './PeerfulConnection.js';
 
 /**
  * @typedef {import('./PeerfulConnection.js').PeerfulConnection} PeerfulConnection
@@ -33,11 +30,9 @@ export class Peerful extends Eventable {
     this.connectionOptions = {};
 
     /** @private */
-    this.onPeerfulLocalConnectionOpen =
-      this.onPeerfulLocalConnectionOpen.bind(this);
+    this.onPeerfulLocalConnectionOpen = this.onPeerfulLocalConnectionOpen.bind(this);
     /** @private */
-    this.onPeerfulRemoteConnectionOpen =
-      this.onPeerfulRemoteConnectionOpen.bind(this);
+    this.onPeerfulRemoteConnectionOpen = this.onPeerfulRemoteConnectionOpen.bind(this);
 
     /** @private */
     this.onSignaling = this.onSignaling.bind(this);
@@ -69,11 +64,7 @@ export class Peerful extends Eventable {
     }
     await this.signalingPromise;
 
-    const conn = new PeerfulLocalConnection(
-      this.id,
-      this.signaling,
-      this.connectionOptions
-    );
+    const conn = new PeerfulLocalConnection(this.id, this.signaling, this.connectionOptions);
     this.connections[remoteId] = conn;
     // Try connecting to remote now
     try {
@@ -103,11 +94,7 @@ export class Peerful extends Eventable {
   resolveRemoteConnection(dst) {
     let conn = /** @type {PeerfulRemoteConnection} */ (this.connections[dst]);
     if (conn) return conn;
-    let next = new PeerfulRemoteConnection(
-      this.id,
-      this.signaling,
-      this.connectionOptions
-    );
+    let next = new PeerfulRemoteConnection(this.id, this.signaling, this.connectionOptions);
     next.listen().then(this.onPeerfulRemoteConnectionOpen);
     this.connections[dst] = next;
     return next;

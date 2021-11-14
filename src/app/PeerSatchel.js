@@ -2,7 +2,14 @@ import { Peerful } from '../peerful/Peerful.js';
 import { copyToClipboard } from '../util/clipboard.js';
 import { getCursorContext } from '../inventory/CursorHelper.js';
 import { saveToJSON } from '../inventory/InventoryLoader.js';
-import { createGridInventoryInStore, createInventoryStore, createSocketInventoryInStore, getInventoryStore, isInventoryInStore, resetInventoryStore } from '../inventory/InventoryStore.js';
+import {
+  createGridInventoryInStore,
+  createInventoryStore,
+  createSocketInventoryInStore,
+  getInventoryStore,
+  isInventoryInStore,
+  resetInventoryStore,
+} from '../inventory/InventoryStore.js';
 
 export async function connectAsClient() {
   const remoteId = tryGetRemotePeerId(window.location);

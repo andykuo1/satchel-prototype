@@ -1,8 +1,4 @@
-import {
-  deleteInventoryFromStore,
-  getInventory,
-  getInventoryStore,
-} from './InventoryStore.js';
+import { deleteInventoryFromStore, getInventory, getInventoryStore } from './InventoryStore.js';
 import { isInventoryEmpty } from './InventoryTransfer.js';
 
 /** @typedef {import('./element/InventoryGridElement.js').InventoryGridElement} InventoryGridElement */
@@ -13,9 +9,7 @@ import { isInventoryEmpty } from './InventoryTransfer.js';
  */
 export function createInventoryView(store, inventoryId) {
   const inv = getInventory(store, inventoryId);
-  const element = /** @type {InventoryGridElement} */ (
-    document.createElement('inventory-grid')
-  );
+  const element = /** @type {InventoryGridElement} */ (document.createElement('inventory-grid'));
   element.invId = inv.invId;
   return element;
 }
@@ -26,9 +20,7 @@ export function createInventoryView(store, inventoryId) {
  */
 export function createTemporaryInventoryView(store, inventoryId) {
   const inv = getInventory(store, inventoryId);
-  const element = /** @type {InventoryGridElement} */ (
-    document.createElement('inventory-grid')
-  );
+  const element = /** @type {InventoryGridElement} */ (document.createElement('inventory-grid'));
   element.invId = inv.invId;
   element.addEventListener('itemchange', onTemporaryInventoryItemChange);
   return element;

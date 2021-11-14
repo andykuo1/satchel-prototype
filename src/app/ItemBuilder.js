@@ -17,9 +17,7 @@ export function openItemBuilder(formElement, itemId = undefined) {
   if (itemId) {
     formElement.reset();
     formElement.querySelector('#itemSizeSet').toggleAttribute('disabled', true);
-    formElement
-      .querySelector('#itemTraitSet')
-      .toggleAttribute('disabled', true);
+    formElement.querySelector('#itemTraitSet').toggleAttribute('disabled', true);
     formElement.querySelector('#itemId').value = itemId;
     formElement.querySelector('input[type="submit"]').value = 'Save';
 
@@ -28,12 +26,8 @@ export function openItemBuilder(formElement, itemId = undefined) {
     formElement.querySelector('#itemDetail').value = item.description;
   } else {
     formElement.reset();
-    formElement
-      .querySelector('#itemSizeSet')
-      .toggleAttribute('disabled', false);
-    formElement
-      .querySelector('#itemTraitSet')
-      .toggleAttribute('disabled', false);
+    formElement.querySelector('#itemSizeSet').toggleAttribute('disabled', false);
+    formElement.querySelector('#itemTraitSet').toggleAttribute('disabled', false);
     formElement.querySelector('#itemId').value = '';
     formElement.querySelector('input[type="submit"]').value = 'Create';
   }
@@ -139,7 +133,7 @@ function buildItem(formData) {
 }
 
 /**
- * @param {Item} item 
+ * @param {Item} item
  */
 function spawnItem(item) {
   addItemToStore(getInventoryStore(), item.itemId, item);

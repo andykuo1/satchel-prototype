@@ -1,7 +1,5 @@
 import { uuid } from '../util/uuid.js';
-import {
-  getCursorContext,
-} from './CursorHelper.js';
+import { getCursorContext } from './CursorHelper.js';
 import { getCursor } from './element/InventoryCursorElement.js';
 import { insertIn } from './InventoryHelper.js';
 import { createSocketInventoryInStore, getInventoryStore } from './InventoryStore.js';
@@ -18,7 +16,6 @@ export function setGroundContainer(ground) {
   if (ctx.ground) {
     document.removeEventListener('mouseup', onMouseUp);
   }
-
   if (ground) {
     ctx.ground = ground;
     document.addEventListener('mouseup', onMouseUp);
@@ -50,10 +47,7 @@ export function dropOnGround(freedItem) {
   const inventory = createSocketInventoryInStore(getInventoryStore(), uuid());
   insertIn(inventory, freedItem);
 
-  const invElement = createTemporaryInventoryView(
-    getInventoryStore(),
-    inventory.invId
-  );
+  const invElement = createTemporaryInventoryView(getInventoryStore(), inventory.invId);
   ground.append(invElement);
 }
 

@@ -45,18 +45,7 @@
  * @returns {Array<number>} An array of x and y coordinates of the found end coordinates. If none are found, then
  * it will return [ -1, -1 ].
  */
-export function dijkstra2d(
-  x,
-  y,
-  minX,
-  minY,
-  maxX,
-  maxY,
-  isEnd,
-  getNeighbors,
-  fromCoord,
-  toCoord
-) {
+export function dijkstra2d(x, y, minX, minY, maxX, maxY, isEnd, getNeighbors, fromCoord, toCoord) {
   if (Number.isNaN(maxX) || Number.isNaN(maxY)) {
     throw new TypeError('Maximum coordinates must be a number.');
   }
@@ -66,9 +55,7 @@ export function dijkstra2d(
   }
 
   if (minX > maxX || minY > maxY) {
-    throw new Error(
-      'Minimum coordinates must be less than maximum coordinates.'
-    );
+    throw new Error('Minimum coordinates must be less than maximum coordinates.');
   }
 
   if (maxX !== (maxX & 0xff_ff) || maxY !== (maxY & 0xff_ff)) {
@@ -95,12 +82,7 @@ export function dijkstra2d(
       }
 
       const [neighborX, neighborY] = toCoord(neighbor, outCoord);
-      if (
-        neighborX >= minX &&
-        neighborY >= minY &&
-        neighborX <= maxX &&
-        neighborY <= maxY
-      ) {
+      if (neighborX >= minX && neighborY >= minY && neighborX <= maxX && neighborY <= maxY) {
         unvisited.push(neighbor);
       }
     }

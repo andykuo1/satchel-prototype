@@ -58,12 +58,7 @@ export function millerRabinPrimalityTest(n, t = 64) {
  * @returns {number}
  */
 function randomInt(min, max) {
-  return (
-    Math.trunc(
-      (crypto.getRandomValues(new Uint32Array(1))[0] / 0xff_ff_ff_ff) *
-        (max - min)
-    ) + min
-  );
+  return Math.trunc((crypto.getRandomValues(new Uint32Array(1))[0] / 0xff_ff_ff_ff) * (max - min)) + min;
 }
 
 /*

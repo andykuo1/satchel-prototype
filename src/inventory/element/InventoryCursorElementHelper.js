@@ -1,6 +1,12 @@
 import { dijkstra2d } from '../../util/dijkstra2d.js';
 import { getInventoryInStore } from '../InventoryStore.js';
-import { getInventoryItemAt, getInventoryItemIdAt, getItemSlotCoords, putItem, removeItem } from '../InventoryTransfer.js';
+import {
+  getInventoryItemAt,
+  getInventoryItemIdAt,
+  getItemSlotCoords,
+  putItem,
+  removeItem,
+} from '../InventoryTransfer.js';
 
 /**
  * @typedef {import('../Inv.js').Inventory} Inventory
@@ -9,7 +15,7 @@ import { getInventoryItemAt, getInventoryItemIdAt, getItemSlotCoords, putItem, r
  *
  * @typedef {import('../Item.js').Item} Item
  * @typedef {import('../Item.js').ItemId} ItemId
- * 
+ *
  * @typedef {import('./InventoryCursorElement.js').InventoryCursorElement} InventoryCursorElement
  */
 

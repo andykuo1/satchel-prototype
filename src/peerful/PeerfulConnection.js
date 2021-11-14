@@ -6,11 +6,7 @@ import {
   resolvePromiseStatus,
 } from './PromiseStatus.js';
 
-import {
-  debug,
-  DEFAULT_ICE_SERVERS,
-  FILTER_TRICKLE_SDP_PATTERN,
-} from './PeerfulUtil.js';
+import { debug, DEFAULT_ICE_SERVERS, FILTER_TRICKLE_SDP_PATTERN } from './PeerfulUtil.js';
 import { PeerfulNegotiator } from './PeerfulNegotiator.js';
 
 /** @typedef {import('./PeerJsSignaling.js').PeerJsSignaling} PeerJsSignaling */
@@ -136,10 +132,7 @@ export class PeerfulConnection extends Eventable {
     this.closed = true;
     this.opened = false;
     if (this.connectedStatus) {
-      rejectPromiseStatus(
-        this.connectedStatus,
-        new Error('Connection closed.')
-      );
+      rejectPromiseStatus(this.connectedStatus, new Error('Connection closed.'));
       this.connectedStatus = null;
     }
     if (this.dataChannel) {
@@ -214,11 +207,7 @@ export class PeerfulConnection extends Eventable {
       iceServers: DEFAULT_ICE_SERVERS,
       ...this.options.rtcConfig,
     });
-    this.negotiator = new PeerfulNegotiator(
-      this.signaling,
-      this.localId,
-      this.peerConnection
-    );
+    this.negotiator = new PeerfulNegotiator(this.signaling, this.localId, this.peerConnection);
     this.negotiator.on('ready', () => {
       this.negotiatorReady = true;
       this.tryConnectionReady();
@@ -265,15 +254,9 @@ export class PeerfulLocalConnection extends PeerfulConnection {
     // Start connection
     this.tryConnectionStart();
     // Listen for negotiations...
-    this.peerConnection.addEventListener(
-      'negotiationneeded',
-      this.onNegotiationNeeded
-    );
+    this.peerConnection.addEventListener('negotiationneeded', this.onNegotiationNeeded);
     // Create channel
-    const channel = this.peerConnection.createDataChannel(
-      'data',
-      this.options.channelOptions
-    );
+    const channel = this.peerConnection.createDataChannel('data', this.options.channelOptions);
     this.setDataChannel(channel);
     // Wait to be connected...
     return createPromiseStatusPromise(this.connectedStatus);
@@ -307,9 +290,7 @@ export class PeerfulLocalConnection extends PeerfulConnection {
       const candidate = /** @type {RTCIceCandidate} */ (sdp);
       this.negotiator.addCandidate(candidate);
     } else {
-      throw new Error(
-        `Received invalid response type '${type}' on local connection.`
-      );
+      throw new Error(`Received invalid response type '${type}' on local connection.`);
     }
   }
 
@@ -393,12 +374,8 @@ export class PeerfulRemoteConnection extends PeerfulConnection {
       this.peerConnection
         .setRemoteDescription(description)
         .then(() => this.negotiator.onRemoteDescription(this.remoteId))
-        .then(() =>
-          debug('[REMOTE]', 'Successfully set remote description from offer.')
-        )
-        .catch((e) =>
-          debug('[REMOTE]', 'Failed to set remote description from offer.', e)
-        )
+        .then(() => debug('[REMOTE]', 'Successfully set remote description from offer.'))
+        .catch((e) => debug('[REMOTE]', 'Failed to set remote description from offer.', e))
         .then(async () => {
           // Send answer
           await this.performAnswer();
@@ -409,9 +386,7 @@ export class PeerfulRemoteConnection extends PeerfulConnection {
       const candidate = /** @type {RTCIceCandidate} */ (sdp);
       this.negotiator.addCandidate(candidate);
     } else {
-      throw new Error(
-        `Received invalid response type '${type}' on remote connection.`
-      );
+      throw new Error(`Received invalid response type '${type}' on remote connection.`);
     }
   }
 

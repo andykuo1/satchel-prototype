@@ -116,9 +116,7 @@ function computeSVGStyles(svg, dst = svg.cloneNode(true)) {
 
       const styleAttributes = [];
       for (const styleName of Object.keys(computedStyle)) {
-        styleAttributes.push(
-          `${styleName}:${computedStyle.getPropertyValue(styleName)};`
-        );
+        styleAttributes.push(`${styleName}:${computedStyle.getPropertyValue(styleName)};`);
       }
 
       child.setAttribute('style', styleAttributes.join(''));

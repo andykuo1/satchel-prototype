@@ -40,18 +40,18 @@ export function removeItem(store, itemId, inventoryId) {
 }
 
 /**
- * @param {InventoryStore} store 
- * @param {InventoryId} inventoryId 
- * @param {number} fromX 
- * @param {number} fromY 
- * @param {number} toX 
- * @param {number} toY 
- * @param {ItemId} itemId 
+ * @param {InventoryStore} store
+ * @param {InventoryId} inventoryId
+ * @param {number} fromX
+ * @param {number} fromY
+ * @param {number} toX
+ * @param {number} toY
+ * @param {ItemId} itemId
  */
 function setSlots(store, inventoryId, fromX, fromY, toX, toY, itemId) {
   let inventory = getExistingInventory(store, inventoryId);
-  for(let x = fromX; x <= toX; ++x) {
-    for(let y = fromY; y <= toY; ++y) {
+  for (let x = fromX; x <= toX; ++x) {
+    for (let y = fromY; y <= toY; ++y) {
       let slotIndex = getInventorySlotIndexByCoords(store, inventoryId, x, y);
       if (slotIndex < 0) {
         continue;
@@ -63,8 +63,8 @@ function setSlots(store, inventoryId, fromX, fromY, toX, toY, itemId) {
 
 function clearSlots(store, inventoryId, fromX, fromY, toX, toY) {
   let inventory = getExistingInventory(store, inventoryId);
-  for(let x = fromX; x <= toX; ++x) {
-    for(let y = fromY; y <= toY; ++y) {
+  for (let x = fromX; x <= toX; ++x) {
+    for (let y = fromY; y <= toY; ++y) {
       let slotIndex = getInventorySlotIndexByCoords(store, inventoryId, x, y);
       if (slotIndex < 0) {
         continue;
@@ -140,9 +140,9 @@ export function getItemSlotCoords(store, inventoryId, itemId) {
 }
 
 /**
- * @param {InventoryStore} store 
- * @param {ItemId} itemId 
- * @param {InventoryId} inventoryId 
+ * @param {InventoryStore} store
+ * @param {ItemId} itemId
+ * @param {InventoryId} inventoryId
  * @returns {boolean}
  */
 export function hasItem(store, itemId, inventoryId) {
@@ -150,14 +150,14 @@ export function hasItem(store, itemId, inventoryId) {
 }
 
 /**
- * @param {InventoryStore} store 
- * @param {InventoryId} inventoryId 
+ * @param {InventoryStore} store
+ * @param {InventoryId} inventoryId
  * @returns {boolean}
  */
 export function isInventoryEmpty(store, inventoryId) {
   const inventory = getExistingInventory(store, inventoryId);
   const length = getInventorySlotCount(store, inventoryId, inventory);
-  for(let i = 0; i < length; ++i) {
+  for (let i = 0; i < length; ++i) {
     let itemId = inventory.slots[i];
     if (itemId) {
       return false;
@@ -167,10 +167,10 @@ export function isInventoryEmpty(store, inventoryId) {
 }
 
 /**
- * @param {InventoryStore} store 
- * @param {InventoryId} inventoryId 
- * @param {number} coordX 
- * @param {number} coordY 
+ * @param {InventoryStore} store
+ * @param {InventoryId} inventoryId
+ * @param {number} coordX
+ * @param {number} coordY
  * @returns {Item}
  */
 export function getInventoryItemAt(store, inventoryId, coordX, coordY) {
@@ -205,8 +205,8 @@ export function isInventorySlotEmpty(store, inventoryId, coordX, coordY) {
 }
 
 /**
- * @param {InventoryStore} store 
- * @param {InventoryId} inventoryId 
+ * @param {InventoryStore} store
+ * @param {InventoryId} inventoryId
  * @returns {Iterable<ItemId>}
  */
 export function getInventoryItemIds(store, inventoryId) {
@@ -235,14 +235,11 @@ export function getInventorySlotCoords(store, inventoryId, slotIndex) {
     return [-1, -1];
   }
   const inventory = getExistingInventory(store, inventoryId);
-  switch(getInventoryType(store, inventoryId, inventory)) {
+  switch (getInventoryType(store, inventoryId, inventory)) {
     case 'socket':
     case 'grid': {
       const width = inventory.width;
-      return [
-        slotIndex % width,
-        Math.floor(slotIndex / width)
-      ];
+      return [slotIndex % width, Math.floor(slotIndex / width)];
     }
     default:
       throw new Error('Unsupported inventory type for slot coords.');
@@ -254,7 +251,7 @@ export function getInventorySlotIndexByCoords(store, inventoryId, slotX, slotY) 
     return -1;
   }
   const inventory = getExistingInventory(store, inventoryId);
-  switch(getInventoryType(store, inventoryId, inventory)) {
+  switch (getInventoryType(store, inventoryId, inventory)) {
     case 'socket':
     case 'grid': {
       const width = inventory.width;
@@ -270,9 +267,9 @@ export function getInventorySlotIndexByCoords(store, inventoryId, slotX, slotY) 
 }
 
 /**
- * @param {InventoryStore} store 
- * @param {InventoryId} inventoryId 
- * @param {Inventory} inventory 
+ * @param {InventoryStore} store
+ * @param {InventoryId} inventoryId
+ * @param {Inventory} inventory
  * @returns {InventoryType}
  */
 export function getInventoryType(store, inventoryId, inventory) {
@@ -280,9 +277,9 @@ export function getInventoryType(store, inventoryId, inventory) {
 }
 
 /**
- * @param {InventoryStore} store 
- * @param {InventoryId} inventoryId 
- * @param {Inventory} inventory 
+ * @param {InventoryStore} store
+ * @param {InventoryId} inventoryId
+ * @param {Inventory} inventory
  * @returns {number}
  */
 export function getInventorySlotCount(store, inventoryId, inventory) {
@@ -291,17 +288,15 @@ export function getInventorySlotCount(store, inventoryId, inventory) {
 
 /**
  * Get an existing inventory. Will throw if it does not exist.
- * 
- * @param {InventoryStore} store 
- * @param {InventoryId} inventoryId 
+ *
+ * @param {InventoryStore} store
+ * @param {InventoryId} inventoryId
  * @returns {Inventory}
  */
- export function getExistingInventory(store, inventoryId) {
+export function getExistingInventory(store, inventoryId) {
   const inventory = getInventory(store, inventoryId);
   if (!inventory) {
-    throw new Error(
-      `Cannot get non-existant inventory '${inventoryId}'.`
-    );
+    throw new Error(`Cannot get non-existant inventory '${inventoryId}'.`);
   }
   return inventory;
 }

@@ -40,10 +40,7 @@ export function createPromiseStatus() {
  * @returns {boolean}
  */
 export function isPromiseStatusPending(promiseStatus) {
-  return (
-    !promiseStatus.complete &&
-    (promiseStatus.resolve.length > 0 || promiseStatus.reject.length > 0)
-  );
+  return !promiseStatus.complete && (promiseStatus.resolve.length > 0 || promiseStatus.reject.length > 0);
 }
 
 /**

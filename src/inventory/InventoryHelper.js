@@ -1,10 +1,6 @@
 import { dijkstra2d } from '../util/dijkstra2d.js';
 import { getCursor } from './element/InventoryCursorElement.js';
-import {
-  getInventoryList,
-  getInventoryStore,
-  getItems,
-} from './InventoryStore.js';
+import { getInventoryList, getInventoryStore, getItems } from './InventoryStore.js';
 import {
   getInventoryItemAt,
   getInventoryItems,
@@ -18,7 +14,6 @@ import {
  * @typedef {import('./InventoryStore.js').ItemId} ItemId
  * @typedef {import('./InventoryStore.js').InventoryId} InventoryId
  */
-
 
 /**
  * @param fromInventory
@@ -42,10 +37,7 @@ export function extractOut(fromInventory, filter) {
  * @param freedItem
  */
 export function insertIn(toInventory, freedItem) {
-  if (
-    toInventory.type === 'socket' &&
-    isInventoryEmpty(getInventoryStore(), toInventory.invId)
-  ) {
+  if (toInventory.type === 'socket' && isInventoryEmpty(getInventoryStore(), toInventory.invId)) {
     return putItem(getInventoryStore(), toInventory.invId, freedItem, 0, 0);
   }
   const cursor = getCursor();
@@ -80,22 +72,10 @@ export function insertIn(toInventory, freedItem) {
  * @param itemHeight
  * @param exclude
  */
-function canPlaceAt(
-  inv,
-  coordX,
-  coordY,
-  itemWidth,
-  itemHeight,
-  exclude = null
-) {
+function canPlaceAt(inv, coordX, coordY, itemWidth, itemHeight, exclude = null) {
   for (let y = 0; y < itemHeight; ++y) {
     for (let x = 0; x < itemWidth; ++x) {
-      const item = getInventoryItemAt(
-        getInventoryStore(),
-        inv.invId,
-        coordX + x,
-        coordY + y
-      );
+      const item = getInventoryItemAt(getInventoryStore(), inv.invId, coordX + x, coordY + y);
       if (item && (!exclude || item !== exclude)) {
         return false;
       }
@@ -112,13 +92,7 @@ function canPlaceAt(
  * @param maxCoordY
  * @param isEmptyCallback
  */
-function findEmptyCoords(
-  coordX,
-  coordY,
-  maxCoordX,
-  maxCoordY,
-  isEmptyCallback = () => true
-) {
+function findEmptyCoords(coordX, coordY, maxCoordX, maxCoordY, isEmptyCallback = () => true) {
   return dijkstra2d(
     coordX,
     coordY,

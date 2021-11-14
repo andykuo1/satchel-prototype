@@ -107,9 +107,7 @@ export class PeerJsSignaling {
   async open() {
     debug('[SIGNAL]', 'Opening signaling socket...');
     if (this.closed) {
-      throw new Error(
-        'Cannot open already closed connection to peerjs server.'
-      );
+      throw new Error('Cannot open already closed connection to peerjs server.');
     }
 
     if (this.opened) {
@@ -155,12 +153,7 @@ export class PeerJsSignaling {
     try {
       data = JSON.parse(e.data);
     } catch (error) {
-      this.callback(
-        new Error(
-          `Invalid signaling message from peerjs server: ${error.data}`
-        ),
-        null
-      );
+      this.callback(new Error(`Invalid signaling message from peerjs server: ${error.data}`), null);
       return;
     }
 
@@ -174,10 +167,7 @@ export class PeerJsSignaling {
         break;
       case 'ERROR':
         this.callback(
-          new PeerJsSignalingError(
-            PeerJsSignalingErrorCode.ERROR,
-            JSON.stringify(payload)
-          ),
+          new PeerJsSignalingError(PeerJsSignalingErrorCode.ERROR, JSON.stringify(payload)),
           null
         );
         break;
@@ -201,19 +191,13 @@ export class PeerJsSignaling {
         break;
       case 'LEAVE':
         this.callback(
-          new PeerJsSignalingError(
-            PeerJsSignalingErrorCode.LEAVE,
-            'Signaling connection left.'
-          ),
+          new PeerJsSignalingError(PeerJsSignalingErrorCode.LEAVE, 'Signaling connection left.'),
           null
         );
         break;
       case 'EXPIRE':
         this.callback(
-          new PeerJsSignalingError(
-            PeerJsSignalingErrorCode.EXPIRE,
-            'Signaling connection expired.'
-          ),
+          new PeerJsSignalingError(PeerJsSignalingErrorCode.EXPIRE, 'Signaling connection expired.'),
           null
         );
         break;
@@ -230,9 +214,7 @@ export class PeerJsSignaling {
         this.callback(
           new PeerJsSignalingError(
             PeerJsSignalingErrorCode.UNKNOWN,
-            `Unknown signaling message from peerjs server: ${JSON.stringify(
-              data
-            )}`
+            `Unknown signaling message from peerjs server: ${JSON.stringify(data)}`
           ),
           null
         );
@@ -248,10 +230,7 @@ export class PeerJsSignaling {
 
     this.destroy();
     this.closed = true;
-    this.callback(
-      new Error('Signaling connection closed unexpectedly to peerjs server.'),
-      null
-    );
+    this.callback(new Error('Signaling connection closed unexpectedly to peerjs server.'), null);
   }
 
   /**
@@ -267,10 +246,7 @@ export class PeerJsSignaling {
     }
 
     if (!isWebSocketOpen(this.webSocket)) {
-      this.callback(
-        new Error('Cannot send candidate message to un-opened connection.'),
-        null
-      );
+      this.callback(new Error('Cannot send candidate message to un-opened connection.'), null);
       return;
     }
 
@@ -295,10 +271,7 @@ export class PeerJsSignaling {
     }
 
     if (!isWebSocketOpen(this.webSocket)) {
-      this.callback(
-        new Error('Cannot send signaling message to un-opened connection.'),
-        null
-      );
+      this.callback(new Error('Cannot send signaling message to un-opened connection.'), null);
       return;
     }
 
@@ -338,10 +311,7 @@ export class PeerJsSignaling {
     }
 
     if (!isWebSocketOpen(this.webSocket)) {
-      this.callback(
-        new Error('Cannot send signaling heartbeat to un-opened connection.'),
-        null
-      );
+      this.callback(new Error('Cannot send signaling heartbeat to un-opened connection.'), null);
       return;
     }
 
@@ -402,10 +372,7 @@ export class PeerJsSignaling {
 
     const { activeStatus } = this;
     if (isPromiseStatusPending(activeStatus)) {
-      rejectPromiseStatus(
-        activeStatus,
-        new Error('Signaling connection closed.')
-      );
+      rejectPromiseStatus(activeStatus, new Error('Signaling connection closed.'));
     }
 
     this.opened = false;

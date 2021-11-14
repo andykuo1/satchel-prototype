@@ -68,7 +68,7 @@ export function createSocketInventory(invId) {
 }
 
 /**
- * @param {Inventory} other 
+ * @param {Inventory} other
  * @param {Inventory} [dst]
  * @returns {Inventory}
  */
@@ -88,8 +88,8 @@ export function copyInventory(other, dst = undefined) {
     dst.length = length;
   }
   if (Array.isArray(other.slots)) {
-    const length = Math.min(other.slots.length, dst.slots.length)
-    for(let i = 0; i < length; ++i) {
+    const length = Math.min(other.slots.length, dst.slots.length);
+    for (let i = 0; i < length; ++i) {
       dst.slots[i] = other.slots[i];
     }
   }

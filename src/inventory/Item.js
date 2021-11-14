@@ -29,13 +29,12 @@ export function createItem(itemId) {
   return item;
 }
 
-
 /**
- * @param {Item} other 
+ * @param {Item} other
  * @param {Item} [dst]
  * @returns {Item}
  */
- export function copyItem(other, dst = undefined) {
+export function copyItem(other, dst = undefined) {
   const itemId = other.itemId || uuid();
   if (!dst) {
     dst = createItem(itemId);
@@ -66,7 +65,6 @@ export function createItem(itemId) {
   }
   return dst;
 }
-
 
 export class ItemBuilder {
   static from(baseItem) {
