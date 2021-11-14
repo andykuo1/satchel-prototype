@@ -103,14 +103,13 @@ export function clearItems(store, inventoryId) {
 }
 
 /**
- * Put and create item in inventory.
+ * Put and create item in inventory. Will throw if unable to.
  *
  * @param {InventoryStore} store
  * @param {InventoryId} inventoryId
  * @param {Item} item
  * @param {number} coordX
  * @param {number} coordY
- * @returns {boolean} Whether the item placed successfully.
  */
 export function putItem(store, inventoryId, item, coordX, coordY) {
   const itemId = item.itemId;
@@ -121,7 +120,6 @@ export function putItem(store, inventoryId, item, coordX, coordY) {
   // Put in slots
   setSlots(store, inventoryId, coordX, coordY, coordX + item.width - 1, coordY + item.height - 1, itemId);
   dispatchInventoryChange(store, inventoryId);
-  return true;
 }
 
 export function getItemSlotIndex(store, inventoryId, itemId, startIndex = 0) {

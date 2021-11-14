@@ -181,9 +181,11 @@ export class InventoryItemElement extends HTMLElement {
     this.style.setProperty('--itemY', `${y}`);
     this.style.setProperty('--itemWidth', `${item.width}`);
     this.style.setProperty('--itemHeight', `${item.height}`);
+    const displayName = item.displayName || 'Item';
+    this.title = displayName;
     this._image.src = item.imgSrc;
-    this._image.alt = item.displayName;
-    this._caption.textContent = item.displayName;
+    this._image.alt = displayName;
+    // this._caption.textContent = item.displayName;
   }
 
   /**

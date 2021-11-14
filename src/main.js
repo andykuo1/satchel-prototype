@@ -1,4 +1,3 @@
-import { setCursorElement } from './inventory/CursorHelper.js';
 import { setGroundContainer } from './inventory/GroundHelper.js';
 import { createInventoryView } from './inventory/InventoryView.js';
 import { getInventoryStore, createGridInventoryInStore } from './inventory/InventoryStore.js';
@@ -56,11 +55,10 @@ window.addEventListener('DOMContentLoaded', () => {
   const workspace = document.querySelector('#workspace');
   const ground = document.querySelector('#ground');
 
-  setCursorElement(document.querySelector('inventory-cursor'));
   setGroundContainer(ground);
 
   const mainInventory = createGridInventoryInStore(store, 'main', 12, 9);
-  const mainElement = createInventoryView(store, mainInventory.name);
+  const mainElement = createInventoryView(store, mainInventory.invId);
   workspace.append(mainElement);
 
   // Load from storage...

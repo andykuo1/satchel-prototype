@@ -1,4 +1,4 @@
-import { pickUpItem, putDownItem } from '../InventoryHelper.js';
+import { getCursor } from './InventoryCursorElement.js';
 
 /**
  * @typedef {import('./InventoryItemElement.js').InventoryItemElement} InventoryItemElement
@@ -26,12 +26,8 @@ export function itemMouseDownCallback(mouseEvent, itemElement, unitSize) {
     mouseEvent.clientY,
     unitSize
   );
-  const result = pickUpItem(
-    itemElement.itemId,
-    containerElement.name,
-    clientCoordX,
-    clientCoordY
-  );
+  let cursor = getCursor();
+  let result = cursor.pickUp(containerElement.name, itemElement.itemId, clientCoordX, clientCoordY);
   if (result) {
     mouseEvent.preventDefault();
     mouseEvent.stopPropagation();
@@ -63,7 +59,8 @@ export function containerMouseUpCallback(
     mouseEvent.clientY,
     unitSize
   );
-  const result = putDownItem(containerElement.name, clientCoordX, clientCoordY);
+  let cursor = getCursor();
+  let result = cursor.putDown(containerElement.name, clientCoordX, clientCoordY);
   if (result) {
     mouseEvent.preventDefault();
     mouseEvent.stopPropagation();

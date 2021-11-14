@@ -16,7 +16,7 @@ export function createInventoryView(store, inventoryId) {
   const element = /** @type {InventoryGridElement} */ (
     document.createElement('inventory-grid')
   );
-  element.name = inv.name;
+  element.name = inv.invId;
   return element;
 }
 
@@ -29,7 +29,7 @@ export function createTemporaryInventoryView(store, inventoryId) {
   const element = /** @type {InventoryGridElement} */ (
     document.createElement('inventory-grid')
   );
-  element.name = inv.name;
+  element.name = inv.invId;
   element.addEventListener('itemchange', onTemporaryInventoryItemChange);
   return element;
 }
