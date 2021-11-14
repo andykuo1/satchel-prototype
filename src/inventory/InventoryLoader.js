@@ -1,5 +1,6 @@
-import { getInventory, resetInventoryStore } from './InventoryStore.js';
-import { getInventoryItems } from './InventoryTransfer.js';
+import { copyInventory } from './Inv.js';
+import { addInventoryToStore, addItemToStore, createInventoryStore, resetInventoryStore } from './InventoryStore.js';
+import { copyItem } from './Item.js';
 
 /**
  * @param store
@@ -32,12 +33,26 @@ export function saveToLocalStorage(store) {
  * @param jsonData
  */
 export function loadFromJSON(store, jsonData) {
-  const nextStore = {
-    data: {
-      item: jsonData.data.item,
-      inventory: jsonData.data.inventory,
-    },
-  };
+  let nextStore = createInventoryStore();
+  if (jsonData) {
+    if ('data' in jsonData && typeof jsonData.data === 'object') {
+      const data = jsonData.data;
+      if ('inventory' in data && typeof data.inventory === 'object') {
+        const inventories = Object.values(data.inventory);
+        for(let inventory of inventories) {
+          let newInventory = copyInventory(inventory);
+          addInventoryToStore(nextStore, newInventory.invId, newInventory);
+        }
+      }
+      if ('item' in data && typeof data.item === 'object') {
+        const items = Object.values(data.item);
+        for(let item of items) {
+          let newItem = copyItem(item);
+          addItemToStore(nextStore, newItem.itemId, newItem);
+        }
+      }
+    }
+  }
   resetInventoryStore(store, nextStore);
 }
 
@@ -48,27 +63,5 @@ export function saveToJSON(store) {
   const result = {
     data: store.data,
   };
-  return result;
-}
-
-/**
- * @param store
- * @param inventoryId
- */
-export function saveInventoryToJSON(store, inventoryId) {
-  const inv = getInventory(store, inventoryId);
-  const result = {
-    data: {
-      item: {},
-      inventory: {
-        [inventoryId]: inv,
-      },
-    },
-  };
-  const items = getInventoryItems(store, inventoryId);
-  for (const item of items) {
-    result.data.item[item.itemId] = item;
-  }
-
   return result;
 }

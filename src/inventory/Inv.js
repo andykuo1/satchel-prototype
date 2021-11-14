@@ -2,6 +2,8 @@
  * @typedef {import('./Item.js').ItemId} ItemId
  */
 
+import { uuid } from '../util/uuid.js';
+
 /**
  * @typedef {string} InventoryId
  * @typedef {'grid'|'socket'} InventoryType
@@ -63,4 +65,43 @@ export function createGridInventory(invId, width, height) {
 export function createSocketInventory(invId) {
   // TODO: width, height = Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY
   return createInventory(invId, 'socket', 1, 1, 1);
+}
+
+/**
+ * @param {Inventory} other 
+ * @param {Inventory} [dst]
+ * @returns {Inventory}
+ */
+export function copyInventory(other, dst = undefined) {
+  const invId = other.invId || uuid();
+  const type = other.type || 'grid';
+  const width = Number(other.width) || 1;
+  const height = Number(other.height) || 1;
+  const length = Number(other.length) || 1;
+  if (!dst) {
+    dst = createInventory(invId, type, length, width, height);
+  } else {
+    dst.invId = invId;
+    dst.type = type;
+    dst.width = width;
+    dst.height = height;
+    dst.length = length;
+  }
+  if (Array.isArray(other.slots)) {
+    const length = Math.min(other.slots.length, dst.slots.length)
+    for(let i = 0; i < length; ++i) {
+      dst.slots[i] = other.slots[i];
+    }
+  }
+  if (typeof other.displayName === 'string') {
+    dst.displayName = other.displayName;
+  }
+  if (typeof other.metadata === 'object') {
+    try {
+      dst.metadata = JSON.parse(JSON.stringify(other.metadata));
+    } catch (e) {
+      dst.metadata = {};
+    }
+  }
+  return dst;
 }

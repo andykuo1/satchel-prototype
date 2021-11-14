@@ -29,6 +29,45 @@ export function createItem(itemId) {
   return item;
 }
 
+
+/**
+ * @param {Item} other 
+ * @param {Item} [dst]
+ * @returns {Item}
+ */
+ export function copyItem(other, dst = undefined) {
+  const itemId = other.itemId || uuid();
+  if (!dst) {
+    dst = createItem(itemId);
+  } else {
+    dst.itemId = itemId;
+  }
+  if (typeof other.width === 'number') {
+    dst.width = other.width;
+  }
+  if (typeof other.height === 'number') {
+    dst.height = other.height;
+  }
+  if (typeof other.imgSrc === 'string') {
+    dst.imgSrc = other.imgSrc;
+  }
+  if (typeof other.displayName === 'string') {
+    dst.displayName = other.displayName;
+  }
+  if (typeof other.description === 'string') {
+    dst.description = other.description;
+  }
+  if (typeof other.metadata === 'object') {
+    try {
+      dst.metadata = JSON.parse(JSON.stringify(other.metadata));
+    } catch (e) {
+      dst.metadata = {};
+    }
+  }
+  return dst;
+}
+
+
 export class ItemBuilder {
   static from(baseItem) {
     return new ItemBuilder().copyItem(baseItem);
@@ -69,27 +108,14 @@ export class ItemBuilder {
    * @param {Item} item
    */
   copyItem(item) {
-    if ('itemId' in item) {
-      this._itemId = item.itemId;
-    }
-    if ('width' in item) {
-      this._width = item.width;
-    }
-    if ('height' in item) {
-      this._height = item.height;
-    }
-    if ('imgSrc' in item) {
-      this._imageSrc = item.imgSrc;
-    }
-    if ('displayName' in item) {
-      this._displayName = item.displayName;
-    }
-    if ('description' in item) {
-      this._description = item.description;
-    }
-    if ('metadata' in item) {
-      this._metadata = JSON.parse(JSON.stringify(item.metadata));
-    }
+    let newItem = copyItem(item);
+    this._itemId = newItem.itemId;
+    this._width = newItem.width;
+    this._height = newItem.height;
+    this._imageSrc = newItem.imgSrc;
+    this._displayName = newItem.displayName;
+    this._description = newItem.description;
+    this._metadata = newItem.metadata;
     return this;
   }
 
