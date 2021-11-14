@@ -17,49 +17,57 @@ const INNER_HTML = `
 `;
 const INNER_STYLE = `
 :host {
-    --background-color: rgba(0, 0, 0, 0.1);
-    --hover-color: rgba(0, 0, 0, 0.2);
-    --itemX: 0;
-    --itemY: 0;
-    --itemWidth: 1;
-    --itemHeight: 1;
-    /* var(--item-unit-size) is inherited from parent container. */
+  --background-color: rgba(0, 0, 0, 0.1);
+  --hover-color: rgba(0, 0, 0, 0.2);
+  --itemX: 0;
+  --itemY: 0;
+  --itemWidth: 1;
+  --itemHeight: 1;
+  /* var(--item-unit-size) is inherited from parent container. */
 }
 .container {
-    display: inline-block;
-    position: absolute;
-    left: calc(var(--itemX) * var(--item-unit-size, 48px));
-    top: calc(var(--itemY) * var(--item-unit-size, 48px));
-    width: calc(var(--itemWidth) * var(--item-unit-size, 48px));
-    height: calc(var(--itemHeight) * var(--item-unit-size, 48px));
-    padding: 0;
-    margin: 0;
-    user-select: none;
-    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
-    transition: box-shadow 0.1s ease;
-    background-color: var(--background-color);
+  display: inline-block;
+  position: absolute;
+  left: calc(var(--itemX) * var(--item-unit-size, 48px));
+  top: calc(var(--itemY) * var(--item-unit-size, 48px));
+  width: calc(var(--itemWidth) * var(--item-unit-size, 48px));
+  height: calc(var(--itemHeight) * var(--item-unit-size, 48px));
+  padding: 0;
+  margin: 0;
+  user-select: none;
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  transition: box-shadow 0.1s ease;
+  background-color: var(--background-color);
 }
 .container:hover {
-    background-color: var(--hover-color);
-    z-index: 1;
+  background-color: var(--hover-color);
+  z-index: 1;
 }
 img {
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
 }
 figcaption {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: calc(var(--item-unit-size, 48px) / 4);
-    opacity: 0;
-    text-align: center;
-    color: white;
-    font-size: 1.2em;
-    background-color: rgba(0, 0, 0, 0.7);
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: unset;
+  opacity: 0;
+  text-align: center;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.7);
+  overflow: hidden;
+}
+figcaption.vertical {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: unset;
+  writing-mode: vertical-rl;
 }
 .container:hover figcaption {
-    opacity: 1;
+  opacity: 1;
 }
 `;
 
@@ -181,11 +189,12 @@ export class InventoryItemElement extends HTMLElement {
     this.style.setProperty('--itemY', `${y}`);
     this.style.setProperty('--itemWidth', `${item.width}`);
     this.style.setProperty('--itemHeight', `${item.height}`);
-    const displayName = item.displayName || 'Item';
-    this.title = displayName;
+    const title = item.displayName || 'Item';
+    this.title = title;
     this._image.src = item.imgSrc;
-    this._image.alt = displayName;
-    // this._caption.textContent = item.displayName;
+    this._image.alt = title;
+    this._caption.textContent = item.displayName;
+    this._caption.classList.toggle('vertical', item.width < item.height);
   }
 
   /**
