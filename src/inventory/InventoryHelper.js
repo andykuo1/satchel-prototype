@@ -5,6 +5,7 @@ import {
 } from './CursorHelper.js';
 import {
   getInventory,
+  getInventoryInStore,
   getInventoryList,
   getInventoryStore,
   getItems,
@@ -16,7 +17,8 @@ import {
   isInventoryEmpty,
   putItem,
   removeItem,
-  getInventoryItemIdAt
+  getInventoryItemIdAt,
+  getInventoryType
 } from './InventoryTransfer.js';
 
 /**
@@ -80,11 +82,51 @@ export function putDownItem(
     return true;
   }
   const toInventory = getInventory(store, toInventoryId);
+  const invType = getInventoryType(store, toInventoryId, toInventory);
+  switch(invType) {
+    case 'socket':
+      return putDownItemInSocketInventory(store, toInventoryId, element, toCoordX, toCoordY);
+    case 'grid':
+      return putDownItemInGridInventory(store, toInventoryId, element, toCoordX, toCoordY);
+    default:
+      throw new Error('Unsupported inventory type.');
+  }
+}
+
+function putDownItemInSocketInventory(store, toInventoryId, cursorElement, toCoordX, toCoordY) {
+  return false; // TODO: Force fail placing items in sockets.
+  /*
+  let heldItem = cursorElement.getHeldItem();
+  let prevItem = getInventoryItemAt(store, toInventoryId, 0, 0);
+  let prevItemId = prevItem.itemId;
+  let prevItemX = -1;
+  let prevItemY = -1;
+  if (prevItem) {
+    // Has an item to swap. So pick up this one for later.
+    let [x, y] = getItemSlotCoords(store, toInventoryId, prevItemId);
+    prevItemX = x;
+    prevItemY = y;
+    prevItem = removeItem(store, prevItemId, toInventoryId);
+  }
+  // Now there are no items in the way. Place it down!
+  cursorElement.releaseItem();
+  putItem(store, toInventoryId, heldItem, 0, 0);
+  // ...finally put the remaining item back now that there is space.
+  if (prevItem) {
+    cursorElement.holdItem(prevItem, Math.min(0, prevItemX - toCoordX), Math.min(0, prevItemY - toCoordY));
+  }
+  return true;
+  */
+}
+
+function putDownItemInGridInventory(store, toInventoryId, cursorElement, toCoordX, toCoordY) {
+  const toInventory = getInventoryInStore(store, toInventoryId);
+  const heldItem = cursorElement.getHeldItem();
   const invWidth = toInventory.width;
   const invHeight = toInventory.height;
   const itemWidth = heldItem.width;
   const itemHeight = heldItem.height;
-  const [pickOffsetX, pickOffsetY] = element.getPickOffset();
+  const [pickOffsetX, pickOffsetY] = cursorElement.getPickOffset();
   const coordX = toCoordX + pickOffsetX;
   const coordY = toCoordY + pickOffsetY;
   const maxCoordX = invWidth - itemWidth;
@@ -126,11 +168,11 @@ export function putDownItem(
       prevItem = removeItem(store, prevItemId, toInventoryId);
     }
     // Now there are no items in the way. Place it down!
-    element.releaseItem();
+    cursorElement.releaseItem();
     putItem(getInventoryStore(), toInventoryId, heldItem, targetCoordX, targetCoordY);
     // ...finally put the remaining item back now that there is space.
     if (prevItem) {
-      element.holdItem(prevItem, Math.min(0, prevItemX - targetCoordX), Math.min(0, prevItemY - targetCoordY));
+      cursorElement.holdItem(prevItem, Math.min(0, prevItemX - targetCoordX), Math.min(0, prevItemY - targetCoordY));
     }
     return true;
   } else {
@@ -143,7 +185,7 @@ export function putDownItem(
       (x, y) => canPlaceAt(toInventory, x, y, itemWidth, itemHeight)
     );
     if (x >= 0 && y >= 0) {
-      element.releaseItem();
+      cursorElement.releaseItem();
       putItem(getInventoryStore(), toInventoryId, heldItem, x, y);
       return true;
     }

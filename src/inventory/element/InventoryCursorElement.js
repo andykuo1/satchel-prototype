@@ -145,8 +145,11 @@ export class InventoryCursorElement extends HTMLElement {
     let store = getInventoryStore();
     if (putItem(store, this.invId, item, 0, 0)) {
       this.style.display = 'unset';
-      this.startPlaceDownBuffer();
-      this.setPickOffset(offsetX, offsetY);
+      this.placeDownBuffer = true;
+      this.pickX = this.clientX;
+      this.pickY = this.clientY;
+      this.pickOffsetX = offsetX;
+      this.pickOffsetY = offsetY;
       return true;
     } else {
       return false;
@@ -170,17 +173,6 @@ export class InventoryCursorElement extends HTMLElement {
       this.pickOffsetX,
       this.pickOffsetY,
     ];
-  }
-
-  setPickOffset(x, y) {
-    this.pickOffsetX = x;
-    this.pickOffsetY = y;
-  }
-
-  startPlaceDownBuffer() {
-    this.placeDownBuffer = true;
-    this.pickX = this.clientX;
-    this.pickY = this.clientY;
   }
 
   isPlaceDownBuffering() {
