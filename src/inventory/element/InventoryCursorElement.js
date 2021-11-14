@@ -60,11 +60,6 @@ export class InventoryCursorElement extends HTMLElement {
     this.clientY = 0;
 
     /** @private */
-    this.localX = 0;
-    /** @private */
-    this.localY = 0;
-
-    /** @private */
     this.pickX = 0;
     /** @private */
     this.pickY = 0;
@@ -127,13 +122,13 @@ export class InventoryCursorElement extends HTMLElement {
   /** @private */
   onAnimationFrame() {
     // Update cursor position
-    const posX = this.clientX + this.pickOffsetX * this.unitSize;
-    const posY = this.clientY + this.pickOffsetY * this.unitSize;
-    this.localX = posX;
-    this.localY = posY;
+    const clientX = this.clientX;
+    const clientY = this.clientY;
+    const posX = clientX + this.pickOffsetX * this.unitSize;
+    const posY = clientY + this.pickOffsetY * this.unitSize;
     this.style.setProperty('left', `${posX - CURSOR_OFFSET_PIXELS}px`);
     this.style.setProperty('top', `${posY - CURSOR_OFFSET_PIXELS}px`);
-    if (this.placeDownBuffer && distanceSquared(posX, posY, this.pickX, this.pickY) >= PLACE_BUFFER_RANGE_SQUARED) {
+    if (this.placeDownBuffer && distanceSquared(clientX, clientY, this.pickX, this.pickY) >= PLACE_BUFFER_RANGE_SQUARED) {
       this.clearPlaceDownBuffer();
     }
     // Wait for another frame...
@@ -184,8 +179,8 @@ export class InventoryCursorElement extends HTMLElement {
 
   startPlaceDownBuffer() {
     this.placeDownBuffer = true;
-    this.pickX = this.localX;
-    this.pickY = this.localY;
+    this.pickX = this.clientX;
+    this.pickY = this.clientY;
   }
 
   isPlaceDownBuffering() {
