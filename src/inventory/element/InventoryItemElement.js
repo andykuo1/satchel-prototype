@@ -107,14 +107,14 @@ export class InventoryItemElement extends HTMLElement {
       throw new Error('Missing container for item element.');
     }
     if (!inventoryId) {
-      throw new Error('Missing inventory name for item element.');
+      throw new Error('Missing inventory id for item element.');
     }
     if (!itemId) {
       throw new Error('Missing item id for item element.');
     }
-    if (containerElement.name !== inventoryId) {
+    if (containerElement.invId !== inventoryId) {
       throw new Error(
-        'Cannot create item element with mismatched container and inventory name.'
+        'Cannot create item element with mismatched container and inventory id.'
       );
     }
     if (!hasItem(getInventoryStore(), itemId, inventoryId)) {
@@ -175,7 +175,7 @@ export class InventoryItemElement extends HTMLElement {
    * @protected
    */
   onItemChange(store, itemId) {
-    const [x, y] = getItemSlotCoords(store, this._containerElement.name, itemId);
+    const [x, y] = getItemSlotCoords(store, this._containerElement.invId, itemId);
     const item = getItemInStore(store, itemId);
     this.style.setProperty('--itemX', `${x}`);
     this.style.setProperty('--itemY', `${y}`);

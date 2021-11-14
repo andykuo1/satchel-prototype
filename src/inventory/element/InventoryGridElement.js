@@ -2,7 +2,7 @@ import { upgradeProperty } from '../../util/wc.js';
 import { containerMouseUpCallback } from './InventoryElementMouseHelper.js';
 import {
   addInventoryChangeListener,
-  getInventory,
+  getInventoryInStore,
   getInventoryStore,
   removeInventoryChangeListener,
 } from '../InventoryStore.js';
@@ -16,7 +16,7 @@ const DEFAULT_ITEM_UNIT_SIZE = 48;
 
 const INNER_HTML = `
 <article>
-  <h2><span class="innerTitle"><slot name="title"></slot></span></h2>
+  <h2></h2>
   <section class="container grid">
     <slot></slot>
   </section>
@@ -31,7 +31,6 @@ const INNER_STYLE = `
   --container-width: 1;
   --container-height: 1;
   --item-unit-size: ${DEFAULT_ITEM_UNIT_SIZE}px;
-  --transition-duration: 0.1s;
 }
 article {
   position: relative;
@@ -67,7 +66,6 @@ h2 {
   border-radius: 1rem;
   box-shadow: 0.4rem 0.4rem 0 0 var(--outline-color);
   overflow: hidden;
-  transition: height var(--transition-duration) ease;
 }
 .flattop {
   border-top-right-radius: 0rem;
@@ -104,7 +102,15 @@ export class InventoryGridElement extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ['name', 'title'];
+    return ['invid', 'name'];
+  }
+
+  get invId() {
+    return this._invId;
+  }
+
+  set invId(value) {
+    this.setAttribute('invid', value);
   }
 
   get name() {
@@ -115,22 +121,7 @@ export class InventoryGridElement extends HTMLElement {
     this.setAttribute('name', value);
   }
 
-  get rows() {
-    const inventory = getInventory(getInventoryStore(), this.name);
-    return inventory.height;
-  }
-
-  get cols() {
-    const inventory = getInventory(getInventoryStore(), this.name);
-    return inventory.width;
-  }
-
-  get type() {
-    const inventory = getInventory(getInventoryStore(), this.name);
-    return inventory.type;
-  }
-
-  constructor(inventoryId = undefined) {
+  constructor() {
     super();
     this.attachShadow({ mode: 'open' });
     this.shadowRoot.append(
@@ -141,7 +132,9 @@ export class InventoryGridElement extends HTMLElement {
     );
 
     /** @private */
-    this._name = inventoryId;
+    this._name = '';
+    /** @private */
+    this._invId = undefined;
 
     /** @private */
     this._root = this.shadowRoot.querySelector('article');
@@ -165,16 +158,22 @@ export class InventoryGridElement extends HTMLElement {
   connectedCallback() {
     this._container.addEventListener('mouseup', this.onMouseUp);
     this._container.addEventListener('contextmenu', this.onContextMenu);
-    if (this._name) {
-      const name = this._name;
+    let invId = this._invId;
+    const name = this._name;
+    if (!invId && name) {
+      invId = name.replace(/\s/g, '_').toLowerCase();
+      this._invId = invId;
+    }
+    if (invId) {
+      let store = getInventoryStore();
       addInventoryChangeListener(
-        getInventoryStore(),
-        name,
+        store,
+        invId,
         this.onInventoryChange
       );
-      this.onInventoryChange(getInventoryStore(), name);
+      this.onInventoryChange(store, invId);
     }
-
+    upgradeProperty(this, 'invId');
     upgradeProperty(this, 'name');
   }
 
@@ -182,11 +181,11 @@ export class InventoryGridElement extends HTMLElement {
   disconnectedCallback() {
     this._container.removeEventListener('mouseup', this.onMouseUp);
     this._container.removeEventListener('contextmenu', this.onContextMenu);
-    if (this._name) {
-      const name = this._name;
+    const invId = this._invId;
+    if (invId) {
       removeInventoryChangeListener(
         getInventoryStore(),
-        name,
+        invId,
         this.onInventoryChange
       );
     }
@@ -201,39 +200,39 @@ export class InventoryGridElement extends HTMLElement {
   attributeChangedCallback(attribute, previous, value) {
     switch (attribute) {
       case 'name':
-        {
-          const store = getInventoryStore();
-          const previousName = this._name;
-          const nextName = value;
-          this._name = nextName;
-          if (previousName) {
-            removeInventoryChangeListener(
-              store,
-              previousName,
-              this.onInventoryChange
-            );
-          }
-
-          if (nextName) {
-            addInventoryChangeListener(store, nextName, this.onInventoryChange);
-            this.onInventoryChange(store, nextName);
-          }
-        }
-        break;
-      case 'title':
+        this._name = value;
         this._containerTitle.textContent = value;
         this._container.classList.toggle('flattop', Boolean(value));
         break;
+      case 'invid': {
+        const store = getInventoryStore();
+        const prevInvId = this._invId;
+        const nextInvId = value;
+        if (prevInvId !== nextInvId) {
+          this._invId = nextInvId;
+          if (prevInvId) {
+            removeInventoryChangeListener(
+              store,
+              prevInvId,
+              this.onInventoryChange
+            );
+          }
+          if (nextInvId) {
+            addInventoryChangeListener(store, nextInvId, this.onInventoryChange);
+            this.onInventoryChange(store, nextInvId);
+          }
+        }
+      } break;
     }
   }
 
   /**
    * @param store
-   * @param inventoryId
+   * @param invId
    * @protected
    */
-  onInventoryChange(store, inventoryId) {
-    const inv = getInventory(getInventoryStore(), inventoryId);
+  onInventoryChange(store, invId) {
+    const inv = getInventoryInStore(store, invId);
     if (!inv) {
       // The inventory has been deleted.
       this.style.setProperty('--container-width', '0');
@@ -245,7 +244,7 @@ export class InventoryGridElement extends HTMLElement {
     let invWidth = inv.width;
     let invHeight = inv.height;
     if (invType === 'socket') {
-      const item = getInventoryItemAt(store, inventoryId, 0, 0);
+      const item = getInventoryItemAt(store, invId, 0, 0);
       if (item) {
         invWidth = item.width;
         invHeight = item.height;
@@ -273,12 +272,12 @@ export class InventoryGridElement extends HTMLElement {
     const emptySlot = /** @type {HTMLSlotElement} */ (
       this._itemSlot.cloneNode(false)
     );
-    for (const itemId of getInventoryItemIds(store, inventoryId)) {
+    for (const itemId of getInventoryItemIds(store, invId)) {
       let element;
       element =
         itemId in preservedItems
           ? preservedItems[itemId]
-          : new InventoryItemElement(this, inventoryId, itemId);
+          : new InventoryItemElement(this, invId, itemId);
       emptySlot.append(element);
     }
 

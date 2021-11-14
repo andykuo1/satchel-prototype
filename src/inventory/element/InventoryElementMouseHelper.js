@@ -27,7 +27,7 @@ export function itemMouseDownCallback(mouseEvent, itemElement, unitSize) {
     unitSize
   );
   let cursor = getCursor();
-  let result = cursor.pickUp(containerElement.name, itemElement.itemId, clientCoordX, clientCoordY);
+  let result = cursor.pickUp(containerElement.invId, itemElement.itemId, clientCoordX, clientCoordY);
   if (result) {
     mouseEvent.preventDefault();
     mouseEvent.stopPropagation();
@@ -60,7 +60,7 @@ export function containerMouseUpCallback(
     unitSize
   );
   let cursor = getCursor();
-  let result = cursor.putDown(containerElement.name, clientCoordX, clientCoordY);
+  let result = cursor.putDown(containerElement.invId, clientCoordX, clientCoordY);
   if (result) {
     mouseEvent.preventDefault();
     mouseEvent.stopPropagation();

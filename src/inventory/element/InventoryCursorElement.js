@@ -19,6 +19,8 @@ import {
 import { putDownToGridInventory } from './InventoryCursorElementHelper.js';
 
 /**
+ * @typedef {import('./InventoryGridElement.js').InventoryGridElement} InventoryGridElement
+ * 
  * @typedef {import('../Inv.js').Inventory} Inventory
  * @typedef {import('../Inv.js').InventoryId} InventoryId
  * @typedef {import('../InventoryStore.js').InventoryStore} InventoryStore
@@ -33,7 +35,7 @@ const PLACE_BUFFER_RANGE_SQUARED = PLACE_BUFFER_RANGE * PLACE_BUFFER_RANGE;
 const CURSOR_INV_ID = 'cursor';
 
 const INNER_HTML = `
-<inventory-grid name="${CURSOR_INV_ID}"></inventory-grid>
+<inventory-grid invid="${CURSOR_INV_ID}"></inventory-grid>
 `;
 const INNER_STYLE = `
 :host {
@@ -101,7 +103,7 @@ export class InventoryCursorElement extends HTMLElement {
     this.ignoreFirstPutDown = false;
 
     /** @private */
-    this.inventoryElement = this.shadowRoot.querySelector('inventory-grid');
+    this.inventoryElement = /** @type {InventoryGridElement} */ (this.shadowRoot.querySelector('inventory-grid'));
 
     /** @private */
     this.onAnimationFrame = this.onAnimationFrame.bind(this);
@@ -109,20 +111,15 @@ export class InventoryCursorElement extends HTMLElement {
     this.onMouseMove = this.onMouseMove.bind(this);
   }
 
-  get name() {
-    return this.inventoryElement.name;
-  }
-
   get invId() {
-    return this.name;
+    return this.inventoryElement.invId;
   }
 
   /** @protected */
   connectedCallback() {
     let store = getInventoryStore();
-    const invId = this.inventoryElement.name;
-    if (!isInventoryInStore(store, invId)) {
-      createSocketInventoryInStore(store, invId);
+    if (!isInventoryInStore(store, CURSOR_INV_ID)) {
+      createSocketInventoryInStore(store, CURSOR_INV_ID);
     }
 
     document.addEventListener('mousemove', this.onMouseMove);
@@ -136,9 +133,8 @@ export class InventoryCursorElement extends HTMLElement {
     this.animationHandle = null;
 
     let store = getInventoryStore();
-    const invId = this.inventoryElement.name;
-    if (isInventoryInStore(store, invId)) {
-      deleteInventoryFromStore(store, invId, getInventoryInStore(store, invId));
+    if (isInventoryInStore(store, CURSOR_INV_ID)) {
+      deleteInventoryFromStore(store, CURSOR_INV_ID, getInventoryInStore(store, CURSOR_INV_ID));
     }
   }
 

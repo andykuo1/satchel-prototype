@@ -2,7 +2,7 @@ import { Peerful } from '../peerful/Peerful.js';
 import { copyToClipboard } from '../util/clipboard.js';
 import { getCursorContext } from '../inventory/CursorHelper.js';
 import { saveToJSON } from '../inventory/InventoryLoader.js';
-import { getInventoryStore, resetInventoryStore } from '../inventory/InventoryStore.js';
+import { createGridInventoryInStore, createInventoryStore, getInventoryStore, resetInventoryStore } from '../inventory/InventoryStore.js';
 
 export async function connectAsClient() {
   const remoteId = tryGetRemotePeerId(window.location);
@@ -95,20 +95,8 @@ function onLocalClientConnection(conn) {
       switch (jsonData.type) {
         case 'new':
           {
-            const defaultInv = {
-              name: 'main',
-              slots: new Array(12 * 9),
-              width: 12,
-              height: 9,
-              type: 'grid',
-            };
-            resetInventoryStore(getInventoryStore(), {
-              data: {
-                inventory: {
-                  main: defaultInv,
-                },
-              },
-            });
+            resetInventoryStore(getInventoryStore(), createInventoryStore());
+            createGridInventoryInStore(getInventoryStore(), 'main', 12, 9);
           }
           break;
         case 'reset':

@@ -59,9 +59,9 @@ export function resetInventoryStore(previousStore, nextStore) {
     visitedItems.add(itemId);
     dispatchItemChange(previousStore, itemId);
   }
-  for (const invName of previousInventoryList) {
-    visitedInventories.add(invName);
-    dispatchInventoryChange(previousStore, invName);
+  for (const invId of previousInventoryList) {
+    visitedInventories.add(invId);
+    dispatchInventoryChange(previousStore, invId);
   }
   // Dispatch for new objects
   for (const itemId of nextItemList) {

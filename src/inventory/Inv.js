@@ -7,7 +7,6 @@
  * @typedef {'grid'|'socket'} InventoryType
  *
  * @typedef Inventory
- * @property {string} name
  * @property {InventoryId} invId
  * @property {InventoryType} type
  * @property {Array<ItemId>} slots
@@ -31,7 +30,6 @@
 function createInventory(invId, invType, slotCount, maxCoordX, maxCoordY) {
   let inv = {
     invId,
-    name: invId,
     type: invType,
     items: {}, // TODO: Not used yet.
     slots: new Array(slotCount),

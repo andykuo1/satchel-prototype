@@ -8,6 +8,8 @@ import { createSocketInventoryInStore, getInventoryStore } from './InventoryStor
 import { clearItems } from './InventoryTransfer.js';
 import { createTemporaryInventoryView } from './InventoryView.js';
 
+/** @typedef {import('./element/InventoryGridElement.js').InventoryGridElement} InventoryGridElement */
+
 /**
  * @param ground
  */
@@ -57,7 +59,8 @@ export function dropOnGround(freedItem) {
 
 export function clearGround() {
   const ground = getGroundContainer();
-  for (const grid of ground.querySelectorAll('inventory-grid')) {
-    clearItems(getInventoryStore(), grid.name);
+  const invs = /** @type {NodeListOf<InventoryGridElement>} */ (ground.querySelectorAll('inventory-grid'));
+  for (const grid of invs) {
+    clearItems(getInventoryStore(), grid.invId);
   }
 }
