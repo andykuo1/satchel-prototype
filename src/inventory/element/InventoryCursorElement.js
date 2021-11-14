@@ -5,6 +5,7 @@ import {
   getInventory,
   getInventoryInStore,
   getInventoryStore,
+  getItemInStore,
   isInventoryInStore,
 } from '../InventoryStore.js';
 import {
@@ -182,7 +183,8 @@ export class InventoryCursorElement extends HTMLElement {
     let store = getInventoryStore();
     if (itemId) {
       const [fromItemX, fromItemY] = getItemSlotCoords(store, invId, itemId);
-      const item = removeItem(store, itemId, invId);
+      const item = getItemInStore(store, itemId);
+      removeItem(store, itemId, invId);
       this.setHeldItem(item, fromItemX - coordX, fromItemY - coordY);
       return true;
     } else {

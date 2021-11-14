@@ -5,7 +5,10 @@ import {
   isItemInStore,
   addItemToStore,
   getItemInStore,
+  dispatchItemChange,
 } from './InventoryStore.js';
+import { getSlotCoordsByIndex, getSlotIndexByCoords, isSlotCoordEmpty } from './InvSlots.js';
+import * as InvItems from './InvItems.js';
 
 /**
  * @typedef {import('./InventoryStore.js').Item} Item
@@ -25,52 +28,15 @@ import {
  * @returns {Item} The removed item.
  */
 export function removeItem(store, itemId, invId) {
-  let slotIndex = getItemSlotIndex(store, invId, itemId);
-  if (slotIndex >= 0) {
-    let item = getItemInStore(store, itemId);
-    let [fromX, fromY] = getInventorySlotCoords(store, invId, slotIndex);
-    let toX = fromX + item.width - 1;
-    let toY = fromY + item.height - 1;
-    clearSlots(store, invId, fromX, fromY, toX, toY);
+  let inv = getExistingInventory(store, invId);
+  if (InvItems.hasItem(inv, itemId)) {
+    let item = InvItems.getItemByItemId(inv, itemId);
+    InvItems.removeItem(inv, itemId);
     dispatchInventoryChange(store, invId);
     deleteItemFromStore(store, itemId, item);
     return item;
-  }
-  return null;
-}
-
-/**
- * @param {InventoryStore} store
- * @param {InventoryId} inventoryId
- * @param {number} fromX
- * @param {number} fromY
- * @param {number} toX
- * @param {number} toY
- * @param {ItemId} itemId
- */
-function setSlots(store, inventoryId, fromX, fromY, toX, toY, itemId) {
-  let inventory = getExistingInventory(store, inventoryId);
-  for (let x = fromX; x <= toX; ++x) {
-    for (let y = fromY; y <= toY; ++y) {
-      let slotIndex = getInventorySlotIndexByCoords(store, inventoryId, x, y);
-      if (slotIndex < 0) {
-        continue;
-      }
-      inventory.slots[slotIndex] = itemId;
-    }
-  }
-}
-
-function clearSlots(store, inventoryId, fromX, fromY, toX, toY) {
-  let inventory = getExistingInventory(store, inventoryId);
-  for (let x = fromX; x <= toX; ++x) {
-    for (let y = fromY; y <= toY; ++y) {
-      let slotIndex = getInventorySlotIndexByCoords(store, inventoryId, x, y);
-      if (slotIndex < 0) {
-        continue;
-      }
-      inventory.slots[slotIndex] = null;
-    }
+  } else {
+    return null;
   }
 }
 
@@ -82,44 +48,36 @@ function clearSlots(store, inventoryId, fromX, fromY, toX, toY) {
  * @returns {Array<Item>} The cleared items.
  */
 export function clearItems(store, invId) {
-  let inventory = getExistingInventory(store, invId);
-  const length = getInventorySlotCount(store, invId, inventory);
-  let keys = new Set();
-  for (let i = 0; i < length; ++i) {
-    let itemId = inventory.slots[i];
-    if (itemId && !keys.has(itemId)) {
-      keys.add(itemId);
-    }
-    inventory.slots[i] = null;
-  }
-  let result = [];
-  for (let itemId of keys) {
-    let item = getItemInStore(store, itemId);
-    result.push(item);
-    deleteItemFromStore(store, itemId, item);
+  let inv = getExistingInventory(store, invId);
+  let items = InvItems.getItems(inv);
+  InvItems.clearItems(inv);
+  for(let item of items) {
+    deleteItemFromStore(store, item.itemId, item);
   }
   dispatchInventoryChange(store, invId);
-  return result;
+  return items;
 }
 
 /**
  * Put and create item in inventory. Will throw if unable to.
  *
  * @param {InventoryStore} store
- * @param {InventoryId} inventoryId
+ * @param {InventoryId} invId
  * @param {Item} item
  * @param {number} coordX
  * @param {number} coordY
  */
-export function putItem(store, inventoryId, item, coordX, coordY) {
+export function putItem(store, invId, item, coordX, coordY) {
+  let inv = getExistingInventory(store, invId);
   const itemId = item.itemId;
   // TODO: Since items are kept globally, create it here
   if (!isItemInStore(store, itemId)) {
     addItemToStore(store, itemId, item);
+    dispatchItemChange(store, itemId);
   }
   // Put in slots
-  setSlots(store, inventoryId, coordX, coordY, coordX + item.width - 1, coordY + item.height - 1, itemId);
-  dispatchInventoryChange(store, inventoryId);
+  InvItems.putItem(inv, item, coordX, coordY);
+  dispatchInventoryChange(store, invId);
 }
 
 export function getItemSlotIndex(store, inventoryId, itemId, startIndex = 0) {
@@ -194,14 +152,8 @@ export function getInventoryItemIdAt(store, inventoryId, coordX, coordY) {
 }
 
 export function isInventorySlotEmpty(store, inventoryId, coordX, coordY) {
-  let slotIndex = getInventorySlotIndexByCoords(store, inventoryId, coordX, coordY);
   const inventory = getExistingInventory(store, inventoryId);
-  const itemId = inventory.slots[slotIndex];
-  if (itemId) {
-    return false;
-  } else {
-    return true;
-  }
+  return isSlotCoordEmpty(inventory, coordX, coordY);
 }
 
 /**
@@ -230,40 +182,14 @@ export function getInventoryItems(store, invId) {
   return result;
 }
 
-export function getInventorySlotCoords(store, inventoryId, slotIndex) {
-  if (slotIndex < 0) {
-    return [-1, -1];
-  }
-  const inventory = getExistingInventory(store, inventoryId);
-  switch (getInventoryType(store, inventoryId, inventory)) {
-    case 'socket':
-    case 'grid': {
-      const width = inventory.width;
-      return [slotIndex % width, Math.floor(slotIndex / width)];
-    }
-    default:
-      throw new Error('Unsupported inventory type for slot coords.');
-  }
+export function getInventorySlotCoords(store, invId, slotIndex) {
+  let inv = getExistingInventory(store, invId);
+  return getSlotCoordsByIndex(inv, slotIndex);
 }
 
 export function getInventorySlotIndexByCoords(store, inventoryId, slotX, slotY) {
-  if (slotX < 0 || slotY < 0) {
-    return -1;
-  }
   const inventory = getExistingInventory(store, inventoryId);
-  switch (getInventoryType(store, inventoryId, inventory)) {
-    case 'socket':
-    case 'grid': {
-      const width = inventory.width;
-      const height = inventory.height;
-      if (slotX >= width || slotY >= height) {
-        return -1;
-      }
-      return Math.floor(slotX) + Math.floor(slotY) * width;
-    }
-    default:
-      throw new Error('Unsupported inventory type for slot coords.');
-  }
+  return getSlotIndexByCoords(inventory, slotX, slotY);
 }
 
 /**

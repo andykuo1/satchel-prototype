@@ -1,5 +1,5 @@
 import { dijkstra2d } from '../../util/dijkstra2d.js';
-import { getInventoryInStore } from '../InventoryStore.js';
+import { getInventoryInStore, getItemInStore } from '../InventoryStore.js';
 import {
   getInventoryItemAt,
   getInventoryItemIdAt,
@@ -43,7 +43,8 @@ export function putDownToSocketInventory(
     let [x, y] = getItemSlotCoords(store, toInventoryId, prevItemId);
     prevItemX = x;
     prevItemY = y;
-    prevItem = removeItem(store, prevItemId, toInventoryId);
+    prevItem = getItemInStore(store, prevItemId);
+    removeItem(store, prevItemId, toInventoryId);
   }
   // Now there are no items in the way. Place it down!
   cursor.clearHeldItem();
@@ -120,7 +121,8 @@ export function putDownToGridInventory(
       let [x, y] = getItemSlotCoords(store, toInventoryId, prevItemId);
       prevItemX = x;
       prevItemY = y;
-      prevItem = removeItem(store, prevItemId, toInventoryId);
+      prevItem = getItemInStore(store, prevItemId);
+      removeItem(store, prevItemId, toInventoryId);
     }
     // Now there are no items in the way. Place it down!
     cursor.clearHeldItem();

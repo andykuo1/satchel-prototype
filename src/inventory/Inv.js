@@ -1,8 +1,10 @@
 /**
+ * @typedef {import('./Item.js').Item} Item
  * @typedef {import('./Item.js').ItemId} ItemId
  */
 
 import { uuid } from '../util/uuid.js';
+import { copyItem } from './Item.js';
 
 /**
  * @typedef {string} InventoryId
@@ -11,6 +13,7 @@ import { uuid } from '../util/uuid.js';
  * @typedef Inventory
  * @property {InventoryId} invId
  * @property {InventoryType} type
+ * @property {Record<ItemId, Item>} items
  * @property {Array<ItemId>} slots
  * @property {number} width
  * @property {number} height
@@ -87,6 +90,12 @@ export function copyInventory(other, dst = undefined) {
     dst.height = height;
     dst.length = length;
   }
+  if (typeof other.items === 'object') {
+    for(let item of Object.values(other.items)) {
+      let newItem = copyItem(item);
+      dst.items[newItem.itemId] = item;
+    }
+  }
   if (Array.isArray(other.slots)) {
     const length = Math.min(other.slots.length, dst.slots.length);
     for (let i = 0; i < length; ++i) {
@@ -104,4 +113,8 @@ export function copyInventory(other, dst = undefined) {
     }
   }
   return dst;
+}
+
+export function getInventorySlotCount(inv) {
+  return inv.length;
 }
