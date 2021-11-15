@@ -35,11 +35,13 @@ export function createItem(itemId) {
  * @returns {Item}
  */
 export function copyItem(other, dst = undefined) {
-  const itemId = other.itemId || uuid();
+  const itemId = other.itemId;
   if (!dst) {
-    dst = createItem(itemId);
-  } else {
+    dst = createItem(itemId || uuid());
+  } else if (itemId) {
     dst.itemId = itemId;
+  } else if (!(dst.itemId)) {
+    dst.itemId = uuid();
   }
   if (typeof other.width === 'number') {
     dst.width = other.width;

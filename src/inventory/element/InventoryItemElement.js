@@ -2,10 +2,11 @@ import { itemMouseDownCallback } from './InventoryElementMouseHelper.js';
 import {
   addItemChangeListener,
   getInventoryStore,
-  getItemInStore,
   removeItemChangeListener,
 } from '../InventoryStore.js';
-import { getItemSlotCoords, hasItem } from '../InventoryTransfer.js';
+import { getExistingInventory, getItemSlotCoords } from '../InventoryTransfer.js';
+import { hasItem } from '../InvItems.js';
+import { getItemByItemId } from '../InvItems.js';
 
 /** @typedef {import('./InventoryGridElement.js').InventoryGridElement} InventoryGridElement */
 
@@ -92,8 +93,8 @@ export class InventoryItemElement extends HTMLElement {
     customElements.define('inventory-item', this);
   }
 
-  get inventoryId() {
-    return this._inventoryId;
+  get invId() {
+    return this._invId;
   }
 
   get itemId() {
@@ -106,26 +107,27 @@ export class InventoryItemElement extends HTMLElement {
 
   /**
    * @param {InventoryGridElement} containerElement
-   * @param {string} inventoryId
+   * @param {string} invId
    * @param {string} itemId
    */
-  constructor(containerElement, inventoryId, itemId) {
+  constructor(containerElement, invId, itemId) {
     super();
     if (!containerElement) {
       throw new Error('Missing container for item element.');
     }
-    if (!inventoryId) {
+    if (!invId) {
       throw new Error('Missing inventory id for item element.');
     }
     if (!itemId) {
       throw new Error('Missing item id for item element.');
     }
-    if (containerElement.invId !== inventoryId) {
+    if (containerElement.invId !== invId) {
       throw new Error(
         'Cannot create item element with mismatched container and inventory id.'
       );
     }
-    if (!hasItem(getInventoryStore(), itemId, inventoryId)) {
+    const inv = getExistingInventory(getInventoryStore(), invId);
+    if (!hasItem(inv, itemId)) {
       throw new Error(
         'Cannot create item element with item id not in given inventory.'
       );
@@ -141,7 +143,7 @@ export class InventoryItemElement extends HTMLElement {
     /** @private */
     this._containerElement = containerElement;
     /** @private */
-    this._inventoryId = inventoryId;
+    this._invId = invId;
     /** @private */
     this._itemId = itemId;
 
@@ -184,7 +186,8 @@ export class InventoryItemElement extends HTMLElement {
   onItemChange(store, itemId) {
     const invId = this._containerElement.invId;
     const [x, y] = getItemSlotCoords(store, invId, itemId);
-    const item = getItemInStore(store, itemId);
+    const inv = getExistingInventory(store, invId);
+    const item = getItemByItemId(inv, itemId);
     this.style.setProperty('--itemX', `${x}`);
     this.style.setProperty('--itemY', `${y}`);
     this.style.setProperty('--itemWidth', `${item.width}`);
@@ -219,7 +222,7 @@ export class InventoryItemElement extends HTMLElement {
         detail: {
           element: this,
           container: this.container,
-          invId: this.inventoryId,
+          invId: this.invId,
           itemId: this.itemId,
         },
       })

@@ -1,11 +1,6 @@
 import {
   getInventory,
   dispatchInventoryChange,
-  deleteItemFromStore,
-  isItemInStore,
-  addItemToStore,
-  getItemInStore,
-  dispatchItemChange,
 } from './InventoryStore.js';
 import { getSlotCoordsByIndex, getSlotIndexByItemId, isSlotCoordEmpty } from './InvSlots.js';
 import * as InvItems from './InvItems.js';
@@ -34,7 +29,6 @@ export function removeItem(store, itemId, invId) {
     let item = InvItems.getItemByItemId(inv, itemId);
     InvItems.removeItem(inv, itemId);
     dispatchInventoryChange(store, invId);
-    deleteItemFromStore(store, itemId, item);
     return item;
   } else {
     return null;
@@ -52,9 +46,6 @@ export function clearItems(store, invId) {
   let inv = getExistingInventory(store, invId);
   let items = InvItems.getItems(inv);
   InvItems.clearItems(inv);
-  for(let item of items) {
-    deleteItemFromStore(store, item.itemId, item);
-  }
   dispatchInventoryChange(store, invId);
   return items;
 }
@@ -70,13 +61,6 @@ export function clearItems(store, invId) {
  */
 export function putItem(store, invId, item, coordX, coordY) {
   let inv = getExistingInventory(store, invId);
-  const itemId = item.itemId;
-  // TODO: Since items are kept globally, create it here
-  if (!isItemInStore(store, itemId)) {
-    addItemToStore(store, itemId, item);
-    dispatchItemChange(store, itemId);
-  }
-  // Put in slots
   InvItems.putItem(inv, item, coordX, coordY);
   dispatchInventoryChange(store, invId);
 }
@@ -160,14 +144,6 @@ export function getInventoryItemIds(store, inventoryId) {
     if (itemId) {
       result.add(itemId);
     }
-  }
-  return result;
-}
-
-export function getInventoryItems(store, invId) {
-  let result = [];
-  for (let itemId of getInventoryItemIds(store, invId)) {
-    result.push(getItemInStore(store, itemId));
   }
   return result;
 }

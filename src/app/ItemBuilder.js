@@ -2,9 +2,9 @@ import { dropOnGround } from '../inventory/GroundHelper.js';
 import {
   getInventoryStore,
   updateItem,
-  addItemToStore,
-  getItemInStore,
 } from '../inventory/InventoryStore.js';
+import { getExistingInventory } from '../inventory/InventoryTransfer.js';
+import { getItemByItemId } from '../inventory/InvItems.js';
 import { ItemBuilder } from '../inventory/Item.js';
 
 /** @typedef {import('../inventory/Item.js').Item} Item */
@@ -22,7 +22,8 @@ export function openItemBuilder(formElement, invId = undefined, itemId = undefin
     formElement.querySelector('#invId').value = invId;
     formElement.querySelector('input[type="submit"]').value = 'Save';
 
-    const item = getItemInStore(getInventoryStore(), itemId);
+    const inv = getExistingInventory(getInventoryStore(), invId);
+    const item = getItemByItemId(inv, itemId);
     formElement.querySelector('#itemName').value = item.displayName;
     formElement.querySelector('#itemDetail').value = item.description;
   } else {
@@ -63,12 +64,16 @@ export function resetItemBuilder(formElement) {
  */
 function editItem(formData) {
   let itemId = '';
+  let invId = '';
   const result = {};
   for (const entry of formData) {
     const [key, value] = entry;
     switch (key) {
       case 'itemId':
         itemId = value;
+        break;
+      case 'invId':
+        invId = value;
         break;
       case 'itemName':
         result.displayName = value;
@@ -79,7 +84,7 @@ function editItem(formData) {
     }
   }
 
-  updateItem(getInventoryStore(), itemId, result);
+  updateItem(getInventoryStore(), invId, itemId, result);
 }
 
 /**
@@ -137,7 +142,6 @@ function buildItem(formData) {
  * @param {Item} item
  */
 function spawnItem(item) {
-  addItemToStore(getInventoryStore(), item.itemId, item);
   dropOnGround(item);
 }
 

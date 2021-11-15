@@ -9,8 +9,8 @@ import {
 import { InventoryItemElement } from './InventoryItemElement.js';
 import {
   getInventoryItemAt,
-  getInventoryItemIds,
 } from '../InventoryTransfer.js';
+import { getItemIds } from '../InvItems.js';
 
 const DEFAULT_ITEM_UNIT_SIZE = 48;
 
@@ -269,7 +269,7 @@ export class InventoryGridElement extends HTMLElement {
     const emptySlot = /** @type {HTMLSlotElement} */ (
       this._itemSlot.cloneNode(false)
     );
-    for (const itemId of getInventoryItemIds(store, invId)) {
+    for (const itemId of getItemIds(inv)) {
       let element;
       element =
         itemId in preservedItems

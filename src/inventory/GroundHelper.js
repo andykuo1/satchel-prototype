@@ -1,9 +1,8 @@
 import { uuid } from '../util/uuid.js';
 import { getCursorContext } from './CursorHelper.js';
 import { getCursor } from './element/InventoryCursorElement.js';
-import { insertIn } from './InventoryHelper.js';
 import { createSocketInventoryInStore, getInventoryStore } from './InventoryStore.js';
-import { clearItems } from './InventoryTransfer.js';
+import { clearItems, putItem } from './InventoryTransfer.js';
 import { createTemporaryInventoryView } from './InventoryView.js';
 
 /** @typedef {import('./element/InventoryGridElement.js').InventoryGridElement} InventoryGridElement */
@@ -45,8 +44,7 @@ export function getGroundContainer() {
 export function dropOnGround(freedItem) {
   const ground = getGroundContainer();
   const inventory = createSocketInventoryInStore(getInventoryStore(), uuid());
-  insertIn(inventory, freedItem);
-
+  putItem(getInventoryStore(), inventory.invId, freedItem, 0, 0);
   const invElement = createTemporaryInventoryView(getInventoryStore(), inventory.invId);
   ground.append(invElement);
 }

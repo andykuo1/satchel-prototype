@@ -1,12 +1,14 @@
 import { dijkstra2d } from '../../util/dijkstra2d.js';
-import { getInventoryInStore, getItemInStore } from '../InventoryStore.js';
+import { getInventoryInStore } from '../InventoryStore.js';
 import {
+  getExistingInventory,
   getInventoryItemAt,
   getInventoryItemIdAt,
   getItemSlotCoords,
   putItem,
   removeItem,
 } from '../InventoryTransfer.js';
+import { getItemByItemId } from '../InvItems.js';
 
 /**
  * @typedef {import('../Inv.js').Inventory} Inventory
@@ -40,10 +42,11 @@ export function putDownToSocketInventory(
   let prevItemY = -1;
   if (prevItem) {
     // Has an item to swap. So pick up this one for later.
+    let inv = getExistingInventory(store, toInventoryId);
     let [x, y] = getItemSlotCoords(store, toInventoryId, prevItemId);
     prevItemX = x;
     prevItemY = y;
-    prevItem = getItemInStore(store, prevItemId);
+    prevItem = getItemByItemId(inv, prevItemId);
     removeItem(store, prevItemId, toInventoryId);
   }
   // Now there are no items in the way. Place it down!
@@ -118,10 +121,11 @@ export function putDownToGridInventory(
     let prevItemY = -1;
     if (prevItemId) {
       // Has an item to swap. So pick up this one for later.
+      let inv = getExistingInventory(store, toInventoryId);
       let [x, y] = getItemSlotCoords(store, toInventoryId, prevItemId);
       prevItemX = x;
       prevItemY = y;
-      prevItem = getItemInStore(store, prevItemId);
+      prevItem = getItemByItemId(inv, prevItemId);
       removeItem(store, prevItemId, toInventoryId);
     }
     // Now there are no items in the way. Place it down!

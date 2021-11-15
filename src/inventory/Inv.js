@@ -36,7 +36,7 @@ function createInventory(invId, invType, slotCount, maxCoordX, maxCoordY) {
   let inv = {
     invId,
     type: invType,
-    items: {}, // TODO: Not used yet.
+    items: {},
     slots: new Array(slotCount),
     width: maxCoordX,
     height: maxCoordY,

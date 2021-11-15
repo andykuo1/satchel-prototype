@@ -5,7 +5,6 @@ import {
   getInventory,
   getInventoryInStore,
   getInventoryStore,
-  getItemInStore,
   isInventoryInStore,
 } from '../InventoryStore.js';
 import {
@@ -15,7 +14,9 @@ import {
   isInventorySlotEmpty,
   putItem,
   removeItem,
+  getExistingInventory
 } from '../InventoryTransfer.js';
+import { getItemByItemId } from '../InvItems.js';
 import { putDownToGridInventory } from './InventoryCursorElementHelper.js';
 
 /**
@@ -182,7 +183,8 @@ export class InventoryCursorElement extends HTMLElement {
     let store = getInventoryStore();
     if (itemId) {
       const [fromItemX, fromItemY] = getItemSlotCoords(store, invId, itemId);
-      const item = getItemInStore(store, itemId);
+      let inv = getExistingInventory(store, invId);
+      const item = getItemByItemId(inv, itemId);
       removeItem(store, itemId, invId);
       this.setHeldItem(item, fromItemX - coordX, fromItemY - coordY);
       return true;

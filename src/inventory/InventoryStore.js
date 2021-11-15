@@ -1,4 +1,6 @@
 import { copyInventory, createGridInventory, createSocketInventory } from './Inv.js';
+import { getExistingInventory } from './InventoryTransfer.js';
+import { getItemByItemId } from './InvItems.js';
 import { copyItem } from './Item.js';
 
 /**
@@ -29,7 +31,6 @@ export function getInventoryStore() {
 export function createInventoryStore() {
   return {
     data: {
-      item: {},
       inventory: {},
     }
   };
@@ -44,22 +45,6 @@ export function copyInventoryStore(store, dst = undefined) {
     dst = createInventoryStore();
   }
   if (typeof store.data === 'object') {
-    // Copy items
-    if (typeof store.data.item === 'object') {
-      for(let item of Object.values(store.data.item)) {
-        const itemId = item.itemId;
-        if (isItemInStore(dst, itemId)) {
-          let prevItem = getItemInStore(dst, itemId);
-          copyItem(item, prevItem);
-        } else {
-          let newItem = copyItem(item);
-          addItemToStore(dst, itemId, newItem);
-        }
-        if (dst === getInventoryStore()) {
-          dispatchItemChange(dst, itemId);
-        }
-      }
-    }
     // Copy inventories
     if (typeof store.data.inventory === 'object') {
       for(let inventory of Object.values(store.data.inventory)) {
@@ -77,6 +62,7 @@ export function copyInventoryStore(store, dst = undefined) {
       }
     }
   }
+  return dst;
 }
 
 /**
@@ -227,78 +213,17 @@ export function getInventoryList(store) {
 /************************************************** INVENTORY */
 
 /**
- * @param {InventoryStore} store
- * @param {ItemId} itemId
- * @returns {boolean}
- */
-export function isItemInStore(store, itemId) {
-  return itemId in store.data.item;
-}
-
-/**
- * @param {InventoryStore} store
- * @param {ItemId} itemId
- * @returns {Item}
- */
-export function getItemInStore(store, itemId) {
-  return store.data.item[itemId];
-}
-
-/**
- * @param {InventoryStore} store
- * @param {ItemId} itemId
- * @param {Item} item
- * @returns {boolean}
- */
-export function addItemToStore(store, itemId, item) {
-  if (itemId !== item.itemId) {
-    throw new Error(`Cannot add item '${item.itemId}' for mismatched id '${itemId}'.`);
-  }
-  if (itemId in store.data.item) {
-    return false;
-  }
-  store.data.item[itemId] = item;
-  return true;
-}
-
-/**
- * @param {InventoryStore} store
- * @param {ItemId} itemId
- * @param {Item} item
- * @returns {boolean}
- */
-export function deleteItemFromStore(store, itemId, item) {
-  if (itemId !== item.itemId) {
-    throw new Error(`Cannot delete item '${item.itemId}' for mismatched id '${itemId}'.`);
-  }
-  if (!(itemId in store.data.item)) {
-    return false;
-  }
-  delete store.data.item[itemId];
-  return true;
-}
-
-/**
- * @param store
- */
-export function getItems(store) {
-  return Object.values(store.data.item);
-}
-
-/**
  * @param store
  * @param itemId
  * @param state
  */
-export function updateItem(store, itemId, state) {
-  const item = store.data.item[itemId];
+export function updateItem(store, invId, itemId, state) {
+  let inv = getExistingInventory(store, invId);
+  let item = getItemByItemId(inv, itemId);
   if (!item) {
     throw new Error('Cannot update null item.');
   }
-  store.data.item[itemId] = {
-    ...item,
-    ...state,
-  };
+  copyItem(state, item);
   dispatchItemChange(store, itemId);
 }
 
