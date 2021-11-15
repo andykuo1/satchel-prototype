@@ -2,8 +2,8 @@ import { uuid } from '../util/uuid.js';
 import { getCursorContext } from './CursorHelper.js';
 import { getCursor } from './element/InventoryCursorElement.js';
 import { createSocketInventoryInStore, getInventoryStore } from './InventoryStore.js';
-import { clearItems, putItem } from './InventoryTransfer.js';
-import { createTemporaryInventoryView } from './InventoryView.js';
+import { addItemToInventory, clearItemsInInventory } from './InventoryTransfer.js';
+import { createTemporaryInventoryView } from './InvView.js';
 
 /** @typedef {import('./element/InventoryGridElement.js').InventoryGridElement} InventoryGridElement */
 
@@ -42,9 +42,10 @@ export function getGroundContainer() {
  * @param freedItem
  */
 export function dropOnGround(freedItem) {
+  let store = getInventoryStore();
   const ground = getGroundContainer();
-  const inventory = createSocketInventoryInStore(getInventoryStore(), uuid());
-  putItem(getInventoryStore(), inventory.invId, freedItem, 0, 0);
+  const inventory = createSocketInventoryInStore(store, uuid());
+  addItemToInventory(store, inventory.invId, freedItem, 0, 0);
   const invElement = createTemporaryInventoryView(getInventoryStore(), inventory.invId);
   ground.append(invElement);
 }
@@ -52,7 +53,8 @@ export function dropOnGround(freedItem) {
 export function clearGround() {
   const ground = getGroundContainer();
   const invs = /** @type {NodeListOf<InventoryGridElement>} */ (ground.querySelectorAll('inventory-grid'));
+  let store = getInventoryStore();
   for (const grid of invs) {
-    clearItems(getInventoryStore(), grid.invId);
+    clearItemsInInventory(store, grid.invId);
   }
 }

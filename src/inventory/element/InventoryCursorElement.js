@@ -2,21 +2,19 @@ import { distanceSquared } from '../../util/math.js';
 import {
   createSocketInventoryInStore,
   deleteInventoryFromStore,
-  getInventory,
   getInventoryInStore,
   getInventoryStore,
   isInventoryInStore,
 } from '../InventoryStore.js';
 import {
-  clearItems,
-  getInventoryItemAt,
-  getItemSlotCoords,
-  isInventorySlotEmpty,
-  putItem,
-  removeItem,
-  getExistingInventory
+  getExistingInventory,
+  removeItemFromInventory,
+  clearItemsInInventory,
+  addItemToInventory,
+  getItemAtSlotIndex
 } from '../InventoryTransfer.js';
 import { getItemByItemId } from '../InvItems.js';
+import { getSlotCoordsByIndex, getSlotIndexByItemId, isSlotIndexEmpty } from '../InvSlots.js';
 import { putDownToGridInventory } from './InventoryCursorElementHelper.js';
 
 /**
@@ -177,20 +175,20 @@ export class InventoryCursorElement extends HTMLElement {
    * @returns {boolean} Whether the transfer to cursor was successful.
    */
   pickUp(invId, itemId, coordX = 0, coordY = 0) {
+    if (!itemId) {
+      return false;
+    }
     if (this.hasHeldItem()) {
       return false;
     }
     let store = getInventoryStore();
-    if (itemId) {
-      const [fromItemX, fromItemY] = getItemSlotCoords(store, invId, itemId);
-      let inv = getExistingInventory(store, invId);
-      const item = getItemByItemId(inv, itemId);
-      removeItem(store, itemId, invId);
-      this.setHeldItem(item, fromItemX - coordX, fromItemY - coordY);
-      return true;
-    } else {
-      return false;
-    }
+    let inv = getExistingInventory(store, invId);
+    const slotIndex = getSlotIndexByItemId(inv, itemId);
+    const [fromItemX, fromItemY] = getSlotCoordsByIndex(inv, slotIndex);
+    const item = getItemByItemId(inv, itemId);
+    removeItemFromInventory(store, invId, itemId);
+    this.setHeldItem(item, fromItemX - coordX, fromItemY - coordY);
+    return true;
   }
 
   /**
@@ -211,7 +209,7 @@ export class InventoryCursorElement extends HTMLElement {
       this.ignoreFirstPutDown = false;
       return true;
     }
-    const toInventory = getInventory(store, invId);
+    const toInventory = getExistingInventory(store, invId);
     const invType = toInventory.type;
     switch (invType) {
       case 'socket':
@@ -233,12 +231,13 @@ export class InventoryCursorElement extends HTMLElement {
 
   hasHeldItem() {
     let store = getInventoryStore();
-    return !isInventorySlotEmpty(store, this.invId, 0, 0);
+    let inv = getExistingInventory(store, this.invId);
+    return !isSlotIndexEmpty(inv, 0);
   }
 
   getHeldItem() {
     let store = getInventoryStore();
-    return getInventoryItemAt(store, this.invId, 0, 0);
+    return getItemAtSlotIndex(store, this.invId, 0);
   }
 
   /**
@@ -256,7 +255,7 @@ export class InventoryCursorElement extends HTMLElement {
       throw new Error('Cannot set held item - already holding another item.');
     }
     let store = getInventoryStore();
-    putItem(store, this.invId, item, 0, 0);
+    addItemToInventory(store, this.invId, item, 0, 0);
     this.style.display = 'unset';
     this.ignoreFirstPutDown = true;
     this.startHeldX = this.clientX;
@@ -267,7 +266,7 @@ export class InventoryCursorElement extends HTMLElement {
 
   clearHeldItem() {
     let store = getInventoryStore();
-    clearItems(store, this.invId);
+    clearItemsInInventory(store, this.invId);
     this.style.display = 'none';
     this.ignoreFirstPutDown = false;
   }

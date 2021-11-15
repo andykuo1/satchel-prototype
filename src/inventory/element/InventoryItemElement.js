@@ -4,9 +4,9 @@ import {
   getInventoryStore,
   removeItemChangeListener,
 } from '../InventoryStore.js';
-import { getExistingInventory, getItemSlotCoords } from '../InventoryTransfer.js';
-import { hasItem } from '../InvItems.js';
-import { getItemByItemId } from '../InvItems.js';
+import { getExistingInventory } from '../InventoryTransfer.js';
+import { hasItem, getItemByItemId } from '../InvItems.js';
+import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../InvSlots.js';
 
 /** @typedef {import('./InventoryGridElement.js').InventoryGridElement} InventoryGridElement */
 
@@ -185,8 +185,9 @@ export class InventoryItemElement extends HTMLElement {
    */
   onItemChange(store, itemId) {
     const invId = this._containerElement.invId;
-    const [x, y] = getItemSlotCoords(store, invId, itemId);
     const inv = getExistingInventory(store, invId);
+    const slotIndex = getSlotIndexByItemId(inv, itemId);
+    const [x, y] = getSlotCoordsByIndex(inv, slotIndex);
     const item = getItemByItemId(inv, itemId);
     this.style.setProperty('--itemX', `${x}`);
     this.style.setProperty('--itemY', `${y}`);

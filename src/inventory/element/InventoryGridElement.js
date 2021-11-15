@@ -8,7 +8,7 @@ import {
 } from '../InventoryStore.js';
 import { InventoryItemElement } from './InventoryItemElement.js';
 import {
-  getInventoryItemAt,
+  getItemAtSlotIndex,
 } from '../InventoryTransfer.js';
 import { getItemIds } from '../InvItems.js';
 
@@ -241,7 +241,7 @@ export class InventoryGridElement extends HTMLElement {
     let invWidth = inv.width;
     let invHeight = inv.height;
     if (invType === 'socket') {
-      const item = getInventoryItemAt(store, invId, 0, 0);
+      const item = getItemAtSlotIndex(store, invId, 0);
       if (item) {
         invWidth = item.width;
         invHeight = item.height;

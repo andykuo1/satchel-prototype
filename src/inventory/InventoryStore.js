@@ -1,7 +1,4 @@
 import { copyInventory, createGridInventory, createSocketInventory } from './Inv.js';
-import { getExistingInventory } from './InventoryTransfer.js';
-import { getItemByItemId } from './InvItems.js';
-import { copyItem } from './Item.js';
 
 /**
  * @typedef {import('./Inv.js').InventoryId} InventoryId
@@ -150,18 +147,6 @@ export function createSocketInventoryInStore(store, invId) {
  * @param store
  * @param inventoryId
  */
-export function getInventory(store, inventoryId) {
-  if (isInventoryInStore(store, inventoryId)) {
-    return getInventoryInStore(store, inventoryId);
-  } else {
-    return null;
-  }
-}
-
-/**
- * @param store
- * @param inventoryId
- */
 export function dispatchInventoryChange(store, inventoryId) {
   dispatchInventoryEvent(store, 'inventory', inventoryId);
 }
@@ -208,23 +193,6 @@ export function removeInventoryListChangeListener(callback) {
  */
 export function getInventoryList(store) {
   return Object.values(store.data.inventory);
-}
-
-/************************************************** INVENTORY */
-
-/**
- * @param store
- * @param itemId
- * @param state
- */
-export function updateItem(store, invId, itemId, state) {
-  let inv = getExistingInventory(store, invId);
-  let item = getItemByItemId(inv, itemId);
-  if (!item) {
-    throw new Error('Cannot update null item.');
-  }
-  copyItem(state, item);
-  dispatchItemChange(store, itemId);
 }
 
 /**

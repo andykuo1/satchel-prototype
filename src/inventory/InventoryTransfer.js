@@ -1,10 +1,12 @@
 import {
-  getInventory,
+  isInventoryInStore,
+  getInventoryInStore,
   dispatchInventoryChange,
+  dispatchItemChange,
 } from './InventoryStore.js';
-import { getSlotCoordsByIndex, getSlotIndexByItemId, isSlotCoordEmpty } from './InvSlots.js';
 import * as InvItems from './InvItems.js';
 import { getInventorySlotCount } from './Inv.js';
+import { copyItem } from './Item.js';
 
 /**
  * @typedef {import('./InventoryStore.js').Item} Item
@@ -16,84 +18,66 @@ import { getInventorySlotCount } from './Inv.js';
  */
 
 /**
- * Remove and delete item from inventory.
- *
- * @param {InventoryStore} store
- * @param {ItemId} itemId
- * @param {InventoryId} invId
- * @returns {Item} The removed item.
+ * @param {InventoryStore} store 
+ * @param {InventoryId} invId 
+ * @param {Item} item 
+ * @param {number} coordX 
+ * @param {number} coordY 
  */
-export function removeItem(store, itemId, invId) {
-  let inv = getExistingInventory(store, invId);
-  if (InvItems.hasItem(inv, itemId)) {
-    let item = InvItems.getItemByItemId(inv, itemId);
-    InvItems.removeItem(inv, itemId);
-    dispatchInventoryChange(store, invId);
-    return item;
-  } else {
-    return null;
-  }
-}
-
-/**
- * Clear items from inventory.
- *
- * @param {InventoryStore} store
- * @param {InventoryId} invId
- * @returns {Array<Item>} The cleared items.
- */
-export function clearItems(store, invId) {
-  let inv = getExistingInventory(store, invId);
-  let items = InvItems.getItems(inv);
-  InvItems.clearItems(inv);
-  dispatchInventoryChange(store, invId);
-  return items;
-}
-
-/**
- * Put and create item in inventory. Will throw if unable to.
- *
- * @param {InventoryStore} store
- * @param {InventoryId} invId
- * @param {Item} item
- * @param {number} coordX
- * @param {number} coordY
- */
-export function putItem(store, invId, item, coordX, coordY) {
+export function addItemToInventory(store, invId, item, coordX, coordY) {
   let inv = getExistingInventory(store, invId);
   InvItems.putItem(inv, item, coordX, coordY);
   dispatchInventoryChange(store, invId);
 }
 
-export function getItemSlotIndex(store, invId, itemId, startIndex = 0) {
-  const inv = getExistingInventory(store, invId);
-  return getSlotIndexByItemId(inv, itemId, startIndex);
-}
-
-export function getItemSlotCoords(store, inventoryId, itemId) {
-  const inv = getExistingInventory(store, inventoryId);
-  const slotIndex = getSlotIndexByItemId(inv, itemId, 0);
-  return getSlotCoordsByIndex(inv, slotIndex);
-}
-
 /**
- * @param {InventoryStore} store
+ * @param {InventoryStore} store 
+ * @param {InventoryId} invId 
  * @param {ItemId} itemId
- * @param {InventoryId} invId
- * @returns {boolean}
  */
-export function hasItem(store, itemId, invId) {
+export function removeItemFromInventory(store, invId, itemId) {
+  let inv = getExistingInventory(store, invId);
+  if (InvItems.hasItem(inv, itemId)) {
+    InvItems.removeItem(inv, itemId);
+    dispatchInventoryChange(store, invId);
+  }
+}
+
+export function clearItemsInInventory(store, invId) {
+  let inv = getExistingInventory(store, invId);
+  InvItems.clearItems(inv);
+  dispatchInventoryChange(store, invId);
+}
+
+export function hasItemInInventory(store, invId, itemId) {
   let inv = getExistingInventory(store, invId);
   return InvItems.hasItem(inv, itemId);
 }
 
+export function getItemAtSlotIndex(store, invId, slotIndex) {
+  let inv = getExistingInventory(store, invId);
+  let itemId = InvItems.getItemIdBySlotIndex(inv, slotIndex);
+  return InvItems.getItemByItemId(inv, itemId);
+}
+
+export function getItemAtSlotCoords(store, invId, coordX, coordY) {
+  let inv = getExistingInventory(store, invId);
+  let itemId = InvItems.getItemIdBySlotCoords(inv, coordX, coordY);
+  return InvItems.getItemByItemId(inv, itemId);
+}
+
+export function getItemIdAtSlotCoords(store, invId, coordX, coordY) {
+  let inv = getExistingInventory(store, invId);
+  return InvItems.getItemIdBySlotCoords(inv, coordX, coordY);
+}
+
 /**
  * @param {InventoryStore} store
- * @param {InventoryId} inventoryId
+ * @param {InventoryId} invId
  * @returns {boolean}
  */
-export function isInventoryEmpty(store, inventoryId) {
-  const inv = getExistingInventory(store, inventoryId);
+export function isInventoryEmpty(store, invId) {
+  const inv = getExistingInventory(store, invId);
   const length = getInventorySlotCount(inv);
   for (let i = 0; i < length; ++i) {
     let itemId = inv.slots[i];
@@ -105,60 +89,31 @@ export function isInventoryEmpty(store, inventoryId) {
 }
 
 /**
- * @param {InventoryStore} store
- * @param {InventoryId} invId
- * @param {number} coordX
- * @param {number} coordY
- * @returns {Item}
- */
-export function getInventoryItemAt(store, invId, coordX, coordY) {
-  const inv = getExistingInventory(store, invId);
-  if (isSlotCoordEmpty(inv, coordX, coordY)) {
-    return null;
-  }
-  let itemId = InvItems.getItemIdBySlotCoords(inv, coordX, coordY);
-  return InvItems.getItemByItemId(inv, itemId);
-}
-
-export function getInventoryItemIdAt(store, inventoryId, coordX, coordY) {
-  const inv = getExistingInventory(store, inventoryId);
-  return InvItems.getItemIdBySlotCoords(inv, coordX, coordY);
-}
-
-export function isInventorySlotEmpty(store, inventoryId, coordX, coordY) {
-  const inventory = getExistingInventory(store, inventoryId);
-  return isSlotCoordEmpty(inventory, coordX, coordY);
-}
-
-/**
- * @param {InventoryStore} store
- * @param {InventoryId} inventoryId
- * @returns {Iterable<ItemId>}
- */
-export function getInventoryItemIds(store, inventoryId) {
-  const inv = getExistingInventory(store, inventoryId);
-  const length = getInventorySlotCount(inv);
-  let result = new Set();
-  for (let i = 0; i < length; ++i) {
-    let itemId = inv.slots[i];
-    if (itemId) {
-      result.add(itemId);
-    }
-  }
-  return result;
-}
-
-/**
  * Get an existing inventory. Will throw if it does not exist.
  *
  * @param {InventoryStore} store
- * @param {InventoryId} inventoryId
+ * @param {InventoryId} invId
  * @returns {Inventory}
  */
-export function getExistingInventory(store, inventoryId) {
-  const inventory = getInventory(store, inventoryId);
-  if (!inventory) {
-    throw new Error(`Cannot get non-existant inventory '${inventoryId}'.`);
+export function getExistingInventory(store, invId) {
+  if (isInventoryInStore(store, invId)) {
+    return getInventoryInStore(store, invId);
+  } else {
+    throw new Error(`Cannot get non-existant inventory '${invId}'.`);
   }
-  return inventory;
+}
+
+/**
+ * @param store
+ * @param itemId
+ * @param state
+ */
+ export function updateItem(store, invId, itemId, state) {
+  let inv = getExistingInventory(store, invId);
+  let item = InvItems.getItemByItemId(inv, itemId);
+  if (!item) {
+    throw new Error('Cannot update null item.');
+  }
+  copyItem(state, item);
+  dispatchItemChange(store, itemId);
 }

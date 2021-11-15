@@ -1,9 +1,8 @@
 import { dropOnGround } from '../inventory/GroundHelper.js';
 import {
   getInventoryStore,
-  updateItem,
 } from '../inventory/InventoryStore.js';
-import { getExistingInventory } from '../inventory/InventoryTransfer.js';
+import { getExistingInventory, updateItem } from '../inventory/InventoryTransfer.js';
 import { getItemByItemId } from '../inventory/InvItems.js';
 import { ItemBuilder } from '../inventory/Item.js';
 

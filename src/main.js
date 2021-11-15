@@ -1,5 +1,5 @@
 import { setGroundContainer } from './inventory/GroundHelper.js';
-import { createInventoryView } from './inventory/InventoryView.js';
+import { createInventoryView } from './inventory/InvView.js';
 import { getInventoryStore, createGridInventoryInStore } from './inventory/InventoryStore.js';
 import {
   applyItemBuilder,
