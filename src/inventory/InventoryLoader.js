@@ -1,3 +1,4 @@
+import { copyInventory } from './Inv.js';
 import {
   copyInventoryStore,
 } from './InventoryStore.js';
@@ -42,4 +43,16 @@ export function loadFromJSON(store, jsonData) {
 export function saveToJSON(store) {
   const result = copyInventoryStore(store);
   return result;
+}
+
+export function saveInventoryToJSON(inv, dst = undefined) {
+  if (!dst) {
+    dst = {};
+  }
+  Object.assign(dst, copyInventory(inv));
+  return dst;
+}
+
+export function loadInventoryFromJSON(jsonData, dst = undefined) {
+  return copyInventory(jsonData, dst);
 }

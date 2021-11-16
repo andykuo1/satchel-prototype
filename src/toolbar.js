@@ -8,7 +8,7 @@ import {
   connectAsServer,
   isServerSide,
   shouldConnnectAsClient,
-} from './app/PeerSatchel.js';
+} from './app/PeerSatchelConnector.js';
 import { getCursorContext } from './inventory/CursorHelper.js';
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -49,12 +49,14 @@ function onDeleteClick() {
 function onCloudClick() {
   document.querySelector('#cloudButton').toggleAttribute('disabled', true);
   if (shouldConnnectAsClient()) {
-    connectAsClient().catch(e => {
+    let ctx = getCursorContext();
+    connectAsClient(ctx).catch(e => {
       window.alert('Could not connect: ' + e);
       document.querySelector('#cloudButton').toggleAttribute('disabled', false);
     });
   } else {
-    connectAsServer().catch(e => {
+    let ctx = getCursorContext();
+    connectAsServer(ctx).catch(e => {
       window.alert('Could not connect: ' + e);
     }).finally(() => {
       document.querySelector('#cloudButton').toggleAttribute('disabled', false);

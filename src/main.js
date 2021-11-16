@@ -1,12 +1,13 @@
 import { setGroundContainer } from './inventory/GroundHelper.js';
 import { createInventoryView } from './inventory/InvView.js';
-import { getInventoryStore, createGridInventoryInStore } from './inventory/InventoryStore.js';
+import { getInventoryStore, createGridInventoryInStore, dispatchInventoryChange } from './inventory/InventoryStore.js';
 import {
   applyItemBuilder,
   openItemBuilder,
   resetItemBuilder,
 } from './app/ItemBuilder.js';
-import { loadFromLocalStorage, saveToLocalStorage } from './inventory/InventoryLoader.js';
+import { loadInventoryFromJSON, saveInventoryToJSON } from './inventory/InventoryLoader.js';
+import { getExistingInventory } from './inventory/InventoryTransfer.js';
 
 const APP_VERSION = '1.0.18';
 
@@ -62,11 +63,19 @@ window.addEventListener('DOMContentLoaded', () => {
   workspace.append(mainElement);
 
   // Load from storage...
-  loadFromLocalStorage(getInventoryStore());
+  let invData = localStorage.getItem('satchel_data_v2');
+  if (invData) {
+    let jsonData = JSON.parse(invData);
+    loadInventoryFromJSON(jsonData, mainInventory);
+    mainInventory.displayName = '';
+    dispatchInventoryChange(store, mainInventory.invId);
+  }
 
-  // Auto save to local storage every 5 second
+  // Auto save to local storage every 1 second
   setInterval(() => {
     console.log('Autosave...');
-    saveToLocalStorage(getInventoryStore());
-  }, 5000);
+    let inv = getExistingInventory(store, 'main');
+    let jsonData = saveInventoryToJSON(inv, {});
+    localStorage.setItem('satchel_data_v2', JSON.stringify(jsonData));
+  }, 1000);
 });

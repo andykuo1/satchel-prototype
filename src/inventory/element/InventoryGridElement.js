@@ -102,7 +102,7 @@ export class InventoryGridElement extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ['invid', 'name'];
+    return ['invid'];
   }
 
   get invId() {
@@ -111,14 +111,6 @@ export class InventoryGridElement extends HTMLElement {
 
   set invId(value) {
     this.setAttribute('invid', value);
-  }
-
-  get name() {
-    return this._name;
-  }
-
-  set name(value) {
-    this.setAttribute('name', value);
   }
 
   constructor() {
@@ -130,9 +122,7 @@ export class InventoryGridElement extends HTMLElement {
     this.shadowRoot.append(
       this.constructor[Symbol.for('styleNode')].cloneNode(true)
     );
-
-    /** @private */
-    this._name = '';
+    
     /** @private */
     this._invId = undefined;
 
@@ -159,11 +149,6 @@ export class InventoryGridElement extends HTMLElement {
     this._container.addEventListener('mouseup', this.onMouseUp);
     this._container.addEventListener('contextmenu', this.onContextMenu);
     let invId = this._invId;
-    const name = this._name;
-    if (!invId && name) {
-      invId = name.replace(/\s/g, '_').toLowerCase();
-      this._invId = invId;
-    }
     if (invId) {
       let store = getInventoryStore();
       addInventoryChangeListener(
@@ -173,7 +158,6 @@ export class InventoryGridElement extends HTMLElement {
       this.onInventoryChange(store, invId);
     }
     upgradeProperty(this, 'invId');
-    upgradeProperty(this, 'name');
   }
 
   /** @protected */
@@ -197,11 +181,6 @@ export class InventoryGridElement extends HTMLElement {
    */
   attributeChangedCallback(attribute, previous, value) {
     switch (attribute) {
-      case 'name':
-        this._name = value;
-        this._containerTitle.textContent = value;
-        this._container.classList.toggle('flattop', Boolean(value));
-        break;
       case 'invid': {
         const store = getInventoryStore();
         const prevInvId = this._invId;
@@ -251,8 +230,13 @@ export class InventoryGridElement extends HTMLElement {
       }
     }
 
-    this.style.setProperty('--container-width', invWidth);
-    this.style.setProperty('--container-height', invHeight);
+    this.style.setProperty('--container-width', `${invWidth}`);
+    this.style.setProperty('--container-height', `${invHeight}`);
+
+    // Set display name
+    const displayName = inv.displayName;
+    this._containerTitle.textContent = displayName;
+    this._container.classList.toggle('flattop', Boolean(displayName));
 
     // Preserve unchanged items in slot
     const preservedItems = {};
