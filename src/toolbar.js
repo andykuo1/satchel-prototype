@@ -1,8 +1,8 @@
 import { downloadText } from './util/downloader.js';
 import { clearGround } from './inventory/GroundHelper.js';
 import { openItemBuilder } from './app/ItemBuilder.js';
-import { saveToJSON, loadFromJSON } from './inventory/InventoryLoader.js';
-import { getInventoryStore } from './inventory/InventoryStore.js';
+import { saveInventoryToJSON, loadInventoryFromJSON } from './inventory/InventoryLoader.js';
+import { dispatchInventoryChange, getInventoryStore } from './inventory/InventoryStore.js';
 import {
   connectAsClient,
   connectAsServer,
@@ -10,6 +10,7 @@ import {
   shouldConnnectAsClient,
 } from './app/PeerSatchelConnector.js';
 import { getCursorContext } from './inventory/CursorHelper.js';
+import { getExistingInventory } from './inventory/InventoryTransfer.js';
 
 window.addEventListener('DOMContentLoaded', () => {
   document.querySelector('#editButton').addEventListener('click', onEditClick);
@@ -82,7 +83,8 @@ function onDownloadClick() {
     const dataString = JSON.stringify(wrappedData, null, 4);
     downloadText(`satchel-server-data-${timestamp}.json`, dataString);
   } else {
-    const jsonData = saveToJSON(getInventoryStore());
+    const store = getInventoryStore();
+    const jsonData = saveInventoryToJSON(getExistingInventory(store, 'main'));
     const wrappedData = {
       timestamp,
       datatype: 'client',
@@ -113,12 +115,13 @@ async function onUploadChange(e) {
   if (jsonData.datatype === 'server') {
     localStorage.setItem('server_data', JSON.stringify(jsonData.data));
     const ctx = getCursorContext();
-    if (ctx.server) {
-      ctx.server.data = jsonData.data;
+    if (ctx.server && ctx.server.instance) {
+      ctx.server.instance.localData = jsonData.data;
     }
-  }
-
-  if (jsonData.datatype === 'client') {
-    loadFromJSON(getInventoryStore(), jsonData.data);
+  } else if (jsonData.datatype === 'client') {
+    const store = getInventoryStore();
+    let inv = getExistingInventory(store, 'main');
+    loadInventoryFromJSON(jsonData.data, inv);
+    dispatchInventoryChange(store, 'main');
   }
 }
