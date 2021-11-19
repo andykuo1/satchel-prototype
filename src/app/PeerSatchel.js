@@ -1,14 +1,20 @@
 import { createGridInventory } from '../inventory/Inv.js';
 import { loadInventoryFromJSON, saveInventoryToJSON } from '../inventory/InventoryLoader.js';
 import {
+  addInventoryToStore,
   createGridInventoryInStore,
+  deleteInventoryFromStore,
   dispatchInventoryChange,
+  getInventoryInStore,
   getInventoryStore,
   isInventoryInStore,
 } from '../inventory/InventoryStore.js';
 import { getExistingInventory } from '../inventory/InventoryTransfer.js';
 
-/** @typedef {import('../peerful/PeerfulConnection.js').PeerfulConnection} PeerfulConnection */
+/**
+ * @typedef {import('../peerful/PeerfulConnection.js').PeerfulConnection} PeerfulConnection
+ * @typedef {import('../inventory/element/InventoryGridElement.js').InventoryGridElement} InventoryGridElement
+ */
 
 export class SatchelServer {
   constructor() {
@@ -46,6 +52,7 @@ export class SatchelServer {
     let remoteClient = {
       connection: conn,
       name: '',
+      element: null,
     };
     this.remoteClients.push(remoteClient);
     conn.on('data', data => {
@@ -91,7 +98,30 @@ export class SatchelServer {
             console.log('Syncing client...', name);
             // Update server's copy of client data
             const clientDataName = `remote_data#${remoteClient.name}`;
-            this.localData[clientDataName] = jsonData.message;
+            const clientData = jsonData.message;
+            this.localData[clientDataName] = clientData;
+            let store = getInventoryStore();
+            try {
+              if (!isInventoryInStore(store, clientDataName)) {
+                let inv = loadInventoryFromJSON(clientData);
+                // Override id
+                inv.invId = clientDataName;
+                addInventoryToStore(store, clientDataName, inv);
+                let element = /** @type {InventoryGridElement} */ (document.createElement('inventory-grid'));
+                element.id = clientDataName;
+                element.invId = clientDataName;
+                remoteClient.element = element;
+                document.querySelector('#workspace').appendChild(element);
+              } else {
+                let inv = getInventoryInStore(store, clientDataName);
+                loadInventoryFromJSON(clientData, inv);
+                // Override id
+                inv.invId = clientDataName;
+                dispatchInventoryChange(store, clientDataName);
+              }
+            } catch (e) {
+              console.error(`Failed to load client inventory - ${e}`);
+            }
           } break;
           default: {
             console.error(`Found unknown message from client - ${data}`);
@@ -116,6 +146,20 @@ export class SatchelServer {
       if (client.connection === conn) {
         console.log('Disconnecting client...', client.name);
         this.remoteClients.splice(i, 1);
+        const clientDataName = `remote_data#${client.name}`;
+        try {
+          let store = getInventoryStore();
+          if (isInventoryInStore(store, clientDataName)) {
+            let inv = getInventoryInStore(store, clientDataName);
+            deleteInventoryFromStore(store, clientDataName, inv);
+          }
+          if (client.element) {
+            let child = /** @type {InventoryGridElement} */ (client.element);
+            child.parentElement.removeChild(child);
+          }
+        } catch (e) {
+          console.error(`Failed to unload client inventory - ${e}`);
+        }
         flag = true;
         break;
       }
