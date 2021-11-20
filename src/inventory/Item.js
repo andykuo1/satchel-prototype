@@ -196,8 +196,8 @@ export class ItemBuilder {
     if (!Number.isFinite(height) || !Number.isSafeInteger(height) || height <= 0) {
       throw new Error('Invalid item height - must be a finite positive integer.');
     }
-    let imgSrc = String(this._imageSrc);
-    let displayName = String(this._displayName);
+    let imgSrc = String(this._imageSrc.trim());
+    let displayName = String(this._displayName.trim());
     let description = String(this._description);
     let stackSize = Number(this._stackSize);
     let metadata;

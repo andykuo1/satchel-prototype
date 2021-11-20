@@ -1,5 +1,12 @@
 import { ItemBuilder } from '../Item.js';
 
+const SATCHEL_IMAGE_PREFIX = 'satchel:';
+const VALID_SATCHEL_IMAGES = {
+  'satchel:blade': 'res/images/blade.png',
+  'satchel:potion': 'res/images/potion.png',
+  'satchel:scroll': 'res/images/scroll.png',
+};
+
 const INNER_HTML = `
 <form autocomplete="off">
   <fieldset>
@@ -57,9 +64,9 @@ const INNER_HTML = `
         </span>
       </div>
     </fieldset>
-    <fieldset disabled id="fieldsetStyle">
+    <fieldset id="fieldsetStyle">
       <legend>Style</legend>
-      <input name="imageSrc" id="itemImage">
+      <input type="url" name="imageSrc" id="itemImage">
     </fieldset>
     <fieldset id="fieldsetDetail">
       <legend>Detail</legend>
@@ -357,6 +364,7 @@ export class InventoryItemBuilderElement extends HTMLElement {
     this.itemName.value = item.displayName;
     this.itemWidth.value = `${item.width}`;
     this.itemHeight.value = `${item.height}`;
+    this.itemImage.value = item.imgSrc;
     this.itemStackSize.value = `${item.stackSize}`;
     this.itemDescription.value = item.description;
     this.itemStackable.checked = item.stackSize >= 0;
@@ -373,7 +381,7 @@ export class InventoryItemBuilderElement extends HTMLElement {
     this.reset();
     this.fieldsetSize.toggleAttribute('disabled', false);
     this.fieldsetShape.toggleAttribute('disabled', false);
-    this.fieldsetStyle.toggleAttribute('disabled', true);
+    this.fieldsetStyle.toggleAttribute('disabled', false);
     this.fieldsetDetail.toggleAttribute('disabled', false);
     this.itemStackSize.toggleAttribute('disabled', true);
     this.groupStackSize.classList.toggle('hidden', true);
@@ -405,10 +413,24 @@ export class InventoryItemBuilderElement extends HTMLElement {
     if (this.itemName.value) {
       builder.displayName(this.itemName.value);
     }
-    if (this.itemImage.value) {
-      builder.imageSrc(this.itemImage.value);
-    } else {
-      let imgSrc;
+    let imgSrc = this.itemImage.value;
+    if (imgSrc) {
+      if (imgSrc.length < 64) {
+        let key = imgSrc.toLowerCase().trim();
+        if (key in VALID_SATCHEL_IMAGES) {
+          imgSrc = VALID_SATCHEL_IMAGES[key];
+        } else if (key.startsWith(SATCHEL_IMAGE_PREFIX)) {
+          imgSrc = undefined;
+          let message = `Invalid satchel image file '${key}'. Can only be one of:\n - ${Object.keys(VALID_SATCHEL_IMAGES).join('\n - ')}`;
+          window.alert(message);
+          // TODO: This is nasty. We should handle errors better.
+          throw new Error(message);
+        }
+      } else {
+        // This is probably a data blob... just let it be.
+      }
+    }
+    if (!imgSrc) {
       if (width < height) {
         imgSrc = 'res/images/blade.png';
       } else if (width > height) {
@@ -416,8 +438,8 @@ export class InventoryItemBuilderElement extends HTMLElement {
       } else {
         imgSrc = 'res/images/potion.png';
       }
-      builder.imageSrc(imgSrc);
     }
+    builder.imageSrc(imgSrc);
     if (this.itemStackable.checked && this.itemStackSize.value) {
       builder.stackSize(this.itemStackSize.value);
     }

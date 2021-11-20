@@ -42,9 +42,13 @@ window.addEventListener('DOMContentLoaded', () => {
 function onActionExportAs() {
     /** @type {import('./inventory/element/InventoryItemBuilderElement.js').InventoryItemBuilderElement} */
     const itemBuilder = document.querySelector('inventory-itembuilder');
-    let item = itemBuilder.toItem();
-    let jsonData = exportItemToJSON(item);
-    downloadText(`${item.displayName || 'New Item'}.json`, JSON.stringify(jsonData, null, 4));
+    try {
+      let item = itemBuilder.toItem();
+      let jsonData = exportItemToJSON(item);
+      downloadText(`${item.displayName || 'New Item'}.json`, JSON.stringify(jsonData, null, 4));
+    } catch (e) {
+      console.error('Failed to export item', e);
+    }
 }
 
 function onActionSendTo() {

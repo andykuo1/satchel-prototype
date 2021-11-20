@@ -15,12 +15,16 @@ window.addEventListener('DOMContentLoaded', () => {
   document.querySelector('#appVersion').textContent = `v${APP_VERSION}`;
   document.querySelector('inventory-itembuilder').addEventListener('submit', (e) => {
     e.preventDefault();
-
-    const editor = document.querySelector('#editor');
-    editor.classList.toggle('open', false);
-
     const { target } = e;
-    applyItemBuilder(target);
+    try {
+      applyItemBuilder(target);
+      
+      const editor = document.querySelector('#editor');
+      editor.classList.toggle('open', false);
+    } catch (e) {
+      console.error('Failed to apply item builder.', e);
+      return false;
+    }
     return false;
   });
   document.querySelector('inventory-itembuilder').addEventListener('reset', (e) => {
