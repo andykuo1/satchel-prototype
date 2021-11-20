@@ -59,7 +59,7 @@ const INNER_HTML = `
     </fieldset>
     <fieldset disabled id="fieldsetStyle">
       <legend>Style</legend>
-      <input type="text" name="imageSrc" id="itemImage">
+      <input name="imageSrc" id="itemImage">
     </fieldset>
     <fieldset id="fieldsetDetail">
       <legend>Detail</legend>
@@ -76,10 +76,16 @@ const INNER_HTML = `
     </fieldset>
   </fieldset>
   <fieldset>
+    <legend>Actions</legend>
     <input name="invId" id="itemInvId" hidden>
     <input name="itemId" id="itemItemId" hidden>
-    <input type="submit">
-    <input type="reset">
+    <div>
+      <input type="submit">
+      <input type="reset">
+    </div>
+    <div>
+      <slot name="actions"></slot>
+    </div>
   </fieldset>
 </form>
 `;
@@ -90,7 +96,7 @@ form {
 form input {
   font-family: monospace;
 }
-input[type="submit"], input[type="reset"] {
+input[type="submit"], input[type="reset"], button {
   font-family: unset;
 }
 
@@ -251,6 +257,11 @@ export class InventoryItemBuilderElement extends HTMLElement {
     this.itemHeavy = this.shadowRoot.querySelector('#itemHeavy');
     /**
      * @private
+     * @type {HTMLInputElement}
+     */
+    this.itemImage = this.shadowRoot.querySelector('#itemImage');
+    /**
+     * @private
      * @type {HTMLTextAreaElement}
      */
     this.itemDescription = this.shadowRoot.querySelector('#itemDescription');
@@ -348,6 +359,7 @@ export class InventoryItemBuilderElement extends HTMLElement {
     this.itemHeight.value = `${item.height}`;
     this.itemStackSize.value = `${item.stackSize}`;
     this.itemDescription.value = item.description;
+    this.itemStackable.checked = item.stackSize >= 0;
     this.fieldsetSize.toggleAttribute('disabled', true);
     this.fieldsetShape.toggleAttribute('disabled', true);
     this.fieldsetStyle.toggleAttribute('disabled', true);
@@ -377,47 +389,26 @@ export class InventoryItemBuilderElement extends HTMLElement {
 
   toItem() {
     const builder = new ItemBuilder();
-    const formData = new FormData(this.form);
-    let imgSrc;
-    let width, height;
-    for (const entry of formData) {
-      const [key, value] = entry;
-      if (!value) {
-        continue;
-      }
-      switch (key) {
-        case 'invId':
-          // Use getSourceInvId() instead.
-          break;
-        case 'itemId':
-          // Use getSourceItemId() instead.
-          builder.itemId(value);
-          break;
-        case 'width':
-          width = Number(value);
-          builder.width(value);
-          break;
-        case 'height':
-          height = Number(value);
-          builder.height(value);
-          break;
-        case 'displayName':
-          builder.displayName(value);
-          break;
-        case 'imageSrc':
-          imgSrc = value;
-          builder.imageSrc(value);
-          break;
-        case 'stackSize':
-          builder.stackSize(value);
-          break;
-        case 'description':
-          builder.description(value);
-          break;
-      }
+    let width;
+    let height;
+    if (this.itemItemId.value) {
+      builder.itemId(this.itemItemId.value);
     }
-
-    if (!imgSrc) {
+    if (this.itemWidth.value) {
+      width = this.itemWidth.value;
+      builder.width(this.itemWidth.value);
+    }
+    if (this.itemHeight.value) {
+      height = this.itemHeight.value;
+      builder.height(this.itemHeight.value);
+    }
+    if (this.itemName.value) {
+      builder.displayName(this.itemName.value);
+    }
+    if (this.itemImage.value) {
+      builder.imageSrc(this.itemImage.value);
+    } else {
+      let imgSrc;
       if (width < height) {
         imgSrc = 'res/images/blade.png';
       } else if (width > height) {
@@ -427,7 +418,12 @@ export class InventoryItemBuilderElement extends HTMLElement {
       }
       builder.imageSrc(imgSrc);
     }
-
+    if (this.itemStackable.checked && this.itemStackSize.value) {
+      builder.stackSize(this.itemStackSize.value);
+    }
+    if (this.itemDescription.value) {
+      builder.description(this.itemDescription.value);
+    }
     return builder.build();
   }
 

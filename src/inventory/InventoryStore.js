@@ -1,4 +1,4 @@
-import { copyInventory, createGridInventory, createSocketInventory } from './Inv.js';
+import { createGridInventory, createSocketInventory } from './Inv.js';
 
 /**
  * @typedef {import('./Inv.js').InventoryId} InventoryId
@@ -29,37 +29,11 @@ export function createInventoryStore() {
   return {
     data: {
       inventory: {},
-    }
+    },
+    assets: {
+      images: {},
+    },
   };
-}
-
-/**
- * @param {InventoryStore} store
- * @param {InventoryStore} [dst]
- */
-export function copyInventoryStore(store, dst = undefined) {
-  if (!dst) {
-    dst = createInventoryStore();
-  }
-  if (typeof store.data === 'object') {
-    // Copy inventories
-    if (typeof store.data.inventory === 'object') {
-      for(let inventory of Object.values(store.data.inventory)) {
-        const invId = inventory.invId;
-        if (isInventoryInStore(dst, invId)) {
-          let prevInventory = getInventoryInStore(dst, invId);
-          copyInventory(inventory, prevInventory);
-        } else {
-          let newInventory = copyInventory(inventory);
-          addInventoryToStore(dst, invId, newInventory);
-        }
-        if (dst === getInventoryStore()) {
-          dispatchInventoryChange(dst, invId);
-        }
-      }
-    }
-  }
-  return dst;
 }
 
 /**

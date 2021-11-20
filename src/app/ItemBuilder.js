@@ -27,11 +27,7 @@ export function applyItemBuilder(target) {
   let invId = target.getSourceInvId();
   let itemId = target.getSourceItemId();
   if (invId) {
-    updateItem(getInventoryStore(), invId, itemId, {
-      displayName: item.displayName,
-      description: item.description,
-      stackSize: item.stackSize,
-    });
+    updateItem(getInventoryStore(), invId, itemId, item);
   } else {
     dropOnGround(item);
   }

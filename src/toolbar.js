@@ -1,7 +1,7 @@
 import { downloadText } from './util/downloader.js';
-import { clearGround } from './inventory/GroundHelper.js';
+import { clearGround, dropOnGround } from './inventory/GroundHelper.js';
 import { openItemBuilder } from './app/ItemBuilder.js';
-import { saveInventoryToJSON, loadInventoryFromJSON } from './inventory/InventoryLoader.js';
+import { exportItemToJSON, exportInventoryToJSON, importInventoryFromJSON, importItemFromJSON, exportDataToJSON } from './inventory/InventoryLoader.js';
 import { dispatchInventoryChange, getInventoryStore } from './inventory/InventoryStore.js';
 import {
   connectAsClient,
@@ -13,7 +13,9 @@ import { getCursorContext } from './inventory/CursorHelper.js';
 import { getExistingInventory } from './inventory/InventoryTransfer.js';
 
 window.addEventListener('DOMContentLoaded', () => {
-  document.querySelector('#editButton').addEventListener('click', onEditClick);
+  document
+    .querySelector('#editButton')
+    .addEventListener('click', onEditClick);
   document
     .querySelector('#deleteButton')
     .addEventListener('click', onDeleteClick);
@@ -29,7 +31,25 @@ window.addEventListener('DOMContentLoaded', () => {
   document
     .querySelector('#uploadInput')
     .addEventListener('change', onUploadChange);
+  document
+    .querySelector('#actionExportAs')
+    .addEventListener('click', onActionExportAs);
+  document
+    .querySelector('#actionSendTo')
+    .addEventListener('click', onActionSendTo);
 });
+
+function onActionExportAs() {
+    /** @type {import('./inventory/element/InventoryItemBuilderElement.js').InventoryItemBuilderElement} */
+    const itemBuilder = document.querySelector('inventory-itembuilder');
+    let item = itemBuilder.toItem();
+    let jsonData = exportItemToJSON(item);
+    downloadText(`${item.displayName || 'New Item'}.json`, JSON.stringify(jsonData, null, 4));
+}
+
+function onActionSendTo() {
+
+}
 
 function onEditClick() {
   const editor = document.querySelector('#editor');
@@ -74,24 +94,15 @@ function onDownloadClick() {
     } catch {
       serverData = {};
     }
-
-    const wrappedData = {
-      timestamp,
-      datatype: 'server',
-      data: serverData,
-    };
-    const dataString = JSON.stringify(wrappedData, null, 4);
+    const jsonData = exportDataToJSON('server_v1', serverData, {});
+    const dataString = JSON.stringify(jsonData, null, 4);
     downloadText(`satchel-server-data-${timestamp}.json`, dataString);
   } else {
     const store = getInventoryStore();
-    const jsonData = saveInventoryToJSON(getExistingInventory(store, 'main'));
-    const wrappedData = {
-      timestamp,
-      datatype: 'client',
-      data: jsonData,
-    };
-    const dataString = JSON.stringify(wrappedData, null, 4);
-    downloadText(`satchel-data-${timestamp}.json`, dataString);
+    const inv = getExistingInventory(store, 'main');
+    const jsonData = exportInventoryToJSON(inv);
+    const dataString = JSON.stringify(jsonData, null, 4);
+    downloadText(`satchel-client-data-${timestamp}.json`, dataString);
   }
 }
 
@@ -109,19 +120,31 @@ async function onUploadChange(e) {
   try {
     jsonData = JSON.parse(await file.text());
   } catch {
-    window.alert('Failed to load file.');
+    window.alert('Cannot load file with invalid json format.');
   }
 
-  if (jsonData.datatype === 'server') {
-    localStorage.setItem('server_data', JSON.stringify(jsonData.data));
-    const ctx = getCursorContext();
-    if (ctx.server && ctx.server.instance) {
-      ctx.server.instance.localData = jsonData.data;
-    }
-  } else if (jsonData.datatype === 'client') {
-    const store = getInventoryStore();
-    let inv = getExistingInventory(store, 'main');
-    loadInventoryFromJSON(jsonData.data, inv);
-    dispatchInventoryChange(store, 'main');
+  switch(jsonData._type) {
+    case 'inv_v1': {
+      const store = getInventoryStore();
+      let inv = getExistingInventory(store, 'main');
+      importInventoryFromJSON(jsonData, inv);
+      dispatchInventoryChange(store, 'main');
+    } break;
+    case 'item_v1': {
+      let item = importItemFromJSON(jsonData);
+      dropOnGround(item);
+    } break;
+    case 'client_v1':
+      throw new Error('Not yet implemented.');
+    case 'server_v1': {
+      const data = jsonData._data;
+      localStorage.setItem('server_data', JSON.stringify(data));
+      const ctx = getCursorContext();
+      if (ctx.server && ctx.server.instance) {
+        ctx.server.instance.localData = data;
+      }
+    } break;
+    default:
+      window.alert('Cannot load json with unknown data type.');
   }
 }

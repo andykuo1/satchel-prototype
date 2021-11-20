@@ -39,7 +39,9 @@ export function getGroundContainer() {
 }
 
 /**
- * @param freedItem
+ * Assumes the given item is not part of any inventory and that the itemId is unique!
+ * 
+ * @param freedItem 
  */
 export function dropOnGround(freedItem) {
   let store = getInventoryStore();

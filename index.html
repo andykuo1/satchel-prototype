@@ -122,6 +122,9 @@
         <button id="editButton">
           <img src="res/edit.svg" alt="edit" width="40" />
         </button>
+        <button id="catalogueButton" disabled>
+          <img src="res/bookmarks.svg" alt="catalogue" width="40" />
+        </button>
         <script type="module" src="src/toolbar.js"></script>
       </div>
     </header>
@@ -158,7 +161,12 @@
         <div id="ground"></div>
       </main>
       <div class="sidebar" id="editor">
-        <inventory-itembuilder></inventory-itembuilder>
+        <inventory-itembuilder>
+          <div slot="actions">
+            <button id="actionExportAs">Export As</button>
+            <button id="actionSendTo" disabled>Send To</button>
+          </div>
+        </inventory-itembuilder>
       </div>
     </div>
     <footer style="font-family: monospace; opacity: 0.6">

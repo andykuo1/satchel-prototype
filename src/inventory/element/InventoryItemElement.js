@@ -84,7 +84,7 @@ figcaption.vertical {
 
 #stackSize {
   position: absolute;
-  right: 0.5em;
+  right: 0.2em;
   top: 0;
   text-align: right;
   text-shadow: 1px 1px 3px black;
