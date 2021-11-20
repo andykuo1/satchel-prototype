@@ -8,6 +8,7 @@
  * @property {string} imgSrc
  * @property {string} displayName
  * @property {string} description
+ * @property {number} stackSize
  * @property {object} metadata
  */
 
@@ -24,6 +25,7 @@ export function createItem(itemId) {
     imgSrc: '',
     displayName: '',
     description: '',
+    stackSize: -1,
     metadata: {},
   };
   return item;
@@ -58,6 +60,9 @@ export function copyItem(other, dst = undefined) {
   if (typeof other.description === 'string') {
     dst.description = other.description;
   }
+  if (typeof other.stackSize === 'number') {
+    dst.stackSize = other.stackSize;
+  }
   if (typeof other.metadata === 'object') {
     try {
       dst.metadata = JSON.parse(JSON.stringify(other.metadata));
@@ -87,6 +92,8 @@ export class ItemBuilder {
     /** @private */
     this._description = '';
     /** @private */
+    this._stackSize = -1;
+    /** @private */
     this._metadata = {};
   }
 
@@ -100,6 +107,7 @@ export class ItemBuilder {
     this._imageSrc = itemBuilder._imageSrc;
     this._displayName = itemBuilder._displayName;
     this._description = itemBuilder._description;
+    this._stackSize = itemBuilder._stackSize;
     this._metadata = JSON.parse(JSON.stringify(itemBuilder._metadata));
     return this;
   }
@@ -115,6 +123,7 @@ export class ItemBuilder {
     this._imageSrc = newItem.imgSrc;
     this._displayName = newItem.displayName;
     this._description = newItem.description;
+    this._stackSize = newItem.stackSize;
     this._metadata = newItem.metadata;
     return this;
   }
@@ -126,6 +135,7 @@ export class ItemBuilder {
     this._imageSrc = '';
     this._displayName = '';
     this._description = '';
+    this._stackSize = -1;
     this._metadata = {};
     return this;
   }
@@ -160,6 +170,11 @@ export class ItemBuilder {
     return this;
   }
 
+  stackSize(stackSize) {
+    this._stackSize = stackSize;
+    return this;
+  }
+
   metadata(key, value) {
     this._metadata[key] = value;
     return this;
@@ -184,6 +199,7 @@ export class ItemBuilder {
     let imgSrc = String(this._imageSrc);
     let displayName = String(this._displayName);
     let description = String(this._description);
+    let stackSize = Number(this._stackSize);
     let metadata;
     try {
       metadata = JSON.parse(JSON.stringify(this._metadata));
@@ -196,6 +212,7 @@ export class ItemBuilder {
     item.imgSrc = imgSrc;
     item.displayName = displayName;
     item.description = description;
+    item.stackSize = stackSize;
     item.metadata = metadata;
     return item;
   }

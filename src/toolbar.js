@@ -36,7 +36,7 @@ function onEditClick() {
   if (editor.classList.contains('open')) {
     editor.classList.remove('open');
   } else {
-    openItemBuilder(document.querySelector('#itemBuilder'));
+    openItemBuilder(document.querySelector('inventory-itembuilder'));
     document.querySelector('#editor').classList.add('open');
   }
 }

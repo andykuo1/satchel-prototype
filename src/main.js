@@ -13,7 +13,7 @@ const APP_VERSION = '1.0.18';
 
 window.addEventListener('DOMContentLoaded', () => {
   document.querySelector('#appVersion').textContent = `v${APP_VERSION}`;
-  document.querySelector('#itemBuilder').addEventListener('submit', (e) => {
+  document.querySelector('inventory-itembuilder').addEventListener('submit', (e) => {
     e.preventDefault();
 
     const editor = document.querySelector('#editor');
@@ -23,15 +23,14 @@ window.addEventListener('DOMContentLoaded', () => {
     applyItemBuilder(target);
     return false;
   });
-  document.querySelector('#itemResetButton').addEventListener('click', (e) => {
+  document.querySelector('inventory-itembuilder').addEventListener('reset', (e) => {
     e.preventDefault();
 
     const editor = document.querySelector('#editor');
     editor.classList.toggle('open', false);
 
-    const itemBuilder = document.querySelector('#itemBuilder');
-    resetItemBuilder(itemBuilder);
-
+    const { target } = e;
+    resetItemBuilder(target);
     return false;
   });
   document.addEventListener('itemcontext', (e) => {
@@ -42,7 +41,7 @@ window.addEventListener('DOMContentLoaded', () => {
     editor.classList.toggle('open', false);
     const { invId, itemId } = e.detail;
     if (invId && itemId) {
-      openItemBuilder(document.querySelector('#itemBuilder'), invId, itemId);
+      openItemBuilder(document.querySelector('inventory-itembuilder'), invId, itemId);
       // Animate open/close transition
       setTimeout(() => editor.classList.toggle('open', true), 100);
     }

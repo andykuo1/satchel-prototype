@@ -48,6 +48,7 @@
     <script type="module" src="./src/inventory/element/InventoryGridElement.js"></script>
     <script type="module" src="./src/inventory/element/InventoryItemElement.js"></script>
     <script type="module" src="./src/inventory/element/InventoryCursorElement.js"></script>
+    <script type="module" src="./src/inventory/element/InventoryItemBuilderElement.js"></script>
   </head>
   <body>
     <style>
@@ -157,83 +158,7 @@
         <div id="ground"></div>
       </main>
       <div class="sidebar" id="editor">
-        <style>
-          #itemDetailSet,
-          #itemFinishSet {
-            display: flex;
-            flex-direction: column;
-          }
-          fieldset:disabled {
-            opacity: 0.3;
-          }
-          #itemName {
-            text-align: center;
-          }
-          input[type='text'],
-          textarea {
-            font-family: 'Times New Roman', Times, serif;
-          }
-        </style>
-        <form id="itemBuilder" autocomplete="off">
-          <legend>Item Builder</legend>
-          <fieldset id="itemSizeSet">
-            <legend>Size</legend>
-            <input type="radio" id="itemSize0" name="itemSize" value="tiny" />
-            <label for="itemSize0">Tiny</label>
-            <input
-              type="radio"
-              id="itemSize1"
-              name="itemSize"
-              value="small"
-              checked
-            />
-            <label for="itemSize1">Small</label>
-            <input type="radio" id="itemSize2" name="itemSize" value="medium" />
-            <label for="itemSize2">Medium</label>
-            <input type="radio" id="itemSize3" name="itemSize" value="large" />
-            <label for="itemSize3">Large</label>
-            <input type="radio" id="itemSize4" name="itemSize" value="huge" />
-            <label for="itemSize4">Huge</label>
-          </fieldset>
-          <fieldset id="itemTraitSet">
-            <legend>Traits</legend>
-            <input
-              type="checkbox"
-              id="itemTrait0"
-              name="itemTrait"
-              value="flat"
-            />
-            <label for="itemTrait0">Flat</label>
-            <input
-              type="checkbox"
-              id="itemTrait1"
-              name="itemTrait"
-              value="long"
-            />
-            <label for="itemTrait1">Long</label>
-            <input
-              type="checkbox"
-              id="itemTrait2"
-              name="itemTrait"
-              value="heavy"
-            />
-            <label for="itemTrait2">Heavy</label>
-          </fieldset>
-          <fieldset id="itemDetailSet">
-            <legend>Details</legend>
-            <input type="hidden" id="itemId" name="itemId" />
-            <input type="hidden" id="invId" name="invId" />
-            <label for="itemName">Name</label>
-            <input type="text" id="itemName" name="itemName" value="" />
-            <label for="itemDetail">Description</label>
-            <textarea id="itemDetail" name="itemDetail"></textarea>
-          </fieldset>
-          <br />
-          <fieldset id="itemFinishSet">
-            <input type="submit" value="Build" />
-            <button id="itemResetButton">Cancel</button>
-          </fieldset>
-        </form>
+        <inventory-itembuilder></inventory-itembuilder>
       </div>
     </div>
     <footer style="font-family: monospace; opacity: 0.6">
@@ -244,7 +169,6 @@
     <div class="foreground" id="cursor">
       <inventory-cursor></inventory-cursor>
     </div>
-
     <script type="module" src="src/main.js"></script>
   </body>
 </html>

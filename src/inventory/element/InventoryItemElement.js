@@ -12,8 +12,11 @@ import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../InvSlots.js';
 
 const INNER_HTML = `
 <figure class="container">
+  <div class="innerContainer">
     <img src="res/images/scroll.png">
     <figcaption></figcaption>
+    <label id="stackSize">1</label>
+  </div>
 </figure>
 `;
 const INNER_STYLE = `
@@ -44,6 +47,12 @@ const INNER_STYLE = `
   background-color: var(--hover-color);
   z-index: 1;
 }
+
+.innerContainer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
 img {
   width: 100%;
   height: 100%;
@@ -55,9 +64,11 @@ figcaption {
   bottom: 0;
   top: unset;
   opacity: 0;
-  text-align: center;
   color: white;
   background-color: rgba(0, 0, 0, 0.7);
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   overflow: hidden;
 }
 figcaption.vertical {
@@ -69,6 +80,14 @@ figcaption.vertical {
 }
 .container:hover figcaption {
   opacity: 1;
+}
+
+#stackSize {
+  position: absolute;
+  right: 0.5em;
+  top: 0;
+  text-align: right;
+  text-shadow: 1px 1px 3px black;
 }
 `;
 
@@ -151,6 +170,8 @@ export class InventoryItemElement extends HTMLElement {
     this._image = this.shadowRoot.querySelector('img');
     /** @private */
     this._caption = this.shadowRoot.querySelector('figcaption');
+    /** @private */
+    this._stackSize = this.shadowRoot.querySelector('#stackSize');
 
     /** @protected */
     this.onItemChange = this.onItemChange.bind(this);
@@ -199,6 +220,12 @@ export class InventoryItemElement extends HTMLElement {
     this._image.alt = title;
     this._caption.textContent = item.displayName;
     this._caption.classList.toggle('vertical', item.width < item.height);
+    // Stack size
+    if (item.stackSize >= 0) {
+      this._stackSize.textContent = `⨯${item.stackSize}`;
+    } else {
+      this._stackSize.textContent = '';
+    }
   }
 
   /**
