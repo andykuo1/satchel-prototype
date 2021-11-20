@@ -97,6 +97,7 @@ function onCloudClick() {
       window.alert('Could not connect: ' + e);
     }).finally(() => {
       document.querySelector('#cloudButton').toggleAttribute('disabled', false);
+      document.querySelector('#actionSendTo').toggleAttribute('disabled', false);
     });
   }
 }
