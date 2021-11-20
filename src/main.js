@@ -9,7 +9,7 @@ import {
 import { loadInventoryFromJSON, saveInventoryToJSON } from './inventory/InventoryLoader.js';
 import { getExistingInventory } from './inventory/InventoryTransfer.js';
 
-const APP_VERSION = '1.0.18';
+const APP_VERSION = '1.0.19';
 
 window.addEventListener('DOMContentLoaded', () => {
   document.querySelector('#appVersion').textContent = `v${APP_VERSION}`;
