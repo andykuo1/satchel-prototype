@@ -81,7 +81,7 @@ const INNER_HTML = `
     <input name="itemId" id="itemItemId" hidden>
     <div>
       <input type="submit">
-      <input type="reset">
+      <input type="reset" value="Cancel">
     </div>
     <div>
       <slot name="actions"></slot>
