@@ -52,7 +52,19 @@ function onActionExportAs() {
 }
 
 function onActionSendTo() {
-
+  /** @type {import('./inventory/element/InventoryItemBuilderElement.js').InventoryItemBuilderElement} */
+  const itemBuilder = document.querySelector('inventory-itembuilder');
+  try {
+    let item = itemBuilder.toItem();
+    const ctx = getCursorContext();
+    if (ctx.server && ctx.server.instance) {
+      let server = ctx.server.instance;
+      let result = window.prompt(`Who do you want to send it to?\n - ${server.getActiveClientNames().join('\n - ')}`).trim().toLowerCase();
+      ctx.server.instance.sendItemTo(result, item);
+    }
+  } catch (e) {
+    console.error('Failed to export item', e);
+  }
 }
 
 function onEditClick() {

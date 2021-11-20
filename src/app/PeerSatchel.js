@@ -1,5 +1,6 @@
+import { dropOnGround } from '../inventory/GroundHelper.js';
 import { createGridInventory } from '../inventory/Inv.js';
-import { loadInventoryFromJSON, saveInventoryToJSON } from '../inventory/InventoryLoader.js';
+import { exportItemToJSON, importItemFromJSON, loadInventoryFromJSON, saveInventoryToJSON } from '../inventory/InventoryLoader.js';
 import {
   addInventoryToStore,
   createGridInventoryInStore,
@@ -10,6 +11,7 @@ import {
   isInventoryInStore,
 } from '../inventory/InventoryStore.js';
 import { getExistingInventory } from '../inventory/InventoryTransfer.js';
+import { copyItem } from '../inventory/Item.js';
 
 /**
  * @typedef {import('../peerful/PeerfulConnection.js').PeerfulConnection} PeerfulConnection
@@ -42,6 +44,31 @@ export class SatchelServer {
     setInterval(() => {
       localStorage.setItem('server_data', JSON.stringify(this.localData));
     }, 5000);
+  }
+
+  getActiveClientNames() {
+    return this.remoteClients.map(client => client.name);
+  }
+
+  getActiveClientByName(clientName) {
+    for(let client of this.remoteClients) {
+      if (client.name === clientName) {
+        return client;
+      }
+    }
+    return null;
+  }
+
+  sendItemTo(clientName, item) {
+    let client = this.getActiveClientByName(clientName);
+    if (!client || !client.connection) {
+      return false;
+    }
+    console.log('Sending item to client...', clientName);
+    let dataToSend = { type: 'gift', message: exportItemToJSON(item) };
+    let stringToSend = JSON.stringify(dataToSend);
+    client.connection.send(stringToSend);
+    return true;
   }
 
   /**
@@ -238,6 +265,11 @@ export class SatchelClient {
             let inv = getExistingInventory(getInventoryStore(), 'main');
             loadInventoryFromJSON(jsonData.message, inv);
             dispatchInventoryChange(store, inv.invId);
+          } break;
+          case 'gift': {
+            let item = importItemFromJSON(jsonData.message);
+            dropOnGround(item);
+            window.alert('You received a gift! Remember to pick it up before closing the browser!');
           } break;
           case 'error':
             window.alert(`Oops! Server error message: ${data.message}`);
