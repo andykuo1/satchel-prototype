@@ -431,13 +431,7 @@ export class InventoryItemBuilderElement extends HTMLElement {
       }
     }
     if (!imgSrc) {
-      if (width < height) {
-        imgSrc = 'res/images/blade.png';
-      } else if (width > height) {
-        imgSrc = 'res/images/scroll.png';
-      } else {
-        imgSrc = 'res/images/potion.png';
-      }
+      imgSrc = getDefaultImageSourceByDimensions(width, height, this.itemStackable.checked);
     }
     builder.imageSrc(imgSrc);
     if (this.itemStackable.checked && this.itemStackSize.value) {
@@ -482,6 +476,7 @@ export class InventoryItemBuilderElement extends HTMLElement {
     this.outputSizeHeight.textContent = `${height}`;
     this.itemWidth.value = `${width}`;
     this.itemHeight.value = `${height}`;
+    this.itemImage.placeholder = getDefaultImageSourceByDimensions(width, height, this.itemStackable.checked);
   }
 
   /** @private */
@@ -545,4 +540,14 @@ function getComputedSize(sizeIndex, flat, long, heavy) {
     height += 1;
   }
   return [width, height];
+}
+
+function getDefaultImageSourceByDimensions(width, height, stackable) {
+  if (width < height) {
+    return 'res/images/blade.png';
+  } else if (width > height) {
+    return 'res/images/scroll.png';
+  } else {
+    return 'res/images/potion.png';
+  }
 }
