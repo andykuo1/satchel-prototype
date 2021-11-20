@@ -1,6 +1,6 @@
 import { dropOnGround } from '../inventory/GroundHelper.js';
 import { createGridInventory } from '../inventory/Inv.js';
-import { exportItemToJSON, importItemFromJSON, loadInventoryFromJSON, saveInventoryToJSON } from '../inventory/InventoryLoader.js';
+import { exportInventoryToJSON, exportItemToJSON, importInventoryFromJSON, importItemFromJSON } from '../inventory/InventoryLoader.js';
 import {
   addInventoryToStore,
   createGridInventoryInStore,
@@ -11,7 +11,6 @@ import {
   isInventoryInStore,
 } from '../inventory/InventoryStore.js';
 import { getExistingInventory } from '../inventory/InventoryTransfer.js';
-import { copyItem } from '../inventory/Item.js';
 
 /**
  * @typedef {import('../peerful/PeerfulConnection.js').PeerfulConnection} PeerfulConnection
@@ -105,7 +104,7 @@ export class SatchelServer {
               // Create a new slate for a new user
               let inv = createGridInventory('main', 12, 9);
               inv.displayName = name.toUpperCase();
-              let jsonData = saveInventoryToJSON(inv, {});
+              let jsonData = exportInventoryToJSON(inv);
               dataToSend = jsonData;
             }
             let stringToSend = JSON.stringify({
@@ -130,7 +129,7 @@ export class SatchelServer {
             let store = getInventoryStore();
             try {
               if (!isInventoryInStore(store, clientDataName)) {
-                let inv = loadInventoryFromJSON(clientData);
+                let inv = importInventoryFromJSON(clientData);
                 // Override id
                 inv.invId = clientDataName;
                 addInventoryToStore(store, clientDataName, inv);
@@ -141,7 +140,7 @@ export class SatchelServer {
                 document.querySelector('#workspace').appendChild(element);
               } else {
                 let inv = getInventoryInStore(store, clientDataName);
-                loadInventoryFromJSON(clientData, inv);
+                importInventoryFromJSON(clientData, inv);
                 // Override id
                 inv.invId = clientDataName;
                 dispatchInventoryChange(store, clientDataName);
@@ -233,7 +232,7 @@ export class SatchelClient {
         return;
       }
       const inv = getExistingInventory(store, 'main');
-      const jsonData = saveInventoryToJSON(inv, {});
+      const jsonData = exportInventoryToJSON(inv);
       const wrappedData = {
         type: 'sync',
         message: jsonData,
@@ -263,7 +262,7 @@ export class SatchelClient {
               createGridInventoryInStore(getInventoryStore(), 'main', 12, 9);
             }
             let inv = getExistingInventory(getInventoryStore(), 'main');
-            loadInventoryFromJSON(jsonData.message, inv);
+            importInventoryFromJSON(jsonData.message, inv);
             dispatchInventoryChange(store, inv.invId);
           } break;
           case 'gift': {

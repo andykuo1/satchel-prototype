@@ -93,11 +93,12 @@ function onCloudClick() {
     });
   } else {
     let ctx = getCursorContext();
-    connectAsServer(ctx).catch(e => {
+    connectAsServer(ctx).then(() => {
+      document.querySelector('#actionSendTo').toggleAttribute('disabled', false);
+    }).catch(e => {
       window.alert('Could not connect: ' + e);
     }).finally(() => {
       document.querySelector('#cloudButton').toggleAttribute('disabled', false);
-      document.querySelector('#actionSendTo').toggleAttribute('disabled', false);
     });
   }
 }
