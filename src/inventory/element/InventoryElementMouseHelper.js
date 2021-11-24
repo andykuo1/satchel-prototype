@@ -17,6 +17,9 @@ export const DEFAULT_ITEM_UNIT_SIZE = 48;
  */
 export function itemMouseDownCallback(mouseEvent, itemElement, unitSize) {
   const containerElement = itemElement.container;
+  if (containerElement.hasAttribute('nooutput')) {
+    return;
+  }
   const boundingRect = containerElement._container.getBoundingClientRect();
   const clientCoordX = getClientCoordX(
     boundingRect,
@@ -31,6 +34,8 @@ export function itemMouseDownCallback(mouseEvent, itemElement, unitSize) {
   let cursor = getCursor();
   let result = cursor.pickUp(containerElement.invId, itemElement.itemId, clientCoordX, clientCoordY);
   if (result) {
+    // HACK: This should really grab focus to the item.
+    document.activeElement.blur();
     mouseEvent.preventDefault();
     mouseEvent.stopPropagation();
     return false;
@@ -53,6 +58,7 @@ export function containerMouseUpCallback(
   if (containerElement.hasAttribute('noinput')) {
     return;
   }
+  const swappable = !containerElement.hasAttribute('nooutput');
   const boundingRect = containerElement._container.getBoundingClientRect();
   const clientCoordX = getClientCoordX(
     boundingRect,
@@ -65,8 +71,10 @@ export function containerMouseUpCallback(
     unitSize
   );
   let cursor = getCursor();
-  let result = cursor.putDown(containerElement.invId, clientCoordX, clientCoordY);
+  let result = cursor.putDown(containerElement.invId, clientCoordX, clientCoordY, swappable);
   if (result) {
+    // HACK: This should really grab focus to the item.
+    document.activeElement.blur();
     mouseEvent.preventDefault();
     mouseEvent.stopPropagation();
     return false;

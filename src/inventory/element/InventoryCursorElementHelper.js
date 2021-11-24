@@ -28,28 +28,35 @@ import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../InvSlots.js';
  * @param {InventoryId} toInventoryId
  * @param {number} coordX
  * @param {number} coordY
+ * @param {boolean} swappable
  */
 export function putDownToSocketInventory(
   cursor,
   store,
   toInventoryId,
   coordX,
-  coordY
+  coordY,
+  swappable
 ) {
   let heldItem = cursor.getHeldItem();
   let prevItem = getItemAtSlotIndex(store, toInventoryId, 0);
   let prevItemX = -1;
   let prevItemY = -1;
   if (prevItem) {
-    // Has an item to swap. So pick up this one for later.
-    let inv = getExistingInventory(store, toInventoryId);
-    let prevItemId = prevItem.itemId;
-    let slotIndex = getSlotIndexByItemId(inv, prevItemId);
-    let [x, y] = getSlotCoordsByIndex(inv, slotIndex);
-    prevItemX = x;
-    prevItemY = y;
-    prevItem = getItemByItemId(inv, prevItemId);
-    removeItemFromInventory(store, toInventoryId, prevItemId);
+    if (swappable) {
+      // Has an item to swap. So pick up this one for later.
+      let inv = getExistingInventory(store, toInventoryId);
+      let prevItemId = prevItem.itemId;
+      let slotIndex = getSlotIndexByItemId(inv, prevItemId);
+      let [x, y] = getSlotCoordsByIndex(inv, slotIndex);
+      prevItemX = x;
+      prevItemY = y;
+      prevItem = getItemByItemId(inv, prevItemId);
+      removeItemFromInventory(store, toInventoryId, prevItemId);
+    } else {
+      // Cannot swap. Exit early.
+      return false;
+    }
   }
   // Now there are no items in the way. Place it down!
   cursor.clearHeldItem();
@@ -71,13 +78,15 @@ export function putDownToSocketInventory(
  * @param {InventoryId} toInventoryId
  * @param {number} itemX The root slot coordinates to place item (includes holding offset)
  * @param {number} itemY The root slot coordinates to place item (includes holding offset)
+ * @param {boolean} swappable
  */
 export function putDownToGridInventory(
   cursor,
   store,
   toInventoryId,
   itemX,
-  itemY
+  itemY,
+  swappable
 ) {
   const toInventory = getInventoryInStore(store, toInventoryId);
   const heldItem = cursor.getHeldItem();
@@ -92,8 +101,7 @@ export function putDownToGridInventory(
   }
   const targetCoordX = Math.min(Math.max(0, itemX), maxCoordX);
   const targetCoordY = Math.min(Math.max(0, itemY), maxCoordY);
-
-  let swappable = true;
+  
   let prevItemId = null;
   for (let y = 0; y < itemHeight; ++y) {
     for (let x = 0; x < itemWidth; ++x) {

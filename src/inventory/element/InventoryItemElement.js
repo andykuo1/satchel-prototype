@@ -240,22 +240,23 @@ export class InventoryItemElement extends HTMLElement {
   }
 
   /**
-   * @param e
+   * @param {MouseEvent} e
    * @protected
    */
   onContextMenu(e) {
-    this.dispatchEvent(
-      new CustomEvent('itemcontext', {
-        bubbles: true,
-        composed: true,
-        detail: {
-          element: this,
-          container: this.container,
-          invId: this.invId,
-          itemId: this.itemId,
-        },
-      })
-    );
+    let event = new CustomEvent('itemcontext', {
+      bubbles: true,
+      composed: true,
+      detail: {
+        clientX: e.clientX,
+        clientY: e.clientY,
+        element: this,
+        container: this.container,
+        invId: this.invId,
+        itemId: this.itemId,
+      },
+    });
+    this.dispatchEvent(event);
     e.preventDefault();
     e.stopPropagation();
     return false;

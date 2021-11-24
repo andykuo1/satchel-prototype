@@ -579,7 +579,7 @@ export class InventoryItemBuilderElement extends HTMLElement {
   onItemDrop(e) {
     const containerElement = this.socketInventory;
     let cursor = getCursor();
-    let result = cursor.putDown(containerElement.invId, 0, 0);
+    let result = cursor.putDown(containerElement.invId, 0, 0, true);
     if (result) {
       e.preventDefault();
       e.stopPropagation();
