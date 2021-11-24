@@ -38,12 +38,12 @@ export function putDownToSocketInventory(
 ) {
   let heldItem = cursor.getHeldItem();
   let prevItem = getItemAtSlotIndex(store, toInventoryId, 0);
-  let prevItemId = prevItem.itemId;
   let prevItemX = -1;
   let prevItemY = -1;
   if (prevItem) {
     // Has an item to swap. So pick up this one for later.
     let inv = getExistingInventory(store, toInventoryId);
+    let prevItemId = prevItem.itemId;
     let slotIndex = getSlotIndexByItemId(inv, prevItemId);
     let [x, y] = getSlotCoordsByIndex(inv, slotIndex);
     prevItemX = x;

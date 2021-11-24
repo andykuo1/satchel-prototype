@@ -15,7 +15,8 @@ import {
 } from '../InventoryTransfer.js';
 import { getItemByItemId } from '../InvItems.js';
 import { getSlotCoordsByIndex, getSlotIndexByItemId, isSlotIndexEmpty } from '../InvSlots.js';
-import { putDownToGridInventory } from './InventoryCursorElementHelper.js';
+import { putDownToGridInventory, putDownToSocketInventory } from './InventoryCursorElementHelper.js';
+import { DEFAULT_ITEM_UNIT_SIZE } from './InventoryElementMouseHelper.js';
 
 /**
  * @typedef {import('./InventoryGridElement.js').InventoryGridElement} InventoryGridElement
@@ -74,9 +75,6 @@ export class InventoryCursorElement extends HTMLElement {
     this.shadowRoot.append(
       this.constructor[Symbol.for('styleNode')].cloneNode(true)
     );
-
-    /** @private */
-    this.unitSize = 48;
 
     /** @private */
     this.animationHandle = null;
@@ -142,8 +140,8 @@ export class InventoryCursorElement extends HTMLElement {
     // Update cursor position
     const clientX = this.clientX;
     const clientY = this.clientY;
-    const posX = clientX + this.heldOffsetX * this.unitSize;
-    const posY = clientY + this.heldOffsetY * this.unitSize;
+    const posX = clientX + this.heldOffsetX * DEFAULT_ITEM_UNIT_SIZE;
+    const posY = clientY + this.heldOffsetY * DEFAULT_ITEM_UNIT_SIZE;
     this.style.setProperty('left', `${posX - CURSOR_OFFSET_PIXELS}px`);
     // NOTE: Add 2rem from InventoryGridElement's title margin
     this.style.setProperty('top', `calc(${posY - CURSOR_OFFSET_PIXELS}px - 2rem)`);
@@ -213,9 +211,7 @@ export class InventoryCursorElement extends HTMLElement {
     const invType = toInventory.type;
     switch (invType) {
       case 'socket':
-        // TODO: Force fail placing items in sockets.
-        return false;
-        // return putDownItemInSocketInventory(this, store, invId, coordX, coordY);
+        return putDownToSocketInventory(this, store, invId, coordX, coordY);
       case 'grid':
         return putDownToGridInventory(
           this,

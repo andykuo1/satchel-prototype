@@ -5,6 +5,8 @@ import { getCursor } from './InventoryCursorElement.js';
  * @typedef {import('./InventoryGridElement.js').InventoryGridElement} InventoryGridElement
  */
 
+export const DEFAULT_ITEM_UNIT_SIZE = 48;
+
 /**
  * Perform pickup logic for item elements.
  *
@@ -48,6 +50,9 @@ export function containerMouseUpCallback(
   containerElement,
   unitSize
 ) {
+  if (containerElement.hasAttribute('noinput')) {
+    return;
+  }
   const boundingRect = containerElement._container.getBoundingClientRect();
   const clientCoordX = getClientCoordX(
     boundingRect,

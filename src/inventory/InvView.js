@@ -22,6 +22,7 @@ export function createTemporaryInventoryView(store, inventoryId) {
   const inv = getExistingInventory(store, inventoryId);
   const element = /** @type {InventoryGridElement} */ (document.createElement('inventory-grid'));
   element.invId = inv.invId;
+  element.toggleAttribute('noinput', true); // Checked by cursor whether the inventory can input items.
   element.addEventListener('itemchange', onTemporaryInventoryItemChange);
   return element;
 }

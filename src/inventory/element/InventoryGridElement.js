@@ -1,7 +1,9 @@
 import { upgradeProperty } from '../../util/wc.js';
-import { containerMouseUpCallback } from './InventoryElementMouseHelper.js';
+import { containerMouseUpCallback, DEFAULT_ITEM_UNIT_SIZE } from './InventoryElementMouseHelper.js';
 import {
   addInventoryChangeListener,
+  createGridInventoryInStore,
+  createSocketInventoryInStore,
   getInventoryInStore,
   getInventoryStore,
   removeInventoryChangeListener,
@@ -11,8 +13,7 @@ import {
   getItemAtSlotIndex,
 } from '../InventoryTransfer.js';
 import { getItemIds } from '../InvItems.js';
-
-const DEFAULT_ITEM_UNIT_SIZE = 48;
+import { uuid } from '../../util/uuid.js';
 
 const INNER_HTML = `
 <article>
@@ -102,7 +103,7 @@ export class InventoryGridElement extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ['invid'];
+    return ['invid', 'init'];
   }
 
   get invId() {
@@ -111,6 +112,14 @@ export class InventoryGridElement extends HTMLElement {
 
   set invId(value) {
     this.setAttribute('invid', value);
+  }
+
+  get init() {
+    return this._init;
+  }
+
+  set init(value) {
+    this.setAttribute('init', value);
   }
 
   constructor() {
@@ -125,6 +134,8 @@ export class InventoryGridElement extends HTMLElement {
     
     /** @private */
     this._invId = undefined;
+    /** @private */
+    this._init = undefined;
 
     /** @private */
     this._root = this.shadowRoot.querySelector('article');
@@ -158,6 +169,7 @@ export class InventoryGridElement extends HTMLElement {
       this.onInventoryChange(store, invId);
     }
     upgradeProperty(this, 'invId');
+    upgradeProperty(this, 'init');
   }
 
   /** @protected */
@@ -181,6 +193,24 @@ export class InventoryGridElement extends HTMLElement {
    */
   attributeChangedCallback(attribute, previous, value) {
     switch (attribute) {
+      case 'init': {
+        const store = getInventoryStore();
+        let invId = this.invId;
+        if (!invId) {
+          invId = uuid();
+          this.invId = invId;
+        }
+        if (value === 'socket') {
+          createSocketInventoryInStore(store, invId);
+        } else if (value.startsWith('grid')) {
+          let i = value.indexOf('x');
+          let w = Number(value.substring(4, i)) || 1;
+          let h = Number(value.substring(i + 1)) || 1;
+          createGridInventoryInStore(store, invId, w, h);
+        } else {
+          throw new Error('Unknown init type for inventory-grid.');
+        }
+      } break;
       case 'invid': {
         const store = getInventoryStore();
         const prevInvId = this._invId;
@@ -275,7 +305,7 @@ export class InventoryGridElement extends HTMLElement {
    */
   onMouseUp(e) {
     if (e.button === 0) {
-      return containerMouseUpCallback(e, this, 48);
+      return containerMouseUpCallback(e, this, DEFAULT_ITEM_UNIT_SIZE);
     }
   }
 

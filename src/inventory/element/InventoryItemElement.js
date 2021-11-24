@@ -1,4 +1,4 @@
-import { itemMouseDownCallback } from './InventoryElementMouseHelper.js';
+import { DEFAULT_ITEM_UNIT_SIZE, itemMouseDownCallback } from './InventoryElementMouseHelper.js';
 import {
   addItemChangeListener,
   getInventoryStore,
@@ -32,10 +32,10 @@ const INNER_STYLE = `
 .container {
   display: inline-block;
   position: absolute;
-  left: calc(var(--itemX) * var(--item-unit-size, 48px));
-  top: calc(var(--itemY) * var(--item-unit-size, 48px));
-  width: calc(var(--itemWidth) * var(--item-unit-size, 48px));
-  height: calc(var(--itemHeight) * var(--item-unit-size, 48px));
+  left: calc(var(--itemX) * var(--item-unit-size));
+  top: calc(var(--itemY) * var(--item-unit-size));
+  width: calc(var(--itemWidth) * var(--item-unit-size));
+  height: calc(var(--itemHeight) * var(--item-unit-size));
   padding: 0;
   margin: 0;
   user-select: none;
@@ -56,6 +56,7 @@ const INNER_STYLE = `
 img {
   width: 100%;
   height: 100%;
+  object-fit: contain;
 }
 figcaption {
   position: absolute;
@@ -234,7 +235,7 @@ export class InventoryItemElement extends HTMLElement {
    */
   onMouseDown(e) {
     if (e.button === 0) {
-      return itemMouseDownCallback(e, this, 48);
+      return itemMouseDownCallback(e, this, DEFAULT_ITEM_UNIT_SIZE);
     }
   }
 

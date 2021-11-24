@@ -1,4 +1,9 @@
+import { dispatchInventoryChange, dispatchItemChange, getInventoryStore, isInventoryInStore } from '../InventoryStore.js';
+import { getItemAtSlotIndex, updateItem } from '../InventoryTransfer.js';
 import { ItemBuilder } from '../Item.js';
+import { getCursor } from './InventoryCursorElement.js';
+
+/** @typedef {import('./InventoryGridElement.js').InventoryGridElement} InventoryGridElement */
 
 const SATCHEL_IMAGE_PREFIX = 'satchel:';
 const VALID_SATCHEL_IMAGES = {
@@ -10,7 +15,10 @@ const VALID_SATCHEL_IMAGES = {
 const INNER_HTML = `
 <form autocomplete="off">
   <fieldset>
-    <legend>Item</legend>
+    <fieldset id="fieldsetSocket">
+      <legend>Item</legend>
+      <inventory-grid init="socket" id="socketInventory"></inventory-grid>
+    </fieldset>
     <fieldset id="fieldsetSize">
       <legend>Size</legend>
       <div class="slider">
@@ -206,6 +214,11 @@ export class InventoryItemBuilderElement extends HTMLElement {
     this.shadowRoot.append(
       this.constructor[Symbol.for('styleNode')].cloneNode(true)
     );
+    /**
+     * @private
+     * @type {InventoryGridElement}
+     */
+    this.socketInventory = this.shadowRoot.querySelector('#socketInventory');
 
     /**
      * @private
@@ -296,6 +309,8 @@ export class InventoryItemBuilderElement extends HTMLElement {
     this.outputSizeHeight = this.shadowRoot.querySelector('#outputSizeHeight');
 
     /** @private */
+    this.fieldsetSocket = this.shadowRoot.querySelector('#fieldsetSocket');
+    /** @private */
     this.fieldsetSize = this.shadowRoot.querySelector('#fieldsetSize');
     /** @private */
     this.fieldsetShape = this.shadowRoot.querySelector('#fieldsetShape');
@@ -318,6 +333,8 @@ export class InventoryItemBuilderElement extends HTMLElement {
     this.onSizeChange = this.onSizeChange.bind(this);
     /** @private */
     this.onStackableChange = this.onStackableChange.bind(this);
+    /** @private */
+    this.onItemDrop = this.onItemDrop.bind(this);
 
     /** @private */
     this.onSubmit = this.onSubmit.bind(this);
@@ -337,6 +354,8 @@ export class InventoryItemBuilderElement extends HTMLElement {
     this.itemLong.addEventListener('change', this.onSizeChange);
     this.itemHeavy.addEventListener('change', this.onSizeChange);
 
+    this.fieldsetSocket.addEventListener('mouseup', this.onItemDrop);
+
     this.form.addEventListener('submit', this.onSubmit);
     this.form.addEventListener('reset', this.onReset);
   }
@@ -352,6 +371,8 @@ export class InventoryItemBuilderElement extends HTMLElement {
     this.itemFlat.removeEventListener('change', this.onSizeChange);
     this.itemLong.removeEventListener('change', this.onSizeChange);
     this.itemHeavy.removeEventListener('change', this.onSizeChange);
+
+    this.fieldsetSocket.removeEventListener('mouseup', this.onItemDrop);
 
     this.form.removeEventListener('submit', this.onSubmit);
     this.form.removeEventListener('reset', this.onReset);
@@ -477,6 +498,16 @@ export class InventoryItemBuilderElement extends HTMLElement {
     this.itemWidth.value = `${width}`;
     this.itemHeight.value = `${height}`;
     this.itemImage.placeholder = getDefaultImageSourceByDimensions(width, height, this.itemStackable.checked);
+    const socketedItem = this.getSocketedItem();
+    if (socketedItem) {
+      socketedItem.width = width;
+      socketedItem.height = height;
+      let imgSrc = this.itemImage.value || this.itemImage.placeholder;
+      socketedItem.imgSrc = imgSrc;
+      const store = getInventoryStore();
+      dispatchItemChange(store, socketedItem.itemId);
+      dispatchInventoryChange(store, this.socketInventory.invId);
+    }
   }
 
   /** @private */
@@ -488,6 +519,27 @@ export class InventoryItemBuilderElement extends HTMLElement {
       this.itemStackSize.focus();
       this.itemStackSize.select();
     }
+  }
+
+  /** @private */
+  onItemDrop(e) {
+    const containerElement = this.socketInventory;
+    let cursor = getCursor();
+    let result = cursor.putDown(containerElement.invId, 0, 0);
+    if (result) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+  }
+
+  getSocketedItem() {
+    const store = getInventoryStore();
+    const invId = this.socketInventory.invId;
+    if (!isInventoryInStore(store, invId)) {
+      return null;
+    }
+    return getItemAtSlotIndex(store, invId, 0);
   }
 
   /** @private */
