@@ -1,5 +1,5 @@
 import { dispatchInventoryChange, dispatchItemChange, getInventoryStore, isInventoryInStore } from '../InventoryStore.js';
-import { getItemAtSlotIndex, updateItem } from '../InventoryTransfer.js';
+import { getItemAtSlotIndex } from '../InventoryTransfer.js';
 import { ItemBuilder } from '../Item.js';
 import { getCursor } from './InventoryCursorElement.js';
 
@@ -17,32 +17,39 @@ const INNER_HTML = `
   <fieldset>
     <fieldset id="fieldsetSocket">
       <legend>Item</legend>
+      <!-- Content Elements -->
       <inventory-grid init="socket" id="socketInventory"></inventory-grid>
-    </fieldset>
-    <fieldset id="fieldsetSize">
+      <!-- UI Elements -->
+      <fieldset id="fieldsetSize">
       <legend>Size</legend>
-      <div class="slider">
-        <div class="labels">
-          <label for="itemSize" id="labelSizeSmall" title="small">
+      <div class="labels">
+        <span class="toggle">
+          <input type="radio" name="sizeIndex" id="itemSize1" value=1>
+          <label for="itemSize1" id="labelSizeSmall" title="small">
             <img src="res/spoke.svg">
           </label>
-          <label for="itemSize" id="labelSizeMedium" title="medium">
+        </span>
+        <span class="toggle">
+          <input type="radio" name="sizeIndex" id="itemSize2" value=2 checked>
+          <label for="itemSize2" id="labelSizeMedium" title="medium">
             <img src="res/onehand.svg">
           </label>
-          <label for="itemSize" id="labelSizeLarge" title="large">
+        </span>
+        <span class="toggle">
+          <input type="radio" name="sizeIndex" id="itemSize3" value=3>
+          <label for="itemSize3" id="labelSizeLarge" title="large">
             <img src="res/twohand.svg">
           </label>
-        </div>
-        <input type="range" name="sizeIndex" id="itemSize" min=1 max=3 value=2>
-        <input type="number" name="width" id="itemWidth" hidden value=2>
-        <input type="number" name="height" id="itemHeight" hidden value=2>
+        </span>
       </div>
-      <output>
-        <span id="outputSizeWidth">2</span>
-        <span>⨯</span>
-        <span id="outputSizeHeight">2</span>
-      </output>
+      <input type="number" name="width" id="itemWidth" hidden value=2>
+      <input type="number" name="height" id="itemHeight" hidden value=2>
     </fieldset>
+    <output id="outputSize">
+      <span id="outputSizeWidth">2</span>
+      <span>⨯</span>
+      <span id="outputSizeHeight">2</span>
+    </output>
     <fieldset id="fieldsetShape">
       <legend>Shape</legend>
       <div class="labels">
@@ -72,23 +79,24 @@ const INNER_HTML = `
         </span>
       </div>
     </fieldset>
-    <fieldset id="fieldsetStyle">
-      <legend>Style</legend>
-      <input type="url" name="imageSrc" id="itemImage">
-    </fieldset>
-    <fieldset id="fieldsetDetail">
-      <legend>Detail</legend>
-      <div class="stackName">
-        <input type="text" name="displayName" id="itemName" placeholder="Item">
-        <span id="groupStackSize">
-          <span class="prefix">⨯</span>
-          <input type="number" name="stackSize" id="itemStackSize" value=1 min=0 max=99 disabled>
-        </span>
-      </div>
-      <div class="stackDesc">
-        <textarea name="description" id="itemDescription" placeholder="Description"></textarea>
-      </div>
-    </fieldset>
+  </fieldset>
+  <fieldset id="fieldsetStyle">
+    <legend>Style</legend>
+    <input type="url" name="imageSrc" id="itemImage">
+    <img src="res/image.svg" title="image">
+  </fieldset>
+  <fieldset id="fieldsetDetail">
+    <legend>Detail</legend>
+    <div class="stackName">
+      <input type="text" name="displayName" id="itemName" placeholder="Item">
+      <span id="groupStackSize">
+        <span class="prefix">⨯</span>
+        <input type="number" name="stackSize" id="itemStackSize" value=1 min=0 max=99 disabled>
+      </span>
+    </div>
+    <div class="stackDesc">
+      <textarea name="description" id="itemDescription" placeholder="Description"></textarea>
+    </div>
   </fieldset>
   <fieldset>
     <legend>Actions</legend>
@@ -107,12 +115,44 @@ const INNER_HTML = `
 const INNER_STYLE = `
 form {
   display: inline-block;
+  position: relative;
 }
 form input {
   font-family: monospace;
 }
 input[type="submit"], input[type="reset"], button {
   font-family: unset;
+}
+
+#fieldsetSocket {
+  position: relative;
+}
+
+#fieldsetSize {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: none;
+  padding: 0;
+}
+#fieldsetSize > legend {
+  display: none;
+}
+#outputSize {
+  position: absolute;
+  left: 0.5em;
+  bottom: 0;
+}
+
+#fieldsetShape {
+  position: absolute;
+  top: 0;
+  right: 0.25em;
+  border: none;
+  padding: 0;
+}
+#fieldsetShape > legend {
+  display: none;
 }
 
 fieldset {
@@ -137,10 +177,9 @@ fieldset:disabled > legend {
   flex: 1;
 }
 
-.slider > input {
-  width: 80%;
+.toggle {
+  margin-bottom: 0.2em;
 }
-
 .toggle > input {
   margin: 0;
   opacity: 0;
@@ -234,7 +273,17 @@ export class InventoryItemBuilderElement extends HTMLElement {
      * @private
      * @type {HTMLInputElement}
      */
-    this.itemSize = this.shadowRoot.querySelector('#itemSize');
+    this.itemSize1 = this.shadowRoot.querySelector('#itemSize1');
+    /**
+     * @private
+     * @type {HTMLInputElement}
+     */
+    this.itemSize2 = this.shadowRoot.querySelector('#itemSize2');
+    /**
+     * @private
+     * @type {HTMLInputElement}
+     */
+    this.itemSize3 = this.shadowRoot.querySelector('#itemSize3');
     /**
      * @private
      * @type {HTMLInputElement}
@@ -297,13 +346,6 @@ export class InventoryItemBuilderElement extends HTMLElement {
     this.itemInvId = this.shadowRoot.querySelector('#itemInvId');
 
     /** @private */
-    this.labelSizeSmall = this.shadowRoot.querySelector('#labelSizeSmall');
-    /** @private */
-    this.labelSizeMedium = this.shadowRoot.querySelector('#labelSizeMedium');
-    /** @private */
-    this.labelSizeLarge = this.shadowRoot.querySelector('#labelSizeLarge');
-
-    /** @private */
     this.outputSizeWidth = this.shadowRoot.querySelector('#outputSizeWidth');
     /** @private */
     this.outputSizeHeight = this.shadowRoot.querySelector('#outputSizeHeight');
@@ -323,13 +365,6 @@ export class InventoryItemBuilderElement extends HTMLElement {
     this.groupStackSize = this.shadowRoot.querySelector('#groupStackSize');
 
     /** @private */
-    this.onSizeSmallLabel = this.onSizeSmallLabel.bind(this);
-    /** @private */
-    this.onSizeMediumLabel = this.onSizeMediumLabel.bind(this);
-    /** @private */
-    this.onSizeLargeLabel = this.onSizeLargeLabel.bind(this);
-
-    /** @private */
     this.onSizeChange = this.onSizeChange.bind(this);
     /** @private */
     this.onStackableChange = this.onStackableChange.bind(this);
@@ -344,11 +379,10 @@ export class InventoryItemBuilderElement extends HTMLElement {
 
   /** @protected */
   connectedCallback() {
-    this.labelSizeSmall.addEventListener('click', this.onSizeSmallLabel);
-    this.labelSizeMedium.addEventListener('click', this.onSizeMediumLabel);
-    this.labelSizeLarge.addEventListener('click', this.onSizeLargeLabel);
-
-    this.itemSize.addEventListener('input', this.onSizeChange);
+    this.itemSize1.addEventListener('click', this.onSizeChange);
+    this.itemSize2.addEventListener('click', this.onSizeChange);
+    this.itemSize3.addEventListener('click', this.onSizeChange);
+    
     this.itemStackable.addEventListener('change', this.onStackableChange);
     this.itemFlat.addEventListener('change', this.onSizeChange);
     this.itemLong.addEventListener('change', this.onSizeChange);
@@ -362,11 +396,10 @@ export class InventoryItemBuilderElement extends HTMLElement {
 
   /** @protected */
   disconnectedCallback() {
-    this.labelSizeSmall.removeEventListener('click', this.onSizeSmallLabel);
-    this.labelSizeMedium.removeEventListener('click', this.onSizeMediumLabel);
-    this.labelSizeLarge.removeEventListener('click', this.onSizeLargeLabel);
+    this.itemSize1.removeEventListener('click', this.onSizeChange);
+    this.itemSize2.removeEventListener('click', this.onSizeChange);
+    this.itemSize3.removeEventListener('click', this.onSizeChange);
 
-    this.itemSize.removeEventListener('input', this.onSizeChange);
     this.itemStackable.removeEventListener('change', this.onStackableChange);
     this.itemFlat.removeEventListener('change', this.onSizeChange);
     this.itemLong.removeEventListener('change', this.onSizeChange);
@@ -474,25 +507,23 @@ export class InventoryItemBuilderElement extends HTMLElement {
 
   /** @private */
   onSizeSmallLabel() {
-    this.itemSize.value = '1';
     this.onSizeChange();
   }
 
   /** @private */
   onSizeMediumLabel() {
-    this.itemSize.value = '2';
     this.onSizeChange();
   }
   
   /** @private */
   onSizeLargeLabel() {
-    this.itemSize.value = '3';
     this.onSizeChange();
   }
 
   /** @private */
   onSizeChange() {
-    let [width, height] = getComputedSize(Number(this.itemSize.value), this.itemFlat.checked, this.itemLong.checked, this.itemHeavy.checked);
+    let itemSize = this.itemSize1.checked ? 1 : this.itemSize2.checked ? 2 : this.itemSize3.checked ? 3 : 0;
+    let [width, height] = getComputedSize(Number(itemSize), this.itemFlat.checked, this.itemLong.checked, this.itemHeavy.checked);
     this.outputSizeWidth.textContent = `${width}`;
     this.outputSizeHeight.textContent = `${height}`;
     this.itemWidth.value = `${width}`;
@@ -553,7 +584,9 @@ export class InventoryItemBuilderElement extends HTMLElement {
 
   /** @private */
   onReset() {
-    this.itemSize.value = '2';
+    this.itemSize1.checked = false;
+    this.itemSize2.checked = true;
+    this.itemSize3.checked = false;
     this.itemWidth.value = '2';
     this.itemHeight.value = '2';
     this.itemStackable.checked = false;
