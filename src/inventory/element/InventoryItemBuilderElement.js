@@ -24,20 +24,20 @@ const INNER_HTML = `
       <legend>Size</legend>
       <div class="labels">
         <span class="toggle">
-          <input type="radio" name="sizeIndex" id="itemSize1" value=1>
-          <label for="itemSize1" id="labelSizeSmall" title="small">
+          <input type="radio" name="sizeIndex" id="itemSize1" value=1 tabindex=-1>
+          <label for="itemSize1" title="small" tabindex=0>
             <img src="res/spoke.svg">
           </label>
         </span>
         <span class="toggle">
-          <input type="radio" name="sizeIndex" id="itemSize2" value=2 checked>
-          <label for="itemSize2" id="labelSizeMedium" title="medium">
+          <input type="radio" name="sizeIndex" id="itemSize2" value=2 checked tabindex=-1>
+          <label for="itemSize2" title="medium" tabindex=0>
             <img src="res/onehand.svg">
           </label>
         </span>
         <span class="toggle">
-          <input type="radio" name="sizeIndex" id="itemSize3" value=3>
-          <label for="itemSize3" id="labelSizeLarge" title="large">
+          <input type="radio" name="sizeIndex" id="itemSize3" value=3 tabindex=-1>
+          <label for="itemSize3" title="large" tabindex=0>
             <img src="res/twohand.svg">
           </label>
         </span>
@@ -54,26 +54,26 @@ const INNER_HTML = `
       <legend>Shape</legend>
       <div class="labels">
         <span class="toggle">
-          <input type="checkbox" name="stackable" id="itemStackable">
-          <label for="itemStackable">
+          <input type="checkbox" name="stackable" id="itemStackable" tabindex=-1>
+          <label for="itemStackable" tabindex=0>
             <img src="res/grain.svg" title="stackable">
           </label>
         </span>
         <span class="toggle">
-          <input type="checkbox" name="long" id="itemLong">
-          <label for="itemLong">
+          <input type="checkbox" name="long" id="itemLong" tabindex=-1>
+          <label for="itemLong" tabindex=0>
             <img src="res/height.svg" title="long">
           </label>
         </span>
         <span class="toggle">
-          <input type="checkbox" name="flat" id="itemFlat">
-          <label for="itemFlat">
+          <input type="checkbox" name="flat" id="itemFlat" tabindex=-1>
+          <label for="itemFlat" tabindex=0>
             <img src="res/flatten.svg" title="flat">
           </label>
         </span>
         <span class="toggle">
-          <input type="checkbox" name="heavy" id="itemHeavy">
-          <label for="itemHeavy">
+          <input type="checkbox" name="heavy" id="itemHeavy" tabindex=-1>
+          <label for="itemHeavy" tabindex=0>
             <img src="res/scale.svg" title="heavy">
           </label>
         </span>
@@ -346,6 +346,21 @@ export class InventoryItemBuilderElement extends HTMLElement {
     this.itemInvId = this.shadowRoot.querySelector('#itemInvId');
 
     /** @private */
+    this.labelSize1 = this.shadowRoot.querySelector('label[for="itemSize1"]');
+    /** @private */
+    this.labelSize2 = this.shadowRoot.querySelector('label[for="itemSize2"]');
+    /** @private */
+    this.labelSize3 = this.shadowRoot.querySelector('label[for="itemSize3"]');
+    /** @private */
+    this.labelStackable = this.shadowRoot.querySelector('label[for="itemStackable"]');
+    /** @private */
+    this.labelFlat = this.shadowRoot.querySelector('label[for="itemFlat"]');
+    /** @private */
+    this.labelLong = this.shadowRoot.querySelector('label[for="itemLong"]');
+    /** @private */
+    this.labelHeavy = this.shadowRoot.querySelector('label[for="itemHeavy"]');
+
+    /** @private */
     this.outputSizeWidth = this.shadowRoot.querySelector('#outputSizeWidth');
     /** @private */
     this.outputSizeHeight = this.shadowRoot.querySelector('#outputSizeHeight');
@@ -370,6 +385,8 @@ export class InventoryItemBuilderElement extends HTMLElement {
     this.onStackableChange = this.onStackableChange.bind(this);
     /** @private */
     this.onItemDrop = this.onItemDrop.bind(this);
+    /** @private */
+    this.onLabelKeyUp = this.onLabelKeyUp.bind(this);
 
     /** @private */
     this.onSubmit = this.onSubmit.bind(this);
@@ -382,11 +399,18 @@ export class InventoryItemBuilderElement extends HTMLElement {
     this.itemSize1.addEventListener('click', this.onSizeChange);
     this.itemSize2.addEventListener('click', this.onSizeChange);
     this.itemSize3.addEventListener('click', this.onSizeChange);
-    
     this.itemStackable.addEventListener('change', this.onStackableChange);
     this.itemFlat.addEventListener('change', this.onSizeChange);
     this.itemLong.addEventListener('change', this.onSizeChange);
     this.itemHeavy.addEventListener('change', this.onSizeChange);
+
+    this.labelSize1.addEventListener('keyup', this.onLabelKeyUp);
+    this.labelSize2.addEventListener('keyup', this.onLabelKeyUp);
+    this.labelSize3.addEventListener('keyup', this.onLabelKeyUp);
+    this.labelStackable.addEventListener('keyup', this.onLabelKeyUp);
+    this.labelFlat.addEventListener('keyup', this.onLabelKeyUp);
+    this.labelLong.addEventListener('keyup', this.onLabelKeyUp);
+    this.labelHeavy.addEventListener('keyup', this.onLabelKeyUp);
 
     this.fieldsetSocket.addEventListener('mouseup', this.onItemDrop);
 
@@ -399,11 +423,18 @@ export class InventoryItemBuilderElement extends HTMLElement {
     this.itemSize1.removeEventListener('click', this.onSizeChange);
     this.itemSize2.removeEventListener('click', this.onSizeChange);
     this.itemSize3.removeEventListener('click', this.onSizeChange);
-
     this.itemStackable.removeEventListener('change', this.onStackableChange);
     this.itemFlat.removeEventListener('change', this.onSizeChange);
     this.itemLong.removeEventListener('change', this.onSizeChange);
     this.itemHeavy.removeEventListener('change', this.onSizeChange);
+
+    this.labelSize1.removeEventListener('keyup', this.onLabelKeyUp);
+    this.labelSize2.removeEventListener('keyup', this.onLabelKeyUp);
+    this.labelSize3.removeEventListener('keyup', this.onLabelKeyUp);
+    this.labelStackable.removeEventListener('keyup', this.onLabelKeyUp);
+    this.labelFlat.removeEventListener('keyup', this.onLabelKeyUp);
+    this.labelLong.removeEventListener('keyup', this.onLabelKeyUp);
+    this.labelHeavy.removeEventListener('keyup', this.onLabelKeyUp);
 
     this.fieldsetSocket.removeEventListener('mouseup', this.onItemDrop);
 
@@ -506,18 +537,10 @@ export class InventoryItemBuilderElement extends HTMLElement {
   }
 
   /** @private */
-  onSizeSmallLabel() {
-    this.onSizeChange();
-  }
-
-  /** @private */
-  onSizeMediumLabel() {
-    this.onSizeChange();
-  }
-  
-  /** @private */
-  onSizeLargeLabel() {
-    this.onSizeChange();
+  onLabelKeyUp(e) {
+    if (e.code === 'Enter') {
+      e.target.click();
+    }
   }
 
   /** @private */
