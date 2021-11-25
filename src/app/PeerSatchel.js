@@ -79,6 +79,7 @@ export class SatchelServer {
       connection: conn,
       name: '',
       element: null,
+      lastHeartbeat: 0,
     };
     this.remoteClients.push(remoteClient);
     conn.on('data', data => {
@@ -93,8 +94,9 @@ export class SatchelServer {
               conn.send(stringToSend);
               return;
             }
-            remoteClient.name = name;
             console.log('Setting up client...', name);
+            remoteClient.lastHeartbeat = performance.now();
+            remoteClient.name = name;
             const clientDataName = `remote_data#${name}`;
             // Send to client their first data store
             let dataToSend;
@@ -122,6 +124,7 @@ export class SatchelServer {
               return;
             }
             console.log('Syncing client...', name);
+            remoteClient.lastHeartbeat = performance.now(); // TODO: Disconnect if heartbeat is too much
             // Update server's copy of client data
             const clientDataName = `remote_data#${remoteClient.name}`;
             const clientData = jsonData.message;
