@@ -68,6 +68,14 @@ export default `
         </span>
       </div>
     </fieldset>
+
+    <fieldset id="fieldsetStyle" disabled>
+      <legend>Style</legend>
+      <input type="url" name="imageSrc" id="itemImage">
+      <label>
+        <img src="res/image.svg" title="image">
+      </label>
+    </fieldset>
     
     <button id="newItem">
       <img src="res/add.svg" title="New" alt="New">
@@ -75,12 +83,6 @@ export default `
 
     <input name="invId" id="itemInvId" hidden>
     <input name="itemId" id="itemItemId" hidden>
-  </fieldset>
-
-  <fieldset id="fieldsetStyle" disabled>
-    <legend>Style</legend>
-    <input type="url" name="imageSrc" id="itemImage">
-    <img src="res/image.svg" title="image">
   </fieldset>
 </fieldset>
 `;

@@ -11,6 +11,7 @@ input {
 
 #fieldsetSocket {
   position: relative;
+  padding-bottom: 2em;
 }
 
 #fieldsetSize {
@@ -38,6 +39,22 @@ input {
 }
 #fieldsetShape > legend {
   display: none;
+}
+
+#fieldsetStyle {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border: none;
+  padding: 0;
+}
+#fieldsetStyle > legend {
+  display: none;
+}
+#fieldsetStyle input {
+  width: 30%;
+  vertical-align: top;
 }
 
 #newItem {
@@ -84,32 +101,5 @@ output[disabled] {
 .toggle > input:checked + label {
   opacity: 1;
   border-color: white;
-}
-
-.stackName {
-  color: black;
-  background-color: white;
-}
-.stackName input[type="text"] {
-  background: none;
-  border: none;
-}
-.stackName input[type="number"] {
-  width: 2.5em;
-  background: none;
-  border: none;
-}
-.hidden {
-  opacity: 0;
-}
-
-.stackDesc {
-  display: flex;
-  height: 8em;
-}
-.stackDesc > textarea {
-  flex: 1;
-  resize: none;
-  border: none;
 }
 `;
