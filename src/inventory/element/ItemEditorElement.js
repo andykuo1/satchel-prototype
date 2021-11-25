@@ -1,5 +1,5 @@
-import Template from './ItemEditorElement.template.html.js';
-import Style from './ItemEditorElement.module.css.js';
+import Template from './ItemEditorElement.template.html';
+import Style from './ItemEditorElement.module.css';
 
 import { dispatchInventoryChange, dispatchItemChange, getInventoryStore, isInventoryInStore, addInventoryChangeListener, removeInventoryChangeListener } from '../InventoryStore.js';
 import { addItemToInventory, clearItemsInInventory, getItemAtSlotIndex, isInventoryEmpty } from '../InventoryTransfer.js';
@@ -324,8 +324,7 @@ export class ItemEditorElement extends HTMLElement {
       let newItem = itemBuilder.copyItem(item).itemId(uuid()).build();
       dropOnGround(newItem);
     } else {
-      let randomSize = 1 + Math.floor(Math.random() * 2);
-      let newItem = itemBuilder.default().width(randomSize).height(randomSize).build();
+      let newItem = itemBuilder.default().width(2).height(2).build();
       addItemToInventory(store, this.socketInventory.invId, newItem, 0, 0);
     }
     return false;

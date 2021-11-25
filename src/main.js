@@ -3,12 +3,15 @@ import { getInventoryStore, createGridInventoryInStore, dispatchInventoryChange,
 import { loadInventoryFromJSON, saveInventoryToJSON } from './inventory/InventoryLoader.js';
 import { getExistingInventory } from './inventory/InventoryTransfer.js';
 import { exportAlbumToJSON, getExistingAlbum, importAlbumFromJSON, createAlbumInStore } from './cards/CardAlbum.js';
+import './toolbar.js';
+import './inventory/element/index.js';
+import './cards/element/index.js';
 
-const APP_VERSION = '1.0.22';
+import { BUILD_VERSION, BUILD_ENV } from './globals.js';
 
 window.addEventListener('DOMContentLoaded', () => {
   // Set app version
-  document.querySelector('#appVersion').textContent = `v${APP_VERSION}`;
+  document.querySelector('#appVersion').textContent = `v${BUILD_VERSION}` + (BUILD_ENV !== 'production' ? '-dev' : '');
   // Prepare item context menu
   document.addEventListener('itemcontext', (e) => {
     e.preventDefault();
