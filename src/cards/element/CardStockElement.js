@@ -1,3 +1,6 @@
+import Template from './CardStockElement.template.html';
+import Style from './CardStockElement.module.css';
+
 import { upgradeProperty } from '../../util/wc.js';
 import { exportItemToJSON, importItemFromJSON } from '../../inventory/InventoryLoader.js';
 import { stringHash } from '../../util/hash.js';
@@ -7,212 +10,11 @@ import { getInventoryStore } from '../../inventory/InventoryStore.js';
 import { removeItemFromAlbum } from '../CardAlbum.js';
 import { downloadText } from '../../util/downloader.js';
 
-const INNER_HTML = `
-<div class="container">
-  <article class="front">
-    <h2>
-      <span class="headerTitle" id="itemName">Item</span>
-      <span class="headerIcon"></span>
-    </h2>
-    <section class="portrait" id="itemImage"></section>
-    <section class="subtitle">
-      <label>
-        <span>Item | Physical | Crafted</span>
-      </label>
-      <span class="spacer"></span>
-      <output id="itemSize">
-        <span>(</span>
-        <span id="itemWidth"></span>
-        <span>,</span>
-        <span id="itemHeight"></span>
-        <span>)</span>
-      </output>
-      <output id="itemStackable">
-        <span>&nbsp;⨯</span>
-        <span id="itemStackSize"></span>
-      </output>
-    </section>
-    <section class="description" id="itemDescription"></section>
-    <section class="credits" id="itemAuthor"></section>
-  </article>
-</div>
-<div class="toolbar">
-  <button id="create">Create</button>
-  <button id="modify">Modify</button>
-  <button id="export">Export</button>
-  <button id="delete">Delete</button>
-</div>
-`;
-const INNER_STYLE = `
-:host {
-  display: inline-block;
-  position: relative;
-  width: 18em;
-  height: 22em;
-  --text-color: #FFFFFF;
-  --outline-color: #333333;
-  --background-image: url(res/images/paper.jpg);
-  --portrait-image: url(res/images/potion.png);
-}
-
-.hidden {
-  display: none;
-}
-
-/* TOOLBAR */
-
-.toolbar {
-  position: absolute;
-  top: 0;
-  right: 0;
-}
-
-/* DIFFERENT VIEWS */
-
-:host(:not([detailed])) section.description {
-  display: none;
-}
-
-:host([minified]) {
-  height: unset;
-}
-:host([minified]) .front {
-  position: relative;
-}
-:host([minified]) .back {
-  display: none;
-}
-:host([minified]) .front h2 {
-  display: flex;
-}
-:host([minified]) section.portrait {
-  display: none;
-}
-:host([minified]) .headerTitle {
-  flex: 1;
-  margin-right: 0.25em;
-}
-:host([minified]) .headerIcon {
-  display: inline-block;
-  width: 20%;
-  background: var(--portrait-image);
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  border-radius: 0.5em;
-  transform: scale(150%);
-}
-
-.front {
-  width: calc(100% - 2em);
-  height: calc(100% - 2em);
-
-  border-radius: 1em;
-  border-color: var(--outline-color);
-  border-style: solid;
-  border-width: 0.5em;
-
-  padding: 0.5em;
-}
-
-/* CARD LAYOUT */
-
-.container {
-  width: 100%;
-  height: 100%;
-}
-
-/* FRONT CARD LAYOUT */
-
-.front {
-  background: var(--background-image);
-  color: var(--outline-color);
-  display: flex;
-  flex-direction: column;
-}
-
-.front h2 {
-  margin: 0;
-  margin-bottom: 0.25em;
-  padding: 0.5em;
-
-  border-radius: 0.5em;
-  background-color: var(--outline-color);
-  color: var(--text-color);
-
-  text-align: left;
-}
-
-section.portrait {
-  background: var(--portrait-image);
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  flex: 1;
-
-  border-radius: 0.5em;
-}
-
-section.subtitle {
-  display: flex;
-  position: relative;
-  margin-top: 0.25em;
-
-  font-size: 0.6em;
-
-  border-radius: 0.5em;
-  background-color: var(--outline-color);
-  color: var(--text-color);
-  padding: 0.5em;
-}
-section.subtitle > * {
-  text-align: left;
-}
-section.subtitle > *:last-child {
-  text-align: right;
-}
-.spacer {
-  flex: 1;
-}
-
-section.description {
-  background-color: var(--text-color);
-  color: var(--outline-color);
-  margin: 0 0.25em;
-  margin-top: 0.75em;
-  margin-bottom: 0.25em;
-  padding: 0.5em;
-  border-radius: 0.5em;
-  flex: 1;
-  overflow-y: auto;
-  text-align: left;
-  outline: 4px ridge var(--outline-color);
-}
-
-section.description p {
-  margin: 0;
-}
-
-section.credits {
-  text-align: left;
-  font-size: 0.5em;
-  margin-bottom: -1em;
-  opacity: 0.8;
-}
-
-/* BACK CARD LAYOUT */
-
-.back {
-  background-color: var(--outline-color);
-  color: var(--text-color);
-}
-`;
-
 export class CardStockElement extends HTMLElement {
   /** @private */
   static get [Symbol.for('templateNode')]() {
     const t = document.createElement('template');
-    t.innerHTML = INNER_HTML;
+    t.innerHTML = Template;
     Object.defineProperty(this, Symbol.for('templateNode'), { value: t });
     return t;
   }
@@ -220,7 +22,7 @@ export class CardStockElement extends HTMLElement {
   /** @private */
   static get [Symbol.for('styleNode')]() {
     const t = document.createElement('style');
-    t.innerHTML = INNER_STYLE;
+    t.innerHTML = Style;
     Object.defineProperty(this, Symbol.for('styleNode'), { value: t });
     return t;
   }

@@ -14,6 +14,7 @@ export default args => /** @type {import('rollup').RollupOptions} */({
     output: {
         file: args.dev ? './out/bundle.js' : './bundle.js',
         format: 'es',
+        sourcemap: true,
     },
     plugins: [
         replace({

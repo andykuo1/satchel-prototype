@@ -1,3 +1,6 @@
+import Template from './InventoryGridElement.template.html';
+import Style from './InventoryGridElement.module.css';
+
 import { upgradeProperty } from '../../util/wc.js';
 import { containerMouseUpCallback, DEFAULT_ITEM_UNIT_SIZE } from './InventoryElementMouseHelper.js';
 import {
@@ -15,77 +18,11 @@ import {
 import { getItemIds } from '../InvItems.js';
 import { uuid } from '../../util/uuid.js';
 
-const INNER_HTML = `
-<article>
-  <h2></h2>
-  <section class="container grid">
-    <slot></slot>
-  </section>
-</article>
-`;
-const INNER_STYLE = `
-:host {
-  --background-color: #7f6b50;
-  --outline-color: #352e25;
-  --title-color: #662200;
-  --grid-color: rgba(0, 0, 0, 0.2);
-  --container-width: 1;
-  --container-height: 1;
-  --item-unit-size: ${DEFAULT_ITEM_UNIT_SIZE}px;
-}
-article {
-  position: relative;
-  display: inline-block;
-  width: calc(var(--container-width) * var(--item-unit-size));
-  transition: width var(--transition-duration) ease;
-  margin-top: 2rem;
-  margin-right: 0.5rem;
-  margin-bottom: 0.5rem;
-}
-h2 {
-  position: absolute;
-  top: 2rem;
-  left: 0;
-  right: 0;
-  font-size: 0.9rem;
-  padding-bottom: 2rem;
-  margin: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  border-radius: 1em;
-  text-align: center;
-  color: white;
-  background-color: var(--title-color);
-  transform: translateY(-100%);
-  box-shadow: 0.4rem 0.4rem 0 0 var(--outline-color);
-}
-.container {
-  position: relative;
-  width: 100%;
-  height: calc(var(--container-height) * var(--item-unit-size));
-  background-color: var(--background-color);
-  border-radius: 1rem;
-  box-shadow: 0.4rem 0.4rem 0 0 var(--outline-color);
-  overflow: hidden;
-}
-.flattop {
-  border-top-right-radius: 0rem;
-  border-top-left-radius: 0rem;
-}
-.grid {
-  background-size: var(--item-unit-size) var(--item-unit-size);
-  background-position: -1px -1px;
-  background-image:
-    linear-gradient(to right, var(--grid-color), transparent 1px),
-    linear-gradient(to bottom, var(--grid-color), transparent 1px);
-}
-`;
-
 export class InventoryGridElement extends HTMLElement {
   /** @private */
   static get [Symbol.for('templateNode')]() {
     const t = document.createElement('template');
-    t.innerHTML = INNER_HTML;
+    t.innerHTML = Template;
     Object.defineProperty(this, Symbol.for('templateNode'), { value: t });
     return t;
   }
@@ -93,7 +30,7 @@ export class InventoryGridElement extends HTMLElement {
   /** @private */
   static get [Symbol.for('styleNode')]() {
     const t = document.createElement('style');
-    t.innerHTML = INNER_STYLE;
+    t.innerHTML = Style;
     Object.defineProperty(this, Symbol.for('styleNode'), { value: t });
     return t;
   }

@@ -16,7 +16,6 @@ export default function watchExternal(opts) {
         buildStart() {
             for(let item of items) {
                 glob.sync(path.resolve(item)).forEach(filename => {
-                    console.log(filename);
                     this.addWatchFile(filename);
                 });
             }

@@ -1,0 +1,22 @@
+:host {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+}
+
+dialog {
+  padding: 0.2em;
+  border: none;
+  border-radius: 0.2em;
+}
+
+dialog[open] {
+  display: flex;
+}
+
+textarea {
+  flex: 1;
+  border: none;
+  height: 10em;
+}

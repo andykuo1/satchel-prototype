@@ -1,21 +1,16 @@
+import Template from './CardAlbumElement.template.html';
+import Style from './CardAlbumElement.module.css';
+
 import { addAlbumChangeListener, getInventoryStore, removeAlbumChangeListener } from '../../inventory/InventoryStore.js';
 import { upgradeProperty } from '../../util/wc.js';
 import { getAlbumInStore, getItemIdsInAlbum, getItemInAlbum } from '../CardAlbum.js';
 import { CardStockElement } from './CardStockElement.js';
 
-const INNER_HTML = `
-<article>
-  <slot></slot>
-</article>
-`;
-const INNER_STYLE = `
-`;
-
 export class CardAlbumElement extends HTMLElement {
   /** @private */
   static get [Symbol.for('templateNode')]() {
     const t = document.createElement('template');
-    t.innerHTML = INNER_HTML;
+    t.innerHTML = Template;
     Object.defineProperty(this, Symbol.for('templateNode'), { value: t });
     return t;
   }
@@ -23,7 +18,7 @@ export class CardAlbumElement extends HTMLElement {
   /** @private */
   static get [Symbol.for('styleNode')]() {
     const t = document.createElement('style');
-    t.innerHTML = INNER_STYLE;
+    t.innerHTML = Style;
     Object.defineProperty(this, Symbol.for('styleNode'), { value: t });
     return t;
   }

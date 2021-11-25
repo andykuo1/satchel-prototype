@@ -1,3 +1,6 @@
+import Template from './InventoryItemElement.template.html';
+import Style from './InventoryItemElement.module.css';
+
 import { DEFAULT_ITEM_UNIT_SIZE, itemMouseDownCallback } from './InventoryElementMouseHelper.js';
 import {
   addItemChangeListener,
@@ -10,93 +13,11 @@ import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../InvSlots.js';
 
 /** @typedef {import('./InventoryGridElement.js').InventoryGridElement} InventoryGridElement */
 
-const INNER_HTML = `
-<figure class="container">
-  <div class="innerContainer">
-    <img src="res/images/scroll.png">
-    <figcaption></figcaption>
-    <label id="stackSize">1</label>
-  </div>
-</figure>
-`;
-const INNER_STYLE = `
-:host {
-  --background-color: rgba(0, 0, 0, 0.1);
-  --hover-color: rgba(0, 0, 0, 0.2);
-  --itemX: 0;
-  --itemY: 0;
-  --itemWidth: 1;
-  --itemHeight: 1;
-  /* var(--item-unit-size) is inherited from parent container. */
-}
-.container {
-  display: inline-block;
-  position: absolute;
-  left: calc(var(--itemX) * var(--item-unit-size));
-  top: calc(var(--itemY) * var(--item-unit-size));
-  width: calc(var(--itemWidth) * var(--item-unit-size));
-  height: calc(var(--itemHeight) * var(--item-unit-size));
-  padding: 0;
-  margin: 0;
-  user-select: none;
-  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
-  transition: box-shadow 0.1s ease;
-  background-color: var(--background-color);
-}
-.container:hover {
-  background-color: var(--hover-color);
-  z-index: 1;
-}
-
-.innerContainer {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-figcaption {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  top: unset;
-  opacity: 0;
-  color: white;
-  background-color: rgba(0, 0, 0, 0.7);
-  text-align: center;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-}
-figcaption.vertical {
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: unset;
-  writing-mode: vertical-rl;
-}
-.container:hover figcaption {
-  opacity: 1;
-}
-
-#stackSize {
-  position: absolute;
-  right: 0.2em;
-  top: 0;
-  text-align: right;
-  text-shadow: 1px 1px 3px black;
-}
-`;
-
 export class InventoryItemElement extends HTMLElement {
   /** @private */
   static get [Symbol.for('templateNode')]() {
     const t = document.createElement('template');
-    t.innerHTML = INNER_HTML;
+    t.innerHTML = Template;
     Object.defineProperty(this, Symbol.for('templateNode'), { value: t });
     return t;
   }
@@ -104,7 +25,7 @@ export class InventoryItemElement extends HTMLElement {
   /** @private */
   static get [Symbol.for('styleNode')]() {
     const t = document.createElement('style');
-    t.innerHTML = INNER_STYLE;
+    t.innerHTML = Style;
     Object.defineProperty(this, Symbol.for('styleNode'), { value: t });
     return t;
   }

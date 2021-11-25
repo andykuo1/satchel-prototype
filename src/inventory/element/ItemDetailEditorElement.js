@@ -1,37 +1,10 @@
+import Template from './ItemDetailEditorElement.template.html';
+import Style from './ItemDetailEditorElement.module.css';
+
 import { upgradeProperty } from '../../util/wc.js';
 import { dispatchItemChange, getInventoryStore } from '../InventoryStore.js';
 import { getExistingInventory } from '../InventoryTransfer.js';
 import { getItemByItemId } from '../InvItems.js';
-
-const INNER_HTML = `
-<dialog>
-  <textarea id="detail"></textarea>
-</dialog>
-`;
-const INNER_STYLE = `
-:host {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 10;
-}
-
-dialog {
-  padding: 0.2em;
-  border: none;
-  border-radius: 0.2em;
-}
-
-dialog[open] {
-  display: flex;
-}
-
-textarea {
-  flex: 1;
-  border: none;
-  height: 10em;
-}
-`;
 
 const STACK_SIZE_PATTERN = /(.*)\s+x([0-9]+)\s*$/;
 
@@ -39,7 +12,7 @@ export class ItemDetailEditorElement extends HTMLElement {
   /** @private */
   static get [Symbol.for('templateNode')]() {
     const t = document.createElement('template');
-    t.innerHTML = INNER_HTML;
+    t.innerHTML = Template;
     Object.defineProperty(this, Symbol.for('templateNode'), { value: t });
     return t;
   }
@@ -47,7 +20,7 @@ export class ItemDetailEditorElement extends HTMLElement {
   /** @private */
   static get [Symbol.for('styleNode')]() {
     const t = document.createElement('style');
-    t.innerHTML = INNER_STYLE;
+    t.innerHTML = Style;
     Object.defineProperty(this, Symbol.for('styleNode'), { value: t });
     return t;
   }

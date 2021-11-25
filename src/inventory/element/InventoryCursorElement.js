@@ -1,3 +1,6 @@
+import Template from './InventoryCursorElement.template.html';
+import Style from './InventoryCursorElement.module.css';
+
 import { distanceSquared } from '../../util/math.js';
 import {
   createSocketInventoryInStore,
@@ -34,22 +37,11 @@ const PLACE_BUFFER_RANGE = 10;
 const PLACE_BUFFER_RANGE_SQUARED = PLACE_BUFFER_RANGE * PLACE_BUFFER_RANGE;
 const CURSOR_INV_ID = 'cursor';
 
-const INNER_HTML = `
-<inventory-grid invid="${CURSOR_INV_ID}"></inventory-grid>
-`;
-const INNER_STYLE = `
-:host {
-  position: absolute;
-  display: none;
-  filter: brightness(70%);
-}
-`;
-
 export class InventoryCursorElement extends HTMLElement {
   /** @private */
   static get [Symbol.for('templateNode')]() {
     const t = document.createElement('template');
-    t.innerHTML = INNER_HTML;
+    t.innerHTML = Template;
     Object.defineProperty(this, Symbol.for('templateNode'), { value: t });
     return t;
   }
@@ -57,7 +49,7 @@ export class InventoryCursorElement extends HTMLElement {
   /** @private */
   static get [Symbol.for('styleNode')]() {
     const t = document.createElement('style');
-    t.innerHTML = INNER_STYLE;
+    t.innerHTML = Style;
     Object.defineProperty(this, Symbol.for('styleNode'), { value: t });
     return t;
   }
