@@ -46,6 +46,8 @@
     <script type="module" src="./src/inventory/element/InventoryCursorElement.js"></script>
     <script type="module" src="./src/inventory/element/ItemEditorElement.js"></script>
     <script type="module" src="./src/inventory/element/ItemDetailEditorElement.js"></script>
+    <script type="module" src="./src/cards/CardStockElement.js"></script>
+    <script type="module" src="./src/cards/CardAlbumElement.js"></script>
   </head>
   <body>
     <style>
@@ -120,7 +122,7 @@
         <button id="editButton">
           <img src="res/edit.svg" alt="edit" width="40" />
         </button>
-        <button id="catalogueButton" disabled>
+        <button id="actionAlbumOpen">
           <img src="res/bookmarks.svg" alt="catalogue" width="40" />
         </button>
         <script type="module" src="src/toolbar.js"></script>
@@ -136,16 +138,37 @@
         .sidebar {
           background: #333333;
           position: absolute;
+          display: flex;
+          flex-direction: row;
           top: 0;
           right: 0;
-          width: 20em;
+          left: 0;
+          bottom: 0;
+          width: 100%;
           height: 100%;
-          overflow-y: auto;
           transform: translateX(100%);
           transition: transform 0.3s ease;
+          --peek-width: 22em;
         }
         .sidebar.open {
+          transform: translateX(calc(100% - var(--peek-width)));
+        }
+        .sidebar.expand {
           transform: translateX(0%);
+        }
+        .sidebar .peek {
+          width: var(--peek-width);
+        }
+        .sidebar:not(.open) .peek {
+          display: none;
+        }
+        .sidebar .full {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+        }
+        .sidebar:not(.expand) .full {
+          display: none;
         }
         .content {
           flex: 1;
@@ -161,13 +184,31 @@
         </div>
         <div id="ground"></div>
       </div>
-      <div class="sidebar" id="editor">
-        <item-editor>
-          <div slot="actions">
-            <button id="actionExportAs">Export As</button>
-            <button id="actionSendTo" disabled>Send To</button>
-          </div>
-        </item-editor>
+      <div class="sidebar">
+        <div class="peek">
+          <item-editor id="editor"></item-editor>
+          <fieldset style="display: flex; flex-direction: column;">
+            <button id="actionSendToPlayer" disabled>Send To Player</button>
+            <button id="actionDropToGround">Drop To Ground</button>
+            <button id="actionExportToFile">Export To File</button>
+            <button id="actionSaveToAlbum">Save To Album</button>
+          </fieldset>
+        </div>
+        <div class="full">
+          <fieldset>
+            <select id="actionAlbumView">
+              <option value="default">Default</option>
+              <option value="compact">Compact</option>
+              <option value="detailed">Detailed</option>
+              <option value="full">Full</option>
+            </select>
+            <button id="actionAlbumExport">Export Album</button>
+          </fieldset>
+          <fieldset style="overflow: auto">
+            <legend>Album</legend>
+            <card-album id="album" albumid="main" style="flex: 1;"></card-album>
+          </fieldset>
+        </div>
       </div>
     </main>
     <footer>

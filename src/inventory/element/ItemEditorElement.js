@@ -2,7 +2,7 @@ import Template from './ItemEditorElement.template.html.js';
 import Style from './ItemEditorElement.module.css.js';
 
 import { dispatchInventoryChange, dispatchItemChange, getInventoryStore, isInventoryInStore, addInventoryChangeListener, removeInventoryChangeListener } from '../InventoryStore.js';
-import { addItemToInventory, getItemAtSlotIndex } from '../InventoryTransfer.js';
+import { addItemToInventory, clearItemsInInventory, getItemAtSlotIndex, isInventoryEmpty } from '../InventoryTransfer.js';
 import { getCursor } from './InventoryCursorElement.js';
 import { ItemBuilder } from '../Item.js';
 import { dropOnGround } from '../GroundHelper.js';
@@ -48,10 +48,7 @@ export class ItemEditorElement extends HTMLElement {
       this.constructor[Symbol.for('styleNode')].cloneNode(true)
     );
 
-    /**
-     * @private
-     * @type {InventoryGridElement}
-     */
+    /** @type {InventoryGridElement} */
     this.socketInventory = this.shadowRoot.querySelector('#socketInventory');
     
     // Modifiable properties
@@ -285,6 +282,11 @@ export class ItemEditorElement extends HTMLElement {
     // Clear these just in case to prevent illegal access
     this.itemInvId.value = '';
     this.itemItemId.value = '';
+    const store = getInventoryStore();
+    const invId = this.socketInventory.invId;
+    if (!isInventoryEmpty(store, invId)) {
+      clearItemsInInventory(store, invId);
+    }
     // Hide knobs
     this.fieldsetSize.toggleAttribute('disabled', true);
     this.fieldsetShape.toggleAttribute('disabled', true);
@@ -322,7 +324,8 @@ export class ItemEditorElement extends HTMLElement {
       let newItem = itemBuilder.copyItem(item).itemId(uuid()).build();
       dropOnGround(newItem);
     } else {
-      let newItem = itemBuilder.default().build();
+      let randomSize = 1 + Math.floor(Math.random() * 2);
+      let newItem = itemBuilder.default().width(randomSize).height(randomSize).build();
       addItemToInventory(store, this.socketInventory.invId, newItem, 0, 0);
     }
     return false;
@@ -439,11 +442,11 @@ function getComputedSize(sizeIndex, flat, long, heavy) {
     width = dim;
     height = dim;
   }
-  if (flat) {
+  if (flat && !long) {
     width += 1;
     height = Math.ceil(height / 2);
   }
-  if (long) {
+  if (long && !flat) {
     width = Math.ceil(width / 2);
     height += 1;
   }

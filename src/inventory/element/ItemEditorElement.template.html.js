@@ -11,19 +11,19 @@ export default `
     <div class="labels">
       <span class="toggle">
         <input type="radio" name="sizeIndex" id="itemSize1" value=1 tabindex=-1>
-        <label for="itemSize1" title="small" tabindex=0>
+        <label for="itemSize1" title="Small" tabindex=0>
           <img src="res/spoke.svg">
         </label>
       </span>
       <span class="toggle">
         <input type="radio" name="sizeIndex" id="itemSize2" value=2 checked tabindex=-1>
-        <label for="itemSize2" title="medium" tabindex=0>
+        <label for="itemSize2" title="Medium" tabindex=0>
           <img src="res/onehand.svg">
         </label>
       </span>
       <span class="toggle">
         <input type="radio" name="sizeIndex" id="itemSize3" value=3 tabindex=-1>
-        <label for="itemSize3" title="large" tabindex=0>
+        <label for="itemSize3" title="Large" tabindex=0>
           <img src="res/twohand.svg">
         </label>
       </span>

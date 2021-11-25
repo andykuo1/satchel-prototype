@@ -18,7 +18,7 @@ let GLOBAL_STORE = createInventoryStore();
 let GLOBAL_LISTENERS = {
   item: {},
   inventory: {},
-  container: {},
+  album: {},
 };
 
 export function getInventoryStore() {
@@ -29,9 +29,7 @@ export function createInventoryStore() {
   return {
     data: {
       inventory: {},
-    },
-    assets: {
-      images: {},
+      album: {},
     },
   };
 }
@@ -66,7 +64,6 @@ export function addInventoryToStore(store, invId, inventory) {
     return false;
   }
   store.data.inventory[invId] = inventory;
-  dispatchInventoryListChange(store);
   dispatchInventoryChange(store, invId);
   return true;
 }
@@ -84,7 +81,6 @@ export function deleteInventoryFromStore(store, invId, inventory) {
     return false;
   }
   delete store.data.inventory[invId];
-  dispatchInventoryListChange(store);
   dispatchInventoryChange(store, invId);
   return true;
 }
@@ -144,27 +140,6 @@ export function removeInventoryChangeListener(inventoryId, callback) {
 /**
  * @param store
  */
-export function dispatchInventoryListChange(store) {
-  dispatchInventoryEvent(store, 'container', 'all');
-}
-
-/**
- * @param callback
- */
-export function addInventoryListChangeListener(callback) {
-  addInventoryEventListener('container', 'all', callback);
-}
-
-/**
- * @param callback
- */
-export function removeInventoryListChangeListener(callback) {
-  removeInventoryEventListener('container', 'all', callback);
-}
-
-/**
- * @param store
- */
 export function getInventoryList(store) {
   return Object.values(store.data.inventory);
 }
@@ -191,6 +166,18 @@ export function addItemChangeListener(itemId, callback) {
  */
 export function removeItemChangeListener(itemId, callback) {
   removeInventoryEventListener('item', itemId, callback);
+}
+
+export function dispatchAlbumChange(store, albumId) {
+  dispatchInventoryEvent(store, 'album', albumId);
+}
+
+export function addAlbumChangeListener(albumId, callback) {
+  addInventoryEventListener('album', albumId, callback);
+}
+
+export function removeAlbumChangeListener(albumId, callback) {
+  removeInventoryEventListener('album', albumId, callback);
 }
 
 /**

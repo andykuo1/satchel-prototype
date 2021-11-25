@@ -1,7 +1,7 @@
 import { downloadText } from './util/downloader.js';
 import { clearGround, dropOnGround } from './inventory/GroundHelper.js';
 import { exportItemToJSON, exportInventoryToJSON, importInventoryFromJSON, importItemFromJSON, exportDataToJSON } from './inventory/InventoryLoader.js';
-import { dispatchInventoryChange, getInventoryStore } from './inventory/InventoryStore.js';
+import { dispatchAlbumChange, dispatchInventoryChange, getInventoryStore } from './inventory/InventoryStore.js';
 import {
   connectAsClient,
   connectAsServer,
@@ -10,6 +10,7 @@ import {
 } from './app/PeerSatchelConnector.js';
 import { getCursorContext } from './inventory/CursorHelper.js';
 import { getExistingInventory } from './inventory/InventoryTransfer.js';
+import { addItemToAlbum, exportAlbumToJSON, getAlbumInStore, getExistingAlbum, importAlbumFromJSON } from './cards/CardAlbum.js';
 
 window.addEventListener('DOMContentLoaded', () => {
   document
@@ -30,45 +31,120 @@ window.addEventListener('DOMContentLoaded', () => {
   document
     .querySelector('#uploadInput')
     .addEventListener('change', onUploadChange);
+
   document
-    .querySelector('#actionExportAs')
-    .addEventListener('click', onActionExportAs);
+    .querySelector('#actionExportToFile')
+    .addEventListener('click', onActionExportToFile);
   document
-    .querySelector('#actionSendTo')
-    .addEventListener('click', onActionSendTo);
+    .querySelector('#actionSendToPlayer')
+    .addEventListener('click', onActionSendToPlayer);
+  document
+    .querySelector('#actionSaveToAlbum')
+    .addEventListener('click', onActionSaveToAlbum);
+  document
+    .querySelector('#actionAlbumView')
+    .addEventListener('change', onActionAlbumView);
+  document
+    .querySelector('#actionAlbumOpen')
+    .addEventListener('click', onActionAlbumOpen);
+  document
+    .querySelector('#actionAlbumExport')
+    .addEventListener('click', onActionAlbumExport);
+  document
+    .querySelector('#actionDropToGround')
+    .addEventListener('click', onActionDropToGround);
 });
 
-function onActionExportAs() {
-    /** @type {import('./inventory/element/ItemEditorElement.js').ItemEditorElement} */
-    const itemBuilder = document.querySelector('inventory-itembuilder');
-    try {
-      let item = itemBuilder.getSocketedItem();
-      let jsonData = exportItemToJSON(item);
-      downloadText(`${item.displayName || 'New Item'}.json`, JSON.stringify(jsonData, null, 4));
-    } catch (e) {
-      console.error('Failed to export item', e);
-    }
-}
-
-function onActionSendTo() {
+function onActionSaveToAlbum() {
   /** @type {import('./inventory/element/ItemEditorElement.js').ItemEditorElement} */
-  const itemBuilder = document.querySelector('inventory-itembuilder');
+  const itemEditor = document.querySelector('#editor');
   try {
-    let item = itemBuilder.getSocketedItem();
-    const ctx = getCursorContext();
-    if (ctx.server && ctx.server.instance) {
-      let server = ctx.server.instance;
-      let result = window.prompt(`Who do you want to send it to?\n - ${server.getActiveClientNames().join('\n - ')}`).trim().toLowerCase();
-      ctx.server.instance.sendItemTo(result, item);
+    let item = itemEditor.getSocketedItem();
+    if (item) {
+      addItemToAlbum(getInventoryStore(), 'main', item);
+      itemEditor.clearEditor();
     }
   } catch (e) {
     console.error('Failed to export item', e);
   }
 }
 
+function onActionExportToFile() {
+  /** @type {import('./inventory/element/ItemEditorElement.js').ItemEditorElement} */
+  const itemEditor = document.querySelector('#editor');
+  try {
+    let item = itemEditor.getSocketedItem();
+    if (item) {
+      let jsonData = exportItemToJSON(item);
+      downloadText(`${item.displayName || 'New Item'}.json`, JSON.stringify(jsonData, null, 4));
+    }
+  } catch (e) {
+    console.error('Failed to export item', e);
+  }
+}
+
+function onActionSendToPlayer() {
+  /** @type {import('./inventory/element/ItemEditorElement.js').ItemEditorElement} */
+  const itemEditor = document.querySelector('#editor');
+  try {
+    let item = itemEditor.getSocketedItem();
+    if (item) {
+      const ctx = getCursorContext();
+      if (ctx.server && ctx.server.instance) {
+        let server = ctx.server.instance;
+        let result = window.prompt(`Who do you want to send it to?\n - ${server.getActiveClientNames().join('\n - ')}`).trim().toLowerCase();
+        ctx.server.instance.sendItemTo(result, item);
+      }
+    }
+  } catch (e) {
+    console.error('Failed to export item', e);
+  }
+}
+
+function onActionDropToGround() {
+  /** @type {import('./inventory/element/ItemEditorElement.js').ItemEditorElement} */
+  const itemEditor = document.querySelector('#editor');
+  let item = itemEditor.getSocketedItem();
+  if (item) {
+    dropOnGround(item);
+    itemEditor.clearEditor();
+  }
+}
+
+function onActionAlbumView(e) {
+  /** @type {import('./cards/CardAlbumElement.js').CardAlbumElement} */
+  const albumElement = document.querySelector('#album');
+  albumElement.changeView(e.target.value);
+}
+
+function onActionAlbumOpen(e) {
+  let sidebar = document.querySelector('.sidebar');
+  if (sidebar.classList.contains('expand')) {
+    sidebar.classList.remove('expand', 'open');
+  } else {
+    sidebar.classList.add('expand', 'open');
+  }
+}
+
+function onActionAlbumExport(e) {
+  /** @type {import('./cards/CardAlbumElement.js').CardAlbumElement} */
+  const albumElement = document.querySelector('#album');
+  const store = getInventoryStore();
+  const album = getAlbumInStore(store, albumElement.albumId);
+  if (album) {
+    const timestamp = Date.now();
+    try {
+      const jsonData = exportAlbumToJSON(album);
+      downloadText(`satchel-album-data-${timestamp}.json`, JSON.stringify(jsonData, null, 4));
+    } catch (e) {
+      console.error(e);
+    }
+  }
+}
+
 function onEditClick() {
-  const editor = document.querySelector('#editor');
-  editor.classList.toggle('open');
+  const sidebar = document.querySelector('.sidebar');
+  sidebar.classList.toggle('open');
 }
 
 function onDeleteClick() {
@@ -142,9 +218,17 @@ async function onUploadChange(e) {
       importInventoryFromJSON(jsonData, inv);
       dispatchInventoryChange(store, 'main');
     } break;
+    case 'album_v1': {
+      const store = getInventoryStore();
+      let album = getExistingAlbum(store, 'main');
+      importAlbumFromJSON(jsonData, album);
+      dispatchAlbumChange(store, 'main');
+    } break;
     case 'item_v1': {
+      const store = getInventoryStore();
+      let album = getExistingAlbum(store, 'main');
       let item = importItemFromJSON(jsonData);
-      dropOnGround(item);
+      addItemToAlbum(store, album.albumId, item);
     } break;
     case 'client_v1':
       throw new Error('Not yet implemented.');
