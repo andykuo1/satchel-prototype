@@ -132,7 +132,7 @@ export class ItemBuilder {
     this._itemId = null;
     this._width = 1;
     this._height = 1;
-    this._imageSrc = '';
+    this._imageSrc = 'res/images/potion.png';
     this._displayName = '';
     this._description = '';
     this._stackSize = -1;

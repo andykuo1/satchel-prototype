@@ -1,6 +1,5 @@
 import { downloadText } from './util/downloader.js';
 import { clearGround, dropOnGround } from './inventory/GroundHelper.js';
-import { openItemBuilder } from './app/ItemBuilder.js';
 import { exportItemToJSON, exportInventoryToJSON, importInventoryFromJSON, importItemFromJSON, exportDataToJSON } from './inventory/InventoryLoader.js';
 import { dispatchInventoryChange, getInventoryStore } from './inventory/InventoryStore.js';
 import {
@@ -40,10 +39,10 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 function onActionExportAs() {
-    /** @type {import('./inventory/element/InventoryItemBuilderElement.js').InventoryItemBuilderElement} */
+    /** @type {import('./inventory/element/ItemEditorElement.js').ItemEditorElement} */
     const itemBuilder = document.querySelector('inventory-itembuilder');
     try {
-      let item = itemBuilder.toItem();
+      let item = itemBuilder.getSocketedItem();
       let jsonData = exportItemToJSON(item);
       downloadText(`${item.displayName || 'New Item'}.json`, JSON.stringify(jsonData, null, 4));
     } catch (e) {
@@ -52,10 +51,10 @@ function onActionExportAs() {
 }
 
 function onActionSendTo() {
-  /** @type {import('./inventory/element/InventoryItemBuilderElement.js').InventoryItemBuilderElement} */
+  /** @type {import('./inventory/element/ItemEditorElement.js').ItemEditorElement} */
   const itemBuilder = document.querySelector('inventory-itembuilder');
   try {
-    let item = itemBuilder.toItem();
+    let item = itemBuilder.getSocketedItem();
     const ctx = getCursorContext();
     if (ctx.server && ctx.server.instance) {
       let server = ctx.server.instance;
@@ -69,12 +68,7 @@ function onActionSendTo() {
 
 function onEditClick() {
   const editor = document.querySelector('#editor');
-  if (editor.classList.contains('open')) {
-    editor.classList.remove('open');
-  } else {
-    openItemBuilder(document.querySelector('inventory-itembuilder'));
-    document.querySelector('#editor').classList.add('open');
-  }
+  editor.classList.toggle('open');
 }
 
 function onDeleteClick() {

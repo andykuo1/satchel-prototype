@@ -39,16 +39,13 @@
         padding: 1rem;
         border: 1rem dashed rgba(0, 0, 0, 0.2);
       }
-
-      #cursor > inventory-grid {
-        filter: brightness(70%);
-      }
     </style>
 
     <script type="module" src="./src/inventory/element/InventoryGridElement.js"></script>
     <script type="module" src="./src/inventory/element/InventoryItemElement.js"></script>
     <script type="module" src="./src/inventory/element/InventoryCursorElement.js"></script>
-    <script type="module" src="./src/inventory/element/InventoryItemBuilderElement.js"></script>
+    <script type="module" src="./src/inventory/element/ItemEditorElement.js"></script>
+    <script type="module" src="./src/inventory/element/ItemDetailEditorElement.js"></script>
   </head>
   <body>
     <style>
@@ -56,9 +53,9 @@
         display: flex;
         flex-direction: column;
       }
-      .content {
+      main {
         flex: 1;
-        height: 0;
+        overflow: hidden;
       }
       header,
       footer {
@@ -77,6 +74,7 @@
           flex: 1;
         }
         .toolbar {
+          white-space: nowrap;
           overflow-x: auto;
         }
         .toolbar button {
@@ -128,55 +126,66 @@
         <script type="module" src="src/toolbar.js"></script>
       </div>
     </header>
-    <div class="content">
-      <main>
-        <style>
-          .content {
-            position: relative;
-            text-align: center;
-            display: flex;
-          }
-          main {
-            overflow: auto;
-            flex: 1;
-          }
-          .sidebar {
-            background: #333333;
-            position: absolute;
-            top: 0;
-            right: 0;
-            max-height: 100%;
-            overflow-y: auto;
-            transform: translateX(100%);
-            transition: transform 0.3s ease;
-            border-left: 0.5em solid black;
-          }
-          .sidebar.open {
-            transform: translateX(0%);
-          }
-        </style>
+    <main>
+      <style>
+        main {
+          display: flex;
+          flex-direction: row;
+          position: relative;
+        }
+        .sidebar {
+          background: #333333;
+          position: absolute;
+          top: 0;
+          right: 0;
+          width: 20em;
+          height: 100%;
+          overflow-y: auto;
+          transform: translateX(100%);
+          transition: transform 0.3s ease;
+        }
+        .sidebar.open {
+          transform: translateX(0%);
+        }
+        .content {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          overflow: auto;
+          padding-left: 5%;
+        }
+      </style>
+      <div class="content">
         <div id="workspace">
-          <!-- MAIN -->
+          <inventory-grid invid="main"></inventory-grid>
         </div>
         <div id="ground"></div>
-      </main>
+      </div>
       <div class="sidebar" id="editor">
-        <inventory-itembuilder>
+        <item-editor>
           <div slot="actions">
             <button id="actionExportAs">Export As</button>
             <button id="actionSendTo" disabled>Send To</button>
           </div>
-        </inventory-itembuilder>
+        </item-editor>
       </div>
-    </div>
-    <footer style="font-family: monospace; opacity: 0.6">
+    </main>
+    <footer>
+      <style>
+        footer {
+          font-family: monospace;
+          opacity: 0.6;
+        }
+      </style>
       <a href="https://github.com/andykuo1/satchel" target="_blank">
         <small> Made with ❤ by Andrew Kuo. </small>
       </a>
     </footer>
-    <div class="foreground" id="cursor">
-      <inventory-cursor></inventory-cursor>
+    <!-- OUTER CONTENT -->
+    <div class="foreground">
+      <inventory-cursor id="cursor"></inventory-cursor>
     </div>
+    <item-detail-editor id="detailEditor"></item-detail-editor>
     <script type="module" src="src/main.js"></script>
   </body>
 </html>
