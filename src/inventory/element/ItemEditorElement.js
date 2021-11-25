@@ -152,7 +152,7 @@ export class ItemEditorElement extends HTMLElement {
     // Groups
 
     /** @private */
-    this.fieldsetSocket = this.shadowRoot.querySelector('#fieldsetSocket');
+    this.container = this.shadowRoot.querySelector('.container');
     /** @private */
     this.fieldsetSize = this.shadowRoot.querySelector('#fieldsetSize');
     /** @private */
@@ -200,7 +200,7 @@ export class ItemEditorElement extends HTMLElement {
     this.labelHeavy.addEventListener('keyup', this.onLabelKeyUp);
 
     this.buttonNew.addEventListener('click', this.onButtonNew);
-    this.fieldsetSocket.addEventListener('mouseup', this.onItemDrop);
+    this.container.addEventListener('mouseup', this.onItemDrop);
 
     addInventoryChangeListener(this.socketInventory.invId, this.onSocketInventoryChange);
   }
@@ -224,7 +224,8 @@ export class ItemEditorElement extends HTMLElement {
     this.labelLong.removeEventListener('keyup', this.onLabelKeyUp);
     this.labelHeavy.removeEventListener('keyup', this.onLabelKeyUp);
 
-    this.fieldsetSocket.removeEventListener('mouseup', this.onItemDrop);
+    this.buttonNew.removeEventListener('click', this.onButtonNew);
+    this.container.removeEventListener('mouseup', this.onItemDrop);
 
     removeInventoryChangeListener(this.socketInventory.invId, this.onSocketInventoryChange);
   }

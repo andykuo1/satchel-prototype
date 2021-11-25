@@ -4,14 +4,10 @@ export default `
 }
 .container {
   position: relative;
+  padding-bottom: 2em;
 }
 input {
   font-family: monospace;
-}
-
-#fieldsetSocket {
-  position: relative;
-  padding-bottom: 2em;
 }
 
 #fieldsetSize {
