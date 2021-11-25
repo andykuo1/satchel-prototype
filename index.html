@@ -173,9 +173,14 @@
         .content {
           flex: 1;
           display: flex;
-          flex-direction: column;
+          flex-direction: row;
           overflow: auto;
           padding-left: 5%;
+        }
+        @media only screen and (max-width: 60em) {
+          .content {
+            flex-direction: column;
+          }
         }
       </style>
       <div class="content">
