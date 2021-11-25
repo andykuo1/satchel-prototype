@@ -4,7 +4,7 @@ import { loadInventoryFromJSON, saveInventoryToJSON } from './inventory/Inventor
 import { getExistingInventory } from './inventory/InventoryTransfer.js';
 import { exportAlbumToJSON, getExistingAlbum, importAlbumFromJSON, createAlbumInStore } from './cards/CardAlbum.js';
 
-const APP_VERSION = '1.0.20';
+const APP_VERSION = '1.0.21';
 
 window.addEventListener('DOMContentLoaded', () => {
   // Set app version
