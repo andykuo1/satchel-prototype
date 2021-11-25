@@ -6,15 +6,19 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
+    "start": "web-dev-server --node-resolve --watch --open",
+    "test": "web-test-runner src/**/*.test.js --node-resolve",
     "lint": "eslint src/**/*.js",
-    "format": "prettier --write src/**/*.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "format": "prettier --write src/**/*.js"
   },
   "keywords": [],
   "author": "Andrew Kuo",
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {
+    "@esm-bundle/chai": "^4.3.4-fix.0",
+    "@web/dev-server": "^0.1.28",
+    "@web/test-runner": "^0.13.22",
     "eslint": "^8.2.0",
     "eslint-config-prettier": "^8.3.0",
     "prettier": "^2.4.1"

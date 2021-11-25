@@ -1,11 +1,11 @@
-import { upgradeProperty } from '../util/wc.js';
-import { exportItemToJSON, importItemFromJSON } from '../inventory/InventoryLoader.js';
-import { stringHash } from '../util/hash.js';
-import { dropOnGround } from '../inventory/GroundHelper.js';
-import { addItemToInventory } from '../inventory/InventoryTransfer.js';
-import { getInventoryStore } from '../inventory/InventoryStore.js';
-import { removeItemFromAlbum } from './CardAlbum.js';
-import { downloadText } from '../util/downloader.js';
+import { upgradeProperty } from '../../util/wc.js';
+import { exportItemToJSON, importItemFromJSON } from '../../inventory/InventoryLoader.js';
+import { stringHash } from '../../util/hash.js';
+import { dropOnGround } from '../../inventory/GroundHelper.js';
+import { addItemToInventory } from '../../inventory/InventoryTransfer.js';
+import { getInventoryStore } from '../../inventory/InventoryStore.js';
+import { removeItemFromAlbum } from '../CardAlbum.js';
+import { downloadText } from '../../util/downloader.js';
 
 const INNER_HTML = `
 <div class="container">

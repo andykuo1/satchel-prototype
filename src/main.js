@@ -4,6 +4,10 @@ import { loadInventoryFromJSON, saveInventoryToJSON } from './inventory/Inventor
 import { getExistingInventory } from './inventory/InventoryTransfer.js';
 import { exportAlbumToJSON, getExistingAlbum, importAlbumFromJSON, createAlbumInStore } from './cards/CardAlbum.js';
 
+import './inventory/element/index.js';
+import './cards/element/index.js';
+import './toolbar.js';
+
 const APP_VERSION = '1.0.22';
 
 window.addEventListener('DOMContentLoaded', () => {
