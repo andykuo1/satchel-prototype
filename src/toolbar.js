@@ -164,7 +164,7 @@ function onCloudClick() {
   } else {
     let ctx = getCursorContext();
     connectAsServer(ctx).then(() => {
-      document.querySelector('#actionSendTo').toggleAttribute('disabled', false);
+      document.querySelector('#actionSendToPlayer').toggleAttribute('disabled', false);
     }).catch(e => {
       window.alert('Could not connect: ' + e);
     }).finally(() => {
