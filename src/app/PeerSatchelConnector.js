@@ -16,7 +16,7 @@ export async function connectAsClient(ctx) {
       peerful,
       instance: new SatchelClient(),
     };
-    peerful.on('connect', conn => {
+    peerful.on('connect', (conn) => {
       console.log('Client connection established.');
       ctx.client.instance.onClientConnected(conn);
       conn.on('error', (error) => {
@@ -60,7 +60,7 @@ export async function connectAsServer(ctx) {
       peerful,
       instance: new SatchelServer(),
     };
-    peerful.on('connect', conn => {
+    peerful.on('connect', (conn) => {
       console.log('Client connection established.');
       ctx.server.instance.onClientConnected(conn);
       conn.on('error', (error) => {

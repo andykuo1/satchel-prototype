@@ -14,7 +14,7 @@ export function loadInventoryFromJSON(jsonData, dst = undefined) {
 }
 
 export function importInventoryFromJSON(jsonData, dst = undefined) {
-  return importDataFromJSON(jsonData, 'inv_v1', data => copyInventory(data, dst));
+  return importDataFromJSON(jsonData, 'inv_v1', (data) => copyInventory(data, dst));
 }
 
 export function exportInventoryToJSON(inv, dst = undefined) {
@@ -22,7 +22,7 @@ export function exportInventoryToJSON(inv, dst = undefined) {
 }
 
 export function importItemFromJSON(jsonData, dst = undefined) {
-  return importDataFromJSON(jsonData, 'item_v1', data => copyItem(data, dst));
+  return importDataFromJSON(jsonData, 'item_v1', (data) => copyItem(data, dst));
 }
 
 export function exportItemToJSON(item, dst = undefined) {

@@ -91,7 +91,7 @@ export function copyInventory(other, dst = undefined) {
     dst.length = length;
   }
   if (typeof other.items === 'object') {
-    for(let item of Object.values(other.items)) {
+    for (let item of Object.values(other.items)) {
       let newItem = copyItem(item);
       dst.items[newItem.itemId] = item;
     }

@@ -18,11 +18,11 @@ import { copyItem } from './Item.js';
  */
 
 /**
- * @param {InventoryStore} store 
- * @param {InventoryId} invId 
- * @param {Item} item 
- * @param {number} coordX 
- * @param {number} coordY 
+ * @param {InventoryStore} store
+ * @param {InventoryId} invId
+ * @param {Item} item
+ * @param {number} coordX
+ * @param {number} coordY
  */
 export function addItemToInventory(store, invId, item, coordX, coordY) {
   let inv = getExistingInventory(store, invId);
@@ -31,8 +31,8 @@ export function addItemToInventory(store, invId, item, coordX, coordY) {
 }
 
 /**
- * @param {InventoryStore} store 
- * @param {InventoryId} invId 
+ * @param {InventoryStore} store
+ * @param {InventoryId} invId
  * @param {ItemId} itemId
  */
 export function removeItemFromInventory(store, invId, itemId) {
@@ -108,7 +108,7 @@ export function getExistingInventory(store, invId) {
  * @param itemId
  * @param state
  */
- export function updateItem(store, invId, itemId, state) {
+export function updateItem(store, invId, itemId, state) {
   let inv = getExistingInventory(store, invId);
   let item = InvItems.getItemByItemId(inv, itemId);
   if (!item) {

@@ -42,7 +42,7 @@ export function copyItem(other, dst = undefined) {
     dst = createItem(itemId || uuid());
   } else if (itemId) {
     dst.itemId = itemId;
-  } else if (!(dst.itemId)) {
+  } else if (!dst.itemId) {
     dst.itemId = uuid();
   }
   if (typeof other.width === 'number') {
