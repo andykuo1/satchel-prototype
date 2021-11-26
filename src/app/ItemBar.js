@@ -1,3 +1,4 @@
+import { clearGround } from '../inventory/GroundHelper.js';
 
 /** @typedef {import('../inventory/element/InventoryCursorElement.js').InventoryCursorElement} InventoryCursorElement */
 
@@ -137,7 +138,11 @@ export class ItemBar extends HTMLElement {
 
     /** @private */
     this.onActionDelete = this.onActionDelete.bind(this);
+    /** @private */
+    this.onActionDeleteUp = this.onActionDeleteUp.bind(this);
+    /** @private */
     this.onActionDeleteEnter = this.onActionDeleteEnter.bind(this);
+    /** @private */
     this.onActionDeleteLeave = this.onActionDeleteLeave.bind(this);
     /** @private */
     this.onActionExpand = this.onActionExpand.bind(this);
@@ -146,7 +151,7 @@ export class ItemBar extends HTMLElement {
   /** @protected */
   connectedCallback() {
     this.actionExpand.addEventListener('click', this.onActionExpand);
-    this.actionDelete.addEventListener('mouseup', this.onActionDelete);
+    this.actionDelete.addEventListener('mouseup', this.onActionDeleteUp);
     this.actionDelete.addEventListener('mousedown', this.onActionDelete);
     this.actionDelete.addEventListener('mouseenter', this.onActionDeleteEnter);
     this.actionDelete.addEventListener('mouseleave', this.onActionDeleteLeave);
@@ -155,7 +160,7 @@ export class ItemBar extends HTMLElement {
   /** @protected */
   disconnectedCallback() {
     this.actionExpand.removeEventListener('click', this.onActionExpand);
-    this.actionDelete.removeEventListener('mouseup', this.onActionDelete);
+    this.actionDelete.removeEventListener('mouseup', this.onActionDeleteUp);
     this.actionDelete.removeEventListener('mousedown', this.onActionDelete);
     this.actionDelete.removeEventListener('mouseenter', this.onActionDeleteEnter);
     this.actionDelete.removeEventListener('mouseleave', this.onActionDeleteLeave);
@@ -175,6 +180,16 @@ export class ItemBar extends HTMLElement {
       e.preventDefault();
       e.stopPropagation();
       return false;
+    }
+  }
+
+  /** @private */
+  onActionDeleteUp(e) {
+    let result = this.onActionDelete(e);
+    if (result !== false) {
+      if (window.confirm('Clear all items on the ground?')) {
+        clearGround();
+      }
     }
   }
 

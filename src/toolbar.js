@@ -17,9 +17,6 @@ window.addEventListener('DOMContentLoaded', () => {
     .querySelector('#editButton')
     .addEventListener('click', onEditClick);
   document
-    .querySelector('#deleteButton')
-    .addEventListener('click', onDeleteClick);
-  document
     .querySelector('#cloudButton')
     .addEventListener('click', onCloudClick);
   document
@@ -145,12 +142,6 @@ function onActionAlbumExport(e) {
 function onEditClick() {
   const sidebar = document.querySelector('.sidebar');
   sidebar.classList.toggle('open');
-}
-
-function onDeleteClick() {
-  if (window.confirm('Clear all items on the ground?')) {
-    clearGround();
-  }
 }
 
 function onCloudClick() {
