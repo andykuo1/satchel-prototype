@@ -34,14 +34,20 @@ const PLACE_BUFFER_RANGE = 10;
 const PLACE_BUFFER_RANGE_SQUARED = PLACE_BUFFER_RANGE * PLACE_BUFFER_RANGE;
 const CURSOR_INV_ID = 'cursor';
 
-const INNER_HTML = `
+const INNER_HTML = /* html */`
 <inventory-grid invid="${CURSOR_INV_ID}"></inventory-grid>
 `;
-const INNER_STYLE = `
+const INNER_STYLE = /* css */`
 :host {
   position: absolute;
   display: none;
   filter: brightness(70%);
+  opacity: 1;
+}
+/* This is only used externally and for style. */
+:host([danger]) {
+  opacity: 0.8;
+  filter: brightness(70%) drop-shadow(0 0 0.5em red);
 }
 `;
 
@@ -143,8 +149,8 @@ export class InventoryCursorElement extends HTMLElement {
     const posX = clientX + this.heldOffsetX * DEFAULT_ITEM_UNIT_SIZE;
     const posY = clientY + this.heldOffsetY * DEFAULT_ITEM_UNIT_SIZE;
     this.style.setProperty('left', `${posX - CURSOR_OFFSET_PIXELS}px`);
-    // NOTE: Add 2rem from InventoryGridElement's title margin
-    this.style.setProperty('top', `calc(${posY - CURSOR_OFFSET_PIXELS}px - 2rem)`);
+    // TODO: Maybe add 2rem from InventoryGridElement's title margin?
+    this.style.setProperty('top', `calc(${posY - CURSOR_OFFSET_PIXELS}px)`);
     if (
       this.ignoreFirstPutDown &&
       distanceSquared(clientX, clientY, this.startHeldX, this.startHeldY) >=

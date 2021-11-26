@@ -3,12 +3,12 @@ import { upgradeProperty } from '../util/wc.js';
 import { getAlbumInStore, getItemIdsInAlbum, getItemInAlbum } from './CardAlbum.js';
 import { CardStockElement } from './CardStockElement.js';
 
-const INNER_HTML = `
+const INNER_HTML = /* html */`
 <article>
   <slot></slot>
 </article>
 `;
-const INNER_STYLE = `
+const INNER_STYLE = /* css */`
 `;
 
 export class CardAlbumElement extends HTMLElement {

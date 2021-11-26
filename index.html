@@ -37,17 +37,9 @@
       #ground {
         position: relative;
         padding: 1rem;
-        border: 1rem dashed rgba(0, 0, 0, 0.2);
+        border: 1rem dashed rgba(100, 100, 100, 0.2);
       }
     </style>
-
-    <script type="module" src="./src/inventory/element/InventoryGridElement.js"></script>
-    <script type="module" src="./src/inventory/element/InventoryItemElement.js"></script>
-    <script type="module" src="./src/inventory/element/InventoryCursorElement.js"></script>
-    <script type="module" src="./src/inventory/element/ItemEditorElement.js"></script>
-    <script type="module" src="./src/inventory/element/ItemDetailEditorElement.js"></script>
-    <script type="module" src="./src/cards/CardStockElement.js"></script>
-    <script type="module" src="./src/cards/CardAlbumElement.js"></script>
   </head>
   <body>
     <style>
@@ -131,10 +123,80 @@
     <main>
       <style>
         main {
+          position: relative;
+          display: flex;
+          flex-direction: column;
+        }
+      </style>
+      <style>
+        .content {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          overflow: auto;
+        }
+        .innerContent {
+          flex: 1;
           display: flex;
           flex-direction: row;
-          position: relative;
         }
+        .otherContent {
+          flex: 1;
+          display: flex;
+          min-width: 10em;
+          min-height: 14em;
+          padding-top: 2em;
+          padding-left: 1em;
+          padding-right: 2em;
+          padding-bottom: 4em;
+        }
+        .mainContent {
+          display: flex;
+          padding-top: 2em;
+          padding-left: 2em;
+          padding-right: 1em;
+          padding-bottom: 4em;
+        }
+        #workspace {
+          flex: 1;
+        }
+        #ground {
+          flex: 1;
+        }
+        @media only screen and (max-width: 50em) {
+          .innerContent {
+            flex-direction: column;
+          }
+          .otherContent {
+            padding-top: 0;
+            padding-left: 2em;
+            padding-right: 2em;
+            padding-bottom: 2em;
+          }
+          .mainContent {
+            padding-top: 2em;
+            padding-left: 2em;
+            padding-right: 1em;
+            padding-bottom: 2em;
+          }
+        }
+      </style>
+      <div class="content">
+        <div class="contentPadding"></div>
+        <div class="innerContent">
+          <div class="mainContent">
+            <div id="workspace">
+              <inventory-grid invid="main"></inventory-grid>
+            </div>
+          </div>
+          <div class="otherContent">
+            <div id="ground"></div>
+          </div>
+        </div>
+        <div class="contentPadding"></div>
+      </div>
+      <item-bar></item-bar>
+      <style>
         .sidebar {
           background: #333333;
           position: absolute;
@@ -146,12 +208,12 @@
           bottom: 0;
           width: 100%;
           height: 100%;
-          transform: translateX(100%);
+          transform: translateX(-100%);
           transition: transform 0.3s ease;
           --peek-width: 22em;
         }
         .sidebar.open {
-          transform: translateX(calc(100% - var(--peek-width)));
+          transform: translateX(calc(-100% + var(--peek-width)));
         }
         .sidebar.expand {
           transform: translateX(0%);
@@ -168,37 +230,18 @@
           flex-direction: column;
         }
         .sidebar:not(.expand) .full {
-          display: none;
+          visibility: hidden;
         }
-        .content {
-          flex: 1;
+
+        .peek {
           display: flex;
-          flex-direction: row;
-          overflow: auto;
-          padding-left: 5%;
+          flex-direction: column;
         }
-        @media only screen and (max-width: 60em) {
-          .content {
-            flex-direction: column;
-          }
+        .peek item-editor {
+          flex: 1;
         }
       </style>
-      <div class="content">
-        <div id="workspace">
-          <inventory-grid invid="main"></inventory-grid>
-        </div>
-        <div id="ground"></div>
-      </div>
       <div class="sidebar">
-        <div class="peek">
-          <item-editor id="editor"></item-editor>
-          <fieldset style="display: flex; flex-direction: column;">
-            <button id="actionSendToPlayer" disabled>Send To Player</button>
-            <button id="actionDropToGround">Drop To Ground</button>
-            <button id="actionExportToFile">Export To File</button>
-            <button id="actionSaveToAlbum">Save To Album</button>
-          </fieldset>
-        </div>
         <div class="full">
           <fieldset>
             <select id="actionAlbumView">
@@ -212,6 +255,15 @@
           <fieldset style="overflow: auto">
             <legend>Album</legend>
             <card-album id="album" albumid="main" style="flex: 1;"></card-album>
+          </fieldset>
+        </div>
+        <div class="peek">
+          <item-editor id="editor"></item-editor>
+          <fieldset style="display: flex; flex-direction: column;">
+            <button id="actionSendToPlayer" disabled>Send To Player</button>
+            <button id="actionDropToGround">Drop To Ground</button>
+            <button id="actionExportToFile">Export To File</button>
+            <button id="actionSaveToAlbum">Save To Album</button>
           </fieldset>
         </div>
       </div>

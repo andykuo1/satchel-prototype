@@ -7,7 +7,7 @@ import { getInventoryStore } from '../inventory/InventoryStore.js';
 import { removeItemFromAlbum } from './CardAlbum.js';
 import { downloadText } from '../util/downloader.js';
 
-const INNER_HTML = `
+const INNER_HTML = /* html */`
 <div class="container">
   <article class="front">
     <h2>
@@ -43,7 +43,7 @@ const INNER_HTML = `
   <button id="delete">Delete</button>
 </div>
 `;
-const INNER_STYLE = `
+const INNER_STYLE = /* css */`
 :host {
   display: inline-block;
   position: relative;

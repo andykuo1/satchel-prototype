@@ -15,15 +15,15 @@ import {
 import { getItemIds } from '../InvItems.js';
 import { uuid } from '../../util/uuid.js';
 
-const INNER_HTML = `
+const INNER_HTML = /* html */`
 <article>
   <h2></h2>
-  <section class="container grid">
+  <section class="container grid flattop">
     <slot></slot>
   </section>
 </article>
 `;
-const INNER_STYLE = `
+const INNER_STYLE = /* css */`
 :host {
   --background-color: #7f6b50;
   --outline-color: #352e25;
@@ -38,9 +38,12 @@ article {
   display: inline-block;
   width: calc(var(--container-width) * var(--item-unit-size));
   transition: width var(--transition-duration) ease;
-  margin-top: 2rem;
-  margin-right: 0.5rem;
-  margin-bottom: 0.5rem;
+  margin-top: 0;
+  margin-right: 0.5em;
+  margin-bottom: 0.5em;
+}
+article.topmargin {
+  margin-top: 2em;
 }
 h2 {
   position: absolute;
@@ -68,7 +71,7 @@ h2 {
   box-shadow: 0.4rem 0.4rem 0 0 var(--outline-color);
   overflow: hidden;
 }
-.flattop {
+.container.flattop {
   border-top-right-radius: 0rem;
   border-top-left-radius: 0rem;
 }
@@ -266,6 +269,7 @@ export class InventoryGridElement extends HTMLElement {
     // Set display name
     const displayName = inv.displayName;
     this._containerTitle.textContent = displayName;
+    this._root.classList.toggle('topmargin', Boolean(displayName));
     this._container.classList.toggle('flattop', Boolean(displayName));
 
     // Preserve unchanged items in slot

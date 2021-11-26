@@ -88,7 +88,7 @@ let k = 2;
 let d = Math.trunc((totient * k + 1) / e);
 let privateKey = [d, n];
 
-console.log(publicKey, privateKey);
+// print(publicKey, privateKey);
 
 function encrypt()
 {

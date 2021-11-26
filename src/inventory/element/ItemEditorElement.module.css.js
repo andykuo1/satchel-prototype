@@ -1,13 +1,21 @@
-export default `
+export default /* css */`
 :host {
   display: block;
 }
 .container {
   position: relative;
+  width: calc(100% - 2em);
+  height: calc(100% - 3em);
   padding-bottom: 2em;
+  display: flex;
+  align-items: center;
+  text-align: center;
 }
 input {
   font-family: monospace;
+}
+#socketInventory {
+  flex: 1;
 }
 
 #fieldsetSize {

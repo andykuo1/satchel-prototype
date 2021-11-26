@@ -1,4 +1,4 @@
-export default `
+export default /* html */`
 <fieldset class="container">
   <legend>Foundry</legend>
 
