@@ -1,5 +1,5 @@
 import { downloadText } from './util/downloader.js';
-import { clearGround, dropOnGround } from './inventory/GroundHelper.js';
+import { dropOnGround } from './inventory/GroundHelper.js';
 import { exportItemToJSON, exportInventoryToJSON, importInventoryFromJSON, importItemFromJSON, exportDataToJSON } from './inventory/InventoryLoader.js';
 import { dispatchAlbumChange, dispatchInventoryChange, getInventoryStore } from './inventory/InventoryStore.js';
 import {
@@ -41,6 +41,9 @@ window.addEventListener('DOMContentLoaded', () => {
   document
     .querySelector('#actionAlbumView')
     .addEventListener('change', onActionAlbumView);
+  document
+    .querySelector('#actionAlbumOpen')
+    .addEventListener('click', onActionAlbumOpen);
   document
     .querySelector('#actionAlbumExport')
     .addEventListener('click', onActionAlbumExport);
@@ -115,6 +118,15 @@ function onActionAlbumView(e) {
   /** @type {import('./cards/CardAlbumElement.js').CardAlbumElement} */
   const albumElement = document.querySelector('#album');
   albumElement.changeView(e.target.value);
+}
+
+function onActionAlbumOpen(e) {
+  let sidebar = document.querySelector('.sidebar');
+  if (sidebar.classList.contains('expand')) {
+    sidebar.classList.remove('expand', 'open');
+  } else {
+    sidebar.classList.add('expand', 'open');
+  }
 }
 
 function onActionAlbumExport(e) {
