@@ -145,6 +145,8 @@ export class ItemEditorElement extends HTMLElement {
 
     /** @private */
     this.buttonNew = this.shadowRoot.querySelector('#newItem');
+    /** @private */
+    this.buttonDelete = this.shadowRoot.querySelector('#deleteItem');
 
     // Groups
 
@@ -169,6 +171,8 @@ export class ItemEditorElement extends HTMLElement {
     this.onImageChange = this.onImageChange.bind(this);
     /** @private */
     this.onButtonNew = this.onButtonNew.bind(this);
+    /** @private */
+    this.onButtonDelete = this.onButtonDelete.bind(this);
     /** @private */
     this.onItemDrop = this.onItemDrop.bind(this);
     /** @private */
@@ -197,6 +201,7 @@ export class ItemEditorElement extends HTMLElement {
     this.labelHeavy.addEventListener('keyup', this.onLabelKeyUp);
 
     this.buttonNew.addEventListener('click', this.onButtonNew);
+    this.buttonDelete.addEventListener('click', this.onButtonDelete);
     this.container.addEventListener('mouseup', this.onItemDrop);
 
     addInventoryChangeListener(this.socketInventory.invId, this.onSocketInventoryChange);
@@ -222,6 +227,7 @@ export class ItemEditorElement extends HTMLElement {
     this.labelHeavy.removeEventListener('keyup', this.onLabelKeyUp);
 
     this.buttonNew.removeEventListener('click', this.onButtonNew);
+    this.buttonDelete.removeEventListener('click', this.onButtonDelete);
     this.container.removeEventListener('mouseup', this.onItemDrop);
 
     removeInventoryChangeListener(this.socketInventory.invId, this.onSocketInventoryChange);
@@ -327,6 +333,17 @@ export class ItemEditorElement extends HTMLElement {
       let randomSize = 1 + Math.floor(Math.random() * 2);
       let newItem = itemBuilder.default().width(randomSize).height(randomSize).build();
       addItemToInventory(store, this.socketInventory.invId, newItem, 0, 0);
+    }
+    return false;
+  }
+
+  /** @private */
+  onButtonDelete(e) {
+    e.stopPropagation();
+    e.preventDefault();
+    let item = this.getSocketedItem();
+    if (item) {
+      this.clearEditor();
     }
     return false;
   }

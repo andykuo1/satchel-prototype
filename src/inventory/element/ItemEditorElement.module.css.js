@@ -69,6 +69,14 @@ input {
   background: none;
   border: none;
 }
+#deleteItem {
+  position: absolute;
+  bottom: 2em;
+  right: 0.25em;
+  padding: 0;
+  background: none;
+  border: none;
+}
 
 fieldset {
   display: block;

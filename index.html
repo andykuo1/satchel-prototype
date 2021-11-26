@@ -227,7 +227,10 @@
           flex-direction: column;
         }
         .sidebar:not(.expand) .full {
-          visibility: hidden;
+          display: none;
+        }
+        .sidebar:not(.expand) .peek {
+          margin-left: auto;
         }
 
         .peek {
@@ -239,6 +242,15 @@
         }
       </style>
       <div class="sidebar">
+        <div class="peek">
+          <item-editor id="editor"></item-editor>
+          <fieldset style="display: flex; flex-direction: column;">
+            <button id="actionSendToPlayer" disabled>Send To Player</button>
+            <button id="actionDropToGround">Drop To Ground</button>
+            <button id="actionExportToFile">Export To File</button>
+            <button id="actionSaveToAlbum">Save To Album</button>
+          </fieldset>
+        </div>
         <div class="full">
           <fieldset>
             <select id="actionAlbumView">
@@ -252,15 +264,6 @@
           <fieldset style="overflow: auto">
             <legend>Album</legend>
             <card-album id="album" albumid="main" style="flex: 1;"></card-album>
-          </fieldset>
-        </div>
-        <div class="peek">
-          <item-editor id="editor"></item-editor>
-          <fieldset style="display: flex; flex-direction: column;">
-            <button id="actionSendToPlayer" disabled>Send To Player</button>
-            <button id="actionDropToGround">Drop To Ground</button>
-            <button id="actionExportToFile">Export To File</button>
-            <button id="actionSaveToAlbum">Save To Album</button>
           </fieldset>
         </div>
       </div>

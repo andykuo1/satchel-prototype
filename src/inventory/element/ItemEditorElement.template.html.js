@@ -79,6 +79,9 @@ export default /* html */`
   <button id="newItem">
     <img src="res/add.svg" title="New" alt="New">
   </button>
+  <button id="deleteItem">
+    <img src="res/delete.svg" title="Delete" alt="Delete">
+  </button>
 
   <input name="invId" id="itemInvId" hidden>
   <input name="itemId" id="itemItemId" hidden>
