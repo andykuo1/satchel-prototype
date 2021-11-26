@@ -8,7 +8,7 @@ import './app/index.js';
 import './inventory/element/index.js';
 import './cards/index.js';
 
-const APP_VERSION = '1.0.22';
+const APP_VERSION = '1.0.23';
 
 window.addEventListener('DOMContentLoaded', () => {
   // Set app version
