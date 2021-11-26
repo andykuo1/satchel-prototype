@@ -26,22 +26,19 @@ const INNER_STYLE = /* css */ `
   right: 0;
   bottom: 0;
   --primary-color: #222222;
-  --secondary-color: #222222;
+  --secondary-color: #333333;
 }
 
 .root {
   position: relative;
 }
 
-#actionNew {
-  position: absolute;
-  bottom: 5.25em;
-  right: 0.5em;
-}
 #actionDelete {
   position: absolute;
   bottom: 1.25em;
   left: 0.5em;
+  background-color: var(--secondary-color);
+  border-radius: 1em;
 }
 #actionDelete:hover {
   filter: brightness(70%);
@@ -50,6 +47,8 @@ const INNER_STYLE = /* css */ `
   position: absolute;
   bottom: 1.25em;
   right: 0.5em;
+  background-color: var(--secondary-color);
+  border-radius: 1em;
 }
 #actionExpand:hover {
   filter: brightness(70%);
@@ -90,7 +89,7 @@ button {
 }
 `;
 
-export class ItemBar extends HTMLElement {
+export class ItemBarElement extends HTMLElement {
   /** @private */
   static get [Symbol.for('templateNode')]() {
     const t = document.createElement('template');
@@ -327,4 +326,4 @@ export class ItemBar extends HTMLElement {
     this.slotItems = emptySlot;
   }
 }
-ItemBar.define();
+ItemBarElement.define();
