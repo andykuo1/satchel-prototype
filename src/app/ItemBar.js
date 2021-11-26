@@ -1,4 +1,8 @@
+import { getAlbumInStore, getItemIdsInAlbum, getItemInAlbum } from '../cards/CardAlbum.js';
 import { clearGround } from '../inventory/GroundHelper.js';
+import { addAlbumChangeListener, getInventoryStore, removeAlbumChangeListener } from '../inventory/InventoryStore.js';
+import { upgradeProperty } from '../util/wc.js';
+import { ItemBarItemElement } from './ItemBarItemElement.js';
 
 /** @typedef {import('../inventory/element/InventoryCursorElement.js').InventoryCursorElement} InventoryCursorElement */
 
@@ -11,25 +15,7 @@ const INNER_HTML = /* html */ `
     <img src="res/delete.svg" alt="Delete" title="Delete Item">
   </button>
   <ul class="container list hidden">
-    <li><img src="res/images/potion.png"></li>
-    <li><img src="res/images/potion.png"></li>
-    <li><img src="res/images/potion.png"></li>
-    <li><img src="res/images/potion.png"></li>
-    <li><img src="res/images/potion.png"></li>
-    <li><img src="res/images/potion.png"></li>
-    <li><img src="res/images/potion.png"></li>
-    <li><img src="res/images/potion.png"></li>
-    <li><img src="res/images/potion.png"></li>
-    <li><img src="res/images/potion.png"></li>
-    <li><img src="res/images/potion.png"></li>
-    <li><img src="res/images/potion.png"></li>
-    <li><img src="res/images/potion.png"></li>
-    <li><img src="res/images/potion.png"></li>
-    <li><img src="res/images/potion.png"></li>
-    <li><img src="res/images/potion.png"></li>
-    <li><img src="res/images/potion.png"></li>
-    <li><img src="res/images/potion.png"></li>
-    <li><img src="res/images/potion.png"></li>
+    <slot name="items"></slot>
   </ul>
 </div>
 `;
@@ -65,6 +51,9 @@ const INNER_STYLE = /* css */ `
   bottom: 1.25em;
   right: 0.5em;
 }
+#actionExpand:hover {
+  filter: brightness(70%);
+}
 
 .container {
   display: flex;
@@ -81,9 +70,9 @@ const INNER_STYLE = /* css */ `
   list-style-type: none;
 }
 .container.hidden {
-  visibility: hidden;
+  display: none;
 }
-.container > li {
+slot[name="items"] > * {
   width: 4em;
   height: calc(100% - 1em);
   margin: 0;
@@ -92,7 +81,6 @@ const INNER_STYLE = /* css */ `
 }
 
 img {
-  color: #FFFFFF;
   height: 100%;
 }
 button {
@@ -123,6 +111,18 @@ export class ItemBar extends HTMLElement {
     customElements.define('item-bar', this);
   }
 
+  static get observedAttributes() {
+    return ['albumid'];
+  }
+
+  get albumId() {
+    return this._albumId;
+  }
+
+  set albumId(value) {
+    this.setAttribute('albumid', value);
+  }
+
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
@@ -130,7 +130,15 @@ export class ItemBar extends HTMLElement {
     this.shadowRoot.append(this.constructor[Symbol.for('styleNode')].cloneNode(true));
 
     /** @private */
+    this._albumId = undefined;
+    
+    /** @private */
     this.container = this.shadowRoot.querySelector('.container');
+    /**
+     * @private
+     * @type {HTMLSlotElement}
+     */
+    this.slotItems = this.shadowRoot.querySelector('slot[name="items"]');
     /** @private */
     this.actionExpand = this.shadowRoot.querySelector('#actionExpand');
     /** @private */
@@ -146,11 +154,29 @@ export class ItemBar extends HTMLElement {
     this.onActionDeleteLeave = this.onActionDeleteLeave.bind(this);
     /** @private */
     this.onActionExpand = this.onActionExpand.bind(this);
+    /** @private */
+    this.onActionExpandDouble = this.onActionExpandDouble.bind(this);
+
+    /** @private */
+    this.onAlbumChange = this.onAlbumChange.bind(this);
   }
 
   /** @protected */
   connectedCallback() {
+    let albumId = this._albumId;
+    if (albumId) {
+      let store = getInventoryStore();
+      addAlbumChangeListener(
+        albumId,
+        this.onAlbumChange
+      );
+      this.onAlbumChange(store, albumId);
+    }
+    upgradeProperty(this, 'albumId');
+
+    this.actionExpand.addEventListener('contextmenu', this.onActionExpandDouble);
     this.actionExpand.addEventListener('click', this.onActionExpand);
+    this.actionExpand.addEventListener('dblclick', this.onActionExpandDouble);
     this.actionDelete.addEventListener('mouseup', this.onActionDeleteUp);
     this.actionDelete.addEventListener('mousedown', this.onActionDelete);
     this.actionDelete.addEventListener('mouseenter', this.onActionDeleteEnter);
@@ -159,16 +185,65 @@ export class ItemBar extends HTMLElement {
 
   /** @protected */
   disconnectedCallback() {
+    const albumId = this._albumId;
+    if (albumId) {
+      removeAlbumChangeListener(
+        albumId,
+        this.onAlbumChange
+      );
+    }
+
+    this.actionExpand.removeEventListener('contextmenu', this.onActionExpandDouble);
     this.actionExpand.removeEventListener('click', this.onActionExpand);
+    this.actionExpand.removeEventListener('dblclick', this.onActionExpandDouble);
     this.actionDelete.removeEventListener('mouseup', this.onActionDeleteUp);
     this.actionDelete.removeEventListener('mousedown', this.onActionDelete);
     this.actionDelete.removeEventListener('mouseenter', this.onActionDeleteEnter);
     this.actionDelete.removeEventListener('mouseleave', this.onActionDeleteLeave);
   }
 
+  /**
+   * @param attribute
+   * @param previous
+   * @param value
+   * @protected
+   */
+  attributeChangedCallback(attribute, previous, value) {
+    switch (attribute) {
+      case 'albumid': {
+        const store = getInventoryStore();
+        const prevAlbumId = this._albumId;
+        const nextAlbumId = value;
+        if (prevAlbumId !== nextAlbumId) {
+          this._albumId = nextAlbumId;
+          if (prevAlbumId) {
+            removeAlbumChangeListener(
+              prevAlbumId,
+              this.onAlbumChange
+            );
+          }
+          if (nextAlbumId) {
+            addAlbumChangeListener(nextAlbumId, this.onAlbumChange);
+            this.onAlbumChange(store, nextAlbumId);
+          }
+        }
+      } break;
+    }
+  }
+
   /** @private */
-  onActionExpand() {
+  onActionExpand(e) {
     this.container.classList.toggle('hidden');
+  }
+
+  /** @private */
+  onActionExpandDouble(e) {
+    // TODO: This shouldn't just reference .sidebar...
+    let sidebar = document.querySelector('.sidebar');
+    sidebar.classList.add('expand', 'open');
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
   }
 
   /** @private */
@@ -209,6 +284,47 @@ export class ItemBar extends HTMLElement {
     if (cursor) {
       cursor.toggleAttribute('danger', false);
     }
+  }
+
+  /**
+   * @param store
+   * @param albumId
+   * @protected
+   */
+   onAlbumChange(store, albumId) {
+    const album = getAlbumInStore(store, albumId);
+    if (!album) {
+      // The album has been deleted.
+      return;
+    }
+
+    // Preserve unchanged items in slot
+    const preservedItems = {};
+    for (const node of this.slotItems.assignedNodes()) {
+      const itemNode = /** @type {ItemBarItemElement} */ (node);
+      const itemId = itemNode.itemId;
+      if (typeof itemId === 'string') {
+        preservedItems[itemId] = node;
+      }
+    }
+
+    // Add new items into slot.
+    const emptySlot = /** @type {HTMLSlotElement} */ (
+      this.slotItems.cloneNode(false)
+    );
+    let itemIds = getItemIdsInAlbum(store, albumId)
+      .sort((a, b) => (getItemInAlbum(store, albumId, a).displayName||'').localeCompare(getItemInAlbum(store, albumId, b).displayName||''));
+    for (const itemId of itemIds) {
+      let element;
+      element =
+        itemId in preservedItems
+          ? preservedItems[itemId]
+          : new ItemBarItemElement(itemId, getItemInAlbum(store, albumId, itemId));
+      emptySlot.append(element);
+    }
+
+    this.slotItems.replaceWith(emptySlot);
+    this.slotItems = emptySlot;
   }
 }
 ItemBar.define();

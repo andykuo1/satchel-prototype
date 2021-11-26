@@ -42,11 +42,14 @@ window.addEventListener('DOMContentLoaded', () => {
     .querySelector('#actionAlbumView')
     .addEventListener('change', onActionAlbumView);
   document
-    .querySelector('#actionAlbumOpen')
-    .addEventListener('click', onActionAlbumOpen);
-  document
     .querySelector('#actionAlbumExport')
     .addEventListener('click', onActionAlbumExport);
+  document
+    .querySelector('#actionAlbumImport')
+    .addEventListener('click', onActionAlbumImport);
+  document
+    .querySelector('#actionAlbumLeave')
+    .addEventListener('click', onActionAlbumLeave);
   document
     .querySelector('#actionDropToGround')
     .addEventListener('click', onActionDropToGround);
@@ -114,15 +117,6 @@ function onActionAlbumView(e) {
   albumElement.changeView(e.target.value);
 }
 
-function onActionAlbumOpen(e) {
-  let sidebar = document.querySelector('.sidebar');
-  if (sidebar.classList.contains('expand')) {
-    sidebar.classList.remove('expand', 'open');
-  } else {
-    sidebar.classList.add('expand', 'open');
-  }
-}
-
 function onActionAlbumExport(e) {
   /** @type {import('./cards/CardAlbumElement.js').CardAlbumElement} */
   const albumElement = document.querySelector('#album');
@@ -137,6 +131,17 @@ function onActionAlbumExport(e) {
       console.error(e);
     }
   }
+}
+
+function onActionAlbumImport() {
+  let input = /** @type {HTMLInputElement} */ (
+    document.querySelector('#uploadInput')
+  );
+  input.click();
+}
+function onActionAlbumLeave() {
+  let sidebar = document.querySelector('.sidebar');
+  sidebar.classList.remove('expand', 'open');
 }
 
 function onEditClick() {

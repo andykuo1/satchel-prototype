@@ -10,7 +10,7 @@ import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../InvSlots.js';
 
 /** @typedef {import('./InventoryGridElement.js').InventoryGridElement} InventoryGridElement */
 
-const INNER_HTML = `
+const INNER_HTML = /* html */`
 <figure class="container">
   <div class="innerContainer">
     <img src="res/images/scroll.png">
@@ -19,7 +19,7 @@ const INNER_HTML = `
   </div>
 </figure>
 `;
-const INNER_STYLE = `
+const INNER_STYLE = /* css */`
 :host {
   --background-color: rgba(0, 0, 0, 0.1);
   --hover-color: rgba(0, 0, 0, 0.2);
