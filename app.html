@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Satchel</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        width: 100vw;
+        height: 100vh;
+        background-image: url('res/images/wood.jpg');
+        background-size: 30rem;
+        background-repeat: repeat;
+        background-color: #211b1c;
+        color: #ffffff;
+        overflow: hidden;
+        font-family: Georgia, 'Times New Roman', Times, serif;
+        box-shadow: inset 0 0 16rem #000000;
+      }
+
+      .foreground {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        pointer-events: none;
+        overflow: hidden;
+        z-index: 5;
+      }
+
+      #ground {
+        position: relative;
+        padding: 1rem;
+        border: 1rem dashed rgba(100, 100, 100, 0.2);
+      }
+    </style>
+  </head>
+  <body>
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+      }
+      main {
+        flex: 1;
+        overflow: hidden;
+      }
+      header,
+      footer {
+        z-index: 1;
+      }
+    </style>
+    <header>
+      <style>
+        header {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          padding: 0 2em;
+        }
+        .spacer {
+          flex: 1;
+        }
+        .toolbar {
+          white-space: nowrap;
+          overflow-x: auto;
+        }
+      </style>
+      <icon-button id="editButton" icon="res/edit.svg" alt="foundry" title="Open Foundry"></icon-button>
+      <div class="spacer"></div>
+      <h1>Satchel</h1>
+      <small id="onlineStatus"></small>
+      <small id="appVersion">v-.-.-</small>
+      <div class="spacer"></div>
+      <div class="toolbar">
+        <style>
+          .toolbar button:disabled {
+            opacity: 0.3;
+          }
+          #onlineStatus {
+            color: red;
+          }
+          #onlineStatus::after {
+            content: 'OFFLINE';
+          }
+          #onlineStatus.active {
+            color: green;
+          }
+          #onlineStatus.active::after {
+            content: 'ONLINE';
+          }
+        </style>
+        <icon-button id="uploadButton" icon="res/upload.svg" alt="upload" title="Upload"></icon-button>
+        <icon-button id="downloadButton" icon="res/download.svg" alt="download" title="Download"></icon-button>
+        <icon-button id="cloudButton" icon="res/cloud.svg" alt="connect" title="Connect"></icon-button>
+        <icon-button id="actionAlbumOpen" icon="res/bookmarks.svg" alt="album" title="Open Album"></icon-button>
+      </div>
+    </header>
+    <main>
+      <style>
+        main {
+          position: relative;
+          display: flex;
+          flex-direction: column;
+        }
+      </style>
+      <style>
+        .content {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          overflow: auto;
+        }
+        .innerContent {
+          flex: 1;
+          display: flex;
+          flex-direction: row;
+        }
+        .otherContent {
+          flex: 1;
+          display: flex;
+          min-width: 10em;
+          min-height: 14em;
+          padding-top: 2em;
+          padding-left: 1em;
+          padding-right: 2em;
+          padding-bottom: 4em;
+        }
+        .mainContent {
+          display: flex;
+          padding-top: 2em;
+          padding-left: 2em;
+          padding-right: 1em;
+          padding-bottom: 4em;
+        }
+        #workspace {
+          flex: 1;
+        }
+        #ground {
+          flex: 1;
+        }
+        @media only screen and (max-width: 50em) {
+          .innerContent {
+            flex-direction: column;
+          }
+          .otherContent {
+            padding-top: 0;
+            padding-left: 2em;
+            padding-right: 2em;
+            padding-bottom: 2em;
+          }
+          .mainContent {
+            padding-top: 2em;
+            padding-left: 2em;
+            padding-right: 1em;
+            padding-bottom: 2em;
+          }
+        }
+      </style>
+      <div class="content">
+        <div class="contentPadding"></div>
+        <div class="innerContent">
+          <div class="mainContent">
+            <div id="workspace">
+              <inventory-grid invid="main"></inventory-grid>
+            </div>
+          </div>
+          <div class="otherContent">
+            <div id="ground"></div>
+          </div>
+        </div>
+        <div class="contentPadding"></div>
+      </div>
+      <item-bar albumid="main"></item-bar>
+      <style>
+        .sidebar {
+          background: #333333;
+          position: absolute;
+          display: flex;
+          flex-direction: row;
+          top: 0;
+          right: 0;
+          left: 0;
+          bottom: 0;
+          width: 100%;
+          height: 100%;
+          transform: translateX(-100%);
+          transition: transform 0.3s ease;
+          --peek-width: 22em;
+        }
+        .sidebar.open {
+          transform: translateX(calc(-100% + var(--peek-width)));
+        }
+        .sidebar.expand {
+          transform: translateX(0%);
+        }
+        .sidebar .peek {
+          width: var(--peek-width);
+        }
+        .sidebar:not(.open) .peek {
+          display: none;
+        }
+        .sidebar .full {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+        }
+        .sidebar:not(.expand) .full {
+          display: none;
+        }
+        .sidebar:not(.expand) .peek {
+          margin-left: auto;
+        }
+
+        .peek {
+          display: flex;
+          flex-direction: column;
+        }
+        .peek item-editor {
+          flex: 1;
+        }
+      </style>
+      <div class="sidebar">
+        <div class="peek">
+          <item-editor id="editor"></item-editor>
+          <fieldset style="display: flex; flex-direction: column;">
+            <button id="actionSendToPlayer" disabled>Send To Player</button>
+            <button id="actionDropToGround">Drop To Ground</button>
+            <button id="actionExportToFile">Export To File</button>
+            <button id="actionSaveToAlbum">Save To Album</button>
+          </fieldset>
+        </div>
+        <div class="full">
+          <fieldset style="display: flex;">
+            <select id="actionAlbumView">
+              <option value="default">Default</option>
+              <option value="compact">Compact</option>
+              <option value="detailed">Detailed</option>
+              <option value="full">Full</option>
+            </select>
+            <div class="spacer"></div>
+            <button id="actionAlbumImport">Import Album</button>
+            <button id="actionAlbumExport">Export Album</button>
+            <div class="spacer"></div>
+            <button id="actionAlbumLeave">Return</button>
+          </fieldset>
+          <fieldset style="overflow: auto">
+            <legend>Album</legend>
+            <card-album id="album" albumid="main" style="flex: 1;"></card-album>
+          </fieldset>
+        </div>
+      </div>
+    </main>
+    <footer>
+      <style>
+        footer {
+          font-family: monospace;
+          opacity: 0.6;
+        }
+      </style>
+      <a href="https://github.com/andykuo1/satchel" target="_blank">
+        <small> Made with ❤ by Andrew Kuo. </small>
+      </a>
+    </footer>
+    <!-- OUTER CONTENT -->
+    <div class="foreground">
+      <inventory-cursor id="cursor"></inventory-cursor>
+    </div>
+    <item-detail-editor id="detailEditor"></item-detail-editor>
+    <script type="module" src="src/main.js"></script>
+  </body>
+</html>

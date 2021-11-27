@@ -62,7 +62,7 @@ export class IconButtonElement extends HTMLElement {
 
   /** @protected */
   static get observedAttributes() {
-    return ['icon', 'alt'];
+    return ['icon', 'alt', 'disabled'];
   }
 
   get icon() {
@@ -81,12 +81,22 @@ export class IconButtonElement extends HTMLElement {
     this.setAttribute('alt', value);
   }
 
+  get disabled() {
+    return this.hasAttribute('disabled');
+  }
+
+  set disabled(value) {
+    this.toggleAttribute('disabled', value);
+  }
+
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
     this.shadowRoot.append(this.constructor[Symbol.for('templateNode')].content.cloneNode(true));
     this.shadowRoot.append(this.constructor[Symbol.for('styleNode')].cloneNode(true));
 
+    /** @private */
+    this.button = this.shadowRoot.querySelector('button');
     /** @private */
     this.image = this.shadowRoot.querySelector('img');
   }
@@ -95,6 +105,7 @@ export class IconButtonElement extends HTMLElement {
   connectedCallback() {
     upgradeProperty(this, 'icon');
     upgradeProperty(this, 'alt');
+    upgradeProperty(this, 'disabled');
   }
 
   /** @protected */
@@ -109,6 +120,9 @@ export class IconButtonElement extends HTMLElement {
         break;
       case 'alt':
         this.image.alt = value;
+        break;
+      case 'disabled':
+        this.button.toggleAttribute('disabled', value !== null);
         break;
     }
   }

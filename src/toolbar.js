@@ -2,12 +2,7 @@ import { downloadText } from './util/downloader.js';
 import { dropOnGround } from './inventory/GroundHelper.js';
 import { exportItemToJSON, exportInventoryToJSON, importInventoryFromJSON, importItemFromJSON, exportDataToJSON } from './inventory/InventoryLoader.js';
 import { dispatchAlbumChange, dispatchInventoryChange, getInventoryStore } from './inventory/InventoryStore.js';
-import {
-  connectAsClient,
-  connectAsServer,
-  isServerSide,
-  shouldConnnectAsClient,
-} from './app/PeerSatchelConnector.js';
+import { connectAsClient, connectAsServer, isServerSide, shouldConnnectAsClient } from './app/PeerSatchelConnector.js';
 import { getCursorContext } from './inventory/CursorHelper.js';
 import { getExistingInventory } from './inventory/InventoryTransfer.js';
 import { addItemToAlbum, exportAlbumToJSON, getAlbumInStore, getExistingAlbum, importAlbumFromJSON } from './cards/CardAlbum.js';

@@ -3,8 +3,7 @@ import { copyToClipboard } from '../util/clipboard.js';
 import { getCursorContext } from '../inventory/CursorHelper.js';
 import { SatchelClient, SatchelServer } from './PeerSatchel.js';
 
-export async function connectAsClient(ctx) {
-  const remoteId = tryGetRemotePeerId(window.location);
+export async function connectAsClient(ctx, remoteId = tryGetRemotePeerId(window.location)) {
   if (!remoteId) {
     return false;
   }
@@ -52,10 +51,10 @@ export function isServerSide() {
   return Boolean(ctx.server);
 }
 
-export async function connectAsServer(ctx) {
+export async function connectAsServer(ctx, localId = undefined) {
   if (!ctx.server) {
     // Initialize server
-    const peerful = new Peerful();
+    const peerful = new Peerful(localId);
     ctx.server = {
       peerful,
       instance: new SatchelServer(),
@@ -74,7 +73,7 @@ export async function connectAsServer(ctx) {
     });
     peerful
       .listen()
-      .then(() => window.alert('Server started!'))
+      .then(() => console.log('Server started!'))
       .catch((error) => window.alert(error));
   }
 
