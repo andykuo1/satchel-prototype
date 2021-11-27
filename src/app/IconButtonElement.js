@@ -21,9 +21,11 @@ button {
   border: none;
   border-radius: 0.8em;
   background-color: var(--background-color);
+  cursor: pointer;
 }
 button:disabled {
   opacity: 0.3;
+  cursor: unset;
 }
 button:not(:disabled):hover {
   background-color: var(--hover-color);
