@@ -249,13 +249,20 @@ export class ItemEditorElement extends HTMLElement {
   setupEditor(invId, itemId, item) {
     const width = item.width;
     const height = item.height;
+    const stackable = item.stackSize >= 0;
 
     // Update hidden properties
     this.itemInvId.value = invId;
     this.itemItemId.value = itemId;
     this.itemWidth.value = width;
     this.itemHeight.value = height;
-    this.itemImage.value = item.imgSrc;
+
+    const defaultImgSrc = getDefaultImageSourceByDimensions(width, height, stackable);
+    if (defaultImgSrc !== item.imgSrc) {
+      this.itemImage.value = item.imgSrc;
+    } else {
+      this.itemImage.value = '';
+    }
 
     // Update modifiable properties
     let sizeIndex = item.metadata.sizeIndex;
@@ -284,7 +291,7 @@ export class ItemEditorElement extends HTMLElement {
     this.itemFlat.checked = item.metadata.flat || false;
     this.itemLong.checked = item.metadata.long || false;
     this.itemHeavy.checked = item.metadata.heavy || false;
-    this.itemStackable.checked = item.stackSize >= 0;
+    this.itemStackable.checked = stackable;
 
     // Update outputs
     this.outputSizeWidth.textContent = `${width}`;
