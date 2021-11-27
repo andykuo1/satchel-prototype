@@ -3,23 +3,29 @@ import { dispatchItemChange, getInventoryStore } from '../InventoryStore.js';
 import { getExistingInventory } from '../InventoryTransfer.js';
 import { getItemByItemId } from '../InvItems.js';
 
-const INNER_HTML = `
+const INNER_HTML = /* html */`
 <dialog>
   <textarea id="detail"></textarea>
 </dialog>
 `;
-const INNER_STYLE = `
+const INNER_STYLE = /* css */`
 :host {
   position: absolute;
   top: 0;
   left: 0;
   z-index: 10;
+  --foreground-color: #FFFFFF;
+  --background-color: #444444;
+  --outline-color: #333333;
 }
 
 dialog {
   padding: 0.2em;
   border: none;
   border-radius: 0.2em;
+  background-color: var(--background-color);
+  box-shadow: 0.4rem 0.4rem 0 0 var(--outline-color);
+  overflow: hidden;
 }
 
 dialog[open] {
@@ -28,8 +34,11 @@ dialog[open] {
 
 textarea {
   flex: 1;
+  outline: none;
   border: none;
+  background: none;
   height: 10em;
+  color: var(--foreground-color);
 }
 `;
 
