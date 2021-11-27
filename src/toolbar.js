@@ -11,6 +11,7 @@ import {
 import { getCursorContext } from './inventory/CursorHelper.js';
 import { getExistingInventory } from './inventory/InventoryTransfer.js';
 import { addItemToAlbum, exportAlbumToJSON, getAlbumInStore, getExistingAlbum, importAlbumFromJSON } from './cards/CardAlbum.js';
+import { uploadFile } from './util/uploader.js';
 
 window.addEventListener('DOMContentLoaded', () => {
   document
@@ -25,9 +26,6 @@ window.addEventListener('DOMContentLoaded', () => {
   document
     .querySelector('#uploadButton')
     .addEventListener('click', onUploadClick);
-  document
-    .querySelector('#uploadInput')
-    .addEventListener('change', onUploadChange);
 
   document
     .querySelector('#actionExportToFile')
@@ -145,11 +143,8 @@ function onActionAlbumExport(e) {
   }
 }
 
-function onActionAlbumImport() {
-  let input = /** @type {HTMLInputElement} */ (
-    document.querySelector('#uploadInput')
-  );
-  input.click();
+async function onActionAlbumImport() {
+  await onUploadClick();
 }
 function onActionAlbumLeave() {
   let sidebar = document.querySelector('.sidebar');
@@ -202,15 +197,9 @@ function onDownloadClick() {
   }
 }
 
-function onUploadClick() {
-  let input = /** @type {HTMLInputElement} */ (
-    document.querySelector('#uploadInput')
-  );
-  input.click();
-}
-
-async function onUploadChange(e) {
-  const file = e.target.files[0];
+async function onUploadClick() {
+  let files = await uploadFile('.json');
+  let file = files[0];
 
   let jsonData;
   try {

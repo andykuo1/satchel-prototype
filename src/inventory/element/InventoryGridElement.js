@@ -17,9 +17,9 @@ import { uuid } from '../../util/uuid.js';
 
 const INNER_HTML = /* html */`
 <article>
-  <h2></h2>
+  <h2><slot name="header"></slot></h2>
   <section class="container grid flattop">
-    <slot></slot>
+    <slot name="items"></slot>
   </section>
 </article>
 `;
@@ -143,18 +143,24 @@ export class InventoryGridElement extends HTMLElement {
     /** @private */
     this._root = this.shadowRoot.querySelector('article');
     /** @private */
-    this._itemSlot = /** @type {HTMLSlotElement} */ (
-      this.shadowRoot.querySelector('.container slot')
-    );
     this._container = this.shadowRoot.querySelector('.container');
-    /** @private */
-    this._containerTitle = this.shadowRoot.querySelector('h2');
 
-    /** @protected */
+    /**
+     * @private
+     * @type {HTMLSlotElement}
+     */
+    this.slotItems = this.shadowRoot.querySelector('slot[name="items"]');
+    /**
+     * @private
+     * @type {HTMLSlotElement}
+     */
+    this.slotHeader = this.shadowRoot.querySelector('slot[name="header"]');
+
+    /** @private */
     this.onInventoryChange = this.onInventoryChange.bind(this);
-    /** @protected */
+    /** @private */
     this.onMouseUp = this.onMouseUp.bind(this);
-    /** @protected */
+    /** @private */
     this.onContextMenu = this.onContextMenu.bind(this);
   }
 
@@ -189,10 +195,10 @@ export class InventoryGridElement extends HTMLElement {
   }
 
   /**
+   * @protected
    * @param attribute
    * @param previous
    * @param value
-   * @protected
    */
   attributeChangedCallback(attribute, previous, value) {
     switch (attribute) {
@@ -236,9 +242,9 @@ export class InventoryGridElement extends HTMLElement {
   }
 
   /**
+   * @private
    * @param store
    * @param invId
-   * @protected
    */
   onInventoryChange(store, invId) {
     const inv = getInventoryInStore(store, invId);
@@ -268,13 +274,13 @@ export class InventoryGridElement extends HTMLElement {
 
     // Set display name
     const displayName = inv.displayName;
-    this._containerTitle.textContent = displayName;
+    this.slotHeader.textContent = displayName;
     this._root.classList.toggle('topmargin', Boolean(displayName));
     this._container.classList.toggle('flattop', Boolean(displayName));
 
     // Preserve unchanged items in slot
     const preservedItems = {};
-    for (const node of this._itemSlot.assignedNodes()) {
+    for (const node of this.slotItems.assignedNodes()) {
       const itemNode =
         /** @type {import('./InventoryItemElement.js').InventoryItemElement} */ (node);
       const itemId = itemNode.itemId;
@@ -285,7 +291,7 @@ export class InventoryGridElement extends HTMLElement {
 
     // Add new items into slot.
     const emptySlot = /** @type {HTMLSlotElement} */ (
-      this._itemSlot.cloneNode(false)
+      this.slotItems.cloneNode(false)
     );
     for (const itemId of getItemIds(inv)) {
       let element;
@@ -296,16 +302,16 @@ export class InventoryGridElement extends HTMLElement {
       emptySlot.append(element);
     }
 
-    this._itemSlot.replaceWith(emptySlot);
-    this._itemSlot = emptySlot;
+    this.slotItems.replaceWith(emptySlot);
+    this.slotItems = emptySlot;
     this.dispatchEvent(
       new CustomEvent('itemchange', { composed: true, bubbles: false })
     );
   }
 
   /**
-   * @param e
-   * @protected
+   * @private
+   * @param {MouseEvent} e
    */
   onMouseUp(e) {
     if (e.button === 0) {
@@ -314,8 +320,8 @@ export class InventoryGridElement extends HTMLElement {
   }
 
   /**
-   * @param e
-   * @protected
+   * @private
+   * @param {MouseEvent} e
    */
   onContextMenu(e) {
     e.preventDefault();

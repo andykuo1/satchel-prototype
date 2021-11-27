@@ -71,10 +71,6 @@
           white-space: nowrap;
           overflow-x: auto;
         }
-        .toolbar button {
-          background: none;
-          border: none;
-        }
       </style>
       <h1>Satchel</h1>
       <small id="onlineStatus"></small>
@@ -98,23 +94,11 @@
             content: 'ONLINE';
           }
         </style>
-        <button id="uploadButton">
-          <img src="res/upload.svg" alt="upload" width="40" for="uploadInput" />
-        </button>
-        <input type="file" id="uploadInput" hidden accept="json" />
-        <button id="downloadButton">
-          <img src="res/download.svg" alt="download" width="40" />
-        </button>
-        <button id="cloudButton">
-          <img src="res/cloud.svg" alt="cloud" width="40" />
-        </button>
-        <button id="editButton">
-          <img src="res/edit.svg" alt="edit" width="40" />
-        </button>
-        <button id="actionAlbumOpen">
-          <img src="res/bookmarks.svg" alt="catalogue" width="40" />
-        </button>
-        <script type="module" src="src/toolbar.js"></script>
+        <icon-button id="uploadButton" icon="res/upload.svg" alt="upload" title="Upload"></icon-button>
+        <icon-button id="downloadButton" icon="res/download.svg" alt="download" title="Download"></icon-button>
+        <icon-button id="cloudButton" icon="res/cloud.svg" alt="connect" title="Connect"></icon-button>
+        <icon-button id="editButton" icon="res/edit.svg" alt="foundry" title="Open Foundry"></icon-button>
+        <icon-button id="actionAlbumOpen" icon="res/bookmarks.svg" alt="album" title="Open Album"></icon-button>
       </div>
     </header>
     <main>

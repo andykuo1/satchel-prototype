@@ -1,6 +1,3 @@
-export const FILE_TYPE_PNG = 'png';
-export const FILE_TYPE_SVG = 'svg';
-
 /**
  * @param {string} filename
  * @param {string} textData
@@ -11,7 +8,7 @@ export function downloadText(filename, textData) {
 
 /**
  * @param {string} filename
- * @param {string} filetype
+ * @param {'png'|'svg'} filetype
  * @param {SVGElement} svg
  * @param {number} width
  * @param {number} height
@@ -19,7 +16,7 @@ export function downloadText(filename, textData) {
 export function downloadImageFromSVG(filename, filetype, svg, width, height) {
   const blob = createBlobFromSVG(svg);
   switch (filetype) {
-    case FILE_TYPE_PNG:
+    case 'png':
       {
         const url = URL.createObjectURL(blob);
 
@@ -46,7 +43,7 @@ export function downloadImageFromSVG(filename, filetype, svg, width, height) {
         image.src = url;
       }
       break;
-    case FILE_TYPE_SVG:
+    case 'svg':
       {
         const reader = new FileReader();
         reader.addEventListener('load', () => {

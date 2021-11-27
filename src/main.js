@@ -7,6 +7,7 @@ import { exportAlbumToJSON, getExistingAlbum, importAlbumFromJSON, createAlbumIn
 import './app/index.js';
 import './inventory/element/index.js';
 import './cards/index.js';
+import './toolbar.js';
 
 const APP_VERSION = '1.0.23';
 
