@@ -233,6 +233,19 @@ export class ItemEditorElement extends HTMLElement {
     removeInventoryChangeListener(this.socketInventory.invId, this.onSocketInventoryChange);
   }
 
+  newEditor() {
+    const itemBuilder = new ItemBuilder();
+    const item = this.getSocketedItem();
+    let store = getInventoryStore();
+    if (item) {
+      let newItem = itemBuilder.copyItem(item).itemId(uuid()).build();
+      dropOnGround(newItem);
+    } else {
+      let newItem = itemBuilder.default().width(2).height(2).build();
+      addItemToInventory(store, this.socketInventory.invId, newItem, 0, 0);
+    }
+  }
+
   setupEditor(invId, itemId, item) {
     const width = item.width;
     const height = item.height;
@@ -300,6 +313,15 @@ export class ItemEditorElement extends HTMLElement {
     this.outputSize.toggleAttribute('disabled', true);
   }
 
+  isEditing() {
+    const store = getInventoryStore();
+    const invId = this.socketInventory.invId;
+    if (!isInventoryInStore(store, invId)) {
+      return false;
+    }
+    return !isInventoryEmpty(store, invId);
+  }
+
   getSocketedItem() {
     const store = getInventoryStore();
     const invId = this.socketInventory.invId;
@@ -323,17 +345,7 @@ export class ItemEditorElement extends HTMLElement {
   onButtonNew(e) {
     e.stopPropagation();
     e.preventDefault();
-    const itemBuilder = new ItemBuilder();
-    const item = this.getSocketedItem();
-    let store = getInventoryStore();
-    if (item) {
-      let newItem = itemBuilder.copyItem(item).itemId(uuid()).build();
-      dropOnGround(newItem);
-    } else {
-      let randomSize = 1 + Math.floor(Math.random() * 2);
-      let newItem = itemBuilder.default().width(randomSize).height(randomSize).build();
-      addItemToInventory(store, this.socketInventory.invId, newItem, 0, 0);
-    }
+    this.newEditor();
     return false;
   }
 

@@ -8,12 +8,8 @@ import { ItemBarItemElement } from './ItemBarItemElement.js';
 
 const INNER_HTML = /* html */ `
 <div class="root">
-  <button id="actionExpand">
-    <img src="res/bookmarks.svg" alt="Show" title="Show Items">
-  </button>
-  <button id="actionDelete">
-    <img src="res/delete.svg" alt="Delete" title="Delete Item">
-  </button>
+  <icon-button id="actionExpand" icon="res/bookmarks.svg" alt="show" title="Show Items"></icon-button>
+  <icon-button id="actionDelete" icon="res/delete.svg" alt="delete" title="Delete Item"></icon-button>
   <ul class="container list hidden">
     <slot name="items"></slot>
   </ul>
@@ -35,8 +31,8 @@ const INNER_STYLE = /* css */ `
 
 #actionDelete {
   position: absolute;
-  bottom: 1.25em;
-  left: 0.5em;
+  bottom: 1em;
+  left: 2em;
   background-color: var(--secondary-color);
   border-radius: 1em;
 }
@@ -45,8 +41,8 @@ const INNER_STYLE = /* css */ `
 }
 #actionExpand {
   position: absolute;
-  bottom: 1.25em;
-  right: 0.5em;
+  bottom: 1em;
+  right: 2em;
   background-color: var(--secondary-color);
   border-radius: 1em;
 }
@@ -59,10 +55,10 @@ const INNER_STYLE = /* css */ `
   flex-direction: row;
   align-items: center;
   height: 5em;
-  width: calc(100% - 8em);
+  width: calc(100% - 12em);
   padding: 0;
   margin: 0;
-  margin-left: 4em;
+  margin-left: 6em;
   background-color: var(--primary-color);
   border-radius: 4em;
   overflow-x: auto;
@@ -81,11 +77,6 @@ slot[name="items"] > * {
 
 img {
   height: 100%;
-}
-button {
-  height: 3em;
-  background: none;
-  border: none;
 }
 `;
 

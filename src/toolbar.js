@@ -154,6 +154,11 @@ function onActionAlbumLeave() {
 function onEditClick() {
   const sidebar = document.querySelector('.sidebar');
   sidebar.classList.toggle('open');
+  /** @type {import('./inventory/element/ItemEditorElement.js').ItemEditorElement} */
+  const editor = document.querySelector('#editor');
+  if (!editor.isEditing()) {
+    editor.newEditor();
+  }
 }
 
 function onCloudClick() {
