@@ -73,7 +73,7 @@ export function getItemIdAtSlotCoords(store, invId, coordX, coordY) {
 
 export function getItemIdsInSlots(store, invId) {
   let inv = getExistingInventory(store, invId);
-  return inv.slots.filter(itemId => typeof itemId === 'string');
+  return new Set(inv.slots.filter(itemId => typeof itemId === 'string'));
 }
 
 /**

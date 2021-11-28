@@ -13,7 +13,7 @@ import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../InvSlots.js';
 const INNER_HTML = /* html */`
 <figure class="container">
   <div class="innerContainer">
-    <img src="res/images/scroll.png">
+    <img src="res/images/potion.png">
     <figcaption></figcaption>
     <label id="stackSize">1</label>
   </div>

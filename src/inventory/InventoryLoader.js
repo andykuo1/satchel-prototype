@@ -1,18 +1,6 @@
 import { copyInventory } from './Inv.js';
 import { copyItem } from './Item.js';
 
-export function saveInventoryToJSON(inv, dst = undefined) {
-  if (!dst) {
-    dst = {};
-  }
-  Object.assign(dst, copyInventory(inv));
-  return dst;
-}
-
-export function loadInventoryFromJSON(jsonData, dst = undefined) {
-  return copyInventory(jsonData, dst);
-}
-
 export function importInventoryFromJSON(jsonData, dst = undefined) {
   return importDataFromJSON(jsonData, 'inv_v1', data => copyInventory(data, dst));
 }

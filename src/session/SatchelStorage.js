@@ -1,5 +1,5 @@
 import { createAlbumInStore, exportAlbumToJSON, getAlbumInStore, importAlbumFromJSON, isAlbumInStore } from '../cards/CardAlbum.js';
-import { exportInventoryToJSON, loadInventoryFromJSON } from '../inventory/InventoryLoader.js';
+import { exportInventoryToJSON, importInventoryFromJSON } from '../inventory/InventoryLoader.js';
 import { createGridInventoryInStore, dispatchAlbumChange, dispatchInventoryChange, getInventoryInStore, getInventoryStore, isInventoryInStore } from '../inventory/InventoryStore.js';
 
 export function loadSatchelFromStorage() {
@@ -20,11 +20,11 @@ export function loadSatchelFromStorage() {
   }
 
   // Load from storage...
-  let invData = localStorage.getItem('satchel_data_v2');
+  let invData = localStorage.getItem('satchel_data_v3');
   if (invData) {
     try {
       let jsonData = JSON.parse(invData);
-      loadInventoryFromJSON(jsonData, mainInventory);
+      importInventoryFromJSON(jsonData, mainInventory);
       mainInventory.displayName = '';
       dispatchInventoryChange(store, mainInventory.invId);
     } catch (e) {
@@ -32,7 +32,7 @@ export function loadSatchelFromStorage() {
       console.error(e);
     }
   }
-  let albumData = localStorage.getItem('satchel_album_v1');
+  let albumData = localStorage.getItem('satchel_album_v2');
   if (albumData) {
     try {
       let jsonData = JSON.parse(albumData);
