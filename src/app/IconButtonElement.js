@@ -12,8 +12,8 @@ const INNER_STYLE = /* css */ `
   height: 3em;
   margin: 0.2em;
   color: #FFFFFF;
-  --background-color: #333333;
-  --hover-color: #444444;
+  --background-color: #444444;
+  --hover-color: #666666;
 }
 button {
   width: 100%;

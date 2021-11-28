@@ -12,6 +12,10 @@
       h1 {
         font-size: 3em;
       }
+      /** To prevent FOUC */
+      dialog-prompt:not([open]) {
+        display: none;
+      }
     </style>
   </head>
   <body>
@@ -40,6 +44,7 @@
 
       #logo {
         width: 10em;
+        height: 14em;
         margin: 2em;
       }
       
@@ -64,42 +69,19 @@
       </nav>
       <div class="spacing"></div>
     </div>
-    <style>
-      dialog {
-        margin: 0;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 1;
-      }
-      #backdrop {
-        visibility: visible;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-      }
-      #backdrop.hidden {
-        visibility: hidden;
-      }
-    </style>
-    <dialog>
+    <dialog-prompt id="sessionDialog">
       <form id="sessionForm" autocomplete="off">
         <p>Your Invitation?</p>
-        <p>
+        <p style="display: flex;">
           <input type="text" name="id" id="sessionId" placeholder="Session Id" required pattern="[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}">
           <button id="sessionPaste">Paste</button>
         </p>
         <p>
           <input type="submit" id="sessionJoin" value="Join">
-          <button id="sessionCancel">Cancel</button>
         </p>
       </form>
-    </dialog>
-    <div id="backdrop" class="hidden"></div>
+    </dialog-prompt>
+    <script type="module" src="./src/app/DialogPromptElement.js"></script>
     <script type="module">
       import { BUILD_VERSION } from './src/globals.js';
       import { pasteFromClipboard } from './src/util/clipboard.js';
@@ -110,14 +92,9 @@
           window.open(`./app.html`, '_parent');
         });
         document.querySelector('#buttonJoin').addEventListener('click', () => {
-          document.querySelector('dialog').toggleAttribute('open', true);
-          document.querySelector('#backdrop').classList.toggle('hidden', false);
+          document.querySelector('#sessionDialog').toggleAttribute('open', true);
         });
         document.querySelector('#appVersion').textContent = `v${BUILD_VERSION}`;
-        document.querySelector('#backdrop').addEventListener('click', () => {
-          document.querySelector('dialog').toggleAttribute('open', false);
-          document.querySelector('#backdrop').classList.toggle('hidden', true);
-        });
         document.querySelector('#sessionPaste').addEventListener('click', async (e) => {
           const text = await pasteFromClipboard();
           const uuidPattern = /[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}/;
@@ -128,12 +105,6 @@
           } else {
             sessionId.value = text;
           }
-          return false;
-        });
-        document.querySelector('#sessionCancel').addEventListener('click', async (e) => {
-          document.querySelector('#backdrop').click();
-          e.preventDefault();
-          e.stopPropagation();
           return false;
         });
         document.querySelector('#sessionForm').addEventListener('submit', (e) => {
