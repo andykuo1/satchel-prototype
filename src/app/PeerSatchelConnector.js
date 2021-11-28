@@ -3,9 +3,9 @@ import { copyToClipboard } from '../util/clipboard.js';
 import { getCursorContext } from '../inventory/CursorHelper.js';
 import { SatchelClient, SatchelServer } from './PeerSatchel.js';
 
-export async function connectAsClient(ctx, remoteId = tryGetRemotePeerId(window.location)) {
+export async function connectAsClient(ctx, remoteId) {
   if (!remoteId) {
-    return false;
+    throw new Error('Missing remote id to start client.');
   }
 
   if (!ctx.client) {
@@ -42,16 +42,15 @@ export async function connectAsClient(ctx, remoteId = tryGetRemotePeerId(window.
   return true;
 }
 
-export function shouldConnnectAsClient() {
-  return Boolean(tryGetRemotePeerId(window.location));
-}
-
 export function isServerSide() {
   const ctx = getCursorContext();
   return Boolean(ctx.server);
 }
 
-export async function connectAsServer(ctx, localId = undefined) {
+export async function connectAsServer(ctx, localId) {
+  if (!localId) {
+    throw new Error('Missing local id to start server.');
+  }
   if (!ctx.server) {
     // Initialize server
     const peerful = new Peerful(localId);
@@ -82,18 +81,6 @@ export async function connectAsServer(ctx, localId = undefined) {
   await copyToClipboard(shareable);
   window.alert(`Link copied!\n${shareable}`);
   document.querySelector('#onlineStatus').classList.toggle('active', true);
-}
-
-/**
- * @param {Location} url
- * @returns {string|null}
- */
-function tryGetRemotePeerId(url) {
-  const parameters = new URLSearchParams(url.search);
-  if (parameters.has('id')) {
-    return parameters.get('id');
-  }
-  return null;
 }
 
 /**

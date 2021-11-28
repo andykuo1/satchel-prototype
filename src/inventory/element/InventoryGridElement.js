@@ -10,9 +10,8 @@ import {
 } from '../InventoryStore.js';
 import { InventoryItemElement } from './InventoryItemElement.js';
 import {
-  getItemAtSlotIndex,
+  getItemAtSlotIndex, getItemIdsInSlots,
 } from '../InventoryTransfer.js';
-import { getItemIds } from '../InvItems.js';
 import { uuid } from '../../util/uuid.js';
 
 const INNER_HTML = /* html */`
@@ -293,7 +292,7 @@ export class InventoryGridElement extends HTMLElement {
     const emptySlot = /** @type {HTMLSlotElement} */ (
       this.slotItems.cloneNode(false)
     );
-    for (const itemId of getItemIds(inv)) {
+    for (const itemId of getItemIdsInSlots(store, invId)) {
       let element;
       element =
         itemId in preservedItems

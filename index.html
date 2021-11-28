@@ -81,41 +81,6 @@
         </p>
       </form>
     </dialog-prompt>
-    <script type="module" src="./src/app/DialogPromptElement.js"></script>
-    <script type="module">
-      import { BUILD_VERSION } from './src/globals.js';
-      import { pasteFromClipboard } from './src/util/clipboard.js';
-      import { uuid } from './src/util/uuid.js';
-
-      window.addEventListener('DOMContentLoaded', () => {
-        document.querySelector('#buttonStart').addEventListener('click', () => {
-          window.open(`./app.html`, '_parent');
-        });
-        document.querySelector('#buttonJoin').addEventListener('click', () => {
-          document.querySelector('#sessionDialog').toggleAttribute('open', true);
-        });
-        document.querySelector('#appVersion').textContent = `v${BUILD_VERSION}`;
-        document.querySelector('#sessionPaste').addEventListener('click', async (e) => {
-          const text = await pasteFromClipboard();
-          const uuidPattern = /[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}/;
-          const result = uuidPattern.exec(text);
-          const sessionId = document.querySelector('#sessionId');
-          if (result) {
-            sessionId.value = result[0];
-          } else {
-            sessionId.value = text;
-          }
-          return false;
-        });
-        document.querySelector('#sessionForm').addEventListener('submit', (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          const formData = new FormData(e.target);
-          const id = formData.get('id');
-          window.open(`./app.html?id=${id}`, '_parent');
-          return false;
-        });
-      });
-    </script>
+    <script type="module" src="./src/landing.js"></script>
   </body>
 </html>
