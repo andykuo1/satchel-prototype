@@ -15,6 +15,9 @@ export async function connectAsClient(ctx, remoteId) {
       peerful,
       instance: new SatchelClient(),
     };
+    peerful.on('error', err => {
+      window.alert('Oh no! Failed to connect to server! ' + err);
+    });
     peerful.on('connect', conn => {
       console.log('Client connection established.');
       ctx.client.instance.onClientConnected(conn);
@@ -58,6 +61,9 @@ export async function connectAsServer(ctx, localId) {
       peerful,
       instance: new SatchelServer(),
     };
+    peerful.on('error', err => {
+      window.alert('Oh no! Failed to start server! ' + err);
+    });
     peerful.on('connect', conn => {
       console.log('Client connection established.');
       ctx.server.instance.onClientConnected(conn);
@@ -75,18 +81,6 @@ export async function connectAsServer(ctx, localId) {
       .then(() => console.log('Server started!'))
       .catch((error) => window.alert(error));
   }
-
-  const { peerful } = ctx.server;
-  const shareable = generateShareableLink(peerful);
-  await copyToClipboard(shareable);
-  window.alert(`Link copied!\n${shareable}`);
+  
   document.querySelector('#onlineStatus').classList.toggle('active', true);
-}
-
-/**
- * @param {Peerful} peerful
- * @returns {string}
- */
-function generateShareableLink(peerful) {
-  return `${location.origin}${location.pathname}?id=${peerful.id}`;
 }

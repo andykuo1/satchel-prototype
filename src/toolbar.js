@@ -2,11 +2,13 @@ import { downloadText } from './util/downloader.js';
 import { dropOnGround } from './inventory/GroundHelper.js';
 import { exportItemToJSON, exportInventoryToJSON, importInventoryFromJSON, importItemFromJSON, exportDataToJSON } from './inventory/InventoryLoader.js';
 import { dispatchAlbumChange, dispatchInventoryChange, getInventoryStore } from './inventory/InventoryStore.js';
-import { isServerSide } from './app/PeerSatchelConnector.js';
+import { connectAsServer, isServerSide } from './app/PeerSatchelConnector.js';
 import { getCursorContext } from './inventory/CursorHelper.js';
 import { getExistingInventory } from './inventory/InventoryTransfer.js';
 import { addItemToAlbum, exportAlbumToJSON, getAlbumInStore, getExistingAlbum, importAlbumFromJSON } from './cards/CardAlbum.js';
 import { uploadFile } from './util/uploader.js';
+import { copyToClipboard, pasteFromClipboard } from './util/clipboard.js';
+import { resolveSessionStatus } from './session/SatchelSession.js';
 
 window.addEventListener('DOMContentLoaded', () => {
   document
@@ -18,6 +20,9 @@ window.addEventListener('DOMContentLoaded', () => {
   document
     .querySelector('#uploadButton')
     .addEventListener('click', onUploadClick);
+  document
+    .querySelector('#cloudButton')
+    .addEventListener('click', onCloudClick);
 
   document
     .querySelector('#actionExportToFile')
@@ -217,4 +222,28 @@ async function onUploadClick() {
     default:
       window.alert('Cannot load json with unknown data type.');
   }
+}
+
+async function onCloudClick() {
+  const ctx = getCursorContext();
+  let peerId;
+  if (ctx.server) {
+    peerId = ctx.server.peerful.id;
+  } else if (ctx.client) {
+    peerId = ctx.client.peerful.remoteId;
+  } else {
+    peerId = ctx.sessionId;
+    await connectAsServer(ctx, peerId);
+  }
+  const shareable = generateShareableLink(peerId);
+  await copyToClipboard(shareable);
+  window.alert(`Link copied!\n${shareable}`);
+}
+
+/**
+ * @param {string} peerId
+ * @returns {string}
+ */
+function generateShareableLink(peerId) {
+  return `${location.origin}${location.pathname}?id=${peerId}`;
 }

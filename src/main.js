@@ -14,12 +14,18 @@ import './toolbar.js';
 async function connect() {
   let session = resolveSessionStatus();
   let ctx = getCursorContext();
-  if (session.sessionId === session.remoteId) {
-    // Start a server.
-    await connectAsServer(ctx, session.sessionId);
-  } else {
-    // Start a client.
-    await connectAsClient(ctx, session.remoteId);
+  ctx.sessionId = session.sessionId;
+  ctx.remoteId = session.remoteId;
+  try {
+    if (session.sessionId === session.remoteId) {
+      // Start a server...when they click the cloud.
+    } else {
+      // Start a client...now.
+      await connectAsClient(ctx, session.remoteId);
+    }
+    document.querySelector('#cloudButton').toggleAttribute('disabled', false);
+  } catch (e) {
+    throw e;
   }
 }
 
