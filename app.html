@@ -39,6 +39,11 @@
         padding: 1rem;
         border: 1rem dashed rgba(100, 100, 100, 0.2);
       }
+
+      /** To prevent FOUC */
+      dialog-prompt:not([open]) {
+        display: none;
+      }
     </style>
   </head>
   <body>
@@ -273,6 +278,15 @@
       <inventory-cursor id="cursor"></inventory-cursor>
     </div>
     <item-detail-editor id="detailEditor"></item-detail-editor>
+    <dialog-prompt id="giftDialog">
+      <h3>Send item to...</h3>
+      <p>
+        <select id="giftTarget"></select>
+      </p>
+      <p>
+        <button id="giftSubmit">Send</button>
+      </p>
+    </dialog-prompt>
     <script type="module" src="src/main.js"></script>
   </body>
 </html>

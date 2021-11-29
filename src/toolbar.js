@@ -7,50 +7,29 @@ import { getCursorContext } from './inventory/CursorHelper.js';
 import { getExistingInventory } from './inventory/InventoryTransfer.js';
 import { addItemToAlbum, exportAlbumToJSON, getAlbumInStore, getExistingAlbum, importAlbumFromJSON } from './cards/CardAlbum.js';
 import { uploadFile } from './util/uploader.js';
-import { copyToClipboard, pasteFromClipboard } from './util/clipboard.js';
-import { resolveSessionStatus } from './session/SatchelSession.js';
+import { copyToClipboard } from './util/clipboard.js';
+
+function elementEventListener(selector, event, callback) {
+  document.querySelector(selector).addEventListener(event, callback);
+}
 
 window.addEventListener('DOMContentLoaded', () => {
-  document
-    .querySelector('#editButton')
-    .addEventListener('click', onEditClick);
-  document
-    .querySelector('#downloadButton')
-    .addEventListener('click', onDownloadClick);
-  document
-    .querySelector('#uploadButton')
-    .addEventListener('click', onUploadClick);
-  document
-    .querySelector('#cloudButton')
-    .addEventListener('click', onCloudClick);
+  elementEventListener('#editButton', 'click', onEditClick);
+  elementEventListener('#downloadButton', 'click', onDownloadClick);
+  elementEventListener('#uploadButton', 'click', onUploadClick);
+  elementEventListener('#cloudButton', 'click', onCloudClick);
 
-  document
-    .querySelector('#actionExportToFile')
-    .addEventListener('click', onActionExportToFile);
-  document
-    .querySelector('#actionSendToPlayer')
-    .addEventListener('click', onActionSendToPlayer);
-  document
-    .querySelector('#actionSaveToAlbum')
-    .addEventListener('click', onActionSaveToAlbum);
-  document
-    .querySelector('#actionAlbumView')
-    .addEventListener('change', onActionAlbumView);
-  document
-    .querySelector('#actionAlbumOpen')
-    .addEventListener('click', onActionAlbumOpen);
-  document
-    .querySelector('#actionAlbumExport')
-    .addEventListener('click', onActionAlbumExport);
-  document
-    .querySelector('#actionAlbumImport')
-    .addEventListener('click', onActionAlbumImport);
-  document
-    .querySelector('#actionAlbumLeave')
-    .addEventListener('click', onActionAlbumLeave);
-  document
-    .querySelector('#actionDropToGround')
-    .addEventListener('click', onActionDropToGround);
+  elementEventListener('#actionExportToFile', 'click', onActionExportToFile);
+  elementEventListener('#actionSendToPlayer', 'click', onActionSendToPlayer);
+  elementEventListener('#actionSaveToAlbum', 'click', onActionSaveToAlbum);
+  elementEventListener('#actionAlbumView', 'change', onActionAlbumView);
+  elementEventListener('#actionAlbumOpen', 'click', onActionAlbumOpen);
+  elementEventListener('#actionAlbumExport', 'click', onActionAlbumExport);
+  elementEventListener('#actionAlbumImport', 'click', onActionAlbumImport);
+  elementEventListener('#actionAlbumLeave', 'click', onActionAlbumLeave);
+  elementEventListener('#actionDropToGround', 'click', onActionDropToGround);
+
+  elementEventListener('#giftSubmit', 'click', onGiftSubmit);
 });
 
 function onActionSaveToAlbum() {
@@ -65,7 +44,7 @@ function onActionSaveToAlbum() {
   } catch (e) {
     console.error('Failed to export item', e);
   }
-}
+};
 
 function onActionExportToFile() {
   /** @type {import('./inventory/element/ItemEditorElement.js').ItemEditorElement} */
@@ -75,24 +54,6 @@ function onActionExportToFile() {
     if (item) {
       let jsonData = exportItemToJSON(item);
       downloadText(`${item.displayName || 'New Item'}.json`, JSON.stringify(jsonData, null, 4));
-    }
-  } catch (e) {
-    console.error('Failed to export item', e);
-  }
-}
-
-function onActionSendToPlayer() {
-  /** @type {import('./inventory/element/ItemEditorElement.js').ItemEditorElement} */
-  const itemEditor = document.querySelector('#editor');
-  try {
-    let item = itemEditor.getSocketedItem();
-    if (item) {
-      const ctx = getCursorContext();
-      if (ctx.server && ctx.server.instance) {
-        let server = ctx.server.instance;
-        let result = window.prompt(`Who do you want to send it to?\n - ${server.getActiveClientNames().join('\n - ')}`).trim().toLowerCase();
-        ctx.server.instance.sendItemTo(result, item);
-      }
     }
   } catch (e) {
     console.error('Failed to export item', e);
@@ -246,4 +207,49 @@ async function onCloudClick() {
  */
 function generateShareableLink(peerId) {
   return `${location.origin}${location.pathname}?id=${peerId}`;
+}
+
+function onActionSendToPlayer() {
+  /** @type {import('./inventory/element/ItemEditorElement.js').ItemEditorElement} */
+  const itemEditor = document.querySelector('#editor');
+  try {
+    let item = itemEditor.getSocketedItem();
+    if (item) {
+      /** @type {HTMLSelectElement} */
+      let giftTarget = document.querySelector('#giftTarget');
+      let ctx = getCursorContext();
+      if (ctx.server && ctx.server.instance) {
+        let content = ctx.server.instance.getActiveClientNames().map(clientName => `<option>${clientName.toLowerCase()}</option>`).join('\n');
+        giftTarget.innerHTML = content;
+      } else if (ctx.client && ctx.client.instance) {
+        let content = ctx.client.instance.getOtherClientNames().map(clientName => `<option>${clientName.toLowerCase()}</option>`).join('\n');
+        giftTarget.innerHTML = content;
+      } else {
+        giftTarget.innerHTML = '';
+      }
+      let giftDialog = document.querySelector('#giftDialog');
+      giftDialog.toggleAttribute('open', true);
+    }
+  } catch (e) {
+    console.error('Failed to export item', e);
+  }
+}
+
+function onGiftSubmit() {
+  let giftDialog = document.querySelector('#giftDialog');
+  /** @type {HTMLSelectElement} */
+  let giftTarget = document.querySelector('#giftTarget');
+  if (giftTarget.value) {
+    /** @type {import('./inventory/element/ItemEditorElement.js').ItemEditorElement} */
+    const itemEditor = document.querySelector('#editor');
+    const item = itemEditor.getSocketedItem();
+    const target = giftTarget.value;
+    const ctx = getCursorContext();
+    if (ctx.server && ctx.server.instance) {
+      ctx.server.instance.sendItemTo(target, item);
+    } else if (ctx.client && ctx.client.instance) {
+      ctx.client.instance.sendItemTo(target, item);
+    }
+  }
+  giftDialog.toggleAttribute('open', false);
 }

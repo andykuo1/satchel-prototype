@@ -64,7 +64,7 @@ export class SatchelServer {
       return false;
     }
     console.log('Sending item to client...', clientName);
-    let dataToSend = { type: 'gift', message: exportItemToJSON(item) };
+    let dataToSend = { type: 'gift', message: { from: '', target: clientName, item: exportItemToJSON(item) } };
     let stringToSend = JSON.stringify(dataToSend);
     client.connection.send(stringToSend);
     return true;
@@ -82,6 +82,10 @@ export class SatchelServer {
       lastHeartbeat: 0,
     };
     this.remoteClients.push(remoteClient);
+    let clientNames = this.remoteClients.map(client => client.name).filter(name => name.length > 0);
+    for(let client of this.remoteClients) {
+      client.connection.send(JSON.stringify({ type: 'clients', message: clientNames }))
+    }
     conn.on('data', data => {
       try {
         const jsonData = JSON.parse(data);
@@ -152,6 +156,32 @@ export class SatchelServer {
               console.error(`Failed to load client inventory - ${e}`);
             }
           } break;
+          case 'gift': {
+            const target = jsonData.message.target;
+            let client = this.getActiveClientByName(target);
+            if (client) {
+              // Forward the request to the target client.
+              client.connection.send(JSON.stringify(jsonData));
+            } else {
+              conn.send(JSON.stringify({ type: 'giftnak' }));
+            }
+          } break;
+          case 'giftack': {
+            const from = jsonData.message.from;
+            if (from) {
+              let client = this.getActiveClientByName(from);
+              if (client) {
+                // Forward the request to the source client.
+                client.connection.send(JSON.stringify(jsonData));
+              } else {
+                // Consume this request.
+              }
+            } else {
+              // This is a server gift.
+              let { target } = jsonData.message;
+              window.alert(`Gift sent to ${target}!`);
+            }
+          } break;
           default: {
             console.error(`Found unknown message from client - ${data}`);
             let dataToSend = { type: 'error', message: 'Unknown message.' };
@@ -193,6 +223,10 @@ export class SatchelServer {
         break;
       }
     }
+    let clientNames = this.remoteClients.map(client => client.name).filter(name => name.length > 0);
+    for(let client of this.remoteClients) {
+      client.connection.send(JSON.stringify({ type: 'clients', message: clientNames }))
+    }
     if (!flag) {
       console.error(`Unable to disconnect unknown connection - ${conn.localId}:${conn.remoteId}`);
     }
@@ -203,9 +237,36 @@ export class SatchelClient {
   constructor() {
     this.remoteServer = null;
     this.localData = {};
+    this.clientName = '';
 
     this.onClientConnected = this.onClientConnected.bind(this);
     this.onClientDisconnected = this.onClientDisconnected.bind(this);
+  }
+
+  getOtherClientNames() {
+    if (this.remoteServer) {
+      return this.remoteServer.clientNames.filter(name => name !== this.clientName);
+    } else {
+      return [];
+    }
+  }
+
+  sendItemTo(clientName, item) {
+    if (!this.remoteServer.clientNames.includes(clientName)) {
+      return false;
+    }
+    console.log('Sending item to client...', clientName);
+    let dataToSend = {
+      type: 'gift',
+      message: {
+        from: this.clientName,
+        target: clientName,
+        item: exportItemToJSON(item)
+      },
+    };
+    let stringToSend = JSON.stringify(dataToSend);
+    this.remoteServer.connection.send(stringToSend);
+    return true;
   }
 
   /**
@@ -227,6 +288,8 @@ export class SatchelClient {
         message: name,
       })
     );
+
+    this.clientName = name;
 
     // Send to server every 1 seconds
     setInterval(() => {
@@ -253,6 +316,7 @@ export class SatchelClient {
     this.remoteServer = {
       connection: conn,
       data: null,
+      clientNames: [],
     };
     conn.on('data', data => {
       try {
@@ -269,9 +333,22 @@ export class SatchelClient {
             dispatchInventoryChange(store, inv.invId);
           } break;
           case 'gift': {
-            let item = importItemFromJSON(jsonData.message);
-            dropOnGround(item);
-            window.alert('You received a gift! Remember to pick it up before closing the browser!');
+            let { from, target, item } = jsonData.message;
+            let newItem = importItemFromJSON(item);
+            dropOnGround(newItem);
+            window.alert(`You received a gift from ${from || 'the server'}! Remember to pick it up before closing the browser!`);
+            this.remoteServer.connection.send(JSON.stringify({ type: 'giftack', message: { from, target } }));
+          } break;
+          case 'giftack': {
+            let { target } = jsonData.message;
+            window.alert(`Gift sent to ${target}!`);
+          } break;
+          case 'giftnak': {
+            let { target } = jsonData.message;
+            window.alert(`Gift failed to send to ${target}!`);
+          } break;
+          case 'clients': {
+            this.remoteServer.clientNames = [...jsonData.message];
           } break;
           case 'error':
             window.alert(`Oops! Server error message: ${data.message}`);

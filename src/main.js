@@ -3,7 +3,7 @@ import { BUILD_VERSION } from './globals.js';
 
 import { resolveSessionStatus } from './session/SatchelSession.js';
 import { getCursorContext } from './inventory/CursorHelper.js';
-import { connectAsClient, connectAsServer } from './app/PeerSatchelConnector.js';
+import { connectAsClient } from './app/PeerSatchelConnector.js';
 import { loadSatchelFromStorage, saveSatchelToStorage } from './session/SatchelStorage.js';
 
 import './app/index.js';
