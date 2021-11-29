@@ -2,6 +2,7 @@ import { Eventable } from '../util/Eventable.js';
 import {
   createPromiseStatus,
   createPromiseStatusPromise,
+  isPromiseStatusPending,
   rejectPromiseStatus,
   resolvePromiseStatus,
 } from './PromiseStatus.js';
@@ -131,7 +132,7 @@ export class PeerfulConnection extends Eventable {
 
     this.closed = true;
     this.opened = false;
-    if (this.connectedStatus) {
+    if (isPromiseStatusPending(this.connectedStatus)) {
       rejectPromiseStatus(this.connectedStatus, new Error('Connection closed.'));
       this.connectedStatus = null;
     }

@@ -24,6 +24,7 @@ export class SatchelServer {
 
     this.onClientConnected = this.onClientConnected.bind(this);
     this.onClientDisconnected = this.onClientDisconnected.bind(this);
+    this.onClientNanny = this.onClientNanny.bind(this);
 
     this.setup();
   }
@@ -80,12 +81,14 @@ export class SatchelServer {
       name: '',
       element: null,
       lastHeartbeat: 0,
+      nannyInterval: null,
     };
     this.remoteClients.push(remoteClient);
     let clientNames = this.remoteClients.map(client => client.name).filter(name => name.length > 0);
     for(let client of this.remoteClients) {
       client.connection.send(JSON.stringify({ type: 'clients', message: clientNames }))
     }
+    remoteClient.nannyInterval = setInterval(() => this.onClientNanny(remoteClient), 1000);
     conn.on('data', data => {
       try {
         const jsonData = JSON.parse(data);
@@ -195,6 +198,20 @@ export class SatchelServer {
     });
   }
 
+  onClientNanny(client) {
+    let now = performance.now();
+    if (client.lastHeartbeat <= 0) {
+      return;
+    }
+    let delta = now - client.lastHeartbeat;
+    console.log(delta);
+    if (delta > 10_000) {
+      console.log('Closing connection due to staleness.');
+      client.connection.close();
+      this.onClientDisconnected(client.connection);
+    }
+  }
+
   /**
    * @param {PeerfulConnection} conn 
    */
@@ -205,6 +222,7 @@ export class SatchelServer {
       if (client.connection === conn) {
         console.log('Disconnecting client...', client.name);
         this.remoteClients.splice(i, 1);
+        clearInterval(client.nannyInterval);
         const clientDataName = `remote_data#${client.name}`;
         try {
           let store = getInventoryStore();
