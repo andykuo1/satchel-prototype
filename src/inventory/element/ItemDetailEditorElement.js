@@ -5,7 +5,7 @@ import { getItemByItemId } from '../InvItems.js';
 
 const INNER_HTML = /* html */`
 <dialog>
-  <textarea id="detail"></textarea>
+  <textarea id="detail" placeholder="Notes..."></textarea>
 </dialog>
 `;
 const INNER_STYLE = /* css */`
