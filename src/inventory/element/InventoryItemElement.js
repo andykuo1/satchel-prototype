@@ -206,6 +206,7 @@ export class InventoryItemElement extends HTMLElement {
    * @protected
    */
   onItemChange(store, itemId) {
+    const fixed = this._containerElement.fixed;
     const invId = this._containerElement.invId;
     const inv = getExistingInventory(store, invId);
     const slotIndex = getSlotIndexByItemId(inv, itemId);
@@ -213,8 +214,13 @@ export class InventoryItemElement extends HTMLElement {
     const item = getItemByItemId(inv, itemId);
     this.style.setProperty('--itemX', `${x}`);
     this.style.setProperty('--itemY', `${y}`);
-    this.style.setProperty('--itemWidth', `${item.width}`);
-    this.style.setProperty('--itemHeight', `${item.height}`);
+    if (fixed) {
+      this.style.setProperty('--itemWidth', '1');
+      this.style.setProperty('--itemHeight', '1');
+    } else {
+      this.style.setProperty('--itemWidth', `${item.width}`);
+      this.style.setProperty('--itemHeight', `${item.height}`);
+    }
     const title = item.displayName || 'Item';
     this.title = title;
     this._image.src = item.imgSrc;

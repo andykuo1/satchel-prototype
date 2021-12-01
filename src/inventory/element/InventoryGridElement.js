@@ -117,11 +117,19 @@ export class InventoryGridElement extends HTMLElement {
   }
 
   get init() {
-    return this._init;
+    return this.getAttribute('init');
   }
 
   set init(value) {
     this.setAttribute('init', value);
+  }
+
+  get fixed() {
+    return this.hasAttribute('fixed');
+  }
+
+  set fixed(value) {
+    this.toggleAttribute('fixed', value);
   }
 
   constructor() {
@@ -136,11 +144,9 @@ export class InventoryGridElement extends HTMLElement {
     
     /** @private */
     this._invId = undefined;
-    /** @private */
-    this._init = undefined;
 
     /** @private */
-    this._root = this.shadowRoot.querySelector('article');
+    this.root = this.shadowRoot.querySelector('article');
     /** @private */
     this._container = this.shadowRoot.querySelector('.container');
 
@@ -259,7 +265,7 @@ export class InventoryGridElement extends HTMLElement {
     let invHeight = inv.height;
     if (invType === 'socket') {
       const item = getItemAtSlotIndex(store, invId, 0);
-      if (item) {
+      if (!this.fixed && item) {
         invWidth = item.width;
         invHeight = item.height;
       } else {
@@ -274,7 +280,7 @@ export class InventoryGridElement extends HTMLElement {
     // Set display name
     const displayName = inv.displayName;
     this.slotHeader.textContent = displayName;
-    this._root.classList.toggle('topmargin', Boolean(displayName));
+    this.root.classList.toggle('topmargin', Boolean(displayName));
     this._container.classList.toggle('flattop', Boolean(displayName));
 
     // Preserve unchanged items in slot
