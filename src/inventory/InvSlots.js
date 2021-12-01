@@ -22,12 +22,8 @@ export function isSlotCoordEmpty(inv, coordX, coordY) {
  * @returns {boolean}
  */
 export function isSlotIndexEmpty(inv, slotIndex) {
-  let itemId = inv.slots[slotIndex];
-  if (itemId) {
-    return false;
-  } else {
-    return true;
-  }
+  const slottedId = inv.slots[slotIndex];
+  return slottedId <= 0;
 }
 
 /**
@@ -36,18 +32,58 @@ export function isSlotIndexEmpty(inv, slotIndex) {
  * @param {number} fromY
  * @param {number} toX
  * @param {number} toY
- * @param {ItemId} itemId
+ * @param {number} slottedId
+ * @returns {boolean} Whether any slots were set.
  */
-export function setSlots(inv, fromX, fromY, toX, toY, itemId) {
+export function setSlots(inv, fromX, fromY, toX, toY, slottedId) {
+  let flag = false;
+  const value = Number(slottedId);
   for (let x = fromX; x <= toX; ++x) {
     for (let y = fromY; y <= toY; ++y) {
       let slotIndex = getSlotIndexByCoords(inv, x, y);
       if (slotIndex < 0) {
         continue;
       }
-      inv.slots[slotIndex] = itemId;
+      let prevSlotted = inv.slots[slotIndex];
+      if (prevSlotted) {
+        throw new Error('Cannot set non-empty slots.');
+      }
+      inv.slots[slotIndex] = value;
+      flag = true;
     }
   }
+  return flag;
+}
+
+/**
+ * @param {Inventory} inv 
+ * @returns {number}
+ */
+export function getNextAvailableSlottedId(inv) {
+  let max = Number.NEGATIVE_INFINITY;
+  for(let key of Object.keys(inv.items)) {
+    let i = Number(key);
+    max = Math.max(i, max);
+  }
+  if (Number.isFinite(max)) {
+    return max + 1;
+  } else {
+    return 1;
+  }
+}
+
+/**
+ * @param {Inventory} inv 
+ * @param {ItemId} itemId 
+ * @returns {number}
+ */
+export function getSlottedIdByItemId(inv, itemId) {
+  for(let [key, value] of Object.entries(inv.items)) {
+    if (value.itemId === itemId) {
+      return Number(key);
+    }
+  }
+  return 0;
 }
 
 /**
@@ -64,7 +100,31 @@ export function clearSlots(inv, fromX, fromY, toX, toY) {
       if (slotIndex < 0) {
         continue;
       }
-      inv.slots[slotIndex] = null;
+      inv.slots[slotIndex] = 0;
+    }
+  }
+}
+
+/**
+ * @param {Inventory} inv
+ * @param {number} fromX
+ * @param {number} fromY
+ * @param {number} toX
+ * @param {number} toY
+ * @param {number} slottedId
+ */
+export function clearSlotsOfSlottedId(inv, fromX, fromY, toX, toY, slottedId) {
+  const value = Number(slottedId);
+  for (let x = fromX; x <= toX; ++x) {
+    for (let y = fromY; y <= toY; ++y) {
+      let slotIndex = getSlotIndexByCoords(inv, x, y);
+      if (slotIndex < 0) {
+        continue;
+      }
+      let slotValue = inv.slots[slotIndex];
+      if (slotValue === value) {
+        inv.slots[slotIndex] = 0;
+      }
     }
   }
 }
@@ -114,11 +174,18 @@ export function getSlotCoordsByIndex(inv, slotIndex) {
   }
 }
 
-export function getSlotIndexByItemId(inv, itemId, startIndex = 0) {
+/**
+ * @param {Inventory} inv 
+ * @param {number} slottedId 
+ * @param {number} [startIndex]
+ * @returns {number}
+ */
+export function getSlotIndexBySlottedId(inv, slottedId, startIndex = 0) {
   const length = getInventorySlotCount(inv);
+  const value = Number(slottedId);
   for(let i = startIndex; i < length; ++i) {
-    let invItemId = inv.slots[i];
-    if (invItemId && invItemId === itemId) {
+    let slotValue = inv.slots[i];
+    if (slotValue === value) {
       return i;
     }
   }

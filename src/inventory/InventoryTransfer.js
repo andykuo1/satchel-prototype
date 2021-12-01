@@ -22,33 +22,58 @@ import { copyItem } from './Item.js';
  * @param {InventoryId} invId 
  * @param {Item} item 
  * @param {number} coordX 
- * @param {number} coordY 
+ * @param {number} coordY
+ * @returns {boolean}
  */
 export function addItemToInventory(store, invId, item, coordX, coordY) {
   let inv = getExistingInventory(store, invId);
-  InvItems.putItem(inv, item, coordX, coordY);
-  dispatchInventoryChange(store, invId);
+  let result = InvItems.putItem(inv, item, coordX, coordY);
+  if (result) {
+    dispatchInventoryChange(store, invId);
+    return true;
+  }
+  return false;
 }
 
 /**
  * @param {InventoryStore} store 
  * @param {InventoryId} invId 
  * @param {ItemId} itemId
+ * @returns {boolean}
  */
 export function removeItemFromInventory(store, invId, itemId) {
   let inv = getExistingInventory(store, invId);
   if (InvItems.hasItem(inv, itemId)) {
-    InvItems.removeItem(inv, itemId);
-    dispatchInventoryChange(store, invId);
+    let result = InvItems.removeItem(inv, itemId);
+    if (result) {
+      dispatchInventoryChange(store, invId);
+      return true;
+    }
   }
+  return false;
 }
 
+/**
+ * @param {InventoryStore} store 
+ * @param {InventoryId} invId
+ * @returns {boolean}
+ */
 export function clearItemsInInventory(store, invId) {
   let inv = getExistingInventory(store, invId);
-  InvItems.clearItems(inv);
-  dispatchInventoryChange(store, invId);
+  if (!isInventoryEmpty(store, invId)) {
+    InvItems.clearItems(inv);
+    dispatchInventoryChange(store, invId);
+    return true;
+  }
+  return false;
 }
 
+/**
+ * @param {InventoryStore} store 
+ * @param {InventoryId} invId
+ * @param {ItemId} itemId
+ * @returns {boolean}
+ */
 export function hasItemInInventory(store, invId, itemId) {
   let inv = getExistingInventory(store, invId);
   return InvItems.hasItem(inv, itemId);
@@ -73,7 +98,13 @@ export function getItemIdAtSlotCoords(store, invId, coordX, coordY) {
 
 export function getItemIdsInSlots(store, invId) {
   let inv = getExistingInventory(store, invId);
-  return new Set(inv.slots.filter(itemId => typeof itemId === 'string'));
+  let result = new Set();
+  for(let slotValue of inv.slots) {
+    if (slotValue) {
+      result.add(inv.items[slotValue].itemId);
+    }
+  }
+  return result;
 }
 
 /**
@@ -83,10 +114,8 @@ export function getItemIdsInSlots(store, invId) {
  */
 export function isInventoryEmpty(store, invId) {
   const inv = getExistingInventory(store, invId);
-  const length = getInventorySlotCount(inv);
-  for (let i = 0; i < length; ++i) {
-    let itemId = inv.slots[i];
-    if (itemId) {
+  for(let slotValue of inv.slots) {
+    if (slotValue) {
       return false;
     }
   }

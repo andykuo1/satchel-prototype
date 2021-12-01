@@ -9,7 +9,7 @@ import {
   removeItemFromInventory,
 } from '../InventoryTransfer.js';
 import { getItemByItemId } from '../InvItems.js';
-import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../InvSlots.js';
+import { getSlotCoordsByIndex, getSlotIndexBySlottedId, getSlottedIdByItemId } from '../InvSlots.js';
 
 /**
  * @typedef {import('../Inv.js').Inventory} Inventory
@@ -47,7 +47,8 @@ export function putDownToSocketInventory(
       // Has an item to swap. So pick up this one for later.
       let inv = getExistingInventory(store, toInventoryId);
       let prevItemId = prevItem.itemId;
-      let slotIndex = getSlotIndexByItemId(inv, prevItemId);
+      let slottedId = getSlottedIdByItemId(inv, prevItemId);
+      let slotIndex = getSlotIndexBySlottedId(inv, slottedId);
       let [x, y] = getSlotCoordsByIndex(inv, slotIndex);
       prevItemX = x;
       prevItemY = y;
@@ -132,7 +133,8 @@ export function putDownToGridInventory(
     if (prevItemId) {
       // Has an item to swap. So pick up this one for later.
       let inv = getExistingInventory(store, toInventoryId);
-      let slotIndex = getSlotIndexByItemId(inv, prevItemId);
+      let slottedId = getSlottedIdByItemId(inv, prevItemId);
+      let slotIndex = getSlotIndexBySlottedId(inv, slottedId);
       let [x, y] = getSlotCoordsByIndex(inv, slotIndex);
       prevItemX = x;
       prevItemY = y;

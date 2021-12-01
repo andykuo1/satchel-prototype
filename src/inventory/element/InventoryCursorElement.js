@@ -14,7 +14,7 @@ import {
   getItemAtSlotIndex
 } from '../InventoryTransfer.js';
 import { getItemByItemId } from '../InvItems.js';
-import { getSlotCoordsByIndex, getSlotIndexByItemId, isSlotIndexEmpty } from '../InvSlots.js';
+import { getSlotCoordsByIndex, getSlotIndexBySlottedId, getSlottedIdByItemId, isSlotIndexEmpty } from '../InvSlots.js';
 import { putDownToGridInventory, putDownToSocketInventory } from './InventoryCursorElementHelper.js';
 import { DEFAULT_ITEM_UNIT_SIZE } from './InventoryElementMouseHelper.js';
 
@@ -188,7 +188,8 @@ export class InventoryCursorElement extends HTMLElement {
     }
     let store = getInventoryStore();
     let inv = getExistingInventory(store, invId);
-    const slotIndex = getSlotIndexByItemId(inv, itemId);
+    const slottedId = getSlottedIdByItemId(inv, itemId);
+    const slotIndex = getSlotIndexBySlottedId(inv, slottedId);
     const [fromItemX, fromItemY] = getSlotCoordsByIndex(inv, slotIndex);
     const item = getItemByItemId(inv, itemId);
     removeItemFromInventory(store, invId, itemId);

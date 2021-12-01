@@ -6,7 +6,7 @@ import {
 } from '../InventoryStore.js';
 import { getExistingInventory } from '../InventoryTransfer.js';
 import { hasItem, getItemByItemId } from '../InvItems.js';
-import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../InvSlots.js';
+import { getSlotCoordsByIndex, getSlotIndexBySlottedId, getSlottedIdByItemId } from '../InvSlots.js';
 
 /** @typedef {import('./InventoryGridElement.js').InventoryGridElement} InventoryGridElement */
 
@@ -201,14 +201,15 @@ export class InventoryItemElement extends HTMLElement {
   }
 
   /**
-   * @param store
-   * @param itemId
+   * @param {import('../InventoryStore.js').InventoryStore}store
+   * @param {import('../Item.js').ItemId} itemId
    * @protected
    */
   onItemChange(store, itemId) {
     const invId = this._containerElement.invId;
     const inv = getExistingInventory(store, invId);
-    const slotIndex = getSlotIndexByItemId(inv, itemId);
+    const slottedId = getSlottedIdByItemId(inv, itemId);
+    const slotIndex = getSlotIndexBySlottedId(inv, slottedId);
     const [x, y] = getSlotCoordsByIndex(inv, slotIndex);
     const item = getItemByItemId(inv, itemId);
     this.style.setProperty('--itemX', `${x}`);
