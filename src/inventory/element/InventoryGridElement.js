@@ -4,6 +4,7 @@ import {
   addInventoryChangeListener,
   createGridInventoryInStore,
   createSocketInventoryInStore,
+  deleteInventoryFromStore,
   getInventoryInStore,
   getInventoryStore,
   removeInventoryChangeListener,
@@ -105,7 +106,7 @@ export class InventoryGridElement extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ['invid', 'init'];
+    return ['invid'];
   }
 
   get invId() {
@@ -184,6 +185,26 @@ export class InventoryGridElement extends HTMLElement {
     }
     upgradeProperty(this, 'invId');
     upgradeProperty(this, 'init');
+    // Only start init once.
+    if (this.init) {
+      const initType = this.init;
+      const store = getInventoryStore();
+      let invId = this.invId;
+      if (!invId) {
+        invId = uuid();
+        this.invId = invId;
+      }
+      if (initType === 'socket') {
+        createSocketInventoryInStore(store, invId);
+      } else if (initType.startsWith('grid')) {
+        let i = initType.indexOf('x');
+        let w = Number(initType.substring(4, i)) || 1;
+        let h = Number(initType.substring(i + 1)) || 1;
+        createGridInventoryInStore(store, invId, w, h);
+      } else {
+        throw new Error(`Unknown init type '${initType}' for inventory-grid.`);
+      }
+    }
   }
 
   /** @protected */
@@ -197,6 +218,15 @@ export class InventoryGridElement extends HTMLElement {
         this.onInventoryChange
       );
     }
+    // Only stop init once.
+    if (this.init) {
+      const store = getInventoryStore();
+      const invId = this.invId;
+      const inventory = getInventoryInStore(store, invId);
+      if (inventory) {
+        deleteInventoryFromStore(getInventoryStore(), invId, inventory);
+      }
+    }
   }
 
   /**
@@ -207,24 +237,6 @@ export class InventoryGridElement extends HTMLElement {
    */
   attributeChangedCallback(attribute, previous, value) {
     switch (attribute) {
-      case 'init': {
-        const store = getInventoryStore();
-        let invId = this.invId;
-        if (!invId) {
-          invId = uuid();
-          this.invId = invId;
-        }
-        if (value === 'socket') {
-          createSocketInventoryInStore(store, invId);
-        } else if (value.startsWith('grid')) {
-          let i = value.indexOf('x');
-          let w = Number(value.substring(4, i)) || 1;
-          let h = Number(value.substring(i + 1)) || 1;
-          createGridInventoryInStore(store, invId, w, h);
-        } else {
-          throw new Error('Unknown init type for inventory-grid.');
-        }
-      } break;
       case 'invid': {
         const store = getInventoryStore();
         const prevInvId = this._invId;
