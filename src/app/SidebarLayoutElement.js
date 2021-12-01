@@ -17,8 +17,6 @@ const INNER_STYLE = /* css */ `
 
 #sidebar {
   background-color: var(--background-color);
-  padding: 0.5em 1em;
-  min-width: 4em;
   overflow-x: hidden;
   overflow-y: auto;
 }
@@ -33,6 +31,7 @@ const INNER_STYLE = /* css */ `
 
 #viewport {
   flex: 1;
+  overflow: hidden;
 }
 `;
 

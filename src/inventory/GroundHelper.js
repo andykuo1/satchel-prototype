@@ -49,6 +49,7 @@ export function dropOnGround(freedItem) {
   const inventory = createSocketInventoryInStore(store, uuid());
   addItemToInventory(store, inventory.invId, freedItem, 0, 0);
   const invElement = createTemporaryInventoryView(getInventoryStore(), inventory.invId);
+  invElement.fixed = true;
   ground.append(invElement);
 }
 
