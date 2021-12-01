@@ -272,6 +272,9 @@ export class InventoryGridElement extends HTMLElement {
         invWidth = 1;
         invHeight = 1;
       }
+    } else if (this.fixed) {
+      // TODO: We need to implement add/remove from slots for fixed vs non-fixed containers
+      throw new Error('Fixed for non-socket inventory is not yet supported!');
     }
 
     this.style.setProperty('--container-width', `${invWidth}`);
