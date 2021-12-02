@@ -1,5 +1,4 @@
 import { Peerful } from '../peerful/Peerful.js';
-import { copyToClipboard } from '../util/clipboard.js';
 import { getCursorContext } from '../inventory/CursorHelper.js';
 import { SatchelClient, SatchelServer } from './PeerSatchel.js';
 
