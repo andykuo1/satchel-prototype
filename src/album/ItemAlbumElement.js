@@ -14,9 +14,10 @@ const INNER_HTML = /* html */`
 <fieldset>
   <legend contenteditable></legend>
   <span class="actionbar">
-    <icon-button class="button" id="buttonDelete" icon="res/delete.svg"></icon-button>
-    <icon-button class="button" id="buttonExport" icon="res/download.svg"></icon-button>
-    <icon-button class="button" id="buttonLock" icon="res/unlock.svg"></icon-button>
+    <icon-button class="button" id="buttonDelete" icon="res/delete.svg" alt="clear" title="Clear Album"></icon-button>
+    <icon-button class="button" id="buttonExport" icon="res/download.svg" alt="export" title="Export Album"></icon-button>
+    <icon-button class="button" id="buttonSend" icon="res/send.svg" alt="send" title="Send Album" disabled></icon-button>
+    <icon-button class="button" id="buttonLock" icon="res/unlock.svg" alt="lock" title="Lock Album"></icon-button>
   </span>
   <slot name="items"></slot>
 </fieldset>
@@ -111,6 +112,8 @@ export class ItemAlbumElement extends HTMLElement {
     this.buttonExport = shadowRoot.querySelector('#buttonExport');
     /** @private */
     this.buttonLock = shadowRoot.querySelector('#buttonLock');
+    /** @private */
+    this.buttonSend = shadowRoot.querySelector('#buttonSend');
 
     /**
      * @private
@@ -129,6 +132,8 @@ export class ItemAlbumElement extends HTMLElement {
     this.onButtonExport = this.onButtonExport.bind(this);
     /** @private */
     this.onButtonDelete = this.onButtonDelete.bind(this);
+    /** @private */
+    this.onButtonSend = this.onButtonSend.bind(this);
     
     /** @private */
     this.onItemDrop = this.onItemDrop.bind(this);
@@ -142,6 +147,7 @@ export class ItemAlbumElement extends HTMLElement {
     this.buttonLock.addEventListener('click', this.onButtonLock);
     this.buttonExport.addEventListener('click', this.onButtonExport);
     this.buttonDelete.addEventListener('click', this.onButtonDelete);
+    this.buttonSend.addEventListener('click', this.onButtonSend);
     this.container.addEventListener('mouseup', this.onItemDrop);
   }
 
@@ -171,6 +177,7 @@ export class ItemAlbumElement extends HTMLElement {
     this.buttonLock.removeEventListener('click', this.onButtonLock);
     this.buttonExport.removeEventListener('click', this.onButtonExport);
     this.buttonDelete.removeEventListener('click', this.onButtonDelete);
+    this.buttonSend.removeEventListener('click', this.onButtonSend);
     this.container.removeEventListener('mouseup', this.onItemDrop);
   }
 
@@ -223,6 +230,8 @@ export class ItemAlbumElement extends HTMLElement {
 
     // Update lock status
     this.buttonLock.icon = locked ? 'res/lock.svg' : 'res/unlock.svg';
+    this.buttonLock.alt = locked ? 'unlock' : 'lock';
+    this.buttonLock.title = locked ? 'Unlock Album' : 'Lock Album';
     this.buttonDelete.toggleAttribute('disabled', locked);
     this.inputTitle.toggleAttribute('contenteditable', !locked);
 
@@ -322,6 +331,11 @@ export class ItemAlbumElement extends HTMLElement {
       deleteAlbumFromStore(store, albumId, album);
       this.remove();
     }
+  }
+
+  /** @private */
+  onButtonSend() {
+    // TODO: Implement sending a whole album of items to a player.
   }
 
   /** @private */
