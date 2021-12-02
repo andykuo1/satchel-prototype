@@ -7,12 +7,12 @@ import { loadSatchelFromStorage, saveSatchelToStorage } from './session/SatchelS
 
 import './app/index.js';
 import './inventory/element/index.js';
-import './cards/index.js';
-import './album/index.js';
+import './satchel/cards/index.js';
+import './satchel/album/index.js';
 import './toolbar.js';
 import { getInventoryStore } from './inventory/InventoryStore.js';
-import { ItemAlbumElement } from './album/ItemAlbumElement.js';
-import { getAlbumsInStore } from './album/AlbumStore.js';
+import { ItemAlbumElement } from './satchel/album/ItemAlbumElement.js';
+import { getAlbumsInStore } from './satchel/album/AlbumStore.js';
 
 async function connect() {
   let session = resolveSessionStatus();

@@ -21,12 +21,12 @@ import { DEFAULT_ITEM_UNIT_SIZE } from './InventoryElementMouseHelper.js';
 /**
  * @typedef {import('./InventoryGridElement.js').InventoryGridElement} InventoryGridElement
  * 
- * @typedef {import('../../inv/Inv.js').Inventory} Inventory
- * @typedef {import('../../inv/Inv.js').InventoryId} InventoryId
+ * @typedef {import('../../satchel/inv/Inv.js').Inventory} Inventory
+ * @typedef {import('../../satchel/inv/Inv.js').InventoryId} InventoryId
  * @typedef {import('../InventoryStore.js').InventoryStore} InventoryStore
  *
- * @typedef {import('../../item/Item.js').Item} Item
- * @typedef {import('../../item/Item.js').ItemId} ItemId
+ * @typedef {import('../../satchel/item/Item.js').Item} Item
+ * @typedef {import('../../satchel/item/Item.js').ItemId} ItemId
  */
 
 const CURSOR_OFFSET_PIXELS = 24;

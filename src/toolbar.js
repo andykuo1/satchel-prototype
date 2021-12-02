@@ -1,21 +1,21 @@
 import { downloadText } from './util/downloader.js';
 import { dropOnGround } from './inventory/GroundHelper.js';
-import { exportInventoryToJSON, importInventoryFromJSON } from './inv/InvLoader.js';
+import { exportInventoryToJSON, importInventoryFromJSON } from './satchel/inv/InvLoader.js';
 import { dispatchInventoryChange, getInventoryStore } from './inventory/InventoryStore.js';
 import { connectAsServer, isServerSide } from './app/PeerSatchelConnector.js';
 import { getCursorContext } from './inventory/CursorHelper.js';
 import { getExistingInventory } from './inventory/InventoryTransfer.js';
 import { uploadFile } from './util/uploader.js';
 import { copyToClipboard } from './util/clipboard.js';
-import { ItemBuilder } from './item/Item.js';
+import { ItemBuilder } from './satchel/item/Item.js';
 import { uuid } from './util/uuid.js';
-import { ItemAlbumElement } from './album/ItemAlbumElement.js';
+import { ItemAlbumElement } from './satchel/album/ItemAlbumElement.js';
 import { exportDataToJSON } from './session/SatchelDataLoader.js';
-import { exportItemToJSON, importItemFromJSON } from './item/ItemLoader.js';
-import { importAlbumFromJSON } from './album/AlbumLoader.js';
-import { createAlbumInStore } from './album/AlbumStore.js';
-import { copyAlbum } from './album/Album.js';
-import { dispatchAlbumChange } from './album/AlbumEvents.js';
+import { exportItemToJSON, importItemFromJSON } from './satchel/item/ItemLoader.js';
+import { importAlbumFromJSON } from './satchel/album/AlbumLoader.js';
+import { createAlbumInStore } from './satchel/album/AlbumStore.js';
+import { copyAlbum } from './satchel/album/Album.js';
+import { dispatchAlbumChange } from './satchel/album/AlbumEvents.js';
 
 function elementEventListener(selector, event, callback) {
   document.querySelector(selector).addEventListener(event, callback);

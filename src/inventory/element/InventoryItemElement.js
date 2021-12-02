@@ -3,7 +3,7 @@ import { getInventoryStore } from '../InventoryStore.js';
 import { getExistingInventory } from '../InventoryTransfer.js';
 import { hasItem, getItemByItemId } from '../InvItems.js';
 import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../InvSlots.js';
-import { addItemChangeListener, removeItemChangeListener } from '../../item/ItemEvents.js';
+import { addItemChangeListener, removeItemChangeListener } from '../../satchel/item/ItemEvents.js';
 
 /** @typedef {import('./InventoryGridElement.js').InventoryGridElement} InventoryGridElement */
 

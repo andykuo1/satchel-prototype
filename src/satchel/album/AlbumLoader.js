@@ -1,4 +1,4 @@
-import { exportDataToJSON, importDataFromJSON } from '../session/SatchelDataLoader.js';
+import { exportDataToJSON, importDataFromJSON } from '../../session/SatchelDataLoader.js';
 import { copyAlbum } from './Album.js';
 
 export function exportAlbumToJSON(album, dst = undefined) {

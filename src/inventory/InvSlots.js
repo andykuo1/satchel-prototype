@@ -1,8 +1,8 @@
-import { getInventorySlotCount } from '../inv/Inv.js';
+import { getInventorySlotCount } from '../satchel/inv/Inv.js';
 
 /**
- * @typedef {import('../inv/Inv.js').Inventory} Inventory
- * @typedef {import('../item/Item.js').ItemId} ItemId
+ * @typedef {import('../satchel/inv/Inv.js').Inventory} Inventory
+ * @typedef {import('../satchel/item/Item.js').ItemId} ItemId
  */
 
 /**

@@ -4,10 +4,10 @@ import Style from './ItemEditorElement.module.css.js';
 import { dispatchInventoryChange, getInventoryStore, isInventoryInStore, addInventoryChangeListener, removeInventoryChangeListener } from '../InventoryStore.js';
 import { addItemToInventory, clearItemsInInventory, getItemAtSlotIndex, isInventoryEmpty } from '../InventoryTransfer.js';
 import { getCursor } from './InventoryCursorElement.js';
-import { ItemBuilder } from '../../item/Item.js';
+import { ItemBuilder } from '../../satchel/item/Item.js';
 import { dropOnGround } from '../GroundHelper.js';
 import { uuid } from '../../util/uuid.js';
-import { dispatchItemChange } from '../../item/ItemEvents.js';
+import { dispatchItemChange } from '../../satchel/item/ItemEvents.js';
 
 /** @typedef {import('./InventoryGridElement.js').InventoryGridElement} InventoryGridElement */
 

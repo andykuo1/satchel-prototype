@@ -1,17 +1,17 @@
-import { addInventoryChangeListener, createSocketInventoryInStore, deleteInventoryFromStore, getInventoryInStore, getInventoryStore, isInventoryInStore, removeInventoryChangeListener } from '../inventory/InventoryStore.js';
-import { addItemToInventory, getItemAtSlotIndex } from '../inventory/InventoryTransfer.js';
-import { createInventoryView } from '../inventory/InvView.js';
-import { uuid } from '../util/uuid.js';
-import { upgradeProperty } from '../util/wc.js';
+import { addInventoryChangeListener, createSocketInventoryInStore, deleteInventoryFromStore, getInventoryInStore, getInventoryStore, isInventoryInStore, removeInventoryChangeListener } from '../../inventory/InventoryStore.js';
+import { addItemToInventory, getItemAtSlotIndex } from '../../inventory/InventoryTransfer.js';
+import { createInventoryView } from '../../inventory/InvView.js';
+import { uuid } from '../../util/uuid.js';
+import { upgradeProperty } from '../../util/wc.js';
 import { getItemIdsInAlbum, getItemInAlbum } from './Album.js';
 import { addItemToAlbum, clearItemsInAlbum, isAlbumLocked, removeItemFromAlbum, setAlbumLocked } from './Album.js';
-import { getCursor } from '../inventory/element/InventoryCursorElement.js';
-import { downloadText } from '../util/downloader.js';
+import { getCursor } from '../../inventory/element/InventoryCursorElement.js';
+import { downloadText } from '../../util/downloader.js';
 import { cloneItem } from '../item/Item.js';
 import { exportAlbumToJSON } from './AlbumLoader.js';
 import { deleteAlbumInStore, getAlbumInStore, isAlbumInStore } from './AlbumStore.js';
 import { addAlbumChangeListener, dispatchAlbumChange, removeAlbumChangeListener } from './AlbumEvents.js';
-import { IconButtonElement } from '../app/IconButtonElement.js';
+import { IconButtonElement } from '../../app/IconButtonElement.js';
 
 const INNER_HTML = /* html */`
 <fieldset>
@@ -175,7 +175,7 @@ export class ItemAlbumElement extends HTMLElement {
     const store = getInventoryStore();
     for (const node of this.slotItems.assignedNodes()) {
       const invNode =
-        /** @type {import('../inventory/element/InventoryGridElement.js').InventoryGridElement} */ (node);
+        /** @type {import('../../inventory/element/InventoryGridElement.js').InventoryGridElement} */ (node);
       const invId = invNode.invId;
       const inv = getInventoryInStore(store, invId);
       if (inv) {
@@ -253,7 +253,7 @@ export class ItemAlbumElement extends HTMLElement {
     const preservedInvs = {};
     for (const node of this.slotItems.assignedNodes()) {
       const invNode =
-        /** @type {import('../inventory/element/InventoryGridElement.js').InventoryGridElement} */ (node);
+        /** @type {import('../../inventory/element/InventoryGridElement.js').InventoryGridElement} */ (node);
       const invId = invNode.invId;
       const item = getItemAtSlotIndex(getInventoryStore(), invId, 0);
       if (item) {

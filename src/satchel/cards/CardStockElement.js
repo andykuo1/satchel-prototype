@@ -1,10 +1,10 @@
-import { upgradeProperty } from '../util/wc.js';
-import { stringHash } from '../util/hash.js';
-import { dropOnGround } from '../inventory/GroundHelper.js';
-import { addItemToInventory } from '../inventory/InventoryTransfer.js';
-import { getInventoryStore } from '../inventory/InventoryStore.js';
+import { upgradeProperty } from '../../util/wc.js';
+import { stringHash } from '../../util/hash.js';
+import { dropOnGround } from '../../inventory/GroundHelper.js';
+import { addItemToInventory } from '../../inventory/InventoryTransfer.js';
+import { getInventoryStore } from '../../inventory/InventoryStore.js';
 import { removeItemFromAlbum } from '../album/Album.js';
-import { downloadText } from '../util/downloader.js';
+import { downloadText } from '../../util/downloader.js';
 import { exportItemToJSON, importItemFromJSON } from '../item/ItemLoader.js';
 
 const INNER_HTML = /* html */`
@@ -352,7 +352,7 @@ export class CardStockElement extends HTMLElement {
   /** @private */
   onToolbarModify() {
     const item = this.getItem();
-    /** @type {import('../inventory/element/ItemEditorElement.js').ItemEditorElement} */
+    /** @type {import('../../inventory/element/ItemEditorElement.js').ItemEditorElement} */
     const editor = document.querySelector('item-editor');
     if (editor) {
       const invId = editor.socketInventory.invId;

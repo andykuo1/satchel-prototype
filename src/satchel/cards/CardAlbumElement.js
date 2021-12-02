@@ -1,5 +1,5 @@
-import { getInventoryStore } from '../inventory/InventoryStore.js';
-import { upgradeProperty } from '../util/wc.js';
+import { getInventoryStore } from '../../inventory/InventoryStore.js';
+import { upgradeProperty } from '../../util/wc.js';
 import { getItemIdsInAlbum, getItemInAlbum } from '../album/Album.js';
 import { CardStockElement } from './CardStockElement.js';
 import { getAlbumInStore } from '../album/AlbumStore.js';

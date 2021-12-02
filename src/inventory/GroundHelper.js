@@ -1,4 +1,4 @@
-import { addItemToAlbum, clearItemsInAlbum } from '../album/Album.js';
+import { addItemToAlbum, clearItemsInAlbum } from '../satchel/album/Album.js';
 import { getInventoryStore } from './InventoryStore.js';
 
 /**

@@ -1,12 +1,12 @@
-import { createGridInventory, createSocketInventory } from '../inv/Inv.js';
+import { createGridInventory, createSocketInventory } from '../satchel/inv/Inv.js';
 import { addStoreEventListener, dispatchStoreEvent, removeStoreEventListener } from './InventoryEventStore.js';
 
 /**
- * @typedef {import('../inv/Inv.js').InventoryId} InventoryId
- * @typedef {import('../inv/Inv.js').InventoryType} InventoryType
- * @typedef {import('../inv/Inv.js').Inventory} Inventory
- * @typedef {import('../item/Item.js').ItemId} ItemId
- * @typedef {import('../item/Item.js').Item} Item
+ * @typedef {import('../satchel/inv/Inv.js').InventoryId} InventoryId
+ * @typedef {import('../satchel/inv/Inv.js').InventoryType} InventoryType
+ * @typedef {import('../satchel/inv/Inv.js').Inventory} Inventory
+ * @typedef {import('../satchel/item/Item.js').ItemId} ItemId
+ * @typedef {import('../satchel/item/Item.js').Item} Item
  */
 
 /************************************************** STORE */
