@@ -1,7 +1,7 @@
 import { addInventoryChangeListener, createSocketInventoryInStore, deleteInventoryFromStore, getInventoryInStore, getInventoryStore, isInventoryInStore, removeInventoryChangeListener } from '../inventory/InventoryStore.js';
 import { addItemToInventory, getItemAtSlotIndex } from '../inventory/InventoryTransfer.js';
 import { createInventoryView } from '../inventory/InvView.js';
-import { cloneItem } from '../inventory/Item.js';
+import { cloneItem } from '../item/Item.js';
 import { uuid } from '../util/uuid.js';
 import { getItemIdsInAlbum, getItemInAlbum } from './Album.js';
 import { removeItemFromAlbum } from './Album.js';

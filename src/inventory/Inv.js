@@ -1,9 +1,9 @@
 import { uuid } from '../util/uuid.js';
-import { cloneItem, copyItem } from './Item.js';
+import { cloneItem, copyItem } from '../item/Item.js';
 
 /**
- * @typedef {import('./Item.js').Item} Item
- * @typedef {import('./Item.js').ItemId} ItemId
+ * @typedef {import('../item/Item.js').Item} Item
+ * @typedef {import('../item/Item.js').ItemId} ItemId
  */
 
 /**

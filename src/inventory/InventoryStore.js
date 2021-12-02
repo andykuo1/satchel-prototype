@@ -5,8 +5,8 @@ import { addStoreEventListener, dispatchStoreEvent, removeStoreEventListener } f
  * @typedef {import('./Inv.js').InventoryId} InventoryId
  * @typedef {import('./Inv.js').InventoryType} InventoryType
  * @typedef {import('./Inv.js').Inventory} Inventory
- * @typedef {import('./Item.js').ItemId} ItemId
- * @typedef {import('./Item.js').Item} Item
+ * @typedef {import('../item/Item.js').ItemId} ItemId
+ * @typedef {import('../item/Item.js').Item} Item
  */
 
 /************************************************** STORE */

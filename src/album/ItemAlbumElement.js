@@ -7,7 +7,7 @@ import { getItemIdsInAlbum, getItemInAlbum } from './Album.js';
 import { addItemToAlbum, clearItemsInAlbum, isAlbumLocked, removeItemFromAlbum, setAlbumLocked } from './Album.js';
 import { getCursor } from '../inventory/element/InventoryCursorElement.js';
 import { downloadText } from '../util/downloader.js';
-import { cloneItem } from '../inventory/Item.js';
+import { cloneItem } from '../item/Item.js';
 import { exportAlbumToJSON } from './AlbumLoader.js';
 import { deleteAlbumInStore, getAlbumInStore, isAlbumInStore } from './AlbumStore.js';
 import { addAlbumChangeListener, dispatchAlbumChange, removeAlbumChangeListener } from './AlbumEvents.js';

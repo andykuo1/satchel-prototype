@@ -1,3 +1,5 @@
+import { uuid } from '../util/uuid.js';
+
 /**
  * @typedef {string} ItemId
  *
@@ -11,8 +13,6 @@
  * @property {number} stackSize
  * @property {object} metadata
  */
-
-import { uuid } from '../util/uuid.js';
 
 /**
  * @param {ItemId} itemId

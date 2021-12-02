@@ -11,7 +11,7 @@ import {
   isInventoryInStore,
 } from '../inventory/InventoryStore.js';
 import { getExistingInventory } from '../inventory/InventoryTransfer.js';
-import { exportItemToJSON, importItemFromJSON } from '../inventory/ItemLoader.js';
+import { exportItemToJSON, importItemFromJSON } from '../item/ItemLoader.js';
 
 /**
  * @typedef {import('../peerful/PeerfulConnection.js').PeerfulConnection} PeerfulConnection

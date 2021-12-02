@@ -2,7 +2,7 @@ import { getInventorySlotCount } from './Inv.js';
 
 /**
  * @typedef {import('./Inv.js').Inventory} Inventory
- * @typedef {import('./Item.js').ItemId} ItemId
+ * @typedef {import('../item/Item.js').ItemId} ItemId
  */
 
 /**

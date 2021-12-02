@@ -5,7 +5,7 @@ import { addItemToInventory } from '../inventory/InventoryTransfer.js';
 import { getInventoryStore } from '../inventory/InventoryStore.js';
 import { removeItemFromAlbum } from '../album/Album.js';
 import { downloadText } from '../util/downloader.js';
-import { exportItemToJSON, importItemFromJSON } from '../inventory/ItemLoader.js';
+import { exportItemToJSON, importItemFromJSON } from '../item/ItemLoader.js';
 
 const INNER_HTML = /* html */`
 <div class="container">

@@ -1,4 +1,4 @@
-import { addStoreEventListener, dispatchStoreEvent, removeStoreEventListener } from './InventoryEventStore.js';
+import { addStoreEventListener, dispatchStoreEvent, removeStoreEventListener } from '../inventory/InventoryEventStore.js';
 
 /**
  * @param store
