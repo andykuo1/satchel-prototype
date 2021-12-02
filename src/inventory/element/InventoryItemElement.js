@@ -1,12 +1,9 @@
 import { DEFAULT_ITEM_UNIT_SIZE, itemMouseDownCallback } from './InventoryElementMouseHelper.js';
-import {
-  addItemChangeListener,
-  getInventoryStore,
-  removeItemChangeListener,
-} from '../InventoryStore.js';
+import { getInventoryStore } from '../InventoryStore.js';
 import { getExistingInventory } from '../InventoryTransfer.js';
 import { hasItem, getItemByItemId } from '../InvItems.js';
 import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../InvSlots.js';
+import { addItemChangeListener, removeItemChangeListener } from '../ItemEvents.js';
 
 /** @typedef {import('./InventoryGridElement.js').InventoryGridElement} InventoryGridElement */
 

@@ -2,11 +2,11 @@ import {
   isInventoryInStore,
   getInventoryInStore,
   dispatchInventoryChange,
-  dispatchItemChange,
 } from './InventoryStore.js';
 import * as InvItems from './InvItems.js';
 import { getInventorySlotCount } from './Inv.js';
 import { cloneItem } from './Item.js';
+import { dispatchItemChange } from './ItemEvents.js';
 
 /**
  * @typedef {import('./InventoryStore.js').Item} Item

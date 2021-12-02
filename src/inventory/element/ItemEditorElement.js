@@ -1,12 +1,13 @@
 import Template from './ItemEditorElement.template.html.js';
 import Style from './ItemEditorElement.module.css.js';
 
-import { dispatchInventoryChange, dispatchItemChange, getInventoryStore, isInventoryInStore, addInventoryChangeListener, removeInventoryChangeListener } from '../InventoryStore.js';
+import { dispatchInventoryChange, getInventoryStore, isInventoryInStore, addInventoryChangeListener, removeInventoryChangeListener } from '../InventoryStore.js';
 import { addItemToInventory, clearItemsInInventory, getItemAtSlotIndex, isInventoryEmpty } from '../InventoryTransfer.js';
 import { getCursor } from './InventoryCursorElement.js';
 import { ItemBuilder } from '../Item.js';
 import { dropOnGround } from '../GroundHelper.js';
 import { uuid } from '../../util/uuid.js';
+import { dispatchItemChange } from '../ItemEvents.js';
 
 /** @typedef {import('./InventoryGridElement.js').InventoryGridElement} InventoryGridElement */
 

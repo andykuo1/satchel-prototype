@@ -139,27 +139,3 @@ export function removeInventoryChangeListener(inventoryId, callback) {
 export function getInventoryList(store) {
   return Object.values(store.data.inventory);
 }
-
-/**
- * @param store
- * @param itemId
- */
-export function dispatchItemChange(store, itemId) {
-  dispatchStoreEvent(store, 'item', itemId);
-}
-
-/**
- * @param itemId
- * @param callback
- */
-export function addItemChangeListener(itemId, callback) {
-  addStoreEventListener('item', itemId, callback);
-}
-
-/**
- * @param itemId
- * @param callback
- */
-export function removeItemChangeListener(itemId, callback) {
-  removeStoreEventListener('item', itemId, callback);
-}
