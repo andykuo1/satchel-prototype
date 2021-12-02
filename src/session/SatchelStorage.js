@@ -1,4 +1,5 @@
-import { createAlbumInStore, exportAlbumToJSON, getAlbumInStore, importAlbumFromJSON, isAlbumInStore } from '../cards/CardAlbum.js';
+import { exportAlbumToJSON, importAlbumFromJSON, isAlbumInStore } from '../cards/CardAlbum.js';
+import { addAlbumToStore, copyAlbum, createAlbum, getAlbumInStore, getAlbumsInStore } from '../album/Album.js';
 import { exportInventoryToJSON, importInventoryFromJSON } from '../inventory/InventoryLoader.js';
 import { createGridInventoryInStore, dispatchAlbumChange, dispatchInventoryChange, getInventoryInStore, getInventoryStore, isInventoryInStore } from '../inventory/InventoryStore.js';
 
@@ -11,12 +12,6 @@ export function loadSatchelFromStorage() {
     mainInventory = getInventoryInStore(store, 'main');
   } else {
     mainInventory = createGridInventoryInStore(store, 'main', 12, 9);
-  }
-  let mainAlbum;
-  if (isAlbumInStore(store, 'main')) {
-    mainAlbum = getAlbumInStore(store, 'main');
-  } else {
-    mainAlbum = createAlbumInStore(store, 'main');
   }
 
   // Load from storage...
@@ -32,15 +27,30 @@ export function loadSatchelFromStorage() {
       console.error(e);
     }
   }
-  let albumData = localStorage.getItem('satchel_album_v2');
+  let albumData = localStorage.getItem('satchel_album_v3');
   if (albumData) {
     try {
       let jsonData = JSON.parse(albumData);
-      importAlbumFromJSON(jsonData, mainAlbum);
-      dispatchAlbumChange(store, mainAlbum.albumId);
+      for(let albumJson of jsonData) {
+        const album = importAlbumFromJSON(albumJson);
+        const albumId = album.albumId;
+        if (isAlbumInStore(store, albumId)) {
+          const oldAlbum = getAlbumInStore(store, albumId);
+          copyAlbum(album, oldAlbum);
+          dispatchAlbumChange(store, albumId);
+        } else {
+          addAlbumToStore(store, albumId, album);
+        }
+      }
     } catch (e) {
       console.error('Failed to load album from localStorage.');
       console.error(e);
+    }
+  } else {
+    if (!isAlbumInStore(store, 'ground')) {
+      let album = createAlbum('ground');
+      album.displayName = 'Ground';
+      addAlbumToStore(store, album.albumId, album);
     }
   }
 }
@@ -58,13 +68,14 @@ export function saveSatchelToStorage() {
     }
   }
 
-  if (isAlbumInStore(store, 'main')) {
+  let albums = getAlbumsInStore(store);
+  let albumData = [];
+  for(let album of albums) {
     try {
-      let mainAlbum = getAlbumInStore(store, 'main');
-      let albumData = exportAlbumToJSON(mainAlbum);
-      localStorage.setItem('satchel_album_v2', JSON.stringify(albumData));
+      albumData.push(exportAlbumToJSON(album));
     } catch (e) {
       console.error(e);
     }
   }
+  localStorage.setItem('satchel_album_v3', JSON.stringify(albumData));
 }

@@ -11,7 +11,7 @@ const INNER_STYLE = /* css */ `
   width: 3em;
   height: 3em;
   margin: 0.2em;
-  color: #FFFFFF;
+  color: #ffffff;
   --background-color: #444444;
   --hover-color: #666666;
 }

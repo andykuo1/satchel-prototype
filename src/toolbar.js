@@ -5,9 +5,12 @@ import { dispatchAlbumChange, dispatchInventoryChange, getInventoryStore } from 
 import { connectAsServer, isServerSide } from './app/PeerSatchelConnector.js';
 import { getCursorContext } from './inventory/CursorHelper.js';
 import { getExistingInventory } from './inventory/InventoryTransfer.js';
-import { addItemToAlbum, exportAlbumToJSON, getAlbumInStore, getExistingAlbum, importAlbumFromJSON } from './cards/CardAlbum.js';
+import { addItemToAlbum, createAlbumInStore, exportAlbumToJSON, getAlbumInStore, getExistingAlbum, importAlbumFromJSON } from './album/Album.js';
 import { uploadFile } from './util/uploader.js';
 import { copyToClipboard } from './util/clipboard.js';
+import { ItemBuilder } from './inventory/Item.js';
+import { uuid } from './util/uuid.js';
+import { ItemAlbumElement } from './album/ItemAlbumElement.js';
 
 function elementEventListener(selector, event, callback) {
   document.querySelector(selector).addEventListener(event, callback);
@@ -22,15 +25,31 @@ window.addEventListener('DOMContentLoaded', () => {
   elementEventListener('#actionExportToFile', 'click', onActionExportToFile);
   elementEventListener('#actionSendToPlayer', 'click', onActionSendToPlayer);
   elementEventListener('#actionSaveToAlbum', 'click', onActionSaveToAlbum);
-  elementEventListener('#actionAlbumView', 'change', onActionAlbumView);
   elementEventListener('#actionAlbumOpen', 'click', onActionAlbumOpen);
-  elementEventListener('#actionAlbumExport', 'click', onActionAlbumExport);
   elementEventListener('#actionAlbumImport', 'click', onActionAlbumImport);
-  elementEventListener('#actionAlbumLeave', 'click', onActionAlbumLeave);
   elementEventListener('#actionDropToGround', 'click', onActionDropToGround);
+  elementEventListener('#actionNewItem', 'click', onActionNewItem);
+  elementEventListener('#actionAlbumNew', 'click', onActionAlbumNew);
 
   elementEventListener('#giftSubmit', 'click', onGiftSubmit);
 });
+
+function onActionAlbumNew() {
+  const store = getInventoryStore();
+  const albumId = uuid();
+  createAlbumInStore(store, albumId);
+  const albumContainer = document.querySelector('#albumList');
+  const albumElement = new ItemAlbumElement();
+  albumElement.albumId = albumId;
+  albumContainer.appendChild(albumElement);
+}
+
+function onActionNewItem() {
+  let item = new ItemBuilder().default().width(2).height(2).build();
+  if (item) {
+    dropOnGround(item);
+  }
+}
 
 function onActionSaveToAlbum() {
   /** @type {import('./inventory/element/ItemEditorElement.js').ItemEditorElement} */
@@ -77,36 +96,12 @@ function onActionAlbumView(e) {
 }
 
 function onActionAlbumOpen(e) {
-  let sidebar = document.querySelector('.sidebar');
-  if (sidebar.classList.contains('expand')) {
-    sidebar.classList.remove('expand', 'open');
-  } else {
-    sidebar.classList.add('expand', 'open');
-  }
-}
-
-function onActionAlbumExport(e) {
-  /** @type {import('./cards/CardAlbumElement.js').CardAlbumElement} */
-  const albumElement = document.querySelector('#album');
-  const store = getInventoryStore();
-  const album = getAlbumInStore(store, albumElement.albumId);
-  if (album) {
-    const timestamp = Date.now();
-    try {
-      const jsonData = exportAlbumToJSON(album);
-      downloadText(`satchel-album-data-${timestamp}.json`, JSON.stringify(jsonData, null, 4));
-    } catch (e) {
-      console.error(e);
-    }
-  }
+  let albumContainer = document.querySelector('.albumContainer');
+  albumContainer.classList.toggle('open');
 }
 
 async function onActionAlbumImport() {
   await onUploadClick();
-}
-function onActionAlbumLeave() {
-  let sidebar = document.querySelector('.sidebar');
-  sidebar.classList.remove('expand', 'open');
 }
 
 function onEditClick() {

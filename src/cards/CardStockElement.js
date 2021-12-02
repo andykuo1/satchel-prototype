@@ -49,7 +49,7 @@ const INNER_STYLE = /* css */`
   position: relative;
   width: 18em;
   height: 22em;
-  --text-color: #FFFFFF;
+  --text-color: #ffffff;
   --outline-color: #333333;
   --background-image: url(res/images/paper.jpg);
   --portrait-image: url(res/images/potion.png);

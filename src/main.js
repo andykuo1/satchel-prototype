@@ -1,4 +1,3 @@
-import { setGroundContainer } from './inventory/GroundHelper.js';
 import { BUILD_VERSION } from './globals.js';
 
 import { resolveSessionStatus } from './session/SatchelSession.js';
@@ -9,7 +8,11 @@ import { loadSatchelFromStorage, saveSatchelToStorage } from './session/SatchelS
 import './app/index.js';
 import './inventory/element/index.js';
 import './cards/index.js';
+import './album/index.js';
 import './toolbar.js';
+import { getAlbumsInStore } from './album/Album.js';
+import { getInventoryStore } from './inventory/InventoryStore.js';
+import { ItemAlbumElement } from './album/ItemAlbumElement.js';
 
 async function connect() {
   let session = resolveSessionStatus();
@@ -32,10 +35,6 @@ async function connect() {
 window.addEventListener('DOMContentLoaded', () => {
   // Set build version
   document.querySelector('#appVersion').textContent = `v${BUILD_VERSION}`;
-
-  // Initialize store
-  const ground = document.querySelector('#ground');
-  setGroundContainer(ground);
 
   // Prepare item context menu
   document.addEventListener('itemcontext', (e) => {
@@ -72,6 +71,17 @@ async function onDocumentFocusUpdate() {
   } finally {
     // Initialize satchel from storage.
     loadSatchelFromStorage();
+    // Add all albums to the panel
+    const store = getInventoryStore();
+    const albumContainer = document.querySelector('#albumList');
+    for(let album of getAlbumsInStore(store)) {
+      if (album.albumId === 'ground') {
+        continue;
+      }
+      const albumElement = new ItemAlbumElement();
+      albumElement.albumId = album.albumId;
+      albumContainer.appendChild(albumElement);
+    }
     setInterval(() => saveSatchelToStorage(), 1000);
   }
 }
