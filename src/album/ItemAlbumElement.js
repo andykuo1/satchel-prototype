@@ -4,7 +4,7 @@ import { createInventoryView } from '../inventory/InvView.js';
 import { copyItem } from '../inventory/Item.js';
 import { uuid } from '../util/uuid.js';
 import { upgradeProperty } from '../util/wc.js';
-import { getAlbumInStore, getItemIdsInAlbum, getItemInAlbum } from '../cards/CardAlbum.js';
+import { getAlbumInStore, getItemIdsInAlbum, getItemInAlbum } from './Album.js';
 import { addItemToAlbum, clearItemsInAlbum, deleteAlbumFromStore, exportAlbumToJSON, isAlbumInStore, isAlbumLocked, removeItemFromAlbum, setAlbumLocked } from './Album.js';
 import { getCursor } from '../inventory/element/InventoryCursorElement.js';
 import { downloadText } from '../util/downloader.js';

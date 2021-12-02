@@ -1,4 +1,4 @@
-import { exportAlbumToJSON, importAlbumFromJSON, isAlbumInStore } from '../cards/CardAlbum.js';
+import { exportAlbumToJSON, importAlbumFromJSON, isAlbumInStore } from '../album/Album.js';
 import { addAlbumToStore, copyAlbum, createAlbum, getAlbumInStore, getAlbumsInStore } from '../album/Album.js';
 import { exportInventoryToJSON, importInventoryFromJSON } from '../inventory/InventoryLoader.js';
 import { createGridInventoryInStore, dispatchAlbumChange, dispatchInventoryChange, getInventoryInStore, getInventoryStore, isInventoryInStore } from '../inventory/InventoryStore.js';

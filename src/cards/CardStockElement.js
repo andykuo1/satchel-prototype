@@ -4,7 +4,7 @@ import { stringHash } from '../util/hash.js';
 import { dropOnGround } from '../inventory/GroundHelper.js';
 import { addItemToInventory } from '../inventory/InventoryTransfer.js';
 import { getInventoryStore } from '../inventory/InventoryStore.js';
-import { removeItemFromAlbum } from './CardAlbum.js';
+import { removeItemFromAlbum } from '../album/Album.js';
 import { downloadText } from '../util/downloader.js';
 
 const INNER_HTML = /* html */`
