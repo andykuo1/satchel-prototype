@@ -1,6 +1,6 @@
 import { downloadText } from './util/downloader.js';
 import { dropOnGround } from './inventory/GroundHelper.js';
-import { exportInventoryToJSON, importInventoryFromJSON } from './inventory/InventoryLoader.js';
+import { exportInventoryToJSON, importInventoryFromJSON } from './inv/InvLoader.js';
 import { dispatchInventoryChange, getInventoryStore } from './inventory/InventoryStore.js';
 import { connectAsServer, isServerSide } from './app/PeerSatchelConnector.js';
 import { getCursorContext } from './inventory/CursorHelper.js';

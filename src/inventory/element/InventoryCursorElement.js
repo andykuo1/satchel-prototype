@@ -21,8 +21,8 @@ import { DEFAULT_ITEM_UNIT_SIZE } from './InventoryElementMouseHelper.js';
 /**
  * @typedef {import('./InventoryGridElement.js').InventoryGridElement} InventoryGridElement
  * 
- * @typedef {import('../Inv.js').Inventory} Inventory
- * @typedef {import('../Inv.js').InventoryId} InventoryId
+ * @typedef {import('../../inv/Inv.js').Inventory} Inventory
+ * @typedef {import('../../inv/Inv.js').InventoryId} InventoryId
  * @typedef {import('../InventoryStore.js').InventoryStore} InventoryStore
  *
  * @typedef {import('../../item/Item.js').Item} Item

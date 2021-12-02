@@ -1,6 +1,6 @@
 import { dropOnGround } from '../inventory/GroundHelper.js';
-import { createGridInventory } from '../inventory/Inv.js';
-import { exportInventoryToJSON, importInventoryFromJSON } from '../inventory/InventoryLoader.js';
+import { createGridInventory } from '../inv/Inv.js';
+import { exportInventoryToJSON, importInventoryFromJSON } from '../inv/InvLoader.js';
 import {
   addInventoryToStore,
   createGridInventoryInStore,

@@ -12,8 +12,8 @@ import { getItemByItemId } from '../InvItems.js';
 import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../InvSlots.js';
 
 /**
- * @typedef {import('../Inv.js').Inventory} Inventory
- * @typedef {import('../Inv.js').InventoryId} InventoryId
+ * @typedef {import('../../inv/Inv.js').Inventory} Inventory
+ * @typedef {import('../../inv/Inv.js').InventoryId} InventoryId
  * @typedef {import('../InventoryStore.js').InventoryStore} InventoryStore
  *
  * @typedef {import('../../item/Item.js').Item} Item
