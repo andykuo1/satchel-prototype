@@ -3,7 +3,8 @@ import { dispatchAlbumChange } from '../satchel/album/AlbumEvents.js';
 import { exportAlbumToJSON, importAlbumFromJSON } from '../satchel/album/AlbumLoader.js';
 import { addAlbumInStore, getAlbumInStore, getAlbumsInStore, isAlbumInStore } from '../satchel/album/AlbumStore.js';
 import { exportInventoryToJSON, importInventoryFromJSON } from '../satchel/inv/InvLoader.js';
-import { createGridInventoryInStore, dispatchInventoryChange, getInventoryInStore, getInventoryStore, isInventoryInStore } from '../inventory/InventoryStore.js';
+import { createGridInventoryInStore, getInventoryInStore, getInventoryStore, isInventoryInStore } from '../inventory/InventoryStore.js';
+import { dispatchInventoryChange } from '../satchel/inv/InvEvents.js';
 
 export function loadSatchelFromStorage() {
   const store = getInventoryStore();

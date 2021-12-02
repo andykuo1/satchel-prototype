@@ -1,5 +1,5 @@
 import { createGridInventory, createSocketInventory } from '../satchel/inv/Inv.js';
-import { addStoreEventListener, dispatchStoreEvent, removeStoreEventListener } from './InventoryEventStore.js';
+import { dispatchInventoryChange } from '../satchel/inv/InvEvents.js';
 
 /**
  * @typedef {import('../satchel/inv/Inv.js').InventoryId} InventoryId
@@ -107,30 +107,6 @@ export function createSocketInventoryInStore(store, invId) {
     throw new Error('Failed to create socket inventory in store.');
   }
   return inv;
-}
-
-/**
- * @param store
- * @param inventoryId
- */
-export function dispatchInventoryChange(store, inventoryId) {
-  dispatchStoreEvent(store, 'inventory', inventoryId);
-}
-
-/**
- * @param inventoryId
- * @param callback
- */
-export function addInventoryChangeListener(inventoryId, callback) {
-  addStoreEventListener('inventory', inventoryId, callback);
-}
-
-/**
- * @param inventoryId
- * @param callback
- */
-export function removeInventoryChangeListener(inventoryId, callback) {
-  removeStoreEventListener('inventory', inventoryId, callback);
 }
 
 /**

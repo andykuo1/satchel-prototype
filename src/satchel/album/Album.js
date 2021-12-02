@@ -1,5 +1,6 @@
 import { cloneItem } from '../item/Item.js';
 import { uuid } from '../../util/uuid.js';
+
 import { dispatchAlbumChange } from './AlbumEvents.js';
 import { getExistingAlbumInStore } from './AlbumStore.js';
 

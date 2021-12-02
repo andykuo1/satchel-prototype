@@ -1,19 +1,18 @@
 import { upgradeProperty } from '../../util/wc.js';
 import { containerMouseUpCallback, DEFAULT_ITEM_UNIT_SIZE } from './InventoryElementMouseHelper.js';
 import {
-  addInventoryChangeListener,
   createGridInventoryInStore,
   createSocketInventoryInStore,
   deleteInventoryFromStore,
   getInventoryInStore,
   getInventoryStore,
-  removeInventoryChangeListener,
 } from '../InventoryStore.js';
 import { InventoryItemElement } from './InventoryItemElement.js';
 import {
   getItemAtSlotIndex, getItemIdsInSlots, isInventoryEmpty,
 } from '../InventoryTransfer.js';
 import { uuid } from '../../util/uuid.js';
+import { addInventoryChangeListener } from '../../satchel/inv/InvEvents.js';
 
 const INNER_HTML = /* html */`
 <article>

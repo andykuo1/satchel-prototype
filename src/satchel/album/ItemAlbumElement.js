@@ -1,4 +1,4 @@
-import { addInventoryChangeListener, createSocketInventoryInStore, deleteInventoryFromStore, getInventoryInStore, getInventoryStore, isInventoryInStore, removeInventoryChangeListener } from '../../inventory/InventoryStore.js';
+import { createSocketInventoryInStore, deleteInventoryFromStore, getInventoryInStore, getInventoryStore, isInventoryInStore } from '../../inventory/InventoryStore.js';
 import { addItemToInventory, getItemAtSlotIndex } from '../../inventory/InventoryTransfer.js';
 import { createInventoryView } from '../../inventory/InvView.js';
 import { uuid } from '../../util/uuid.js';
@@ -12,6 +12,7 @@ import { exportAlbumToJSON } from './AlbumLoader.js';
 import { deleteAlbumInStore, getAlbumInStore, isAlbumInStore } from './AlbumStore.js';
 import { addAlbumChangeListener, dispatchAlbumChange, removeAlbumChangeListener } from './AlbumEvents.js';
 import { IconButtonElement } from '../../app/IconButtonElement.js';
+import { addInventoryChangeListener, removeInventoryChangeListener } from '../inv/InvEvents.js';
 
 const INNER_HTML = /* html */`
 <fieldset>

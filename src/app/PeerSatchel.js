@@ -5,13 +5,13 @@ import {
   addInventoryToStore,
   createGridInventoryInStore,
   deleteInventoryFromStore,
-  dispatchInventoryChange,
   getInventoryInStore,
   getInventoryStore,
   isInventoryInStore,
 } from '../inventory/InventoryStore.js';
 import { getExistingInventory } from '../inventory/InventoryTransfer.js';
 import { exportItemToJSON, importItemFromJSON } from '../satchel/item/ItemLoader.js';
+import { dispatchInventoryChange } from '../satchel/inv/InvEvents.js';
 
 /**
  * @typedef {import('../peerful/PeerfulConnection.js').PeerfulConnection} PeerfulConnection

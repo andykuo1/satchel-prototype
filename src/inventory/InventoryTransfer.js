@@ -1,12 +1,12 @@
 import {
   isInventoryInStore,
   getInventoryInStore,
-  dispatchInventoryChange,
 } from './InventoryStore.js';
 import * as InvItems from './InvItems.js';
 import { getInventorySlotCount } from '../satchel/inv/Inv.js';
 import { cloneItem } from '../satchel/item/Item.js';
 import { dispatchItemChange } from '../satchel/item/ItemEvents.js';
+import { dispatchInventoryChange } from '../satchel/inv/InvEvents.js';
 
 /**
  * @typedef {import('./InventoryStore.js').Item} Item

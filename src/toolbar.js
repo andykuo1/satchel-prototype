@@ -1,7 +1,7 @@
 import { downloadText } from './util/downloader.js';
 import { dropOnGround } from './inventory/GroundHelper.js';
 import { exportInventoryToJSON, importInventoryFromJSON } from './satchel/inv/InvLoader.js';
-import { dispatchInventoryChange, getInventoryStore } from './inventory/InventoryStore.js';
+import { getInventoryStore } from './inventory/InventoryStore.js';
 import { connectAsServer, isServerSide } from './app/PeerSatchelConnector.js';
 import { getCursorContext } from './inventory/CursorHelper.js';
 import { getExistingInventory } from './inventory/InventoryTransfer.js';
@@ -16,6 +16,7 @@ import { importAlbumFromJSON } from './satchel/album/AlbumLoader.js';
 import { createAlbumInStore } from './satchel/album/AlbumStore.js';
 import { copyAlbum } from './satchel/album/Album.js';
 import { dispatchAlbumChange } from './satchel/album/AlbumEvents.js';
+import { dispatchInventoryChange } from './satchel/inv/InvEvents.js';
 
 function elementEventListener(selector, event, callback) {
   document.querySelector(selector).addEventListener(event, callback);
