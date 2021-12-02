@@ -13,7 +13,7 @@ import { ItemAlbumElement } from './satchel/album/ItemAlbumElement.js';
 import { exportDataToJSON } from './session/SatchelDataLoader.js';
 import { exportItemToJSON, importItemFromJSON } from './satchel/item/ItemLoader.js';
 import { importAlbumFromJSON } from './satchel/album/AlbumLoader.js';
-import { createAlbumInStore } from './satchel/album/AlbumStore.js';
+import { addAlbumInStore, createAlbumInStore } from './satchel/album/AlbumStore.js';
 import { copyAlbum } from './satchel/album/Album.js';
 import { dispatchAlbumChange } from './satchel/album/AlbumEvents.js';
 import { dispatchInventoryChange } from './satchel/inv/InvEvents.js';
@@ -158,8 +158,8 @@ async function onUploadClick() {
     case 'album_v1': {
       const store = getInventoryStore();
       const album = importAlbumFromJSON(jsonData);
-      const newAlbum = createAlbumInStore(store, album.albumId);
-      copyAlbum(album, newAlbum);
+      const newAlbum = copyAlbum(album);
+      addAlbumInStore(store, newAlbum.albumId, newAlbum);
       const albumContainer = document.querySelector('#albumList');
       const albumElement = new ItemAlbumElement();
       albumElement.albumId = newAlbum.albumId;

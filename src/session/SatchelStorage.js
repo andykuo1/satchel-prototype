@@ -1,4 +1,4 @@
-import { copyAlbum, createAlbum } from '../satchel/album/Album.js';
+import { cloneAlbum, createAlbum } from '../satchel/album/Album.js';
 import { dispatchAlbumChange } from '../satchel/album/AlbumEvents.js';
 import { exportAlbumToJSON, importAlbumFromJSON } from '../satchel/album/AlbumLoader.js';
 import { addAlbumInStore, getAlbumInStore, getAlbumsInStore, isAlbumInStore } from '../satchel/album/AlbumStore.js';
@@ -39,7 +39,7 @@ export function loadSatchelFromStorage() {
         const albumId = album.albumId;
         if (isAlbumInStore(store, albumId)) {
           const oldAlbum = getAlbumInStore(store, albumId);
-          copyAlbum(album, oldAlbum);
+          cloneAlbum(album, oldAlbum);
           dispatchAlbumChange(store, albumId);
         } else {
           addAlbumInStore(store, albumId, album);
