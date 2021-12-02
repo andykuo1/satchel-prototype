@@ -6,15 +6,6 @@ const INNER_HTML = /* html */ `
 <icon-button id="actionDelete" icon="res/delete.svg" alt="delete" title="Delete Item"></icon-button>
 `;
 const INNER_STYLE = /* css */ `
-#actionDelete {
-  position: absolute;
-  bottom: 1em;
-  left: 2em;
-  border-radius: 1em;
-}
-#actionDelete:hover {
-  filter: brightness(70%);
-}
 `;
 
 export class ItemDeleteElement extends HTMLElement {

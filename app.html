@@ -49,220 +49,222 @@
         height: 100%;
       }
     </style>
-    <sidebar-layout style="flex-direction: row-reverse">
+    <sidebar-layout>
       <style>
-        .groundContainer {
-          display: flex;
-          flex-direction: column;
-        }
-        #ground {
+        .spacing {
           flex: 1;
-          display: flex;
-          flex-direction: column;
           overflow-y: auto;
-          width: 4em;
-        }
-        #ground > * {
-          margin: 0 0.5em;
-          margin-top: 0.2em;
-        }
-        .sidebarActions {
-          padding: 0.5em 0;
+          margin-left: 0.5em;
+          width: 5em;
+          scroll-behavior: smooth;
         }
       </style>
-      <div slot="sidebar" class="groundContainer">
+      <div slot="sidebar">
         <div class="sidebarActions">
-          <icon-button id="actionAlbumOpen" icon="res/bookmarks.svg" alt="album" title="Open Album"></icon-button>
+          <icon-button id="actionItemEdit" icon="res/edit.svg" alt="foundry" title="Open Foundry"></icon-button>
         </div>
-        <div id="ground">
-          <!-- To be filled with ground items -->
-          <album-ground></album-ground>
+        <div class="spacing">
+
         </div>
         <div class="sidebarActions">
-          <icon-button id="actionNewItem" icon="res/add.svg" alt="new" title="New Item"></icon-button>
+          <icon-button id="cloudButton" icon="res/cloud.svg" alt="connect" title="Connect" disabled></icon-button>
+        </div>
+        <div class="sidebarActions">
+          <icon-button id="actionSettings" icon="res/settings.svg" alt="settings" title="Settings"></icon-button>
         </div>
       </div>
-      <div class="body">
+      <sidebar-layout style="flex-direction: row-reverse">
         <style>
-          main {
-            flex: 1;
-            overflow: hidden;
+          .groundContainer {
+            display: flex;
+            flex-direction: column;
           }
-          header,
-          footer {
-            z-index: 1;
+          #ground {
+            flex: 1;
+            overflow-y: auto;
+            margin-left: 0.5em;
+            width: 5em;
+            scroll-behavior: smooth;
+          }
+          .sidebarActions {
+            padding: 0.5em 0;
           }
         </style>
-        <header>
-          <style>
-            header {
-              display: flex;
-              flex-direction: row;
-              align-items: center;
-              padding: 0 2em;
-            }
-            .spacer {
-              flex: 1;
-            }
-            .toolbar {
-              white-space: nowrap;
-              overflow-x: auto;
-            }
-          </style>
-          <icon-button id="editButton" icon="res/edit.svg" alt="foundry" title="Open Foundry"></icon-button>
-          <div class="spacer"></div>
-          <h1>Satchel</h1>
-          <small id="onlineStatus"></small>
-          <small id="appVersion">v-.-.-</small>
-          <div class="spacer"></div>
-          <div class="toolbar">
-            <style>
-              .toolbar button:disabled {
-                opacity: 0.3;
-              }
-              #onlineStatus {
-                color: red;
-              }
-              #onlineStatus::after {
-                content: 'OFFLINE';
-              }
-              #onlineStatus.active {
-                color: green;
-              }
-              #onlineStatus.active::after {
-                content: 'ONLINE';
-              }
-            </style>
-            <icon-button id="uploadButton" icon="res/upload.svg" alt="upload" title="Upload"></icon-button>
-            <icon-button id="downloadButton" icon="res/download.svg" alt="download" title="Download"></icon-button>
-            <icon-button id="cloudButton" icon="res/cloud.svg" alt="connect" title="Connect" disabled></icon-button>
+        <div slot="sidebar" class="groundContainer">
+          <div class="sidebarActions">
+            <icon-button id="actionAlbumOpen" icon="res/bookmarks.svg" alt="album" title="Open Album"></icon-button>
           </div>
-        </header>
-        <main>
+          <album-ground id="ground"></album-ground>
+          <div class="sidebarActions">
+            <icon-button id="actionNewItem" icon="res/add.svg" alt="new" title="New Item"></icon-button>
+          </div>
+        </div>
+        <div class="body">
           <style>
             main {
-              position: relative;
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              text-align: center;
-            }
-          </style>
-          <style>
-            #workspace {
               flex: 1;
-              width: 100%;
-              height: 100%;
-              overflow: auto;
+              overflow: hidden;
             }
-          </style>
-          <div id="workspace">
-            <inventory-grid invid="main"></inventory-grid>
-          </div>
-          <item-delete></item-delete>
-          <style>
-            .sidebar {
-              background: #333333;
-              position: absolute;
-              display: flex;
-              flex-direction: row;
-              top: 0;
-              right: 0;
-              left: 0;
-              bottom: 0;
-              width: 100%;
-              height: 100%;
-              transform: translateX(-100%);
-              transition: transform 0.3s ease;
-              --peek-width: 22em;
-            }
-            .sidebar.open {
-              transform: translateX(calc(-100% + var(--peek-width)));
-            }
-            .sidebar.expand {
-              transform: translateX(0%);
-            }
-            .sidebar .peek {
-              width: var(--peek-width);
-            }
-            .sidebar:not(.open) .peek {
-              display: none;
-            }
-            .sidebar:not(.expand) .peek {
-              margin-left: auto;
-            }
-
-            .peek {
-              display: flex;
-              flex-direction: column;
-            }
-            .peek item-editor {
-              flex: 1;
-            }
-          </style>
-          <div class="sidebar">
-            <div class="peek">
-              <item-editor id="editor"></item-editor>
-              <fieldset style="display: flex; flex-direction: column;">
-                <button id="actionSendToPlayer">Send To Player</button>
-                <button id="actionDropToGround">Drop To Ground</button>
-                <button id="actionExportToFile">Export To File</button>
-                <button id="actionSaveToAlbum">Save To Album</button>
-              </fieldset>
-            </div>
-          </div>
-        </main>
-        <footer>
-          <style>
+            header,
             footer {
-              font-family: monospace;
-              opacity: 0.6;
+              z-index: 1;
             }
           </style>
-          <a href="https://github.com/andykuo1/satchel" target="_blank">
-            <small> Made with ❤ by Andrew Kuo. </small>
-          </a>
-        </footer>
-      </div>
-      <style>
-        .albumContainer {
-          display: flex;
-          flex-direction: column;
-          position: absolute;
-          right: 0;
-          top: 0;
-          bottom: 0;
-          background-color: #333333;
-          padding: 0.5em;
-          z-index: 1;
-          transform: translateX(100%);
-          transition: transform 0.2s ease;
-        }
-        .albumContainer.open {
-          transform: translateX(0);
-        }
-        .albumContainer > * {
-          visibility: hidden;
-        }
-        .albumContainer.open > * {
-          visibility: visible;
-        }
-        .albumActions {
-          display: flex;
-          flex-direction: column;
-        }
-        #albumList {
-          flex: 1;
-          overflow-y: auto;
-        }
-      </style>
-      <div class="albumContainer">
-        <div id="albumList"></div>
-        <div class="albumActions">
-          <button id="actionAlbumNew">New Album</button>
-          <button id="actionAlbumImport">Import Album</button>
+          <header>
+            <style>
+              header {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                padding: 0 2em;
+              }
+              .spacer {
+                flex: 1;
+              }
+              .toolbar {
+                white-space: nowrap;
+                overflow-x: auto;
+              }
+            </style>
+            <div class="spacer"></div>
+            <h1>Satchel</h1>
+            <small id="onlineStatus"></small>
+            <small id="appVersion">v-.-.-</small>
+            <div class="spacer"></div>
+            <div class="toolbar">
+              <style>
+                .toolbar button:disabled {
+                  opacity: 0.3;
+                }
+                #onlineStatus {
+                  color: red;
+                }
+                #onlineStatus::after {
+                  content: 'OFFLINE';
+                }
+                #onlineStatus.active {
+                  color: green;
+                }
+                #onlineStatus.active::after {
+                  content: 'ONLINE';
+                }
+              </style>
+            </div>
+          </header>
+          <main>
+            <style>
+              main {
+                position: relative;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+              }
+            </style>
+            <style>
+              #workspace {
+                flex: 1;
+                width: 100%;
+                height: 100%;
+                overflow: auto;
+              }
+              #delete {
+                position: absolute;
+                left: 0;
+                right: 0;
+                bottom: 0.5em;
+              }
+            </style>
+            <div id="workspace">
+              <inventory-grid invid="main"></inventory-grid>
+            </div>
+            <item-delete id="delete"></item-delete>
+          </main>
         </div>
-      </div>
+        <!-- EDITOR CONTENT -->
+        <style>
+          .editorContainer {
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 25em;
+            background-color: #333333;
+            padding: 0.5em;
+            z-index: 1;
+            transform: translateX(-100%);
+            transition: transform 0.2s ease;
+          }
+          .editorContainer.open {
+            transform: translateX(0);
+          }
+          .editorContainer > * {
+            visibility: hidden;
+          }
+          .editorContainer.open > * {
+            visibility: visible;
+          }
+          .editorActions {
+            display: flex;
+            flex-direction: column;
+          }
+          #editor {
+            flex: 1;
+            overflow-y: auto;
+          }
+        </style>
+        <div class="editorContainer">
+          <item-editor id="editor"></item-editor>
+          <div class="editorActions">
+            <button id="actionItemNew">New Item</button>
+            <button id="actionItemImport">Import Item</button>
+            <button id="actionItemExport">Export Item</button>
+            <button id="actionSendToPlayer">Send To Player</button>
+          </div>
+        </div>
+        <!-- ALBUM CONTENT -->
+        <style>
+          .albumContainer {
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            background-color: #333333;
+            padding: 0.5em;
+            z-index: 1;
+            transform: translateX(100%);
+            transition: transform 0.2s ease;
+          }
+          .albumContainer.open {
+            transform: translateX(0);
+          }
+          .albumContainer > * {
+            visibility: hidden;
+          }
+          .albumContainer.open > * {
+            visibility: visible;
+          }
+          .albumActions {
+            display: flex;
+            flex-direction: column;
+          }
+          #albumList {
+            flex: 1;
+            overflow-y: auto;
+          }
+        </style>
+        <div class="albumContainer">
+          <div id="albumList"></div>
+          <div class="albumActions">
+            <button id="actionAlbumNew">New Album</button>
+            <button id="actionAlbumImport">Import Album</button>
+          </div>
+        </div>
+      </sidebar-layout>
     </sidebar-layout>
     <!-- OUTER CONTENT -->
     <div class="foreground">
@@ -276,6 +278,30 @@
       </p>
       <p>
         <button id="giftSubmit">Send</button>
+      </p>
+    </dialog-prompt>
+    <dialog-prompt id="settingsDialog" style="text-align: center;">
+      <h3>Settings</h3>
+      <p style="display: flex; flex-direction: column;">
+        <button id="actionEraseAll">Erase All Content</button>
+        <br>
+        <button id="uploadButton">Import Data</button>
+        <button id="downloadButton">Export Data</button>
+      </p>
+      <p>
+        <style>
+          #author {
+            font-family: monospace;
+            opacity: 0.3;
+            color: #ffffff;
+          }
+          #author:hover {
+            opacity: 0.6;
+          }
+        </style>
+        <a id="author" href="https://github.com/andykuo1/satchel" target="_blank">
+          <small>Made with ❤ by Andrew Kuo</small>
+        </a>
       </p>
     </dialog-prompt>
     <script type="module" src="src/main.js"></script>

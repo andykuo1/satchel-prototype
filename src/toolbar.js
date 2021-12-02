@@ -5,7 +5,7 @@ import { dispatchAlbumChange, dispatchInventoryChange, getInventoryStore } from 
 import { connectAsServer, isServerSide } from './app/PeerSatchelConnector.js';
 import { getCursorContext } from './inventory/CursorHelper.js';
 import { getExistingInventory } from './inventory/InventoryTransfer.js';
-import { addItemToAlbum, createAlbumInStore, exportAlbumToJSON, getAlbumInStore, getExistingAlbum, importAlbumFromJSON } from './album/Album.js';
+import { addItemToAlbum, createAlbumInStore, getExistingAlbum, importAlbumFromJSON } from './album/Album.js';
 import { uploadFile } from './util/uploader.js';
 import { copyToClipboard } from './util/clipboard.js';
 import { ItemBuilder } from './inventory/Item.js';
@@ -17,22 +17,29 @@ function elementEventListener(selector, event, callback) {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-  elementEventListener('#editButton', 'click', onEditClick);
+  elementEventListener('#actionItemEdit', 'click', onActionItemEdit);
   elementEventListener('#downloadButton', 'click', onDownloadClick);
   elementEventListener('#uploadButton', 'click', onUploadClick);
   elementEventListener('#cloudButton', 'click', onCloudClick);
+  elementEventListener('#actionEraseAll', 'click', onActionEraseAll);
 
-  elementEventListener('#actionExportToFile', 'click', onActionExportToFile);
+  elementEventListener('#actionItemNew', 'click', onActionItemNew);
+  elementEventListener('#actionItemExport', 'click', onActionItemExport);
   elementEventListener('#actionSendToPlayer', 'click', onActionSendToPlayer);
-  elementEventListener('#actionSaveToAlbum', 'click', onActionSaveToAlbum);
   elementEventListener('#actionAlbumOpen', 'click', onActionAlbumOpen);
   elementEventListener('#actionAlbumImport', 'click', onActionAlbumImport);
-  elementEventListener('#actionDropToGround', 'click', onActionDropToGround);
-  elementEventListener('#actionNewItem', 'click', onActionNewItem);
   elementEventListener('#actionAlbumNew', 'click', onActionAlbumNew);
+  elementEventListener('#actionNewItem', 'click', onActionNewItem);
+
+  elementEventListener('#actionSettings', 'click', onActionSettings);
 
   elementEventListener('#giftSubmit', 'click', onGiftSubmit);
 });
+
+function onActionEraseAll() {
+  localStorage.clear();
+  window.location.reload();
+}
 
 function onActionAlbumNew() {
   const store = getInventoryStore();
@@ -48,24 +55,19 @@ function onActionNewItem() {
   let item = new ItemBuilder().default().width(2).height(2).build();
   if (item) {
     dropOnGround(item);
+    const groundElement = document.querySelector('#ground');
+    groundElement.scrollTo(0, groundElement.scrollHeight);
   }
 }
 
-function onActionSaveToAlbum() {
+function onActionItemNew() {
   /** @type {import('./inventory/element/ItemEditorElement.js').ItemEditorElement} */
-  const itemEditor = document.querySelector('#editor');
-  try {
-    let item = itemEditor.getSocketedItem();
-    if (item) {
-      addItemToAlbum(getInventoryStore(), 'main', item);
-      itemEditor.clearEditor();
-    }
-  } catch (e) {
-    console.error('Failed to export item', e);
-  }
-};
+  const editor = document.querySelector('#editor');
+  editor.clearEditor();
+  editor.newEditor();
+}
 
-function onActionExportToFile() {
+function onActionItemExport() {
   /** @type {import('./inventory/element/ItemEditorElement.js').ItemEditorElement} */
   const itemEditor = document.querySelector('#editor');
   try {
@@ -89,12 +91,6 @@ function onActionDropToGround() {
   }
 }
 
-function onActionAlbumView(e) {
-  /** @type {import('./cards/CardAlbumElement.js').CardAlbumElement} */
-  const albumElement = document.querySelector('#album');
-  albumElement.changeView(e.target.value);
-}
-
 function onActionAlbumOpen(e) {
   let albumContainer = document.querySelector('.albumContainer');
   albumContainer.classList.toggle('open');
@@ -104,9 +100,9 @@ async function onActionAlbumImport() {
   await onUploadClick();
 }
 
-function onEditClick() {
-  const sidebar = document.querySelector('.sidebar');
-  sidebar.classList.toggle('open');
+function onActionItemEdit() {
+  let editorContainer = document.querySelector('.editorContainer');
+  editorContainer.classList.toggle('open');
   /** @type {import('./inventory/element/ItemEditorElement.js').ItemEditorElement} */
   const editor = document.querySelector('#editor');
   if (!editor.isEditing()) {
@@ -194,6 +190,11 @@ async function onCloudClick() {
   const shareable = generateShareableLink(peerId);
   await copyToClipboard(shareable);
   window.alert(`Link copied!\n${shareable}`);
+}
+
+function onActionSettings() {
+  let settingsDialog = document.querySelector('#settingsDialog');
+  settingsDialog.toggleAttribute('open', true);
 }
 
 /**

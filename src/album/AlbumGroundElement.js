@@ -13,6 +13,10 @@ const INNER_HTML = /* html */`
 <slot name="items"></slot>
 `;
 const INNER_STYLE = /* css */`
+slot[name="items"] {
+  display: flex;
+  flex-direction: column;
+}
 `;
 
 export class AlbumGroundElement extends HTMLElement {
