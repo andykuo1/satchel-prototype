@@ -48,11 +48,11 @@ export class SatchelServer {
   }
 
   getActiveClientNames() {
-    return this.remoteClients.map(client => client.name);
+    return this.remoteClients.map((client) => client.name);
   }
 
   getActiveClientByName(clientName) {
-    for(let client of this.remoteClients) {
+    for (let client of this.remoteClients) {
       if (client.name === clientName) {
         return client;
       }
@@ -66,14 +66,17 @@ export class SatchelServer {
       return false;
     }
     console.log('Sending item to client...', clientName);
-    let dataToSend = { type: 'gift', message: { from: '', target: clientName, item: exportItemToJSON(item) } };
+    let dataToSend = {
+      type: 'gift',
+      message: { from: '', target: clientName, item: exportItemToJSON(item) },
+    };
     let stringToSend = JSON.stringify(dataToSend);
     client.connection.send(stringToSend);
     return true;
   }
 
   /**
-   * @param {PeerfulConnection} conn 
+   * @param {PeerfulConnection} conn
    */
   onClientConnected(conn) {
     console.log('Remote connection established.');
@@ -85,113 +88,125 @@ export class SatchelServer {
       nannyInterval: null,
     };
     this.remoteClients.push(remoteClient);
-    let clientNames = this.remoteClients.map(client => client.name).filter(name => name.length > 0);
-    for(let client of this.remoteClients) {
-      client.connection.send(JSON.stringify({ type: 'clients', message: clientNames }))
+    let clientNames = this.remoteClients.map((client) => client.name).filter((name) => name.length > 0);
+    for (let client of this.remoteClients) {
+      client.connection.send(JSON.stringify({ type: 'clients', message: clientNames }));
     }
     remoteClient.nannyInterval = setInterval(() => this.onClientNanny(remoteClient), 1000);
-    conn.on('data', data => {
+    conn.on('data', (data) => {
       try {
         const jsonData = JSON.parse(data);
         switch (jsonData.type) {
-          case 'name': {
-            const name = jsonData.message.toLowerCase().replace(/\s/g, '_');
-            if (!name) {
-              let dataToSend = { type: 'error', message: 'Invalid user name.' };
-              let stringToSend = JSON.stringify(dataToSend);
-              conn.send(stringToSend);
-              return;
-            }
-            console.log('Setting up client...', name);
-            remoteClient.lastHeartbeat = performance.now();
-            remoteClient.name = name;
-            const clientDataName = `remote_data#${name}`;
-            // Send to client their first data store
-            let dataToSend;
-            if (clientDataName in this.localData) {
-              dataToSend = this.localData[clientDataName];
-            } else {
-              // Create a new slate for a new user
-              let inv = createGridInventory('main', 12, 9);
-              inv.displayName = name.toUpperCase();
-              let jsonData = exportInventoryToJSON(inv);
-              dataToSend = jsonData;
-            }
-            let stringToSend = JSON.stringify({
-              type: 'reset',
-              message: dataToSend,
-            });
-            conn.send(stringToSend);
-          } break;
-          case 'sync': {
-            const name = remoteClient.name;
-            if (!name) {
-              let dataToSend = { type: 'error', message: 'Not yet signed in.' };
-              let stringToSend = JSON.stringify(dataToSend);
-              conn.send(stringToSend);
-              return;
-            }
-            console.log('Syncing client...', name);
-            remoteClient.lastHeartbeat = performance.now(); // TODO: Disconnect if heartbeat is too much
-            // Update server's copy of client data
-            const clientDataName = `remote_data#${remoteClient.name}`;
-            const clientData = jsonData.message;
-            this.localData[clientDataName] = clientData;
-            let store = getInventoryStore();
-            try {
-              if (!isInventoryInStore(store, clientDataName)) {
-                let inv = importInventoryFromJSON(clientData);
-                // Override id
-                inv.invId = clientDataName;
-                addInventoryToStore(store, clientDataName, inv);
-                let element = /** @type {InventoryGridElement} */ (document.createElement('inventory-grid'));
-                element.id = clientDataName;
-                element.invId = clientDataName;
-                remoteClient.element = element;
-                document.querySelector('#workspace').appendChild(element);
-              } else {
-                let inv = getInventoryInStore(store, clientDataName);
-                importInventoryFromJSON(clientData, inv);
-                // Override id
-                inv.invId = clientDataName;
-                dispatchInventoryChange(store, clientDataName);
+          case 'name':
+            {
+              const name = jsonData.message.toLowerCase().replace(/\s/g, '_');
+              if (!name) {
+                let dataToSend = { type: 'error', message: 'Invalid user name.' };
+                let stringToSend = JSON.stringify(dataToSend);
+                conn.send(stringToSend);
+                return;
               }
-            } catch (e) {
-              console.error(`Failed to load client inventory - ${e}`);
+              console.log('Setting up client...', name);
+              remoteClient.lastHeartbeat = performance.now();
+              remoteClient.name = name;
+              const clientDataName = `remote_data#${name}`;
+              // Send to client their first data store
+              let dataToSend;
+              if (clientDataName in this.localData) {
+                dataToSend = this.localData[clientDataName];
+              } else {
+                // Create a new slate for a new user
+                let inv = createGridInventory('main', 12, 9);
+                inv.displayName = name.toUpperCase();
+                let jsonData = exportInventoryToJSON(inv);
+                dataToSend = jsonData;
+              }
+              let stringToSend = JSON.stringify({
+                type: 'reset',
+                message: dataToSend,
+              });
+              conn.send(stringToSend);
             }
-          } break;
-          case 'gift': {
-            const target = jsonData.message.target;
-            let client = this.getActiveClientByName(target);
-            if (client) {
-              // Forward the request to the target client.
-              client.connection.send(JSON.stringify(jsonData));
-            } else {
-              conn.send(JSON.stringify({ type: 'giftnak' }));
+            break;
+          case 'sync':
+            {
+              const name = remoteClient.name;
+              if (!name) {
+                let dataToSend = { type: 'error', message: 'Not yet signed in.' };
+                let stringToSend = JSON.stringify(dataToSend);
+                conn.send(stringToSend);
+                return;
+              }
+              console.log('Syncing client...', name);
+              remoteClient.lastHeartbeat = performance.now(); // TODO: Disconnect if heartbeat is too much
+              // Update server's copy of client data
+              const clientDataName = `remote_data#${remoteClient.name}`;
+              const clientData = jsonData.message;
+              this.localData[clientDataName] = clientData;
+              let store = getInventoryStore();
+              try {
+                if (!isInventoryInStore(store, clientDataName)) {
+                  let inv = importInventoryFromJSON(clientData);
+                  // Override id
+                  inv.invId = clientDataName;
+                  addInventoryToStore(store, clientDataName, inv);
+                  let element = /** @type {InventoryGridElement} */ (
+                    document.createElement('inventory-grid')
+                  );
+                  element.id = clientDataName;
+                  element.invId = clientDataName;
+                  remoteClient.element = element;
+                  document.querySelector('#workspace').appendChild(element);
+                } else {
+                  let inv = getInventoryInStore(store, clientDataName);
+                  importInventoryFromJSON(clientData, inv);
+                  // Override id
+                  inv.invId = clientDataName;
+                  dispatchInventoryChange(store, clientDataName);
+                }
+              } catch (e) {
+                console.error(`Failed to load client inventory - ${e}`);
+              }
             }
-          } break;
-          case 'giftack': {
-            const from = jsonData.message.from;
-            if (from) {
-              let client = this.getActiveClientByName(from);
+            break;
+          case 'gift':
+            {
+              const target = jsonData.message.target;
+              let client = this.getActiveClientByName(target);
               if (client) {
-                // Forward the request to the source client.
+                // Forward the request to the target client.
                 client.connection.send(JSON.stringify(jsonData));
               } else {
-                // Consume this request.
+                conn.send(JSON.stringify({ type: 'giftnak' }));
               }
-            } else {
-              // This is a server gift.
-              let { target } = jsonData.message;
-              window.alert(`Gift sent to ${target}!`);
             }
-          } break;
-          default: {
-            console.error(`Found unknown message from client - ${data}`);
-            let dataToSend = { type: 'error', message: 'Unknown message.' };
-            let stringToSend = JSON.stringify(dataToSend);
-            conn.send(stringToSend);
-          } break;
+            break;
+          case 'giftack':
+            {
+              const from = jsonData.message.from;
+              if (from) {
+                let client = this.getActiveClientByName(from);
+                if (client) {
+                  // Forward the request to the source client.
+                  client.connection.send(JSON.stringify(jsonData));
+                } else {
+                  // Consume this request.
+                }
+              } else {
+                // This is a server gift.
+                let { target } = jsonData.message;
+                window.alert(`Gift sent to ${target}!`);
+              }
+            }
+            break;
+          default:
+            {
+              console.error(`Found unknown message from client - ${data}`);
+              let dataToSend = { type: 'error', message: 'Unknown message.' };
+              let stringToSend = JSON.stringify(dataToSend);
+              conn.send(stringToSend);
+            }
+            break;
         }
       } catch (error) {
         console.error(`Found invalid message from client - ${data}`, error);
@@ -214,11 +229,11 @@ export class SatchelServer {
   }
 
   /**
-   * @param {PeerfulConnection} conn 
+   * @param {PeerfulConnection} conn
    */
   onClientDisconnected(conn) {
     let flag = false;
-    for(let i = 0; i < this.remoteClients.length; ++i) {
+    for (let i = 0; i < this.remoteClients.length; ++i) {
       let client = this.remoteClients[i];
       if (client.connection === conn) {
         console.log('Disconnecting client...', client.name);
@@ -242,9 +257,9 @@ export class SatchelServer {
         break;
       }
     }
-    let clientNames = this.remoteClients.map(client => client.name).filter(name => name.length > 0);
-    for(let client of this.remoteClients) {
-      client.connection.send(JSON.stringify({ type: 'clients', message: clientNames }))
+    let clientNames = this.remoteClients.map((client) => client.name).filter((name) => name.length > 0);
+    for (let client of this.remoteClients) {
+      client.connection.send(JSON.stringify({ type: 'clients', message: clientNames }));
     }
     if (!flag) {
       console.error(`Unable to disconnect unknown connection - ${conn.localId}:${conn.remoteId}`);
@@ -264,7 +279,7 @@ export class SatchelClient {
 
   getOtherClientNames() {
     if (this.remoteServer) {
-      return this.remoteServer.clientNames.filter(name => name !== this.clientName);
+      return this.remoteServer.clientNames.filter((name) => name !== this.clientName);
     } else {
       return [];
     }
@@ -280,7 +295,7 @@ export class SatchelClient {
       message: {
         from: this.clientName,
         target: clientName,
-        item: exportItemToJSON(item)
+        item: exportItemToJSON(item),
       },
     };
     let stringToSend = JSON.stringify(dataToSend);
@@ -290,7 +305,7 @@ export class SatchelClient {
 
   /**
    * @private
-   * @param {PeerfulConnection} conn 
+   * @param {PeerfulConnection} conn
    */
   setup(conn) {
     let name;
@@ -328,7 +343,7 @@ export class SatchelClient {
   }
 
   /**
-   * @param {PeerfulConnection} conn 
+   * @param {PeerfulConnection} conn
    */
   onClientConnected(conn) {
     console.log('Local connection established.');
@@ -337,38 +352,54 @@ export class SatchelClient {
       data: null,
       clientNames: [],
     };
-    conn.on('data', data => {
+    conn.on('data', (data) => {
       try {
         const jsonData = JSON.parse(data);
         switch (jsonData.type) {
-          case 'reset': {
-            this.remoteServer.data = jsonData.message;
-            const store = getInventoryStore();
-            if (!isInventoryInStore(store, 'main')) {
-              createGridInventoryInStore(getInventoryStore(), 'main', 12, 9);
+          case 'reset':
+            {
+              this.remoteServer.data = jsonData.message;
+              const store = getInventoryStore();
+              if (!isInventoryInStore(store, 'main')) {
+                createGridInventoryInStore(getInventoryStore(), 'main', 12, 9);
+              }
+              let inv = getExistingInventory(getInventoryStore(), 'main');
+              importInventoryFromJSON(jsonData.message, inv);
+              dispatchInventoryChange(store, inv.invId);
             }
-            let inv = getExistingInventory(getInventoryStore(), 'main');
-            importInventoryFromJSON(jsonData.message, inv);
-            dispatchInventoryChange(store, inv.invId);
-          } break;
-          case 'gift': {
-            let { from, target, item } = jsonData.message;
-            let newItem = importItemFromJSON(item);
-            dropOnGround(newItem);
-            window.alert(`You received a gift from ${from || 'the server'}! Remember to pick it up before closing the browser!`);
-            this.remoteServer.connection.send(JSON.stringify({ type: 'giftack', message: { from, target } }));
-          } break;
-          case 'giftack': {
-            let { target } = jsonData.message;
-            window.alert(`Gift sent to ${target}!`);
-          } break;
-          case 'giftnak': {
-            let { target } = jsonData.message;
-            window.alert(`Gift failed to send to ${target}!`);
-          } break;
-          case 'clients': {
-            this.remoteServer.clientNames = [...jsonData.message];
-          } break;
+            break;
+          case 'gift':
+            {
+              let { from, target, item } = jsonData.message;
+              let newItem = importItemFromJSON(item);
+              dropOnGround(newItem);
+              window.alert(
+                `You received a gift from ${
+                  from || 'the server'
+                }! Remember to pick it up before closing the browser!`
+              );
+              this.remoteServer.connection.send(
+                JSON.stringify({ type: 'giftack', message: { from, target } })
+              );
+            }
+            break;
+          case 'giftack':
+            {
+              let { target } = jsonData.message;
+              window.alert(`Gift sent to ${target}!`);
+            }
+            break;
+          case 'giftnak':
+            {
+              let { target } = jsonData.message;
+              window.alert(`Gift failed to send to ${target}!`);
+            }
+            break;
+          case 'clients':
+            {
+              this.remoteServer.clientNames = [...jsonData.message];
+            }
+            break;
           case 'error':
             window.alert(`Oops! Server error message: ${data.message}`);
             conn.close();
@@ -385,7 +416,7 @@ export class SatchelClient {
   }
 
   /**
-   * @param {PeerfulConnection} conn 
+   * @param {PeerfulConnection} conn
    */
   onClientDisconnected(conn) {
     this.remoteServer = null;

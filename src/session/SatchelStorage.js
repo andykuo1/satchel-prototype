@@ -1,9 +1,19 @@
 import { cloneAlbum, createAlbum } from '../satchel/album/Album.js';
 import { dispatchAlbumChange } from '../satchel/album/AlbumEvents.js';
 import { exportAlbumToJSON, importAlbumFromJSON } from '../satchel/album/AlbumLoader.js';
-import { addAlbumInStore, getAlbumInStore, getAlbumsInStore, isAlbumInStore } from '../satchel/album/AlbumStore.js';
+import {
+  addAlbumInStore,
+  getAlbumInStore,
+  getAlbumsInStore,
+  isAlbumInStore,
+} from '../satchel/album/AlbumStore.js';
 import { exportInventoryToJSON, importInventoryFromJSON } from '../satchel/inv/InvLoader.js';
-import { createGridInventoryInStore, getInventoryInStore, getInventoryStore, isInventoryInStore } from '../inventory/InventoryStore.js';
+import {
+  createGridInventoryInStore,
+  getInventoryInStore,
+  getInventoryStore,
+  isInventoryInStore,
+} from '../inventory/InventoryStore.js';
 import { dispatchInventoryChange } from '../satchel/inv/InvEvents.js';
 
 export function loadSatchelFromStorage() {
@@ -34,7 +44,7 @@ export function loadSatchelFromStorage() {
   if (albumData) {
     try {
       let jsonData = JSON.parse(albumData);
-      for(let albumJson of jsonData) {
+      for (let albumJson of jsonData) {
         const album = importAlbumFromJSON(albumJson);
         const albumId = album.albumId;
         if (isAlbumInStore(store, albumId)) {
@@ -73,7 +83,7 @@ export function saveSatchelToStorage() {
 
   let albums = getAlbumsInStore(store);
   let albumData = [];
-  for(let album of albums) {
+  for (let album of albums) {
     try {
       albumData.push(exportAlbumToJSON(album));
     } catch (e) {

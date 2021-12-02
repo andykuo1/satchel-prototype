@@ -111,12 +111,11 @@ export class IconButtonElement extends HTMLElement {
   }
 
   /** @protected */
-  disconnectedCallback() {
-  }
+  disconnectedCallback() {}
 
   /** @protected */
   attributeChangedCallback(attribute, prev, value) {
-    switch(attribute) {
+    switch (attribute) {
       case 'icon':
         this.image.src = value;
         break;

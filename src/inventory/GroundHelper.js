@@ -3,8 +3,8 @@ import { getInventoryStore } from './InventoryStore.js';
 
 /**
  * Assumes the given item is not part of any inventory and that the itemId is unique!
- * 
- * @param freedItem 
+ *
+ * @param freedItem
  */
 export function dropOnGround(freedItem) {
   const store = getInventoryStore();

@@ -14,10 +14,10 @@ export async function connectAsClient(ctx, remoteId) {
       peerful,
       instance: new SatchelClient(),
     };
-    peerful.on('error', err => {
+    peerful.on('error', (err) => {
       window.alert('Oh no! Failed to connect to server! ' + err);
     });
-    peerful.on('connect', conn => {
+    peerful.on('connect', (conn) => {
       console.log('Client connection established.');
       ctx.client.instance.onClientConnected(conn);
       conn.on('error', (error) => {
@@ -60,10 +60,10 @@ export async function connectAsServer(ctx, localId) {
       peerful,
       instance: new SatchelServer(),
     };
-    peerful.on('error', err => {
+    peerful.on('error', (err) => {
       window.alert('Oh no! Failed to start server! ' + err);
     });
-    peerful.on('connect', conn => {
+    peerful.on('connect', (conn) => {
       console.log('Client connection established.');
       ctx.server.instance.onClientConnected(conn);
       conn.on('error', (error) => {
@@ -80,6 +80,6 @@ export async function connectAsServer(ctx, localId) {
       .then(() => console.log('Server started!'))
       .catch((error) => window.alert(error));
   }
-  
+
   document.querySelector('#onlineStatus').classList.toggle('active', true);
 }

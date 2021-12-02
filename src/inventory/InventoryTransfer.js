@@ -1,7 +1,4 @@
-import {
-  isInventoryInStore,
-  getInventoryInStore,
-} from './InventoryStore.js';
+import { isInventoryInStore, getInventoryInStore } from './InventoryStore.js';
 import * as InvItems from '../satchel/inv/InvItems.js';
 import { getInventorySlotCount } from '../satchel/inv/Inv.js';
 import { cloneItem } from '../satchel/item/Item.js';
@@ -18,11 +15,11 @@ import { dispatchInventoryChange } from '../satchel/inv/InvEvents.js';
  */
 
 /**
- * @param {InventoryStore} store 
- * @param {InventoryId} invId 
- * @param {Item} item 
- * @param {number} coordX 
- * @param {number} coordY 
+ * @param {InventoryStore} store
+ * @param {InventoryId} invId
+ * @param {Item} item
+ * @param {number} coordX
+ * @param {number} coordY
  */
 export function addItemToInventory(store, invId, item, coordX, coordY) {
   let inv = getExistingInventory(store, invId);
@@ -31,8 +28,8 @@ export function addItemToInventory(store, invId, item, coordX, coordY) {
 }
 
 /**
- * @param {InventoryStore} store 
- * @param {InventoryId} invId 
+ * @param {InventoryStore} store
+ * @param {InventoryId} invId
  * @param {ItemId} itemId
  */
 export function removeItemFromInventory(store, invId, itemId) {
@@ -73,7 +70,7 @@ export function getItemIdAtSlotCoords(store, invId, coordX, coordY) {
 
 export function getItemIdsInSlots(store, invId) {
   let inv = getExistingInventory(store, invId);
-  return new Set(inv.slots.filter(itemId => typeof itemId === 'string'));
+  return new Set(inv.slots.filter((itemId) => typeof itemId === 'string'));
 }
 
 /**
@@ -113,7 +110,7 @@ export function getExistingInventory(store, invId) {
  * @param itemId
  * @param state
  */
- export function updateItem(store, invId, itemId, state) {
+export function updateItem(store, invId, itemId, state) {
   let inv = getExistingInventory(store, invId);
   let item = InvItems.getItemByItemId(inv, itemId);
   if (!item) {

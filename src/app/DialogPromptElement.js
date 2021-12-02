@@ -161,15 +161,19 @@ export class DialogPromptElement extends HTMLElement {
    */
   attributeChangedCallback(attribute, previous, value) {
     switch (attribute) {
-      case 'open': {
-        let result = value !== null;
-        this.dialog.toggleAttribute('open', result);
-        this.backdrop.classList.toggle('hidden', !result);
-      } break;
-      case 'required': {
-        let result = value !== null;
-        this.cancel.toggleAttribute('disabled', result);
-      } break;
+      case 'open':
+        {
+          let result = value !== null;
+          this.dialog.toggleAttribute('open', result);
+          this.backdrop.classList.toggle('hidden', !result);
+        }
+        break;
+      case 'required':
+        {
+          let result = value !== null;
+          this.cancel.toggleAttribute('disabled', result);
+        }
+        break;
     }
   }
 

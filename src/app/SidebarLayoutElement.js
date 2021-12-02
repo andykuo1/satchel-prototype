@@ -66,12 +66,10 @@ export class SidebarLayoutElement extends HTMLElement {
   }
 
   /** @protected */
-  connectedCallback() {
-  }
+  connectedCallback() {}
 
   /** @protected */
-  disconnectedCallback() {
-  }
+  disconnectedCallback() {}
 
   /**
    * @param attribute
@@ -79,7 +77,6 @@ export class SidebarLayoutElement extends HTMLElement {
    * @param value
    * @protected
    */
-  attributeChangedCallback(attribute, previous, value) {
-  }
+  attributeChangedCallback(attribute, previous, value) {}
 }
 SidebarLayoutElement.define();
