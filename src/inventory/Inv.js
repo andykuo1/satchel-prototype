@@ -1,10 +1,10 @@
+import { uuid } from '../util/uuid.js';
+import { cloneItem, copyItem } from './Item.js';
+
 /**
  * @typedef {import('./Item.js').Item} Item
  * @typedef {import('./Item.js').ItemId} ItemId
  */
-
-import { uuid } from '../util/uuid.js';
-import { cloneItem } from './Item.js';
 
 /**
  * @typedef {string} InventoryId
@@ -32,7 +32,7 @@ import { cloneItem } from './Item.js';
  * @param {number} maxCoordY
  * @returns {Inventory}
  */
-function createInventory(invId, invType, slotCount, maxCoordX, maxCoordY) {
+export function createInventory(invId, invType, slotCount, maxCoordX, maxCoordY) {
   let inv = {
     invId,
     type: invType,
@@ -71,11 +71,35 @@ export function createSocketInventory(invId) {
 }
 
 /**
+ * Copies the target inventory to destination as a new inventory. Unlike cloneInventory(),
+ * the resultant inventory can be added to the store with its copy.
+ * 
  * @param {Inventory} other
  * @param {Inventory} [dst]
  * @returns {Inventory}
  */
 export function copyInventory(other, dst = undefined) {
+  let result = cloneInventory(other, dst, { preserveItemId: false });
+  if (result.invId === other.invId) {
+    result.invId = uuid();
+  }
+  return result;
+}
+
+/**
+ * Clones the target inventory to destination as a stored inventory. This is usually used
+ * to store an exact replica of an inventory state, including ids. Unlike copyInventory(),
+ * the resultant inventory CANNOT be added to the store with its clone. It must be replace
+ * its clone.
+ * 
+ * @param {Inventory} other
+ * @param {Inventory} [dst]
+ * @param {object} [opts]
+ * @param {boolean} [opts.preserveItemId]
+ * @returns {Inventory}
+ */
+export function cloneInventory(other, dst = undefined, opts = {}) {
+  const { preserveItemId = true } = opts;
   const invId = other.invId || uuid();
   const type = other.type || 'grid';
   const width = Number(other.width) || 1;
@@ -91,9 +115,16 @@ export function copyInventory(other, dst = undefined) {
     dst.length = length;
   }
   if (typeof other.items === 'object') {
-    for(let item of Object.values(other.items)) {
-      let newItem = cloneItem(item);
-      dst.items[newItem.itemId] = item;
+    if (preserveItemId) {
+      for(let item of Object.values(other.items)) {
+        let newItem = cloneItem(item);
+        dst.items[newItem.itemId] = item;
+      }
+    } else {
+      for(let item of Object.values(other.items)) {
+        let newItem = copyItem(item);
+        dst.items[newItem.itemId] = item;
+      }
     }
   }
   if (Array.isArray(other.slots)) {

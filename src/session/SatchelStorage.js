@@ -1,5 +1,6 @@
-import { exportAlbumToJSON, importAlbumFromJSON, isAlbumInStore } from '../album/Album.js';
+import { isAlbumInStore } from '../album/Album.js';
 import { addAlbumToStore, copyAlbum, createAlbum, getAlbumInStore, getAlbumsInStore } from '../album/Album.js';
+import { exportAlbumToJSON, importAlbumFromJSON } from '../album/AlbumLoader.js';
 import { exportInventoryToJSON, importInventoryFromJSON } from '../inventory/InventoryLoader.js';
 import { createGridInventoryInStore, dispatchAlbumChange, dispatchInventoryChange, getInventoryInStore, getInventoryStore, isInventoryInStore } from '../inventory/InventoryStore.js';
 

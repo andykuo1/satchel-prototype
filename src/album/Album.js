@@ -1,15 +1,6 @@
-import { exportDataToJSON, importDataFromJSON } from '../inventory/InventoryLoader.js';
 import { dispatchAlbumChange } from '../inventory/InventoryStore.js';
 import { cloneItem } from '../inventory/Item.js';
 import { uuid } from '../util/uuid.js';
-
-export function exportAlbumToJSON(album, dst = undefined) {
-  return exportDataToJSON('album_v1', copyAlbum(album), {}, dst);
-}
-
-export function importAlbumFromJSON(jsonData, dst = undefined) {
-  return importDataFromJSON(jsonData, 'album_v1', (data) => copyAlbum(data, dst));
-}
 
 export function getExistingAlbum(store, albumId) {
   if (isAlbumInStore(store, albumId)) {

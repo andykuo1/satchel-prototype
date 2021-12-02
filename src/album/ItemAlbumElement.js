@@ -4,10 +4,11 @@ import { createInventoryView } from '../inventory/InvView.js';
 import { uuid } from '../util/uuid.js';
 import { upgradeProperty } from '../util/wc.js';
 import { getAlbumInStore, getItemIdsInAlbum, getItemInAlbum } from './Album.js';
-import { addItemToAlbum, clearItemsInAlbum, deleteAlbumFromStore, exportAlbumToJSON, isAlbumInStore, isAlbumLocked, removeItemFromAlbum, setAlbumLocked } from './Album.js';
+import { addItemToAlbum, clearItemsInAlbum, deleteAlbumFromStore, isAlbumInStore, isAlbumLocked, removeItemFromAlbum, setAlbumLocked } from './Album.js';
 import { getCursor } from '../inventory/element/InventoryCursorElement.js';
 import { downloadText } from '../util/downloader.js';
 import { cloneItem } from '../inventory/Item.js';
+import { exportAlbumToJSON } from './AlbumLoader.js';
 
 
 const INNER_HTML = /* html */`

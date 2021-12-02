@@ -1,6 +1,6 @@
 import { dropOnGround } from '../inventory/GroundHelper.js';
 import { createGridInventory } from '../inventory/Inv.js';
-import { exportInventoryToJSON, exportItemToJSON, importInventoryFromJSON, importItemFromJSON } from '../inventory/InventoryLoader.js';
+import { exportInventoryToJSON, importInventoryFromJSON } from '../inventory/InventoryLoader.js';
 import {
   addInventoryToStore,
   createGridInventoryInStore,
@@ -11,6 +11,7 @@ import {
   isInventoryInStore,
 } from '../inventory/InventoryStore.js';
 import { getExistingInventory } from '../inventory/InventoryTransfer.js';
+import { exportItemToJSON, importItemFromJSON } from '../inventory/ItemLoader.js';
 
 /**
  * @typedef {import('../peerful/PeerfulConnection.js').PeerfulConnection} PeerfulConnection
