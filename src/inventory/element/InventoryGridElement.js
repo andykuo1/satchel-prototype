@@ -12,7 +12,7 @@ import {
   getItemAtSlotIndex, getItemIdsInSlots, isInventoryEmpty,
 } from '../InventoryTransfer.js';
 import { uuid } from '../../util/uuid.js';
-import { addInventoryChangeListener } from '../../satchel/inv/InvEvents.js';
+import { addInventoryChangeListener, removeInventoryChangeListener } from '../../satchel/inv/InvEvents.js';
 
 const INNER_HTML = /* html */`
 <article>
