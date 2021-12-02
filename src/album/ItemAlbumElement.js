@@ -29,12 +29,16 @@ const INNER_STYLE = /* css */`
 fieldset {
   position: relative;
   width: 15em;
+  min-height: 2em;
   border-color: #444444;
+}
+fieldset.unlocked {
+  border-color: #ffffff;
 }
 legend {
   display: flex;
   flex-direction: row;
-  border-bottom: 1px solid transparent;
+  border-bottom: 2px solid transparent;
 }
 legend[contenteditable] {
   border-color: #ffffff;
@@ -234,6 +238,7 @@ export class ItemAlbumElement extends HTMLElement {
     this.buttonLock.title = locked ? 'Unlock Album' : 'Lock Album';
     this.buttonDelete.toggleAttribute('disabled', locked);
     this.inputTitle.toggleAttribute('contenteditable', !locked);
+    this.container.classList.toggle('unlocked', !locked);
 
     // Update name
     this.inputTitle.textContent = name;
