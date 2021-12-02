@@ -1,7 +1,8 @@
 import { addAlbumChangeListener, getInventoryStore, removeAlbumChangeListener } from '../inventory/InventoryStore.js';
 import { upgradeProperty } from '../util/wc.js';
-import { getAlbumInStore, getItemIdsInAlbum, getItemInAlbum } from '../album/Album.js';
+import { getItemIdsInAlbum, getItemInAlbum } from '../album/Album.js';
 import { CardStockElement } from './CardStockElement.js';
+import { getAlbumInStore } from '../album/AlbumStore.js';
 
 const INNER_HTML = /* html */`
 <article>

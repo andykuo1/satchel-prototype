@@ -5,7 +5,6 @@ import { dispatchAlbumChange, dispatchInventoryChange, getInventoryStore } from 
 import { connectAsServer, isServerSide } from './app/PeerSatchelConnector.js';
 import { getCursorContext } from './inventory/CursorHelper.js';
 import { getExistingInventory } from './inventory/InventoryTransfer.js';
-import { addItemToAlbum, createAlbumInStore, getExistingAlbum } from './album/Album.js';
 import { uploadFile } from './util/uploader.js';
 import { copyToClipboard } from './util/clipboard.js';
 import { ItemBuilder } from './inventory/Item.js';
@@ -14,6 +13,8 @@ import { ItemAlbumElement } from './album/ItemAlbumElement.js';
 import { exportDataToJSON } from './session/SatchelDataLoader.js';
 import { exportItemToJSON, importItemFromJSON } from './inventory/ItemLoader.js';
 import { importAlbumFromJSON } from './album/AlbumLoader.js';
+import { createAlbumInStore } from './album/AlbumStore.js';
+import { copyAlbum } from './album/Album.js';
 
 function elementEventListener(selector, event, callback) {
   document.querySelector(selector).addEventListener(event, callback);
@@ -154,15 +155,18 @@ async function onUploadClick() {
     } break;
     case 'album_v1': {
       const store = getInventoryStore();
-      let album = getExistingAlbum(store, 'main');
-      importAlbumFromJSON(jsonData, album);
-      dispatchAlbumChange(store, 'main');
+      const album = importAlbumFromJSON(jsonData);
+      const newAlbum = createAlbumInStore(store, album.albumId);
+      copyAlbum(album, newAlbum);
+      const albumContainer = document.querySelector('#albumList');
+      const albumElement = new ItemAlbumElement();
+      albumElement.albumId = newAlbum.albumId;
+      albumContainer.appendChild(albumElement);
+      dispatchAlbumChange(store, newAlbum.albumId);
     } break;
     case 'item_v1': {
-      const store = getInventoryStore();
-      let album = getExistingAlbum(store, 'main');
       let item = importItemFromJSON(jsonData);
-      addItemToAlbum(store, album.albumId, item);
+      dropOnGround(item);
     } break;
     case 'client_v1':
       throw new Error('Not yet implemented.');

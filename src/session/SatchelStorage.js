@@ -1,6 +1,6 @@
-import { isAlbumInStore } from '../album/Album.js';
-import { addAlbumToStore, copyAlbum, createAlbum, getAlbumInStore, getAlbumsInStore } from '../album/Album.js';
+import { copyAlbum, createAlbum } from '../album/Album.js';
 import { exportAlbumToJSON, importAlbumFromJSON } from '../album/AlbumLoader.js';
+import { addAlbumInStore, getAlbumInStore, getAlbumsInStore, isAlbumInStore } from '../album/AlbumStore.js';
 import { exportInventoryToJSON, importInventoryFromJSON } from '../inventory/InventoryLoader.js';
 import { createGridInventoryInStore, dispatchAlbumChange, dispatchInventoryChange, getInventoryInStore, getInventoryStore, isInventoryInStore } from '../inventory/InventoryStore.js';
 
@@ -40,7 +40,7 @@ export function loadSatchelFromStorage() {
           copyAlbum(album, oldAlbum);
           dispatchAlbumChange(store, albumId);
         } else {
-          addAlbumToStore(store, albumId, album);
+          addAlbumInStore(store, albumId, album);
         }
       }
     } catch (e) {
@@ -51,7 +51,7 @@ export function loadSatchelFromStorage() {
     if (!isAlbumInStore(store, 'ground')) {
       let album = createAlbum('ground');
       album.displayName = 'Ground';
-      addAlbumToStore(store, album.albumId, album);
+      addAlbumInStore(store, album.albumId, album);
     }
   }
 }
