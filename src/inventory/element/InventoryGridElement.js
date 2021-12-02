@@ -11,7 +11,7 @@ import {
 } from '../InventoryStore.js';
 import { InventoryItemElement } from './InventoryItemElement.js';
 import {
-  getItemAtSlotIndex, getItemIdsInSlots,
+  getItemAtSlotIndex, getItemIdsInSlots, isInventoryEmpty,
 } from '../InventoryTransfer.js';
 import { uuid } from '../../util/uuid.js';
 
@@ -84,6 +84,13 @@ h2 {
 }
 `;
 
+/**
+ * init - create a new inventory on add
+ * temp - delete the inventory on remove
+ * noinput - no adding items
+ * nooutput - no removing items
+ * copyoutput - only copy items on remove (does not actually remove)
+ */
 export class InventoryGridElement extends HTMLElement {
   /** @private */
   static get [Symbol.for('templateNode')]() {
@@ -324,6 +331,15 @@ export class InventoryGridElement extends HTMLElement {
 
     this.slotItems.replaceWith(emptySlot);
     this.slotItems = emptySlot;
+
+    if (this.hasAttribute('temp')) {
+      if (isInventoryEmpty(store, invId)) {
+        this.remove();
+        deleteInventoryFromStore(store, invId, inv);
+        return;
+      }
+    }
+
     this.dispatchEvent(
       new CustomEvent('itemchange', { composed: true, bubbles: false })
     );

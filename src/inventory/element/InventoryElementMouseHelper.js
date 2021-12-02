@@ -1,3 +1,9 @@
+import { uuid } from '../../util/uuid.js';
+import { getInventoryStore } from '../InventoryStore.js';
+import { getExistingInventory } from '../InventoryTransfer.js';
+import { getItemByItemId } from '../InvItems.js';
+import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../InvSlots.js';
+import { copyItem } from '../Item.js';
 import { getCursor } from './InventoryCursorElement.js';
 
 /**
@@ -32,7 +38,29 @@ export function itemMouseDownCallback(mouseEvent, itemElement, unitSize) {
     unitSize
   );
   let cursor = getCursor();
-  let result = cursor.pickUp(containerElement.invId, itemElement.itemId, clientCoordX, clientCoordY);
+  let result;
+  if (containerElement.hasAttribute('copyoutput')) {
+    const itemId = itemElement.itemId;
+    const invId = containerElement.invId;
+    if (!itemId) {
+      return;
+    }
+    if (cursor.hasHeldItem()) {
+      // NOTE: Swapping is performed on putDown(), so ignore for pick up.
+      return;
+    }
+    let store = getInventoryStore();
+    let inv = getExistingInventory(store, invId);
+    const slotIndex = getSlotIndexByItemId(inv, itemId);
+    const [fromItemX, fromItemY] = getSlotCoordsByIndex(inv, slotIndex);
+    const item = getItemByItemId(inv, itemId);
+    let newItem = copyItem(item);
+    newItem.itemId = uuid();
+    cursor.setHeldItem(newItem, fromItemX - clientCoordX, fromItemY - clientCoordY);
+    result = true;
+  } else {
+    result = cursor.pickUp(containerElement.invId, itemElement.itemId, clientCoordX, clientCoordY);
+  }
   if (result) {
     // HACK: This should really grab focus to the item.
     document.activeElement.blur();

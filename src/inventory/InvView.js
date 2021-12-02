@@ -1,5 +1,4 @@
-import { deleteInventoryFromStore, getInventoryStore } from './InventoryStore.js';
-import { getExistingInventory, isInventoryEmpty } from './InventoryTransfer.js';
+import { getExistingInventory } from './InventoryTransfer.js';
 
 /** @typedef {import('./element/InventoryGridElement.js').InventoryGridElement} InventoryGridElement */
 
@@ -23,21 +22,6 @@ export function createTemporaryInventoryView(store, inventoryId) {
   const element = /** @type {InventoryGridElement} */ (document.createElement('inventory-grid'));
   element.invId = inv.invId;
   element.toggleAttribute('noinput', true); // Checked by cursor whether the inventory can input items.
-  element.addEventListener('itemchange', onTemporaryInventoryItemChange);
+  element.toggleAttribute('temp', true);
   return element;
-}
-
-/**
- * @param e
- */
-function onTemporaryInventoryItemChange(e) {
-  const { target } = e;
-  const inventoryId = target.invId;
-  const store = getInventoryStore();
-  if (isInventoryEmpty(store, inventoryId)) {
-    target.removeEventListener('itemchange', onTemporaryInventoryItemChange);
-    target.remove();
-    const inventory = getExistingInventory(store, inventoryId);
-    deleteInventoryFromStore(store, inventoryId, inventory);
-  }
 }
