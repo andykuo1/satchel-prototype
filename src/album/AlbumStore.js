@@ -1,5 +1,5 @@
-import { dispatchAlbumChange } from '../inventory/InventoryStore.js';
 import { createAlbum } from './Album.js';
+import { dispatchAlbumChange } from './AlbumEvents.js';
 
 export function getExistingAlbumInStore(store, albumId) {
   if (isAlbumInStore(store, albumId)) {

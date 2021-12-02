@@ -1,7 +1,7 @@
 import { downloadText } from './util/downloader.js';
 import { dropOnGround } from './inventory/GroundHelper.js';
 import { exportInventoryToJSON, importInventoryFromJSON } from './inventory/InventoryLoader.js';
-import { dispatchAlbumChange, dispatchInventoryChange, getInventoryStore } from './inventory/InventoryStore.js';
+import { dispatchInventoryChange, getInventoryStore } from './inventory/InventoryStore.js';
 import { connectAsServer, isServerSide } from './app/PeerSatchelConnector.js';
 import { getCursorContext } from './inventory/CursorHelper.js';
 import { getExistingInventory } from './inventory/InventoryTransfer.js';
@@ -15,6 +15,7 @@ import { exportItemToJSON, importItemFromJSON } from './inventory/ItemLoader.js'
 import { importAlbumFromJSON } from './album/AlbumLoader.js';
 import { createAlbumInStore } from './album/AlbumStore.js';
 import { copyAlbum } from './album/Album.js';
+import { dispatchAlbumChange } from './album/AlbumEvents.js';
 
 function elementEventListener(selector, event, callback) {
   document.querySelector(selector).addEventListener(event, callback);

@@ -1,4 +1,4 @@
-import { addAlbumChangeListener, addInventoryChangeListener, createSocketInventoryInStore, deleteInventoryFromStore, getInventoryInStore, getInventoryStore, isInventoryInStore, removeAlbumChangeListener, removeInventoryChangeListener } from '../inventory/InventoryStore.js';
+import { addInventoryChangeListener, createSocketInventoryInStore, deleteInventoryFromStore, getInventoryInStore, getInventoryStore, isInventoryInStore, removeInventoryChangeListener } from '../inventory/InventoryStore.js';
 import { addItemToInventory, getItemAtSlotIndex } from '../inventory/InventoryTransfer.js';
 import { createInventoryView } from '../inventory/InvView.js';
 import { cloneItem } from '../inventory/Item.js';
@@ -8,6 +8,7 @@ import { removeItemFromAlbum } from './Album.js';
 import { getCursor } from '../inventory/element/InventoryCursorElement.js';
 import { dropOnGround } from '../inventory/GroundHelper.js';
 import { getAlbumInStore } from './AlbumStore.js';
+import { addAlbumChangeListener, removeAlbumChangeListener } from './AlbumEvents.js';
 
 
 const INNER_HTML = /* html */`

@@ -1,4 +1,4 @@
-import { addAlbumChangeListener, addInventoryChangeListener, createSocketInventoryInStore, deleteInventoryFromStore, dispatchAlbumChange, getInventoryInStore, getInventoryStore, isInventoryInStore, removeAlbumChangeListener, removeInventoryChangeListener } from '../inventory/InventoryStore.js';
+import { addInventoryChangeListener, createSocketInventoryInStore, deleteInventoryFromStore, getInventoryInStore, getInventoryStore, isInventoryInStore, removeInventoryChangeListener } from '../inventory/InventoryStore.js';
 import { addItemToInventory, getItemAtSlotIndex } from '../inventory/InventoryTransfer.js';
 import { createInventoryView } from '../inventory/InvView.js';
 import { uuid } from '../util/uuid.js';
@@ -10,7 +10,8 @@ import { downloadText } from '../util/downloader.js';
 import { cloneItem } from '../inventory/Item.js';
 import { exportAlbumToJSON } from './AlbumLoader.js';
 import { deleteAlbumInStore, getAlbumInStore, isAlbumInStore } from './AlbumStore.js';
-
+import { addAlbumChangeListener, dispatchAlbumChange, removeAlbumChangeListener } from './AlbumEvents.js';
+import { IconButtonElement } from '../app/IconButtonElement.js';
 
 const INNER_HTML = /* html */`
 <fieldset>
@@ -116,7 +117,10 @@ export class ItemAlbumElement extends HTMLElement {
     this.buttonDelete = shadowRoot.querySelector('#buttonDelete');
     /** @private */
     this.buttonExport = shadowRoot.querySelector('#buttonExport');
-    /** @private */
+    /**
+     * @private
+     * @type {IconButtonElement}
+     */
     this.buttonLock = shadowRoot.querySelector('#buttonLock');
     /** @private */
     this.buttonSend = shadowRoot.querySelector('#buttonSend');

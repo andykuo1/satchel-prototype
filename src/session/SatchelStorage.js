@@ -1,8 +1,9 @@
 import { copyAlbum, createAlbum } from '../album/Album.js';
+import { dispatchAlbumChange } from '../album/AlbumEvents.js';
 import { exportAlbumToJSON, importAlbumFromJSON } from '../album/AlbumLoader.js';
 import { addAlbumInStore, getAlbumInStore, getAlbumsInStore, isAlbumInStore } from '../album/AlbumStore.js';
 import { exportInventoryToJSON, importInventoryFromJSON } from '../inventory/InventoryLoader.js';
-import { createGridInventoryInStore, dispatchAlbumChange, dispatchInventoryChange, getInventoryInStore, getInventoryStore, isInventoryInStore } from '../inventory/InventoryStore.js';
+import { createGridInventoryInStore, dispatchInventoryChange, getInventoryInStore, getInventoryStore, isInventoryInStore } from '../inventory/InventoryStore.js';
 
 export function loadSatchelFromStorage() {
   const store = getInventoryStore();

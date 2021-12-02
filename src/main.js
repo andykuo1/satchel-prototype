@@ -10,9 +10,9 @@ import './inventory/element/index.js';
 import './cards/index.js';
 import './album/index.js';
 import './toolbar.js';
-import { getAlbumsInStore } from './album/Album.js';
 import { getInventoryStore } from './inventory/InventoryStore.js';
 import { ItemAlbumElement } from './album/ItemAlbumElement.js';
+import { getAlbumsInStore } from './album/AlbumStore.js';
 
 async function connect() {
   let session = resolveSessionStatus();

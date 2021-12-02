@@ -1,6 +1,6 @@
-import { dispatchAlbumChange } from '../inventory/InventoryStore.js';
 import { cloneItem } from '../inventory/Item.js';
 import { uuid } from '../util/uuid.js';
+import { dispatchAlbumChange } from './AlbumEvents.js';
 import { getExistingAlbumInStore } from './AlbumStore.js';
 
 export function createAlbum(albumId) {
