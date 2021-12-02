@@ -1,25 +1,31 @@
-import { addStoreEventListener, dispatchStoreEvent, removeStoreEventListener } from '../../inventory/InventoryEventStore.js';
+import { addStoreEventListener, dispatchStoreEvent, removeStoreEventListener } from '../store/InventoryEventStore.js';
+
+/**
+ * @callback OnInventoryChangeCallback
+ * @param store
+ * @param invId
+ */
 
 /**
  * @param store
- * @param inventoryId
+ * @param invId
  */
- export function dispatchInventoryChange(store, inventoryId) {
-  dispatchStoreEvent(store, 'inventory', inventoryId);
+ export function dispatchInventoryChange(store, invId) {
+  dispatchStoreEvent(store, 'inventory', invId);
 }
 
 /**
- * @param inventoryId
- * @param callback
+ * @param invId
+ * @param {OnInventoryChangeCallback} callback
  */
-export function addInventoryChangeListener(inventoryId, callback) {
-  addStoreEventListener('inventory', inventoryId, callback);
+export function addInventoryChangeListener(invId, callback) {
+  addStoreEventListener('inventory', invId, callback);
 }
 
 /**
- * @param inventoryId
- * @param callback
+ * @param invId
+ * @param {OnInventoryChangeCallback} callback
  */
-export function removeInventoryChangeListener(inventoryId, callback) {
-  removeStoreEventListener('inventory', inventoryId, callback);
+export function removeInventoryChangeListener(invId, callback) {
+  removeStoreEventListener('inventory', invId, callback);
 }
