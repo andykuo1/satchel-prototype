@@ -2,7 +2,7 @@ import {
   isInventoryInStore,
   getInventoryInStore,
 } from './InventoryStore.js';
-import * as InvItems from './InvItems.js';
+import * as InvItems from '../satchel/inv/InvItems.js';
 import { getInventorySlotCount } from '../satchel/inv/Inv.js';
 import { cloneItem } from '../satchel/item/Item.js';
 import { dispatchItemChange } from '../satchel/item/ItemEvents.js';

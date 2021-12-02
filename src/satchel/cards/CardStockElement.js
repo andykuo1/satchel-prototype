@@ -3,9 +3,9 @@ import { stringHash } from '../../util/hash.js';
 import { dropOnGround } from '../../inventory/GroundHelper.js';
 import { addItemToInventory } from '../../inventory/InventoryTransfer.js';
 import { getInventoryStore } from '../../inventory/InventoryStore.js';
-import { removeItemFromAlbum } from '../album/Album.js';
 import { downloadText } from '../../util/downloader.js';
 import { exportItemToJSON, importItemFromJSON } from '../item/ItemLoader.js';
+import { removeItemFromAlbum } from '../album/AlbumItems.js';
 
 const INNER_HTML = /* html */`
 <div class="container">

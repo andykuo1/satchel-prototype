@@ -13,8 +13,8 @@ import {
   addItemToInventory,
   getItemAtSlotIndex
 } from '../InventoryTransfer.js';
-import { getItemByItemId } from '../InvItems.js';
-import { getSlotCoordsByIndex, getSlotIndexByItemId, isSlotIndexEmpty } from '../InvSlots.js';
+import { getItemByItemId } from '../../satchel/inv/InvItems.js';
+import { getSlotCoordsByIndex, getSlotIndexByItemId, isSlotIndexEmpty } from '../../satchel/inv/InvSlots.js';
 import { putDownToGridInventory, putDownToSocketInventory } from './InventoryCursorElementHelper.js';
 import { DEFAULT_ITEM_UNIT_SIZE } from './InventoryElementMouseHelper.js';
 

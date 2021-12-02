@@ -1,9 +1,9 @@
 import { clearSlots, getSlotCoordsByIndex, getSlotIndexByCoords, getSlotIndexByItemId, setSlots } from './InvSlots.js';
 
 /**
- * @typedef {import('../satchel/inv/Inv.js').Inventory} Inventory
- * @typedef {import('../satchel/item/Item.js').ItemId} ItemId
- * @typedef {import('../satchel/item/Item.js').Item} Item
+ * @typedef {import('./Inv.js').Inventory} Inventory
+ * @typedef {import('../item/Item.js').ItemId} ItemId
+ * @typedef {import('../item/Item.js').Item} Item
  */
 
 /**

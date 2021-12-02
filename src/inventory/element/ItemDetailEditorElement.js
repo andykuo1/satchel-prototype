@@ -1,7 +1,7 @@
 import { upgradeProperty } from '../../util/wc.js';
 import { getInventoryStore } from '../InventoryStore.js';
 import { getExistingInventory } from '../InventoryTransfer.js';
-import { getItemByItemId } from '../InvItems.js';
+import { getItemByItemId } from '../../satchel/inv/InvItems.js';
 import { dispatchItemChange } from '../../satchel/item/ItemEvents.js';
 
 const INNER_HTML = /* html */`

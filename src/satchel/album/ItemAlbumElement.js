@@ -3,8 +3,7 @@ import { addItemToInventory, getItemAtSlotIndex } from '../../inventory/Inventor
 import { createInventoryView } from '../../inventory/InvView.js';
 import { uuid } from '../../util/uuid.js';
 import { upgradeProperty } from '../../util/wc.js';
-import { getItemIdsInAlbum, getItemInAlbum } from './Album.js';
-import { addItemToAlbum, clearItemsInAlbum, isAlbumLocked, removeItemFromAlbum, setAlbumLocked } from './Album.js';
+import { isAlbumLocked, setAlbumLocked } from './Album.js';
 import { getCursor } from '../../inventory/element/InventoryCursorElement.js';
 import { downloadText } from '../../util/downloader.js';
 import { cloneItem } from '../item/Item.js';
@@ -13,6 +12,7 @@ import { deleteAlbumInStore, getAlbumInStore, isAlbumInStore } from './AlbumStor
 import { addAlbumChangeListener, dispatchAlbumChange, removeAlbumChangeListener } from './AlbumEvents.js';
 import { IconButtonElement } from '../../app/IconButtonElement.js';
 import { addInventoryChangeListener, removeInventoryChangeListener } from '../inv/InvEvents.js';
+import { addItemToAlbum, clearItemsInAlbum, getItemIdsInAlbum, getItemInAlbum, removeItemFromAlbum } from './AlbumItems.js';
 
 const INNER_HTML = /* html */`
 <fieldset>

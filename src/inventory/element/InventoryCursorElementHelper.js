@@ -8,8 +8,8 @@ import {
   getItemIdAtSlotCoords,
   removeItemFromInventory,
 } from '../InventoryTransfer.js';
-import { getItemByItemId } from '../InvItems.js';
-import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../InvSlots.js';
+import { getItemByItemId } from '../../satchel/inv/InvItems.js';
+import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../../satchel/inv/InvSlots.js';
 
 /**
  * @typedef {import('../../satchel/inv/Inv.js').Inventory} Inventory

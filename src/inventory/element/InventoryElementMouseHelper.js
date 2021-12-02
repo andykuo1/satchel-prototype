@@ -1,7 +1,7 @@
 import { getInventoryStore } from '../InventoryStore.js';
 import { getExistingInventory } from '../InventoryTransfer.js';
-import { getItemByItemId } from '../InvItems.js';
-import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../InvSlots.js';
+import { getItemByItemId } from '../../satchel/inv/InvItems.js';
+import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../../satchel/inv/InvSlots.js';
 import { copyItem } from '../../satchel/item/Item.js';
 import { getCursor } from './InventoryCursorElement.js';
 

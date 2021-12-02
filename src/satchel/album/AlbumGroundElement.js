@@ -3,13 +3,12 @@ import { addItemToInventory, getItemAtSlotIndex } from '../../inventory/Inventor
 import { createInventoryView } from '../../inventory/InvView.js';
 import { cloneItem } from '../item/Item.js';
 import { uuid } from '../../util/uuid.js';
-import { getItemIdsInAlbum, getItemInAlbum } from './Album.js';
-import { removeItemFromAlbum } from './Album.js';
 import { getCursor } from '../../inventory/element/InventoryCursorElement.js';
 import { dropOnGround } from '../../inventory/GroundHelper.js';
 import { getAlbumInStore } from './AlbumStore.js';
 import { addAlbumChangeListener, removeAlbumChangeListener } from './AlbumEvents.js';
 import { addInventoryChangeListener, removeInventoryChangeListener } from '../inv/InvEvents.js';
+import { getItemIdsInAlbum, getItemInAlbum, removeItemFromAlbum } from './AlbumItems.js';
 
 
 const INNER_HTML = /* html */`
