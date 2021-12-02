@@ -41,7 +41,7 @@
     </style>
   </head>
   <body>
-    <sidebar-layout>
+    <sidebar-layout style="--background-color: none">
       <style>
         .spacing {
           flex: 1;
@@ -64,7 +64,7 @@
           <icon-button id="actionSettings" icon="res/settings.svg" alt="settings" title="Settings"></icon-button>
         </div>
       </div>
-      <sidebar-layout style="flex-direction: row-reverse">
+      <sidebar-layout style="flex-direction: row-reverse; --background-color: none">
         <style>
           .groundContainer {
             display: flex;
@@ -193,7 +193,7 @@
             background-color: #333333;
             padding: 0.5em;
             z-index: 1;
-            transform: translateX(-100%);
+            transform: translateX(-110%);
             transition: transform 0.2s ease;
           }
           .editorContainer.open {
@@ -235,7 +235,7 @@
             background-color: #333333;
             padding: 0.5em;
             z-index: 1;
-            transform: translateX(100%);
+            transform: translateX(110%);
             transition: transform 0.2s ease;
           }
           .albumContainer.open {
