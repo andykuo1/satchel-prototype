@@ -171,7 +171,7 @@ export class ItemDetailEditorElement extends HTMLElement {
 
     this._invId = invId;
     this._itemId = itemId;
-    
+
     this.style.left = `${clientX}px`;
     this.style.top = `${clientY}px`;
     this.dialog.toggleAttribute('open', force);

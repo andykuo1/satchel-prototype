@@ -1,7 +1,7 @@
 import { addAlbumChangeListener, addInventoryChangeListener, createSocketInventoryInStore, deleteInventoryFromStore, getInventoryInStore, getInventoryStore, isInventoryInStore, removeAlbumChangeListener, removeInventoryChangeListener } from '../inventory/InventoryStore.js';
 import { addItemToInventory, getItemAtSlotIndex } from '../inventory/InventoryTransfer.js';
 import { createInventoryView } from '../inventory/InvView.js';
-import { copyItem } from '../inventory/Item.js';
+import { cloneItem } from '../inventory/Item.js';
 import { uuid } from '../util/uuid.js';
 import { getAlbumInStore, getItemIdsInAlbum, getItemInAlbum } from './Album.js';
 import { removeItemFromAlbum } from './Album.js';
@@ -146,7 +146,7 @@ export class AlbumGroundElement extends HTMLElement {
       } else {
         let store = getInventoryStore();
         let albumItem = getItemInAlbum(store, albumId, itemId);
-        let newItem = copyItem(albumItem);
+        let newItem = cloneItem(albumItem);
         element = createItemInv(store, newItem, albumId);
       }
       emptySlot.append(element);

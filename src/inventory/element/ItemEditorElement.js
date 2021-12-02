@@ -238,10 +238,10 @@ export class ItemEditorElement extends HTMLElement {
     const item = this.getSocketedItem();
     let store = getInventoryStore();
     if (item) {
-      let newItem = itemBuilder.copyItem(item).itemId(uuid()).build();
+      let newItem = itemBuilder.fromItem(item).itemId(uuid()).build();
       dropOnGround(newItem);
     } else {
-      let newItem = itemBuilder.default().width(2).height(2).build();
+      let newItem = itemBuilder.fromDefault().width(2).height(2).build();
       addItemToInventory(store, this.socketInventory.invId, newItem, 0, 0);
     }
   }

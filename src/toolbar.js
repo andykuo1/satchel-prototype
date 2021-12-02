@@ -52,7 +52,7 @@ function onActionAlbumNew() {
 }
 
 function onActionNewItem() {
-  let item = new ItemBuilder().default().width(2).height(2).build();
+  let item = new ItemBuilder().fromDefault().width(2).height(2).build();
   if (item) {
     dropOnGround(item);
     const groundElement = document.querySelector('#ground');

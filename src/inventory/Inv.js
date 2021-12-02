@@ -4,7 +4,7 @@
  */
 
 import { uuid } from '../util/uuid.js';
-import { copyItem } from './Item.js';
+import { cloneItem } from './Item.js';
 
 /**
  * @typedef {string} InventoryId
@@ -92,7 +92,7 @@ export function copyInventory(other, dst = undefined) {
   }
   if (typeof other.items === 'object') {
     for(let item of Object.values(other.items)) {
-      let newItem = copyItem(item);
+      let newItem = cloneItem(item);
       dst.items[newItem.itemId] = item;
     }
   }

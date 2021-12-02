@@ -1,10 +1,8 @@
 /**
  * @typedef CursorContext
- * @property {HTMLElement} ground
  */
 
 const CURSOR_CONTEXT = {
-  ground: null,
 };
 
 /** @returns {CursorContext} */

@@ -1,5 +1,5 @@
 import { copyInventory } from './Inv.js';
-import { copyItem } from './Item.js';
+import { cloneItem } from './Item.js';
 
 export function importInventoryFromJSON(jsonData, dst = undefined) {
   return importDataFromJSON(jsonData, 'inv_v1', data => copyInventory(data, dst));
@@ -10,11 +10,11 @@ export function exportInventoryToJSON(inv, dst = undefined) {
 }
 
 export function importItemFromJSON(jsonData, dst = undefined) {
-  return importDataFromJSON(jsonData, 'item_v1', data => copyItem(data, dst));
+  return importDataFromJSON(jsonData, 'item_v1', data => cloneItem(data, dst));
 }
 
 export function exportItemToJSON(item, dst = undefined) {
-  let data = copyItem(item);
+  let data = cloneItem(item);
   delete data.itemId;
   return exportDataToJSON('item_v1', data, {}, dst);
 }

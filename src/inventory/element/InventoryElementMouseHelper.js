@@ -1,4 +1,3 @@
-import { uuid } from '../../util/uuid.js';
 import { getInventoryStore } from '../InventoryStore.js';
 import { getExistingInventory } from '../InventoryTransfer.js';
 import { getItemByItemId } from '../InvItems.js';
@@ -55,7 +54,6 @@ export function itemMouseDownCallback(mouseEvent, itemElement, unitSize) {
     const [fromItemX, fromItemY] = getSlotCoordsByIndex(inv, slotIndex);
     const item = getItemByItemId(inv, itemId);
     let newItem = copyItem(item);
-    newItem.itemId = uuid();
     cursor.setHeldItem(newItem, fromItemX - clientCoordX, fromItemY - clientCoordY);
     result = true;
   } else {

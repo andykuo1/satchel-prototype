@@ -1,6 +1,6 @@
 import { exportDataToJSON, importDataFromJSON } from '../inventory/InventoryLoader.js';
 import { dispatchAlbumChange } from '../inventory/InventoryStore.js';
-import { copyItem } from '../inventory/Item.js';
+import { cloneItem } from '../inventory/Item.js';
 import { uuid } from '../util/uuid.js';
 
 export function exportAlbumToJSON(album, dst = undefined) {
@@ -95,7 +95,7 @@ export function copyAlbum(other, dst = undefined) {
   }
   if (typeof other.items === 'object') {
     for (let item of Object.values(other.items)) {
-      let newItem = copyItem(item);
+      let newItem = cloneItem(item);
       dst.items[newItem.itemId] = item;
     }
   }

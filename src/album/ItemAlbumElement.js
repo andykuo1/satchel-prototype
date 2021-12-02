@@ -1,13 +1,13 @@
 import { addAlbumChangeListener, addInventoryChangeListener, createSocketInventoryInStore, deleteInventoryFromStore, dispatchAlbumChange, getInventoryInStore, getInventoryStore, isInventoryInStore, removeAlbumChangeListener, removeInventoryChangeListener } from '../inventory/InventoryStore.js';
 import { addItemToInventory, getItemAtSlotIndex } from '../inventory/InventoryTransfer.js';
 import { createInventoryView } from '../inventory/InvView.js';
-import { copyItem } from '../inventory/Item.js';
 import { uuid } from '../util/uuid.js';
 import { upgradeProperty } from '../util/wc.js';
 import { getAlbumInStore, getItemIdsInAlbum, getItemInAlbum } from './Album.js';
 import { addItemToAlbum, clearItemsInAlbum, deleteAlbumFromStore, exportAlbumToJSON, isAlbumInStore, isAlbumLocked, removeItemFromAlbum, setAlbumLocked } from './Album.js';
 import { getCursor } from '../inventory/element/InventoryCursorElement.js';
 import { downloadText } from '../util/downloader.js';
+import { cloneItem } from '../inventory/Item.js';
 
 
 const INNER_HTML = /* html */`
@@ -270,7 +270,7 @@ export class ItemAlbumElement extends HTMLElement {
       } else {
         let store = getInventoryStore();
         let albumItem = getItemInAlbum(store, albumId, itemId);
-        let newItem = copyItem(albumItem);
+        let newItem = cloneItem(albumItem);
         element = createItemInv(store, newItem, albumId, locked);
       }
       emptySlot.append(element);

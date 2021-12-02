@@ -31,12 +31,20 @@ export function createItem(itemId) {
   return item;
 }
 
+export function copyItem(other, dst = undefined) {
+  let result = cloneItem(other, dst);
+  if (result.itemId === other.itemId) {
+    result.itemId = uuid();
+  }
+  return result;
+}
+
 /**
  * @param {Item} other
  * @param {Item} [dst]
  * @returns {Item}
  */
-export function copyItem(other, dst = undefined) {
+export function cloneItem(other, dst = undefined) {
   const itemId = other.itemId;
   if (!dst) {
     dst = createItem(itemId || uuid());
@@ -75,7 +83,7 @@ export function copyItem(other, dst = undefined) {
 
 export class ItemBuilder {
   static from(baseItem) {
-    return new ItemBuilder().copyItem(baseItem);
+    return new ItemBuilder().fromItem(baseItem);
   }
 
   constructor() {
@@ -100,7 +108,7 @@ export class ItemBuilder {
   /**
    * @param {ItemBuilder} itemBuilder
    */
-  copyItemBuilder(itemBuilder) {
+  fromItemBuilder(itemBuilder) {
     this._itemId = itemBuilder._itemId;
     this._width = itemBuilder._width;
     this._height = itemBuilder._height;
@@ -115,8 +123,8 @@ export class ItemBuilder {
   /**
    * @param {Item} item
    */
-  copyItem(item) {
-    let newItem = copyItem(item);
+  fromItem(item) {
+    let newItem = cloneItem(item);
     this._itemId = newItem.itemId;
     this._width = newItem.width;
     this._height = newItem.height;
@@ -128,7 +136,7 @@ export class ItemBuilder {
     return this;
   }
 
-  default() {
+  fromDefault() {
     this._itemId = null;
     this._width = 1;
     this._height = 1;

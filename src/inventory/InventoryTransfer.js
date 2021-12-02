@@ -6,7 +6,7 @@ import {
 } from './InventoryStore.js';
 import * as InvItems from './InvItems.js';
 import { getInventorySlotCount } from './Inv.js';
-import { copyItem } from './Item.js';
+import { cloneItem } from './Item.js';
 
 /**
  * @typedef {import('./InventoryStore.js').Item} Item
@@ -119,6 +119,6 @@ export function getExistingInventory(store, invId) {
   if (!item) {
     throw new Error('Cannot update null item.');
   }
-  copyItem(state, item);
+  cloneItem(state, item);
   dispatchItemChange(store, itemId);
 }
