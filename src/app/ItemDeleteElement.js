@@ -6,6 +6,10 @@ const INNER_HTML = /* html */ `
 <icon-button id="actionDelete" icon="res/delete.svg" alt="delete" title="Delete Item"></icon-button>
 `;
 const INNER_STYLE = /* css */ `
+:host {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
 `;
 
 export class ItemDeleteElement extends HTMLElement {
@@ -46,6 +50,8 @@ export class ItemDeleteElement extends HTMLElement {
     this.onActionDeleteEnter = this.onActionDeleteEnter.bind(this);
     /** @private */
     this.onActionDeleteLeave = this.onActionDeleteLeave.bind(this);
+    /** @private */
+    this.onMouseMove = this.onMouseMove.bind(this);
   }
 
   /** @protected */
@@ -54,6 +60,7 @@ export class ItemDeleteElement extends HTMLElement {
     this.actionDelete.addEventListener('mousedown', this.onActionDelete);
     this.actionDelete.addEventListener('mouseenter', this.onActionDeleteEnter);
     this.actionDelete.addEventListener('mouseleave', this.onActionDeleteLeave);
+    document.addEventListener('mousemove', this.onMouseMove);
   }
 
   /** @protected */
@@ -62,6 +69,7 @@ export class ItemDeleteElement extends HTMLElement {
     this.actionDelete.removeEventListener('mousedown', this.onActionDelete);
     this.actionDelete.removeEventListener('mouseenter', this.onActionDeleteEnter);
     this.actionDelete.removeEventListener('mouseleave', this.onActionDeleteLeave);
+    document.removeEventListener('mousemove', this.onMouseMove);
   }
 
   /** @private */
@@ -101,6 +109,17 @@ export class ItemDeleteElement extends HTMLElement {
     let cursor = document.querySelector('inventory-cursor');
     if (cursor) {
       cursor.toggleAttribute('danger', false);
+    }
+  }
+
+  /** @private */
+  onMouseMove(e) {
+    let rect = this.getBoundingClientRect();
+    let ratio = Math.abs(e.clientY - rect.y) / document.body.clientHeight;
+    if (ratio < 0.1) {
+      this.style.opacity = '1';
+    } else {
+      this.style.opacity = '0';
     }
   }
 }
