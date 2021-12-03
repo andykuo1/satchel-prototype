@@ -109,11 +109,6 @@ async function onActionAlbumImport() {
 function onActionItemEdit() {
   let editorContainer = document.querySelector('.editorContainer');
   editorContainer.classList.toggle('open');
-  /** @type {import('./inventory/element/ItemEditorElement.js').ItemEditorElement} */
-  const editor = document.querySelector('#editor');
-  if (!editor.isEditing()) {
-    editor.newEditor();
-  }
 }
 
 function onDownloadClick() {
