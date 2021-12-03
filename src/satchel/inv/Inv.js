@@ -41,7 +41,7 @@ export function createInventory(invId, invType, slotCount, maxCoordX, maxCoordY)
     width: maxCoordX,
     height: maxCoordY,
     length: slotCount,
-    displayName: '', // TODO: Not used yet.
+    displayName: '',
     metadata: {}, // TODO: Not used yet.
   };
   return inv;
