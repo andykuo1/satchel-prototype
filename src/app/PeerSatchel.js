@@ -12,6 +12,7 @@ import {
 import { getExistingInventory } from '../inventory/InventoryTransfer.js';
 import { exportItemToJSON, importItemFromJSON } from '../satchel/item/ItemLoader.js';
 import { dispatchInventoryChange } from '../satchel/inv/InvEvents.js';
+import { dispatchItemChange } from '../satchel/item/ItemEvents.js';
 
 /**
  * @typedef {import('../peerful/PeerfulConnection.js').PeerfulConnection} PeerfulConnection
@@ -88,10 +89,6 @@ export class SatchelServer {
       nannyInterval: null,
     };
     this.remoteClients.push(remoteClient);
-    let clientNames = this.remoteClients.map((client) => client.name).filter((name) => name.length > 0);
-    for (let client of this.remoteClients) {
-      client.connection.send(JSON.stringify({ type: 'clients', message: clientNames }));
-    }
     remoteClient.nannyInterval = setInterval(() => this.onClientNanny(remoteClient), 1000);
     conn.on('data', (data) => {
       try {
@@ -219,8 +216,16 @@ export class SatchelServer {
     if (client.lastHeartbeat <= 0) {
       return;
     }
+    if (client.connection.closed) {
+      console.log('Closing connection since already closed.');
+      this.onClientDisconnected(client.connection);
+      return;
+    }
+    // Update active clients
+    let clientNames = this.remoteClients.map((client) => client.name).filter((name) => name.length > 0);
+    client.connection.send(JSON.stringify({ type: 'clients', message: clientNames }));
+    // Calculate heartbeat
     let delta = now - client.lastHeartbeat;
-    console.log(delta);
     if (delta > 10_000) {
       console.log('Closing connection due to staleness.');
       client.connection.close();
@@ -256,10 +261,6 @@ export class SatchelServer {
         flag = true;
         break;
       }
-    }
-    let clientNames = this.remoteClients.map((client) => client.name).filter((name) => name.length > 0);
-    for (let client of this.remoteClients) {
-      client.connection.send(JSON.stringify({ type: 'clients', message: clientNames }));
     }
     if (!flag) {
       console.error(`Unable to disconnect unknown connection - ${conn.localId}:${conn.remoteId}`);
@@ -358,13 +359,14 @@ export class SatchelClient {
         switch (jsonData.type) {
           case 'reset':
             {
-              this.remoteServer.data = jsonData.message;
+              const serverData = jsonData.message;
+              this.remoteServer.data = serverData;
               const store = getInventoryStore();
               if (!isInventoryInStore(store, 'main')) {
                 createGridInventoryInStore(getInventoryStore(), 'main', 12, 9);
               }
               let inv = getExistingInventory(getInventoryStore(), 'main');
-              importInventoryFromJSON(jsonData.message, inv);
+              importInventoryFromJSON(serverData, inv);
               dispatchInventoryChange(store, inv.invId);
             }
             break;
