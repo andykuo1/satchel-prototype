@@ -75,7 +75,7 @@ export async function connectAsServer(ctx, localId) {
         ctx.server.instance.onClientDisconnected(conn);
       });
     });
-    peerful
+    await peerful
       .listen()
       .then(() => console.log('Server started!'))
       .catch((error) => window.alert(error));

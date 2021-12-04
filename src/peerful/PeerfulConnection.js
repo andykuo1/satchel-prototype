@@ -14,10 +14,10 @@ import { PeerfulNegotiator } from './PeerfulNegotiator.js';
 
 /**
  * @typedef PeerfulConnectionEvents
- * @property {(data: string) => void} data
- * @property {(error: Error) => void} error
+ * @property {(data: string, conn: PeerfulConnection) => void} data
+ * @property {(error: Error, conn: PeerfulConnection) => void} error
  * @property {(conn: PeerfulConnection) => void} open Same as waiting on the returned promise when connecting.
- * @property {() => void} close
+ * @property {(conn: PeerfulConnection) => void} close
  */
 
 /**
@@ -164,7 +164,7 @@ export class PeerfulConnection extends Eventable {
    */
   onDataChannelMessage(e) {
     debug('[CHANNEL]', 'Received message:', e.data);
-    this.emit('data', e.data);
+    this.emit('data', e.data, this);
   }
 
   /**
@@ -172,7 +172,7 @@ export class PeerfulConnection extends Eventable {
    */
   onDataChannelClose() {
     debug('[CHANNEL]', 'Close!');
-    this.emit('close');
+    this.emit('close', this);
   }
 
   /**
@@ -193,7 +193,7 @@ export class PeerfulConnection extends Eventable {
     let errorEvent = /** @type {unknown} */ (e);
     let error = /** @type {{error: DOMException}} */ (errorEvent).error;
     debug('[CHANNEL]', 'Error!', error);
-    this.emit('error', error);
+    this.emit('error', error, this);
   }
 
   /** @protected */

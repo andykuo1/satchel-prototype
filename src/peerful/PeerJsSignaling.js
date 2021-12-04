@@ -1,15 +1,10 @@
-import {
-  createPromiseStatus,
-  createPromiseStatusPromise,
-  isPromiseStatusPending,
-  rejectPromiseStatus,
-  resolvePromiseStatus,
-} from './PromiseStatus.js';
-import { debug } from './PeerfulUtil.js';
+import { Logger } from '../util/Logger.js';
 
 /**
  * @typedef {(error: Error|null, data: object|null, src?: string, dst?: string) => void} PeerJsSignalingHandler
  */
+
+const LOGGER = new Logger('PeerJsSignaling');
 
 export const PeerJsSignalingErrorCode = {
   UNKNOWN: -1,
@@ -39,7 +34,8 @@ export class PeerJsSignalingError extends Error {
  * @property {string} path
  * @property {number} port
  * @property {string} key
- * @property {number} pingIntervalMillis
+ * @property {number} heartbeatTimeoutMillis
+ * @property {number} connectionTimeoutMillis
  */
 
 /** @type {PeerJsSignalingOptions} */
@@ -49,7 +45,8 @@ const DEFAULT_OPTS = {
   path: '/',
   port: 443,
   key: 'peerjs',
-  pingIntervalMillis: 5000,
+  heartbeatTimeoutMillis: 1_000,
+  connectionTimeoutMillis: 10_000,
 };
 
 export class PeerJsSignaling {
@@ -75,7 +72,7 @@ export class PeerJsSignaling {
     /** @private */
     this.id = id;
     /** @private */
-    this.token = randomToken();
+    this.token = null;
     /** @private */
     this.baseUrl = buildPeerJsSignalingUrl(
       options.protocol,
@@ -85,11 +82,18 @@ export class PeerJsSignaling {
       options.key
     );
     /** @private */
-    this.pingHandle = null;
+    this.heartbeatTimeoutHandle = null;
     /** @private */
-    this.pingInterval = options.pingIntervalMillis;
+    this.heartbeatTimeoutMillis = options.heartbeatTimeoutMillis;
     /** @private */
-    this.activeStatus = createPromiseStatus();
+    this.heartbeatTimeoutAttempts = 0;
+
+    /** @private */
+    this.awaitPendings = [];
+    /** @private */
+    this.connectionTimeoutHandle = null;
+    /** @private */
+    this.connectionTimeoutMillis = options.connectionTimeoutMillis;
 
     /** @private */
     this.onSocketMessage = this.onSocketMessage.bind(this);
@@ -98,44 +102,132 @@ export class PeerJsSignaling {
     /** @private */
     this.onSocketClosed = this.onSocketClosed.bind(this);
     /** @private */
+    this.onSocketError = this.onSocketError.bind(this);
+
+    /** @private */
     this.onHeartbeatTimeout = this.onHeartbeatTimeout.bind(this);
+    /** @private */
+    this.onConnectionTimeout = this.onConnectionTimeout.bind(this);
+  }
+
+  isActive() {
+    return this.opened && !this.closed;
   }
 
   /**
    * @returns {Promise<PeerJsSignaling>}
    */
   async open() {
-    debug('[SIGNAL]', 'Opening signaling socket...');
+    return new Promise((resolve, reject) => {
+      if (this.opened) {
+        resolve(this);
+        return;
+      }
+      if (this.closed) {
+        reject(new Error('Cannot re-open already closed peerjs signaling connection.'));
+        return;
+      }
+      const isPending = this.awaitPendings.length > 0;
+      this.awaitPendings.push({ resolve, reject });
+      if (isPending) {
+        // Waiting...
+        return;
+      }
+      LOGGER.debug('Opening signaling socket...');
+      const token = randomToken();
+      const url = `${this.baseUrl}&id=${this.id}&token=${token}`;
+      const webSocket = new WebSocket(url);
+      this.webSocket = webSocket;
+      this.token = token;
+      webSocket.addEventListener('message', this.onSocketMessage);
+      webSocket.addEventListener('close', this.onSocketClosed);
+      webSocket.addEventListener('open', this.onSocketOpened);
+      webSocket.addEventListener('error', this.onSocketError);
+      this.connectionTimeoutHandle = setTimeout(this.onConnectionTimeout, this.connectionTimeoutMillis);
+    });
+  }
+
+  close() {
     if (this.closed) {
-      throw new Error('Cannot open already closed connection to peerjs server.');
+      return;
+    }
+    LOGGER.info('Signaling socket closed!');
+    this.closed = true;
+
+    const webSocket = this.webSocket;
+    this.webSocket = null;
+    if (!webSocket) {
+      webSocket.removeEventListener('open', this.onSocketOpened);
+      webSocket.removeEventListener('close', this.onSocketClosed);
+      webSocket.removeEventListener('message', this.onSocketMessage);
+      webSocket.removeEventListener('error', this.onSocketError);
+      webSocket.close();
+      this.token = null;
     }
 
+    const heartbeatTimeoutHandle = this.heartbeatTimeoutHandle;
+    this.heartbeatTimeoutHandle = null;
+    if (heartbeatTimeoutHandle) {
+      clearTimeout(heartbeatTimeoutHandle);
+    }
+
+    const connectionTimeoutHandle = this.connectionTimeoutHandle;
+    this.connectionTimeoutHandle = null;
+    if (connectionTimeoutHandle) {
+      clearTimeout(connectionTimeoutHandle);
+    }
+
+    const awaitPendings = this.awaitPendings;
+    this.awaitPendings = [];
+    for(let pending of awaitPendings) {
+      pending.reject(new Error('Signaling connection closed.'));
+    }
+    
+    this.opened = false;
+  }
+
+  /** @private */
+  error(err, forceClose = false) {
+    if (this.closed) {
+      LOGGER.warn('Ignoring error when already closed.', err);
+      return;
+    } else {
+      LOGGER.error('Encountered error.', err);
+    }
     if (this.opened) {
-      throw new Error('Already opened connection to peerjs server.');
+      this.callback(err, null);
     }
-
-    if (isPromiseStatusPending(this.activeStatus)) {
-      throw new Error('Already trying to open connection to peerjs server.');
+    if (forceClose || !this.opened) {
+      this.close();
     }
+  }
 
-    const url = `${this.baseUrl}&id=${this.id}&token=${this.token}`;
-    const webSocket = new WebSocket(url);
-    this.webSocket = webSocket;
+  /** @private */
+  onConnectionTimeout() {
+    const connectionTimeoutHandle = this.connectionTimeoutHandle;
+    this.connectionTimeoutHandle = null;
+    if (connectionTimeoutHandle) {
+      clearTimeout(connectionTimeoutHandle);
+    }
+    if (this.opened || this.closed) {
+      return;
+    }
+    LOGGER.error('Signaling socket connection timed out.');
+    this.close();
+  }
 
-    webSocket.addEventListener('message', this.onSocketMessage);
-    webSocket.addEventListener('close', this.onSocketClosed);
-    webSocket.addEventListener('open', this.onSocketOpened);
-
-    return createPromiseStatusPromise(this.activeStatus);
+  /** @private */
+  onSocketError(e) {
+    this.error(new Error(`Signaling socket connection could not open web socket for ${e.target.url}`), true);
   }
 
   /** @private */
   onSocketOpened() {
-    debug('[SOCKET]', 'Open!');
     if (this.closed) {
       return;
     }
-
+    LOGGER.debug('Signaling socket connection established.');
+    this.heartbeatTimeoutAttempts = 0;
     this.scheduleHeartbeat();
   }
 
@@ -144,16 +236,16 @@ export class PeerJsSignaling {
    * @param {MessageEvent<?>} e
    */
   onSocketMessage(e) {
-    debug('[SOCKET]', 'Received message:', e.data);
     if (this.closed) {
       return;
     }
 
+    LOGGER.debug('Signaling socket received message:', e.data);
     let data;
     try {
       data = JSON.parse(e.data);
     } catch (error) {
-      this.callback(new Error(`Invalid signaling message from peerjs server: ${error.data}`), null);
+      this.error(new Error(`Invalid signaling message from peerjs server: ${error.data}`));
       return;
     }
 
@@ -161,45 +253,43 @@ export class PeerJsSignaling {
     switch (type) {
       case 'OPEN':
         if (!this.opened) {
+          LOGGER.info('Signaling socket opened!');
           this.opened = true;
-          resolvePromiseStatus(this.activeStatus, this);
+          const awaitPendings = this.awaitPendings;
+          this.awaitPendings = [];
+          for(let pending of awaitPendings) {
+            pending.resolve(this);
+          }
         }
         break;
       case 'ERROR':
-        this.callback(
-          new PeerJsSignalingError(PeerJsSignalingErrorCode.ERROR, JSON.stringify(payload)),
-          null
-        );
+        this.error(
+          new PeerJsSignalingError(
+            PeerJsSignalingErrorCode.ERROR, JSON.stringify(payload)));
         break;
       case 'ID-TAKEN':
-        this.callback(
+        this.error(
           new PeerJsSignalingError(
             PeerJsSignalingErrorCode.ID_TAKEN,
-            'The requested signaling id is unavailable.'
-          ),
-          null
-        );
+            'The requested signaling id is unavailable.'));
         break;
       case 'INVALID-KEY':
-        this.callback(
+        this.error(
           new PeerJsSignalingError(
             PeerJsSignalingErrorCode.INVALID_KEY,
-            'The given signaling api key is invalid.'
-          ),
-          null
-        );
+            'The given signaling api key is invalid.'));
         break;
       case 'LEAVE':
-        this.callback(
-          new PeerJsSignalingError(PeerJsSignalingErrorCode.LEAVE, 'Signaling connection left.'),
-          null
-        );
+        this.error(
+          new PeerJsSignalingError(
+            PeerJsSignalingErrorCode.LEAVE,
+            'Signaling connection left.'));
         break;
       case 'EXPIRE':
-        this.callback(
-          new PeerJsSignalingError(PeerJsSignalingErrorCode.EXPIRE, 'Signaling connection expired.'),
-          null
-        );
+        this.error(
+          new PeerJsSignalingError(
+            PeerJsSignalingErrorCode.EXPIRE,
+            'Signaling connection expired.'));
         break;
       case 'OFFER':
         this.callback(undefined, payload, src, dst);
@@ -211,51 +301,47 @@ export class PeerJsSignaling {
         this.callback(undefined, payload, src, dst);
         break;
       default:
-        this.callback(
+        this.error(
           new PeerJsSignalingError(
             PeerJsSignalingErrorCode.UNKNOWN,
-            `Unknown signaling message from peerjs server: ${JSON.stringify(data)}`
-          ),
-          null
-        );
+            `Unknown signaling message from peerjs server: ${JSON.stringify(data)}`));
+        break;
     }
   }
 
   /** @private */
   onSocketClosed() {
-    debug('[SOCKET]', 'Close!');
     if (this.closed) {
       return;
     }
-
-    this.destroy();
+    LOGGER.debug('Signaling socket closed!');
     this.closed = true;
-    this.callback(new Error('Signaling connection closed unexpectedly to peerjs server.'), null);
+    if (this.opened) {
+      this.callback(new Error('Signaling socket connection closed unexpectedly to peerjs.'), null);
+    }
+    this.close();
   }
 
   /**
-   *
    * @param {string} src
    * @param {string} dst
    * @param {RTCIceCandidate} candidate
    */
   sendCandidateMessage(src, dst, candidate) {
-    debug('[SIGNAL]', 'Sending candidate from', src, 'to', dst);
+    LOGGER.debug(`Sending candidate from ${src} to ${dst}...`);
     if (this.closed) {
       return;
     }
-
-    if (!isWebSocketOpen(this.webSocket)) {
-      this.callback(new Error('Cannot send candidate message to un-opened connection.'), null);
-      return;
+    const webSocket = this.webSocket;
+    if (!isWebSocketOpen(webSocket)) {
+      throw new Error('Cannot send candidate message to un-opened connection.');
     }
-
     const message = JSON.stringify({
       type: 'CANDIDATE',
       payload: candidate,
       dst,
     });
-    this.webSocket.send(message);
+    webSocket.send(message);
   }
 
   /**
@@ -264,15 +350,15 @@ export class PeerJsSignaling {
    * @param {RTCSessionDescriptionInit} signal
    */
   sendSignalMessage(src, dst, signal) {
-    const { type } = signal;
-    debug('[SIGNAL]', 'Sending', type, 'from', src, 'to', dst);
     if (this.closed) {
       return;
     }
 
-    if (!isWebSocketOpen(this.webSocket)) {
-      this.callback(new Error('Cannot send signaling message to un-opened connection.'), null);
-      return;
+    const { type } = signal;
+    const webSocket = this.webSocket;
+    LOGGER.debug(`Sending signal ${type} from ${src} to ${dst}...`);
+    if (!isWebSocketOpen(webSocket)) {
+      throw new Error('Cannot send signaling message to un-opened connection.');
     }
 
     let message;
@@ -298,84 +384,58 @@ export class PeerJsSignaling {
         // TODO: What is this?
         break;
       default:
-      // TODO: Unknown signal type?
+        throw new Error(`Cannot send unknown signal type '${type}'.`);
     }
-
-    this.webSocket.send(message);
+    webSocket.send(message);
   }
 
   sendHeartbeatMessage() {
-    debug('[SIGNAL]', 'Sending heartbeat');
     if (this.closed) {
       return;
     }
-
-    if (!isWebSocketOpen(this.webSocket)) {
-      this.callback(new Error('Cannot send signaling heartbeat to un-opened connection.'), null);
-      return;
+    const webSocket = this.webSocket;
+    if (!isWebSocketOpen(webSocket)) {
+      throw new Error('Cannot send signaling heartbeat to un-opened connection.');
     }
-
     const message = JSON.stringify({ type: 'HEARTBEAT' });
-    this.webSocket.send(message);
-  }
-
-  close() {
-    if (this.closed) {
-      return;
-    }
-
-    this.destroy();
-    this.closed = true;
+    webSocket.send(message);
   }
 
   /** @private */
   scheduleHeartbeat() {
-    if (!this.pingHandle) {
-      this.pingHandle = setTimeout(this.onHeartbeatTimeout, this.pingInterval);
+    if (this.closed) {
+      return;
     }
+    if (this.heartbeatTimeoutHandle) {
+      return;
+    }
+    this.heartbeatTimeoutHandle = setTimeout(this.onHeartbeatTimeout, this.heartbeatTimeoutMillis);
   }
 
   /** @private */
   onHeartbeatTimeout() {
-    if (this.closed || !isWebSocketOpen(this.webSocket)) {
+    const heartbeatTimeoutHandle = this.heartbeatTimeoutHandle;
+    this.heartbeatTimeoutHandle = null;
+    if (heartbeatTimeoutHandle) {
+      clearTimeout(heartbeatTimeoutHandle);
+    }
+
+    if (this.closed) {
       return;
     }
-
-    const { pingHandle } = this;
-    if (pingHandle) {
-      clearTimeout(pingHandle);
-      this.pingHandle = null;
+    
+    LOGGER.debug('Sending heartbeat...');
+    try {
+      if (isWebSocketOpen(this.webSocket)) {
+        this.sendHeartbeatMessage();
+      } else if (this.opened) {
+        throw new Error('Web socket is closed but connection is still opened!');
+      }
+    } catch (e) {
+      this.error(new Error('Could not send heartbeat to peerjs server.'), true);
+      return;
     }
-
-    this.sendHeartbeatMessage();
     this.scheduleHeartbeat();
-  }
-
-  /** @private */
-  destroy() {
-    const { webSocket } = this;
-    if (!webSocket) {
-      webSocket.removeEventListener('open', this.onSocketOpened);
-      webSocket.removeEventListener('close', this.onSocketClosed);
-      webSocket.removeEventListener('message', this.onSocketMessage);
-      webSocket.close();
-      // Refresh token for the re-connection
-      this.token = randomToken();
-      this.webSocket = null;
-    }
-
-    const { pingHandle } = this;
-    if (pingHandle) {
-      clearTimeout(pingHandle);
-      this.pingHandle = null;
-    }
-
-    const { activeStatus } = this;
-    if (isPromiseStatusPending(activeStatus)) {
-      rejectPromiseStatus(activeStatus, new Error('Signaling connection closed.'));
-    }
-
-    this.opened = false;
   }
 }
 
@@ -396,7 +456,7 @@ function buildPeerJsSignalingUrl(protocol, host, port, path, key) {
 }
 
 /**
- *
+ * @returns {string}
  */
 function randomToken() {
   return Math.random().toString(36).slice(2);

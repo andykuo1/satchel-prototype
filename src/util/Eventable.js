@@ -97,6 +97,19 @@ export class Eventable {
   /**
    * @protected
    * @param {keyof T} event
+   * @returns {number}
+   */
+  countEventListeners(event) {
+    const eventListeners = this.listeners[event];
+    if (eventListeners) {
+      return eventListeners.length;
+    }
+    return 0;
+  }
+
+  /**
+   * @protected
+   * @param {keyof T} event
    * @param {Array<any>} args
    */
   dispatchEvent(event, args) {

@@ -38,8 +38,6 @@ export class Peerful extends Eventable {
     this.onSignaling = this.onSignaling.bind(this);
     /** @private */
     this.signaling = new PeerJsSignaling(id, this.onSignaling);
-    /** @private */
-    this.signalingPromise = this.signaling.open();
   }
 
   close() {
@@ -62,7 +60,9 @@ export class Peerful extends Eventable {
     if (this.closed) {
       throw new Error('Cannot connect to peers when already closed.');
     }
-    await this.signalingPromise;
+    if (!this.signaling.isActive()) {
+      await this.signaling.open();
+    }
 
     const conn = new PeerfulLocalConnection(this.id, this.signaling, this.connectionOptions);
     this.connections[remoteId] = conn;
@@ -82,7 +82,9 @@ export class Peerful extends Eventable {
     if (this.closed) {
       throw new Error('Cannot listen for peers when already closed.');
     }
-    await this.signalingPromise;
+    if (!this.signaling.isActive()) {
+      await this.signaling.open();
+    }
     return this;
   }
 
