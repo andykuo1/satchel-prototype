@@ -12,7 +12,7 @@ import {
 import { getExistingInventory } from '../inventory/InventoryTransfer.js';
 import { exportItemToJSON, importItemFromJSON } from '../satchel/item/ItemLoader.js';
 import { dispatchInventoryChange } from '../satchel/inv/InvEvents.js';
-import { dispatchItemChange } from '../satchel/item/ItemEvents.js';
+import { ListPlayersActivity } from './ListPlayersActivity.js';
 
 /**
  * @typedef {import('../peerful/PeerfulConnection.js').PeerfulConnection} PeerfulConnection
@@ -27,6 +27,10 @@ export class SatchelServer {
     this.onClientConnected = this.onClientConnected.bind(this);
     this.onClientDisconnected = this.onClientDisconnected.bind(this);
     this.onClientNanny = this.onClientNanny.bind(this);
+
+    this.activities = {
+      listPlayers: new ListPlayersActivity(),
+    };
 
     this.setup();
   }
