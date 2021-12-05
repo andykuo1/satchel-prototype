@@ -220,7 +220,6 @@
             <button id="actionItemNew">New Item</button>
             <button id="actionItemImport">Import Item</button>
             <button id="actionItemExport">Export Item</button>
-            <button id="actionSendToPlayer">Send To Player</button>
           </div>
         </div>
         <!-- ALBUM CONTENT -->
@@ -269,7 +268,9 @@
     <div class="foreground">
       <inventory-cursor id="cursor"></inventory-cursor>
     </div>
-    <item-dialog id="itemDialog"></item-dialog>
+    <item-dialog id="itemDialog">
+      <icon-button slot="actions" id="actionShareItem" icon="res/share.svg" alt="send" title="Send Item"></icon-button>
+    </item-dialog>
     <dialog-prompt id="giftDialog">
       <h3>Send item to...</h3>
       <p>

@@ -5,7 +5,7 @@ import './IconButtonElement.js';
 const INNER_HTML = /* html */ `
 <div class="backdrop hidden"></div>
 <dialog>
-  <icon-button id="cancel" icon="res/cancel.svg" alt="cancel" title="Cancel"></icon-button>
+  <icon-button id="cancel" icon="res/cancel.svg" alt="close" title="Close"></icon-button>
   <slot></slot>
 </dialog>
 `;
@@ -71,6 +71,10 @@ dialog[open] {
 }
 `;
 
+/**
+ * @fires open
+ * @fires close
+ */
 export class DialogPromptElement extends HTMLElement {
   /** @private */
   static get [Symbol.for('templateNode')]() {
@@ -166,8 +170,16 @@ export class DialogPromptElement extends HTMLElement {
       case 'open':
         {
           let result = value !== null;
+          let prev = this.dialog.hasAttribute('open');
           this.dialog.toggleAttribute('open', result);
           this.backdrop.classList.toggle('hidden', !result);
+          // Dispatch 'open' event. The 'close' events are handled elsewhere.
+          if (prev !== result && result) {
+            this.dispatchEvent(new CustomEvent('open', {
+              composed: true,
+              bubbles: false,
+            }));
+          }
         }
         break;
       case 'required':
@@ -191,6 +203,14 @@ export class DialogPromptElement extends HTMLElement {
     }
     document.activeElement.blur();
     this.toggleAttribute('open', false);
+    this.dispatchEvent(new CustomEvent('close', {
+      composed: true,
+      bubbles: false,
+      detail: {
+        from: 'blur'
+      }
+    }));
+
     e.preventDefault();
     e.stopPropagation();
     return false;
@@ -200,6 +220,13 @@ export class DialogPromptElement extends HTMLElement {
   onCancelClick() {
     document.activeElement.blur();
     this.toggleAttribute('open', false);
+    this.dispatchEvent(new CustomEvent('close', {
+      composed: true,
+      bubbles: false,
+      detail: {
+        from: 'cancel'
+      }
+    }));
   }
 }
 DialogPromptElement.define();

@@ -12,12 +12,15 @@ const INNER_HTML = /* html */`
     <legend>Item</legend>
     <inventory-grid init="socket" id="socketInventory" noedit nooutput noinput></inventory-grid>
     <p class="styleContainer">
-      <input type="text" id="itemImage">
-      <img src="res/image.svg" title="image">
+      <label for="itemImage">
+        <img src="res/image.svg" title="image">
+      </label>
+      <input type="url" id="itemImage">
     </p>
   </fieldset>
   <fieldset class="detail">
     <legend>Detail</legend>
+    <slot name="actions" class="actionContainer"></slot>
     <p class="titleContainer">
       <input type="text" id="itemTitle">
       <span id="itemStackSizeContainer">
@@ -49,6 +52,10 @@ p {
   margin: 0;
 }
 
+img {
+  height: 100%;
+}
+
 .detail {
   position: relative;
   display: flex;
@@ -71,6 +78,10 @@ p {
 
 #itemImage {
   flex: 1;
+  background: none;
+  border: none;
+  color: #aaaaaa;
+  margin-left: 0.5em;
 }
 
 #itemStackSize {
@@ -80,9 +91,22 @@ p {
 #itemTitle {
   margin-bottom: 0.5em;
 }
+
+.actionContainer {
+  display: flex;
+  flex-direction: row-reverse;
+  position: absolute;
+  top: -2.1em;
+  right: -1.2em;
+}
+
+.actionContainer::slotted(*) {
+  width: 2em;
+  height: 2em;
+}
 `;
 
-export class ItemDialogElement extends HTMLElement {
+export class ItemEditorElement extends HTMLElement {
   /** @private */
   static get [Symbol.for('templateNode')]() {
     const t = document.createElement('template');
@@ -146,6 +170,10 @@ export class ItemDialogElement extends HTMLElement {
      * @type {HTMLInputElement}
      */
     this.itemDesc = shadowRoot.querySelector('#itemDesc');
+    /**
+     * @private
+     */
+    this.actionReset = shadowRoot.querySelector('#actionReset');
 
     /** @private */
     this.onItemTitle = this.onItemTitle.bind(this);
@@ -155,6 +183,12 @@ export class ItemDialogElement extends HTMLElement {
     this.onItemStackSize = this.onItemStackSize.bind(this);
     /** @private */
     this.onItemImage = this.onItemImage.bind(this);
+    /** @private */
+    this.onClickSelectAll = this.onClickSelectAll.bind(this);
+    /** @private */
+    this.onActionReset = this.onActionReset.bind(this);
+    /** @private */
+    this.onDialogClose = this.onDialogClose.bind(this);
   }
 
   /** @protected */
@@ -163,6 +197,9 @@ export class ItemDialogElement extends HTMLElement {
     this.itemDesc.addEventListener('input', this.onItemDesc);
     this.itemStackSize.addEventListener('change', this.onItemStackSize);
     this.itemImage.addEventListener('change', this.onItemImage);
+    this.itemImage.addEventListener('click', this.onClickSelectAll);
+    this.actionReset.addEventListener('click', this.onActionReset);
+    this.dialog.addEventListener('close', this.onDialogClose);
   }
 
   /** @protected */
@@ -171,6 +208,9 @@ export class ItemDialogElement extends HTMLElement {
     this.itemDesc.removeEventListener('input', this.onItemDesc);
     this.itemStackSize.removeEventListener('change', this.onItemStackSize);
     this.itemImage.removeEventListener('change', this.onItemImage);
+    this.itemImage.removeEventListener('click', this.onClickSelectAll);
+    this.actionReset.removeEventListener('click', this.onActionReset);
+    this.dialog.removeEventListener('close', this.onDialogClose);
   }
 
   openDialog(invId, itemId, clientX, clientY) {
@@ -186,12 +226,52 @@ export class ItemDialogElement extends HTMLElement {
     clearItemsInInventory(store, socketInvId);
     addItemToInventory(store, socketInvId, newItem, 0, 0);
 
-    this.itemTitle.value = newItem.displayName;
-    this.itemDesc.textContent = newItem.description;
-    this.itemStackSize.value = String(newItem.stackSize);
-    this.itemImage.value = newItem.imgSrc;
+    this.resetInputs(newItem);
 
     this.dialog.toggleAttribute('open', true);
+  }
+
+  getSocketedItem() {
+    if (!this.dialog.hasAttribute('open')) {
+      return null;
+    }
+    const store = getInventoryStore();
+    const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
+    return socketItem;
+  }
+
+  /** @private */
+  resetInputs(item) {
+    this.itemTitle.value = item.displayName;
+    this.itemDesc.textContent = item.description;
+    this.itemStackSize.value = String(item.stackSize);
+    this.itemImage.value = item.imgSrc;
+  }
+
+  /** @private */
+  onDialogClose() {
+    const store = getInventoryStore();
+    const sourceInv = getInventoryInStore(store, this._invId);
+    const sourceItem = getItemByItemId(sourceInv, this._itemId);
+    const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
+    cloneItem(socketItem, sourceItem);
+    dispatchItemChange(store, sourceItem.itemId);
+  }
+
+  /** @private */
+  onActionReset() {
+    const store = getInventoryStore();
+    const sourceInv = getInventoryInStore(store, this._invId);
+    const sourceItem = getItemByItemId(sourceInv, this._itemId);
+    const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
+    cloneItem(sourceItem, socketItem);
+    dispatchItemChange(store, socketItem.itemId);
+    this.resetInputs(socketItem);
+  }
+
+  /** @private */
+  onClickSelectAll(e) {
+    e.target.select();
   }
 
   /** @private */
@@ -199,13 +279,10 @@ export class ItemDialogElement extends HTMLElement {
     const imgSrc = this.itemImage.value;
     const store = getInventoryStore();
     const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
-    const sourceInv = getInventoryInStore(store, this._invId);
-    const sourceItem = getItemByItemId(sourceInv, this._itemId);
     socketItem.imgSrc = imgSrc;
-    sourceItem.imgSrc = imgSrc;
     dispatchItemChange(store, socketItem.itemId);
-    dispatchItemChange(store, sourceItem.itemId);
   }
+
   /** @private */
   onItemStackSize() {
     let stackSize = Number(this.itemStackSize.value);
@@ -214,36 +291,26 @@ export class ItemDialogElement extends HTMLElement {
     }
     const store = getInventoryStore();
     const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
-    const sourceInv = getInventoryInStore(store, this._invId);
-    const sourceItem = getItemByItemId(sourceInv, this._itemId);
     socketItem.stackSize = stackSize;
-    sourceItem.stackSize = stackSize;
     dispatchItemChange(store, socketItem.itemId);
-    dispatchItemChange(store, sourceItem.itemId);
   }
+
   /** @private */
   onItemTitle() {
     const title = this.itemTitle.value.trim();
     const store = getInventoryStore();
     const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
-    const sourceInv = getInventoryInStore(store, this._invId);
-    const sourceItem = getItemByItemId(sourceInv, this._itemId);
     socketItem.displayName = title;
-    sourceItem.displayName = title;
     dispatchItemChange(store, socketItem.itemId);
-    dispatchItemChange(store, sourceItem.itemId);
   }
+
   /** @private */
   onItemDesc() {
     const desc = this.itemDesc.textContent;
     const store = getInventoryStore();
     const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
-    const sourceInv = getInventoryInStore(store, this._invId);
-    const sourceItem = getItemByItemId(sourceInv, this._itemId);
     socketItem.description = desc;
-    sourceItem.description = desc;
     dispatchItemChange(store, socketItem.itemId);
-    dispatchItemChange(store, sourceItem.itemId);
   }
 }
-ItemDialogElement.define();
+ItemEditorElement.define();

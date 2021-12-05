@@ -20,7 +20,7 @@ const INNER_HTML = /* html */`
   <span class="actionbar">
     <icon-button class="button" id="buttonDelete" icon="res/delete.svg" alt="clear" title="Clear Album"></icon-button>
     <icon-button class="button" id="buttonExport" icon="res/download.svg" alt="export" title="Export Album"></icon-button>
-    <icon-button class="button" id="buttonSend" icon="res/send.svg" alt="send" title="Send Album" disabled></icon-button>
+    <icon-button class="button" id="buttonSend" icon="res/share.svg" alt="send" title="Send Album" disabled></icon-button>
     <icon-button class="button" id="buttonLock" icon="res/unlock.svg" alt="lock" title="Lock Album"></icon-button>
   </span>
   <slot name="items"></slot>

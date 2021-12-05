@@ -31,18 +31,63 @@ window.addEventListener('DOMContentLoaded', () => {
 
   elementEventListener('#actionItemNew', 'click', onActionItemNew);
   elementEventListener('#actionItemExport', 'click', onActionItemExport);
-  elementEventListener('#actionSendToPlayer', 'click', onActionSendToPlayer);
   elementEventListener('#actionAlbumOpen', 'click', onActionAlbumOpen);
   elementEventListener('#actionAlbumImport', 'click', onActionAlbumImport);
   elementEventListener('#actionAlbumNew', 'click', onActionAlbumNew);
   elementEventListener('#actionNewItem', 'click', onActionNewItem);
 
+  elementEventListener('#actionShareItem', 'click', onActionShareItem);
   elementEventListener('#actionSettings', 'click', onActionSettings);
 
   elementEventListener('#giftSubmit', 'click', onGiftSubmit);
 
   document.addEventListener('itemcontext', onItemContext);
 });
+
+function onActionShareItem() {
+  /** @type {import('./satchel/item/ItemDialogElement.js').ItemEditorElement} */
+  const itemEditor = document.querySelector('#itemDialog');
+  const socketedItem = itemEditor.getSocketedItem();
+  try {
+    if (socketedItem) {
+      /** @type {HTMLSelectElement} */
+      let giftTarget = document.querySelector('#giftTarget');
+      let ctx = getCursorContext();
+      if (ctx.server && ctx.server.instance) {
+        let content = ctx.server.instance.getActiveClientNames().map(clientName => `<option>${clientName.toLowerCase()}</option>`).join('\n');
+        giftTarget.innerHTML = content;
+      } else if (ctx.client && ctx.client.instance) {
+        let content = ctx.client.instance.getOtherClientNames().map(clientName => `<option>${clientName.toLowerCase()}</option>`).join('\n');
+        giftTarget.innerHTML = content;
+      } else {
+        giftTarget.innerHTML = '';
+      }
+      let giftDialog = document.querySelector('#giftDialog');
+      giftDialog.toggleAttribute('open', true);
+    }
+  } catch (e) {
+    console.error('Failed to export item', e);
+  }
+}
+
+function onGiftSubmit() {
+  let giftDialog = document.querySelector('#giftDialog');
+  /** @type {HTMLSelectElement} */
+  let giftTarget = document.querySelector('#giftTarget');
+  if (giftTarget.value) {
+    /** @type {import('./satchel/item/ItemDialogElement.js').ItemEditorElement} */
+    const itemEditor = document.querySelector('#itemDialog');
+    const socketedItem = itemEditor.getSocketedItem();
+    const target = giftTarget.value;
+    const ctx = getCursorContext();
+    if (ctx.server && ctx.server.instance) {
+      ctx.server.instance.sendItemTo(target, socketedItem);
+    } else if (ctx.client && ctx.client.instance) {
+      ctx.client.instance.sendItemTo(target, socketedItem);
+    }
+  }
+  giftDialog.toggleAttribute('open', false);
+}
 
 function onActionEraseAll() {
   localStorage.clear();
@@ -209,51 +254,6 @@ function onActionSettings() {
  */
 function generateShareableLink(peerId) {
   return `${location.origin}${location.pathname}?id=${peerId}`;
-}
-
-function onActionSendToPlayer() {
-  /** @type {import('./inventory/element/ItemEditorElement.js').ItemEditorElement} */
-  const itemEditor = document.querySelector('#editor');
-  try {
-    let item = itemEditor.getSocketedItem();
-    if (item) {
-      /** @type {HTMLSelectElement} */
-      let giftTarget = document.querySelector('#giftTarget');
-      let ctx = getCursorContext();
-      if (ctx.server && ctx.server.instance) {
-        let content = ctx.server.instance.getActiveClientNames().map(clientName => `<option>${clientName.toLowerCase()}</option>`).join('\n');
-        giftTarget.innerHTML = content;
-      } else if (ctx.client && ctx.client.instance) {
-        let content = ctx.client.instance.getOtherClientNames().map(clientName => `<option>${clientName.toLowerCase()}</option>`).join('\n');
-        giftTarget.innerHTML = content;
-      } else {
-        giftTarget.innerHTML = '';
-      }
-      let giftDialog = document.querySelector('#giftDialog');
-      giftDialog.toggleAttribute('open', true);
-    }
-  } catch (e) {
-    console.error('Failed to export item', e);
-  }
-}
-
-function onGiftSubmit() {
-  let giftDialog = document.querySelector('#giftDialog');
-  /** @type {HTMLSelectElement} */
-  let giftTarget = document.querySelector('#giftTarget');
-  if (giftTarget.value) {
-    /** @type {import('./inventory/element/ItemEditorElement.js').ItemEditorElement} */
-    const itemEditor = document.querySelector('#editor');
-    const item = itemEditor.getSocketedItem();
-    const target = giftTarget.value;
-    const ctx = getCursorContext();
-    if (ctx.server && ctx.server.instance) {
-      ctx.server.instance.sendItemTo(target, item);
-    } else if (ctx.client && ctx.client.instance) {
-      ctx.client.instance.sendItemTo(target, item);
-    }
-  }
-  giftDialog.toggleAttribute('open', false);
 }
 
 function onItemContext(e) {

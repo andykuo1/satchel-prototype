@@ -1,1 +1,1 @@
-export { ItemDialogElement } from './ItemDialogElement.js';
+export { ItemEditorElement } from './ItemDialogElement.js';
