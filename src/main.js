@@ -4,15 +4,16 @@ import { resolveSessionStatus } from './session/SatchelSession.js';
 import { getCursorContext } from './inventory/CursorHelper.js';
 import { connectAsClient } from './app/PeerSatchelConnector.js';
 import { loadSatchelFromStorage, saveSatchelToStorage } from './session/SatchelStorage.js';
+import { getInventoryStore } from './inventory/InventoryStore.js';
+import { ItemAlbumElement } from './satchel/album/ItemAlbumElement.js';
+import { getAlbumsInStore } from './satchel/album/AlbumStore.js';
 
+import './satchel/item/index.js';
 import './app/index.js';
 import './inventory/element/index.js';
 import './satchel/cards/index.js';
 import './satchel/album/index.js';
 import './toolbar.js';
-import { getInventoryStore } from './inventory/InventoryStore.js';
-import { ItemAlbumElement } from './satchel/album/ItemAlbumElement.js';
-import { getAlbumsInStore } from './satchel/album/AlbumStore.js';
 
 async function connect() {
   let session = resolveSessionStatus();
@@ -35,21 +36,6 @@ async function connect() {
 window.addEventListener('DOMContentLoaded', () => {
   // Set build version
   document.querySelector('#appVersion').textContent = `v${BUILD_VERSION}`;
-
-  // Prepare item context menu
-  document.addEventListener('itemcontext', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    /** @type {import('./inventory/element/ItemDetailEditorElement.js').ItemDetailEditorElement} */
-    const detailEditor = document.querySelector('#detailEditor');
-    // @ts-ignore
-    const { invId, itemId, clientX, clientY } = e.detail;
-    if (invId && itemId) {
-      detailEditor.open(invId, itemId, clientX, clientY, true);
-    }
-    return false;
-  });
   
   if (document.hasFocus()) {
     setTimeout(onDocumentFocusUpdate, 300);

@@ -139,6 +139,7 @@ export class DialogPromptElement extends HTMLElement {
     upgradeProperty(this, 'open');
     upgradeProperty(this, 'required');
 
+    this.backdrop.addEventListener('contextmenu', this.onBackdropClick);
     this.backdrop.addEventListener('click', this.onBackdropClick);
     this.cancel.addEventListener('click', this.onCancelClick);
   }
@@ -149,6 +150,7 @@ export class DialogPromptElement extends HTMLElement {
       clearTimeout(this.shakeDebounce);
       this.shakeDebounce = null;
     }
+    this.backdrop.removeEventListener('contextmenu', this.onBackdropClick);
     this.backdrop.removeEventListener('click', this.onBackdropClick);
     this.cancel.removeEventListener('click', this.onCancelClick);
   }
@@ -178,7 +180,7 @@ export class DialogPromptElement extends HTMLElement {
   }
 
   /** @private */
-  onBackdropClick() {
+  onBackdropClick(e) {
     if (this.required) {
       this.dialog.classList.toggle('shake', false);
       this.shakeDebounce = setTimeout(() => {
@@ -187,11 +189,16 @@ export class DialogPromptElement extends HTMLElement {
       });
       return;
     }
+    document.activeElement.blur();
     this.toggleAttribute('open', false);
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
   }
 
   /** @private */
   onCancelClick() {
+    document.activeElement.blur();
     this.toggleAttribute('open', false);
   }
 }

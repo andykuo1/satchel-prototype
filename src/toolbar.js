@@ -40,6 +40,8 @@ window.addEventListener('DOMContentLoaded', () => {
   elementEventListener('#actionSettings', 'click', onActionSettings);
 
   elementEventListener('#giftSubmit', 'click', onGiftSubmit);
+
+  document.addEventListener('itemcontext', onItemContext);
 });
 
 function onActionEraseAll() {
@@ -252,4 +254,18 @@ function onGiftSubmit() {
     }
   }
   giftDialog.toggleAttribute('open', false);
+}
+
+function onItemContext(e) {
+  e.preventDefault();
+  e.stopPropagation();
+
+  /** @type {import('./satchel/item/ItemDialogElement.js').ItemDialogElement} */
+  const itemDialog = document.querySelector('#itemDialog');
+  // @ts-ignore
+  const { invId, itemId, clientX, clientY } = e.detail;
+  if (invId && itemId) {
+    itemDialog.openDialog(invId, itemId, clientX, clientY);
+  }
+  return false;
 }

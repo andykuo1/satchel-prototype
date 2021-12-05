@@ -61,13 +61,16 @@ figcaption {
   right: 0;
   bottom: 0;
   top: unset;
-  opacity: 0;
   color: white;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.1);
   text-align: center;
   text-overflow: ellipsis;
+  text-shadow: 0.1em 0.1em 0.05em #000000;
   white-space: nowrap;
   overflow: hidden;
+  /*
+  opacity: 0;
+  */
 }
 figcaption.vertical {
   top: 0;
@@ -76,9 +79,11 @@ figcaption.vertical {
   right: unset;
   writing-mode: vertical-rl;
 }
+/*
 .container:hover figcaption {
   opacity: 1;
 }
+*/
 
 #stackSize {
   position: absolute;
@@ -247,6 +252,11 @@ export class InventoryItemElement extends HTMLElement {
    * @protected
    */
   onContextMenu(e) {
+    if (this.hasAttribute('noedit')) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
     let event = new CustomEvent('itemcontext', {
       bubbles: true,
       composed: true,
