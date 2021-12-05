@@ -227,7 +227,17 @@ export class InventoryItemElement extends HTMLElement {
       this.style.setProperty('--itemHeight', `${item.height}`);
     }
     if (item.background) {
-      this.style.setProperty('--itemBackground', item.background);
+      try {
+        let hex = Number.parseInt(item.background.substring(1), 16);
+        let r = (hex >> 16) & 0xFF;
+        let g = (hex >> 8) & 0xFF;
+        let b = (hex & 0xFF);
+        let a = hex === 0 ? 0.1 : 0.3;
+        let background = `rgba(${r}, ${g}, ${b}, ${a})`;
+        this.style.setProperty('--itemBackground', background);
+      } catch (e) {
+        this.style.removeProperty('--itemBackground');
+      }
     } else {
       this.style.removeProperty('--itemBackground');
     }

@@ -16,7 +16,7 @@ const INNER_HTML = /* html */`
         <img src="res/image.svg" title="Image">
       </label>
       <input type="url" id="itemImage">
-      <input type="color" id="itemBackground" disabled>
+      <input type="color" id="itemBackground">
     </p>
   </fieldset>
   <fieldset class="detail">
@@ -274,10 +274,9 @@ export class ItemEditorElement extends HTMLElement {
 
   /** @private */
   onItemBackground() {
-    const background = this.itemBackground.value;
     const store = getInventoryStore();
     const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
-    socketItem.background = background;
+    socketItem.background = this.itemBackground.value;
     dispatchItemChange(store, socketItem.itemId);
   }
 
