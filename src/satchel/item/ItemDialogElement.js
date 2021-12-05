@@ -23,14 +23,15 @@ const INNER_HTML = /* html */`
     <legend>Detail</legend>
     <slot name="actions" class="actionContainer"></slot>
     <p class="titleContainer">
-      <input type="text" id="itemTitle">
+      <input type="text" id="itemTitle" placeholder="Item">
       <span id="itemStackSizeContainer">
-        <span>⨯</span><input type="number" id="itemStackSize">
+        <span>⨯</span><input type="number" id="itemStackSize" placeholder="--">
       </span>
     </p>
     <p class="textContainer">
       <textarea id="itemDesc" placeholder="Notes..."></textarea>
     </p>
+    <button id="actionSave">Save & Close</button>
   </fieldset>
 </dialog-prompt>
 `;
@@ -90,6 +91,7 @@ img {
 }
 
 #itemTitle {
+  flex: 1;
   margin-bottom: 0.5em;
 }
 
@@ -176,6 +178,8 @@ export class ItemEditorElement extends HTMLElement {
      * @type {HTMLInputElement}
      */
     this.itemBackground = shadowRoot.querySelector('#itemBackground');
+    /** @private */
+    this.actionSave = shadowRoot.querySelector('#actionSave');
 
     /** @private */
     this.onItemTitle = this.onItemTitle.bind(this);
@@ -191,6 +195,8 @@ export class ItemEditorElement extends HTMLElement {
     this.onClickSelectAll = this.onClickSelectAll.bind(this);
     /** @private */
     this.onDialogClose = this.onDialogClose.bind(this);
+    /** @private */
+    this.onActionSave = this.onActionSave.bind(this);
   }
 
   /** @protected */
@@ -202,6 +208,7 @@ export class ItemEditorElement extends HTMLElement {
     this.itemImage.addEventListener('click', this.onClickSelectAll);
     this.itemBackground.addEventListener('input', this.onItemBackground);
     this.dialog.addEventListener('close', this.onDialogClose);
+    this.actionSave.addEventListener('click', this.onActionSave);
   }
 
   /** @protected */
@@ -213,6 +220,7 @@ export class ItemEditorElement extends HTMLElement {
     this.itemImage.removeEventListener('click', this.onClickSelectAll);
     this.itemBackground.removeEventListener('input', this.onItemBackground);
     this.dialog.removeEventListener('close', this.onDialogClose);
+    this.actionSave.removeEventListener('click', this.onActionSave);
   }
 
   openDialog(invId, itemId, clientX, clientY) {
@@ -245,7 +253,7 @@ export class ItemEditorElement extends HTMLElement {
   /** @private */
   resetInputs(item) {
     this.itemTitle.value = item.displayName;
-    this.itemDesc.textContent = item.description;
+    this.itemDesc.value = item.description;
     if (item.stackSize < 0) {
       this.itemStackSize.value = '';
     } else {
@@ -256,14 +264,25 @@ export class ItemEditorElement extends HTMLElement {
   }
 
   /** @private */
+  saveInputs() {
+    const store = getInventoryStore();
+    const sourceInv = getInventoryInStore(store, this._invId);
+    const sourceItem = getItemByItemId(sourceInv, this._itemId);
+    const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
+    cloneItem(socketItem, sourceItem);
+    dispatchItemChange(store, sourceItem.itemId);
+  }
+
+  /** @private */
+  onActionSave() {
+    this.saveInputs();
+    this.dialog.toggleAttribute('open', false);
+  }
+
+  /** @private */
   onDialogClose(e) {
     if (e.detail.from !== 'cancel') {
-      const store = getInventoryStore();
-      const sourceInv = getInventoryInStore(store, this._invId);
-      const sourceItem = getItemByItemId(sourceInv, this._itemId);
-      const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
-      cloneItem(socketItem, sourceItem);
-      dispatchItemChange(store, sourceItem.itemId);
+      this.saveInputs();
     }
   }
 
@@ -321,7 +340,7 @@ export class ItemEditorElement extends HTMLElement {
 
   /** @private */
   onItemDesc() {
-    const desc = this.itemDesc.textContent;
+    const desc = this.itemDesc.value;
     const store = getInventoryStore();
     const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
     socketItem.description = desc;
