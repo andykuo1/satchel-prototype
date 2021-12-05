@@ -43,6 +43,13 @@
   <body>
     <sidebar-layout style="--background-color: none">
       <style>
+        .foundryContainer {
+          flex-direction: row;
+        }
+        .sideContainer {
+          display: flex;
+          flex-direction: column;
+        }
         .spacing {
           flex: 1;
           overflow-y: auto;
@@ -51,17 +58,55 @@
           scroll-behavior: smooth;
         }
       </style>
-      <div slot="sidebar">
-        <div class="sidebarActions">
-          <icon-button id="actionItemEdit" icon="res/edit.svg" alt="foundry" title="Open Foundry"></icon-button>
+      <div slot="sidebar" class="foundryContainer">
+        <div class="sideContainer">
+          <div class="sidebarActions">
+            <icon-button id="actionItemEdit" icon="res/edit.svg" alt="foundry" title="Open Foundry"></icon-button>
+          </div>
+          <div class="spacing">
+          </div>
+          <div class="sidebarActions">
+            <icon-button id="cloudButton" icon="res/cloud.svg" alt="connect" title="Connect" disabled></icon-button>
+          </div>
+          <div class="sidebarActions">
+            <icon-button id="actionSettings" icon="res/settings.svg" alt="settings" title="Settings"></icon-button>
+          </div>
         </div>
-        <div class="spacing">
-        </div>
-        <div class="sidebarActions">
-          <icon-button id="cloudButton" icon="res/cloud.svg" alt="connect" title="Connect" disabled></icon-button>
-        </div>
-        <div class="sidebarActions">
-          <icon-button id="actionSettings" icon="res/settings.svg" alt="settings" title="Settings"></icon-button>
+        <!-- EDITOR CONTENT -->
+        <style>
+          .editorContainer {
+            display: none;
+            flex-direction: column;
+            width: 25em;
+            background-color: #333333;
+            padding: 0.5em;
+            z-index: 1;
+          }
+          .editorContainer.open {
+            display: flex;
+          }
+          .editorContainer > * {
+            visibility: hidden;
+          }
+          .editorContainer.open > * {
+            visibility: visible;
+          }
+          .editorActions {
+            display: flex;
+            flex-direction: column;
+          }
+          #editor {
+            flex: 1;
+            overflow-y: auto;
+          }
+        </style>
+        <div class="editorContainer">
+          <item-editor id="editor"></item-editor>
+          <div class="editorActions">
+            <button id="actionItemNew">New Item</button>
+            <button id="actionItemImport" disabled>Import Item</button>
+            <button id="actionItemExport">Export Item</button>
+          </div>
         </div>
       </div>
       <sidebar-layout style="flex-direction: row-reverse; --background-color: none">
@@ -155,11 +200,12 @@
               main {
                 position: relative;
                 display: flex;
-                flex-direction: column;
+                flex-direction: row;
                 align-items: center;
                 text-align: center;
               }
             </style>
+            <!-- WORKSPACE CONTENT -->
             <style>
               #workspace {
                 flex: 1;
@@ -176,51 +222,10 @@
             </style>
             <div id="workspace">
               <inventory-grid invid="main"></inventory-grid>
+              <div id="remoteWorkspace"></div>
             </div>
             <item-delete id="delete"></item-delete>
           </main>
-        </div>
-        <!-- EDITOR CONTENT -->
-        <style>
-          .editorContainer {
-            display: flex;
-            flex-direction: column;
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 25em;
-            background-color: #333333;
-            padding: 0.5em;
-            z-index: 1;
-            transform: translateX(-110%);
-            transition: transform 0.2s ease;
-          }
-          .editorContainer.open {
-            transform: translateX(0);
-          }
-          .editorContainer > * {
-            visibility: hidden;
-          }
-          .editorContainer.open > * {
-            visibility: visible;
-          }
-          .editorActions {
-            display: flex;
-            flex-direction: column;
-          }
-          #editor {
-            flex: 1;
-            overflow-y: auto;
-          }
-        </style>
-        <div class="editorContainer">
-          <item-editor id="editor"></item-editor>
-          <div class="editorActions">
-            <button id="actionItemNew">New Item</button>
-            <button id="actionItemImport">Import Item</button>
-            <button id="actionItemExport">Export Item</button>
-          </div>
         </div>
         <!-- ALBUM CONTENT -->
         <style>

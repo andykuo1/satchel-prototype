@@ -31,13 +31,16 @@ export function addItemToInventory(store, invId, item, coordX, coordY) {
  * @param {InventoryStore} store
  * @param {InventoryId} invId
  * @param {ItemId} itemId
+ * @returns {boolean}
  */
 export function removeItemFromInventory(store, invId, itemId) {
   let inv = getExistingInventory(store, invId);
   if (InvItems.hasItem(inv, itemId)) {
     InvItems.removeItem(inv, itemId);
     dispatchInventoryChange(store, invId);
+    return true;
   }
+  return false;
 }
 
 export function clearItemsInInventory(store, invId) {

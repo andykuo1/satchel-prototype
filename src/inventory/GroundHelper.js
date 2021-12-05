@@ -9,6 +9,8 @@ import { getInventoryStore } from './InventoryStore.js';
 export function dropOnGround(freedItem) {
   const store = getInventoryStore();
   addItemToAlbum(store, 'ground', freedItem);
+  const groundElement = document.querySelector('#ground');
+  groundElement.scrollTo(0, groundElement.scrollHeight);
 }
 
 export function clearGround() {

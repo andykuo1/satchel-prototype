@@ -64,7 +64,7 @@ figcaption {
   right: 0;
   bottom: 0;
   top: unset;
-  color: white;
+  color: #ffffff;
   background-color: rgba(0, 0, 0, 0.1);
   text-align: center;
   text-overflow: ellipsis;
@@ -270,7 +270,7 @@ export class InventoryItemElement extends HTMLElement {
    * @protected
    */
   onContextMenu(e) {
-    if (this.hasAttribute('noedit')) {
+    if (this._containerElement.hasAttribute('noedit')) {
       e.preventDefault();
       e.stopPropagation();
       return false;

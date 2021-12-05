@@ -47,11 +47,12 @@ dialog[open] {
   visibility: hidden;
 }
 #cancel {
-  position: absolute;
+  position: fixed;
   right: 0;
   top: 0;
   width: 2em;
   height: 2em;
+  z-index: 1;
 }
 #cancel[disabled] {
   display: none;

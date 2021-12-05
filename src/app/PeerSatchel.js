@@ -153,7 +153,7 @@ export class SatchelServer {
                   element.id = clientDataName;
                   element.invId = clientDataName;
                   remoteClient.element = element;
-                  document.querySelector('#workspace').appendChild(element);
+                  document.querySelector('#remoteWorkspace').appendChild(element);
                 } else {
                   let inv = getInventoryInStore(store, clientDataName);
                   importInventoryFromJSON(clientData, inv);

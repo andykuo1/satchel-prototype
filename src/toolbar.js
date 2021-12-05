@@ -105,12 +105,9 @@ function onActionAlbumNew() {
 }
 
 function onActionNewItem() {
-  let item = new ItemBuilder().fromDefault().width(2).height(2).build();
-  if (item) {
-    dropOnGround(item);
-    const groundElement = document.querySelector('#ground');
-    groundElement.scrollTo(0, groundElement.scrollHeight);
-  }
+  /** @type {import('./satchel/item/ItemDialogElement.js').ItemEditorElement} */
+  const itemEditor = document.querySelector('#itemDialog');
+  itemEditor.openDialog(null, undefined, undefined, 0, 0, true);
 }
 
 function onActionItemNew() {
@@ -260,12 +257,12 @@ function onItemContext(e) {
   e.preventDefault();
   e.stopPropagation();
 
-  /** @type {import('./satchel/item/ItemDialogElement.js').ItemDialogElement} */
+  /** @type {import('./satchel/item/ItemDialogElement.js').ItemEditorElement} */
   const itemDialog = document.querySelector('#itemDialog');
   // @ts-ignore
-  const { invId, itemId, clientX, clientY } = e.detail;
+  const { container, invId, itemId, clientX, clientY } = e.detail;
   if (invId && itemId) {
-    itemDialog.openDialog(invId, itemId, clientX, clientY);
+    itemDialog.openDialog(container, invId, itemId, clientX, clientY);
   }
   return false;
 }
