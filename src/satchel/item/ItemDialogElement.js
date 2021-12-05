@@ -13,9 +13,10 @@ const INNER_HTML = /* html */`
     <inventory-grid init="socket" id="socketInventory" noedit nooutput noinput></inventory-grid>
     <p class="styleContainer">
       <label for="itemImage">
-        <img src="res/image.svg" title="image">
+        <img src="res/image.svg" title="Image">
       </label>
       <input type="url" id="itemImage">
+      <input type="color" id="itemBackground" disabled>
     </p>
   </fieldset>
   <fieldset class="detail">
@@ -172,8 +173,9 @@ export class ItemEditorElement extends HTMLElement {
     this.itemDesc = shadowRoot.querySelector('#itemDesc');
     /**
      * @private
+     * @type {HTMLInputElement}
      */
-    this.actionReset = shadowRoot.querySelector('#actionReset');
+    this.itemBackground = shadowRoot.querySelector('#itemBackground');
 
     /** @private */
     this.onItemTitle = this.onItemTitle.bind(this);
@@ -184,9 +186,9 @@ export class ItemEditorElement extends HTMLElement {
     /** @private */
     this.onItemImage = this.onItemImage.bind(this);
     /** @private */
-    this.onClickSelectAll = this.onClickSelectAll.bind(this);
+    this.onItemBackground = this.onItemBackground.bind(this);
     /** @private */
-    this.onActionReset = this.onActionReset.bind(this);
+    this.onClickSelectAll = this.onClickSelectAll.bind(this);
     /** @private */
     this.onDialogClose = this.onDialogClose.bind(this);
   }
@@ -198,7 +200,7 @@ export class ItemEditorElement extends HTMLElement {
     this.itemStackSize.addEventListener('change', this.onItemStackSize);
     this.itemImage.addEventListener('change', this.onItemImage);
     this.itemImage.addEventListener('click', this.onClickSelectAll);
-    this.actionReset.addEventListener('click', this.onActionReset);
+    this.itemBackground.addEventListener('input', this.onItemBackground);
     this.dialog.addEventListener('close', this.onDialogClose);
   }
 
@@ -209,7 +211,7 @@ export class ItemEditorElement extends HTMLElement {
     this.itemStackSize.removeEventListener('change', this.onItemStackSize);
     this.itemImage.removeEventListener('change', this.onItemImage);
     this.itemImage.removeEventListener('click', this.onClickSelectAll);
-    this.actionReset.removeEventListener('click', this.onActionReset);
+    this.itemBackground.removeEventListener('input', this.onItemBackground);
     this.dialog.removeEventListener('close', this.onDialogClose);
   }
 
@@ -244,34 +246,39 @@ export class ItemEditorElement extends HTMLElement {
   resetInputs(item) {
     this.itemTitle.value = item.displayName;
     this.itemDesc.textContent = item.description;
-    this.itemStackSize.value = String(item.stackSize);
+    if (item.stackSize < 0) {
+      this.itemStackSize.value = '';
+    } else {
+      this.itemStackSize.value = String(item.stackSize);
+    }
     this.itemImage.value = item.imgSrc;
+    this.itemBackground.value = item.background;
   }
 
   /** @private */
-  onDialogClose() {
-    const store = getInventoryStore();
-    const sourceInv = getInventoryInStore(store, this._invId);
-    const sourceItem = getItemByItemId(sourceInv, this._itemId);
-    const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
-    cloneItem(socketItem, sourceItem);
-    dispatchItemChange(store, sourceItem.itemId);
-  }
-
-  /** @private */
-  onActionReset() {
-    const store = getInventoryStore();
-    const sourceInv = getInventoryInStore(store, this._invId);
-    const sourceItem = getItemByItemId(sourceInv, this._itemId);
-    const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
-    cloneItem(sourceItem, socketItem);
-    dispatchItemChange(store, socketItem.itemId);
-    this.resetInputs(socketItem);
+  onDialogClose(e) {
+    if (e.detail.from !== 'cancel') {
+      const store = getInventoryStore();
+      const sourceInv = getInventoryInStore(store, this._invId);
+      const sourceItem = getItemByItemId(sourceInv, this._itemId);
+      const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
+      cloneItem(socketItem, sourceItem);
+      dispatchItemChange(store, sourceItem.itemId);
+    }
   }
 
   /** @private */
   onClickSelectAll(e) {
     e.target.select();
+  }
+
+  /** @private */
+  onItemBackground() {
+    const background = this.itemBackground.value;
+    const store = getInventoryStore();
+    const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
+    socketItem.background = background;
+    dispatchItemChange(store, socketItem.itemId);
   }
 
   /** @private */
@@ -285,14 +292,23 @@ export class ItemEditorElement extends HTMLElement {
 
   /** @private */
   onItemStackSize() {
-    let stackSize = Number(this.itemStackSize.value);
-    if (Number.isSafeInteger(stackSize) && stackSize < 0) {
+    let stackSize;
+    try {
+      stackSize = Number.parseInt(this.itemStackSize.value);
+      if (!Number.isSafeInteger(stackSize) || stackSize < 0) {
+        stackSize = -1;
+      }
+    } catch (e) {
       stackSize = -1;
     }
     const store = getInventoryStore();
     const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
     socketItem.stackSize = stackSize;
     dispatchItemChange(store, socketItem.itemId);
+
+    if (stackSize < 0) {
+      this.itemStackSize.value = '';
+    }
   }
 
   /** @private */

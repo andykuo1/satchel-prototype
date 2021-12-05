@@ -24,6 +24,7 @@ const INNER_STYLE = /* css */`
   --itemY: 0;
   --itemWidth: 1;
   --itemHeight: 1;
+  --itemBackground: unset;
   /* var(--item-unit-size) is inherited from parent container. */
 }
 .container {
@@ -38,11 +39,13 @@ const INNER_STYLE = /* css */`
   user-select: none;
   box-shadow: 0 0 0 rgba(0, 0, 0, 0);
   transition: box-shadow 0.1s ease;
-  background-color: var(--background-color);
+  background: var(--itemBackground, var(--background-color));
 }
 .container:hover {
-  background-color: var(--hover-color);
   z-index: 1;
+}
+.container:hover .innerContainer {
+  background-color: var(--hover-color);
 }
 
 .innerContainer {
@@ -222,6 +225,11 @@ export class InventoryItemElement extends HTMLElement {
     } else {
       this.style.setProperty('--itemWidth', `${item.width}`);
       this.style.setProperty('--itemHeight', `${item.height}`);
+    }
+    if (item.background) {
+      this.style.setProperty('--itemBackground', item.background);
+    } else {
+      this.style.removeProperty('--itemBackground');
     }
     const title = item.displayName || 'Item';
     this.title = title;

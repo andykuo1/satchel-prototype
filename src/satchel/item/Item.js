@@ -11,6 +11,7 @@ import { uuid } from '../../util/uuid.js';
  * @property {string} displayName
  * @property {string} description
  * @property {number} stackSize
+ * @property {string} background
  * @property {object} metadata
  */
 
@@ -26,6 +27,7 @@ export function createItem(itemId) {
     displayName: '',
     description: '',
     stackSize: -1,
+    background: '',
     metadata: {},
   };
   return item;
@@ -71,6 +73,9 @@ export function cloneItem(other, dst = undefined) {
   if (typeof other.stackSize === 'number') {
     dst.stackSize = other.stackSize;
   }
+  if (typeof other.background === 'string') {
+    dst.background = other.background;
+  }
   if (typeof other.metadata === 'object') {
     try {
       dst.metadata = JSON.parse(JSON.stringify(other.metadata));
@@ -102,6 +107,8 @@ export class ItemBuilder {
     /** @private */
     this._stackSize = -1;
     /** @private */
+    this._background = '';
+    /** @private */
     this._metadata = {};
   }
 
@@ -116,6 +123,7 @@ export class ItemBuilder {
     this._displayName = itemBuilder._displayName;
     this._description = itemBuilder._description;
     this._stackSize = itemBuilder._stackSize;
+    this._background = itemBuilder._background;
     this._metadata = JSON.parse(JSON.stringify(itemBuilder._metadata));
     return this;
   }
@@ -132,6 +140,7 @@ export class ItemBuilder {
     this._displayName = newItem.displayName;
     this._description = newItem.description;
     this._stackSize = newItem.stackSize;
+    this._background = newItem.background;
     this._metadata = newItem.metadata;
     return this;
   }
@@ -144,6 +153,7 @@ export class ItemBuilder {
     this._displayName = '';
     this._description = '';
     this._stackSize = -1;
+    this._background = '';
     this._metadata = {};
     return this;
   }
@@ -183,6 +193,11 @@ export class ItemBuilder {
     return this;
   }
 
+  background(background) {
+    this._background = background;
+    return this;
+  }
+
   metadata(key, value) {
     this._metadata[key] = value;
     return this;
@@ -208,6 +223,7 @@ export class ItemBuilder {
     let displayName = String(this._displayName.trim());
     let description = String(this._description);
     let stackSize = Number(this._stackSize);
+    let background = String(this._background);
     let metadata;
     try {
       metadata = JSON.parse(JSON.stringify(this._metadata));
@@ -221,6 +237,7 @@ export class ItemBuilder {
     item.displayName = displayName;
     item.description = description;
     item.stackSize = stackSize;
+    item.background = background;
     item.metadata = metadata;
     return item;
   }
