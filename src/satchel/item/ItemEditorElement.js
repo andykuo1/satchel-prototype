@@ -143,8 +143,8 @@ img {
 }
 
 .socketContainer {
-  max-width: 30vw;
-  max-height: 30vh;
+  max-width: 16em;
+  max-height: 16em;
   overflow: auto;
 }
 .socketSpacing {
@@ -423,9 +423,11 @@ export class ItemEditorElement extends HTMLElement {
     this.resetInputs(item);
     this.resetSizeInputs(resizable);
     const content = this.itemDesc.value;
-    this.itemDesc.focus();
-    this.itemDesc.setSelectionRange(content.length, content.length);
-    this.itemDesc.scrollTo({ top: 0 });
+    if (!this.contains(document.activeElement)) {
+      this.itemDesc.focus({ preventScroll: true });
+      this.itemDesc.setSelectionRange(content.length, content.length);
+      this.itemDesc.scrollTo({ top: 0 });
+    }
   }
 
   disableInputs(force = true) {
