@@ -49,7 +49,6 @@ const INNER_HTML = /* html */`
   </fieldset>
   <fieldset class="detailContainer">
     <legend>Detail</legend>
-    <slot name="actions" class="actionContainer"></slot>
     <p class="titleContainer">
       <input type="text" id="itemTitle" placeholder="Item">
       <span id="itemStackSizeContainer">
@@ -58,6 +57,7 @@ const INNER_HTML = /* html */`
     </p>
     <p class="textContainer">
       <textarea id="itemDesc" placeholder="Notes..."></textarea>
+      <slot name="actions" class="actionContainer"></slot>
     </p>
   </fieldset>
 </div>
@@ -65,6 +65,7 @@ const INNER_HTML = /* html */`
 const INNER_STYLE = /* css */`
 :host {
   text-align: center;
+  height: 100%;
 }
 
 textarea {
@@ -113,6 +114,7 @@ img {
 .textContainer {
   flex: 1;
   display: flex;
+  flex-direction: row;
 }
 .styleContainer {
   display: flex;
@@ -211,10 +213,7 @@ img {
 
 .actionContainer {
   display: flex;
-  flex-direction: row-reverse;
-  position: absolute;
-  top: -2.1em;
-  right: -1.2em;
+  flex-direction: column;
 }
 
 .actionContainer::slotted(*) {
