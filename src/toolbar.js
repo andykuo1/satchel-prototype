@@ -11,12 +11,13 @@ import { ItemBuilder } from './satchel/item/Item.js';
 import { uuid } from './util/uuid.js';
 import { ItemAlbumElement } from './satchel/album/ItemAlbumElement.js';
 import { exportDataToJSON } from './session/SatchelDataLoader.js';
-import { exportItemToJSON, importItemFromJSON } from './satchel/item/ItemLoader.js';
+import { importItemFromJSON } from './satchel/item/ItemLoader.js';
 import { importAlbumFromJSON } from './satchel/album/AlbumLoader.js';
 import { addAlbumInStore, createAlbumInStore } from './satchel/album/AlbumStore.js';
 import { copyAlbum } from './satchel/album/Album.js';
 import { dispatchAlbumChange } from './satchel/album/AlbumEvents.js';
 import { dispatchInventoryChange } from './satchel/inv/InvEvents.js';
+import { openFoundry } from './inventory/FoundryHelper.js';
 
 function elementEventListener(selector, event, callback) {
   document.querySelector(selector).addEventListener(event, callback);
@@ -28,9 +29,7 @@ window.addEventListener('DOMContentLoaded', () => {
   elementEventListener('#uploadButton', 'click', onUploadClick);
   elementEventListener('#cloudButton', 'click', onCloudClick);
   elementEventListener('#actionEraseAll', 'click', onActionEraseAll);
-
-  elementEventListener('#actionItemNew', 'click', onActionItemNew);
-  elementEventListener('#actionItemExport', 'click', onActionItemExport);
+  
   elementEventListener('#actionAlbumOpen', 'click', onActionAlbumOpen);
   elementEventListener('#actionAlbumImport', 'click', onActionAlbumImport);
   elementEventListener('#actionAlbumNew', 'click', onActionAlbumNew);
@@ -104,43 +103,6 @@ function onActionAlbumNew() {
   albumContainer.appendChild(albumElement);
 }
 
-function onActionNewItem() {
-  /** @type {import('./satchel/item/ItemDialogElement.js').ItemEditorElement} */
-  const itemEditor = document.querySelector('#itemDialog');
-  itemEditor.openDialog(null, undefined, undefined, 0, 0, true);
-}
-
-function onActionItemNew() {
-  /** @type {import('./inventory/element/ItemEditorElement.js').ItemEditorElement} */
-  const editor = document.querySelector('#editor');
-  editor.clearEditor();
-  editor.newEditor();
-}
-
-function onActionItemExport() {
-  /** @type {import('./inventory/element/ItemEditorElement.js').ItemEditorElement} */
-  const itemEditor = document.querySelector('#editor');
-  try {
-    let item = itemEditor.getSocketedItem();
-    if (item) {
-      let jsonData = exportItemToJSON(item);
-      downloadText(`${item.displayName || 'New Item'}.json`, JSON.stringify(jsonData, null, 4));
-    }
-  } catch (e) {
-    console.error('Failed to export item', e);
-  }
-}
-
-function onActionDropToGround() {
-  /** @type {import('./inventory/element/ItemEditorElement.js').ItemEditorElement} */
-  const itemEditor = document.querySelector('#editor');
-  let item = itemEditor.getSocketedItem();
-  if (item) {
-    dropOnGround(item);
-    itemEditor.clearEditor();
-  }
-}
-
 function onActionAlbumOpen(e) {
   let albumContainer = document.querySelector('.albumContainer');
   albumContainer.classList.toggle('open');
@@ -153,6 +115,11 @@ async function onActionAlbumImport() {
 function onActionItemEdit() {
   let editorContainer = document.querySelector('.editorContainer');
   editorContainer.classList.toggle('open');
+}
+
+function onActionNewItem() {
+  let newItem = new ItemBuilder().fromDefault().width(2).height(2).build();
+  openFoundry(newItem);
 }
 
 function onDownloadClick() {

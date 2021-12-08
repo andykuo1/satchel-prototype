@@ -41,7 +41,7 @@
     </style>
   </head>
   <body>
-    <sidebar-layout style="--background-color: none">
+    <sidebar-layout>
       <style>
         .foundryContainer {
           flex-direction: row;
@@ -62,6 +62,9 @@
         <div class="sideContainer">
           <div class="sidebarActions">
             <icon-button id="actionItemEdit" icon="res/edit.svg" alt="foundry" title="Open Foundry"></icon-button>
+          </div>
+          <div class="sidebarActions">
+            <icon-button id="actionNewItem" icon="res/add.svg" alt="new" title="New Item"></icon-button>
           </div>
           <div class="spacing">
           </div>
@@ -91,22 +94,13 @@
           .editorContainer.open > * {
             visibility: visible;
           }
-          .editorActions {
-            display: flex;
-            flex-direction: column;
-          }
-          #editor {
+          #itemEditor {
             flex: 1;
             overflow-y: auto;
           }
         </style>
         <div class="editorContainer">
-          <item-editor id="editor"></item-editor>
-          <div class="editorActions">
-            <button id="actionItemNew">New Item</button>
-            <button id="actionItemImport" disabled>Import Item</button>
-            <button id="actionItemExport">Export Item</button>
-          </div>
+          <item-editor2 id="itemEditor" editable></item-editor2>
         </div>
       </div>
       <sidebar-layout style="flex-direction: row-reverse; --background-color: none">
@@ -132,7 +126,7 @@
           </div>
           <album-ground id="ground"></album-ground>
           <div class="sidebarActions">
-            <icon-button id="actionNewItem" icon="res/add.svg" alt="new" title="New Item"></icon-button>
+            <item-delete id="delete"></item-delete>
           </div>
         </div>
         <style>
@@ -213,18 +207,11 @@
                 height: 100%;
                 overflow: auto;
               }
-              #delete {
-                position: absolute;
-                left: 0;
-                right: 0;
-                bottom: 0.5em;
-              }
             </style>
             <div id="workspace">
               <inventory-grid invid="main"></inventory-grid>
               <div id="remoteWorkspace"></div>
             </div>
-            <item-delete id="delete"></item-delete>
           </main>
         </div>
         <!-- ALBUM CONTENT -->

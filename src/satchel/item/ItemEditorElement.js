@@ -1,12 +1,9 @@
-import { DialogPromptElement } from '../../app/DialogPromptElement.js';
+import { getCursor } from '../../inventory/element/InventoryCursorElement.js';
 import { InventoryGridElement } from '../../inventory/element/InventoryGridElement.js';
-import { openFoundry } from '../../inventory/FoundryHelper.js';
 import { dropOnGround } from '../../inventory/GroundHelper.js';
-import { getInventoryInStore, getInventoryStore } from '../../inventory/InventoryStore.js';
-import { addItemToInventory, clearItemsInInventory, getItemAtSlotIndex, isInventoryEmpty, removeItemFromInventory } from '../../inventory/InventoryTransfer.js';
-import { dispatchInventoryChange } from '../inv/InvEvents.js';
-import { getItemByItemId } from '../inv/InvItems.js';
-import { cloneItem, copyItem, ItemBuilder } from './Item.js';
+import { getInventoryStore } from '../../inventory/InventoryStore.js';
+import { addItemToInventory, clearItemsInInventory, getItemAtSlotIndex, isInventoryEmpty } from '../../inventory/InventoryTransfer.js';
+import { addInventoryChangeListener, dispatchInventoryChange, removeInventoryChangeListener } from '../inv/InvEvents.js';
 import { dispatchItemChange } from './ItemEvents.js';
 
 /** @typedef {import('./Item.js').Item} Item */
@@ -15,55 +12,58 @@ const MAX_ITEM_WIDTH = 8;
 const MAX_ITEM_HEIGHT = 8;
 
 const INNER_HTML = /* html */`
-<dialog-prompt>
-  <div class="container">
-    <button id="actionFoundry">Send to Foundry</button>
-    <fieldset class="portraitContainer">
-      <legend>Item</legend>
-      <div class="foundrySocketContainer">
-        <div class="foundryContainer">
-          <icon-button id="actionEnlarge" icon="res/more.svg"></icon-button>
-          <icon-button id="actionShrink" icon="res/less.svg"></icon-button>
-          <icon-button id="actionFlatten" icon="res/flatten.svg"></icon-button>
-          <icon-button id="actionRotate" icon="res/rotate.svg"></icon-button>
-        </div>
-        <div class="socketMarginContainer">
+<div class="rootContainer">
+  <fieldset class="portraitContainer">
+    <legend>Item</legend>
+    <div class="foundrySocketContainer">
+      <div class="foundryContainer">
+        <icon-button id="actionEnlarge" icon="res/more.svg"></icon-button>
+        <icon-button id="actionShrink" icon="res/less.svg"></icon-button>
+        <icon-button id="actionFlatten" icon="res/flatten.svg"></icon-button>
+        <icon-button id="actionRotate" icon="res/rotate.svg"></icon-button>
+      </div>
+      <div class="socketXContainer">
+        <div class="socketSpacing"></div>
+        <div class="socketYContainer">
+          <div class="socketSpacing"></div>
           <div class="socketContainer">
+            <inventory-grid init="socket" id="socketInventory" noedit></inventory-grid>
+          </div>
+          <div class="socketSpacing">
             <input type="number" min="1" max="${MAX_ITEM_WIDTH}" id="itemWidth">
-            <input type="number" min="1" max="${MAX_ITEM_HEIGHT}" id="itemHeight">
-            <span class="socketInventoryContainer">
-              <inventory-grid init="socket" id="socketInventory" noedit nooutput noinput></inventory-grid>
-            </span>
           </div>
         </div>
+        <div class="socketSpacing">
+          <input type="number" min="1" max="${MAX_ITEM_HEIGHT}" id="itemHeight">
+        </div>
       </div>
-      <p class="styleContainer">
-        <label for="itemImage">
-          <img src="res/image.svg" title="Image">
-        </label>
-        <input type="url" id="itemImage">
-        <input type="color" id="itemBackground">
-      </p>
-    </fieldset>
-    <fieldset class="detailContainer">
-      <legend>Detail</legend>
-      <slot name="actions" class="actionContainer"></slot>
-      <p class="titleContainer">
-        <input type="text" id="itemTitle" placeholder="Item">
-        <span id="itemStackSizeContainer">
-          <span>⨯</span><input type="number" id="itemStackSize" placeholder="--">
-        </span>
-      </p>
-      <p class="textContainer">
-        <textarea id="itemDesc" placeholder="Notes..."></textarea>
-      </p>
-      <button id="actionSave">Save & Close</button>
-    </fieldset>
-  </div>
-</dialog-prompt>
+      <div class="foundrySocketMargin"></div>
+    </div>
+    <p class="styleContainer">
+      <label for="itemImage">
+        <img src="res/image.svg" alt="image" title="Change Image">
+      </label>
+      <input type="url" id="itemImage">
+      <input type="color" id="itemBackground">
+    </p>
+  </fieldset>
+  <fieldset class="detailContainer">
+    <legend>Detail</legend>
+    <slot name="actions" class="actionContainer"></slot>
+    <p class="titleContainer">
+      <input type="text" id="itemTitle" placeholder="Item">
+      <span id="itemStackSizeContainer">
+        <span>⨯</span><input type="number" id="itemStackSize" placeholder="--">
+      </span>
+    </p>
+    <p class="textContainer">
+      <textarea id="itemDesc" placeholder="Notes..."></textarea>
+    </p>
+  </fieldset>
+</div>
 `;
 const INNER_STYLE = /* css */`
-dialog-prompt {
+:host {
   text-align: center;
 }
 
@@ -72,7 +72,7 @@ textarea {
   outline: none;
   border: none;
   background: none;
-  height: 10em;
+  min-height: 10em;
   color: var(--foreground-color);
 }
 
@@ -85,26 +85,33 @@ img {
   height: 100%;
 }
 
-.container {
-  display: inline-block;
-  max-height: 80vh;
+.rootContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .portraitContainer {
+  flex: 3;
   position: relative;
   display: flex;
   flex-direction: column;
 }
 .detailContainer {
+  flex: 2;
   position: relative;
   display: flex;
   flex-direction: column;
+}
+.detailContainer:disabled {
+  display: none;
 }
 
 .titleContainer {
   display: flex;
 }
 .textContainer {
+  flex: 1;
   display: flex;
 }
 .styleContainer {
@@ -113,44 +120,52 @@ img {
   margin-top: 0.5em;
 }
 
+.foundrySocketContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+}
+.foundrySocketMargin {
+  width: 1em;
+}
+
 .foundryContainer {
-  position: absolute;
   display: flex;
   flex-direction: column;
 }
 .foundryContainer icon-button {
   width: 2em;
   height: 2em;
-  margin: 0;
+  margin: 0.2em 0;
 }
 .foundryContainer icon-button[disabled] {
-  display: none;
-}
-.foundrySocketContainer {
-  display: flex;
-  flex-direction: row;
+  visibility: hidden;
 }
 
-.socketMarginContainer {
-  flex: 1;
-  margin: 1em 2em;
-}
-.socketFixedContainer {
-  width: 30vw;
-  height: 30vh;
-}
 .socketContainer {
-  display: inline-block;
-  position: relative;
-  margin-left: auto;
-  margin-right: auto;
-}
-.socketInventoryContainer {
-  display: inline-block;
   max-width: 30vw;
   max-height: 30vh;
   overflow: auto;
 }
+.socketSpacing {
+  flex: 1;
+}
+.socketXContainer {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  text-align: left;
+  align-items: center;
+}
+.socketYContainer {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  align-items: center;
+}
+
 #itemWidth, #itemHeight {
   color: #ffffff;
   width: 2.5em;
@@ -161,32 +176,28 @@ img {
   opacity: 0.3;
 }
 #itemWidth {
-  position: absolute;
-  left: calc(50% + 1em);
-  bottom: -1.5em;
   z-index: 1;
-  transform: translateX(-50%);
+  transform: translateX(30%);
 }
 #itemHeight {
-  position: absolute;
-  top: 50%;
-  right: -3em;
   z-index: 1;
-  transform: translateY(-50%);
-}
-
-#actionFoundry {
-  position: absolute;
-  left: 0;
-  top: 0;
+  transform: translateY(-80%);
 }
 
 #itemImage {
   flex: 1;
   background: none;
   border: none;
-  color: #aaaaaa;
+  color: #ffffff;
   margin-left: 0.5em;
+}
+.rootContainer[disabled] label[for="itemImage"] {
+  opacity: 0.6;
+  visibility: hidden;
+}
+
+#itemBackground:disabled {
+  visibility: hidden;
 }
 
 #itemStackSize {
@@ -230,7 +241,7 @@ export class ItemEditorElement extends HTMLElement {
   }
 
   static define(customElements = window.customElements) {
-    customElements.define('item-dialog', this);
+    customElements.define('item-editor2', this);
   }
 
   constructor() {
@@ -244,22 +255,17 @@ export class ItemEditorElement extends HTMLElement {
     );
 
     /** @private */
-    this._containerElement = null;
+    this.rootContainer = shadowRoot.querySelector('.rootContainer');
     /** @private */
-    this._invId = null;
+    this.portraitContainer = shadowRoot.querySelector('.portraitContainer');
     /** @private */
-    this._itemId = null;
+    this.detailContainer = shadowRoot.querySelector('.detailContainer');
 
     /**
      * @private
      * @type {InventoryGridElement}
      */
     this.socket = shadowRoot.querySelector('inventory-grid');
-    /**
-     * @private
-     * @type {DialogPromptElement}
-     */
-    this.dialog = shadowRoot.querySelector('dialog-prompt');
     /**
      * @private
      * @type {HTMLInputElement}
@@ -285,13 +291,6 @@ export class ItemEditorElement extends HTMLElement {
      * @type {HTMLInputElement}
      */
     this.itemBackground = shadowRoot.querySelector('#itemBackground');
-    /** @private */
-    this.actionSave = shadowRoot.querySelector('#actionSave');
-    /** @private */
-    this.actionFoundry = shadowRoot.querySelector('#actionFoundry');
-
-    /** @private */
-    this.socketMarginContainer = shadowRoot.querySelector('.socketMarginContainer');
     /**
      * @private
      * @type {HTMLInputElement}
@@ -324,12 +323,6 @@ export class ItemEditorElement extends HTMLElement {
     /** @private */
     this.onClickSelectAll = this.onClickSelectAll.bind(this);
     /** @private */
-    this.onDialogClose = this.onDialogClose.bind(this);
-    /** @private */
-    this.onActionSave = this.onActionSave.bind(this);
-    /** @private */
-    this.onActionFoundry = this.onActionFoundry.bind(this);
-    /** @private */
     this.onActionEnlarge = this.onActionEnlarge.bind(this);
     /** @private */
     this.onActionShrink = this.onActionShrink.bind(this);
@@ -341,25 +334,36 @@ export class ItemEditorElement extends HTMLElement {
     this.onItemWidth = this.onItemWidth.bind(this);
     /** @private */
     this.onItemHeight = this.onItemHeight.bind(this);
+
+    /** @private */
+    this.onSocketInventoryChange = this.onSocketInventoryChange.bind(this);
+    /** @private */
+    this.onItemDrop = this.onItemDrop.bind(this);
   }
 
   /** @protected */
   connectedCallback() {
+    const editable = this.hasAttribute('editable');
+    this.socket.toggleAttribute('noinput', !editable);
+    this.socket.toggleAttribute('nooutput', !editable);
+
     this.itemTitle.addEventListener('input', this.onItemTitle);
     this.itemDesc.addEventListener('input', this.onItemDesc);
     this.itemStackSize.addEventListener('change', this.onItemStackSize);
     this.itemImage.addEventListener('change', this.onItemImage);
     this.itemImage.addEventListener('click', this.onClickSelectAll);
     this.itemBackground.addEventListener('input', this.onItemBackground);
-    this.dialog.addEventListener('close', this.onDialogClose);
-    this.actionSave.addEventListener('click', this.onActionSave);
-    this.actionFoundry.addEventListener('click', this.onActionFoundry);
     this.actionEnlarge.addEventListener('click', this.onActionEnlarge);
     this.actionShrink.addEventListener('click', this.onActionShrink);
     this.actionFlatten.addEventListener('click', this.onActionFlatten);
     this.actionRotate.addEventListener('click', this.onActionRotate);
     this.itemWidth.addEventListener('change', this.onItemWidth);
     this.itemHeight.addEventListener('change', this.onItemHeight);
+
+    this.portraitContainer.addEventListener('mouseup', this.onItemDrop);
+    addInventoryChangeListener(this.socket.invId, this.onSocketInventoryChange);
+
+    this.disableInputs(true);
   }
 
   /** @protected */
@@ -370,63 +374,81 @@ export class ItemEditorElement extends HTMLElement {
     this.itemImage.removeEventListener('change', this.onItemImage);
     this.itemImage.removeEventListener('click', this.onClickSelectAll);
     this.itemBackground.removeEventListener('input', this.onItemBackground);
-    this.dialog.removeEventListener('close', this.onDialogClose);
-    this.actionSave.removeEventListener('click', this.onActionSave);
-    this.actionFoundry.removeEventListener('click', this.onActionFoundry);
     this.actionEnlarge.removeEventListener('click', this.onActionEnlarge);
     this.actionShrink.removeEventListener('click', this.onActionShrink);
     this.actionFlatten.removeEventListener('click', this.onActionFlatten);
     this.actionRotate.removeEventListener('click', this.onActionRotate);
     this.itemWidth.removeEventListener('change', this.onItemWidth);
     this.itemHeight.removeEventListener('change', this.onItemHeight);
+
+    this.portraitContainer.removeEventListener('mouseup', this.onItemDrop);
+    removeInventoryChangeListener(this.socket.invId, this.onSocketInventoryChange);
   }
 
-  openDialog(containerElement, invId, itemId, clientX = 0, clientY = 0, resizable = false) {
-    this._containerElement = containerElement;
-    this._invId = invId;
-    this._itemId = itemId;
-
+  putSocketedItem(item, resizable) {
     const store = getInventoryStore();
     const socketInvId = this.socket.invId;
-    let newItem;
-    if (invId && itemId) {
-      const inv = getInventoryInStore(store, invId);
-      const item = getItemByItemId(inv, itemId);
-      newItem = cloneItem(item);
-      this.actionSave.textContent = 'Save & Close';
-    } else {
-      if (itemId === this._itemId) {
-        newItem = getItemAtSlotIndex(store, socketInvId, 0);
-      } else {
-        newItem = new ItemBuilder()
-          .fromDefault()
-          .width(2)
-          .height(2)
-          .build();
-      }
-      this.actionSave.textContent = 'Create';
+    if (!isInventoryEmpty(store, socketInvId)) {
+      const item = getItemAtSlotIndex(store, socketInvId, 0);
+      clearItemsInInventory(store, socketInvId);
+      dropOnGround(item);
     }
-    clearItemsInInventory(store, socketInvId);
-    addItemToInventory(store, socketInvId, newItem, 0, 0);
+    removeInventoryChangeListener(socketInvId, this.onSocketInventoryChange);
+    addItemToInventory(store, socketInvId, item, 0, 0);
+    this.setupSocketInventory(resizable);
+    addInventoryChangeListener(socketInvId, this.onSocketInventoryChange);
+  }
 
-    this.resetInputs(newItem);
+  getSocketedItem() {
+    const store = getInventoryStore();
+    return getItemAtSlotIndex(store, this.socket.invId, 0);
+  }
+
+  /** @private */
+  onSocketInventoryChange() {
+    if (this.hasAttribute('editable')) {
+      this.setupSocketInventory(true);
+    }
+  }
+
+  /** @private */
+  setupSocketInventory(resizable) {
+    const item = this.getSocketedItem();
+    if (!item) {
+      this.disableInputs(true);
+      this.clearInputs();
+      return;
+    }
+    this.disableInputs(false);
+    this.resetInputs(item);
     this.resetSizeInputs(resizable);
-
-    this.dialog.toggleAttribute('open', true);
-
     const content = this.itemDesc.value;
     this.itemDesc.focus();
     this.itemDesc.setSelectionRange(content.length, content.length);
     this.itemDesc.scrollTo({ top: 0 });
   }
 
-  getSocketedItem() {
-    if (!this.dialog.hasAttribute('open')) {
-      return null;
-    }
-    const store = getInventoryStore();
-    const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
-    return socketItem;
+  disableInputs(force = true) {
+    this.rootContainer.toggleAttribute('disabled', force);
+    this.itemImage.toggleAttribute('disabled', force);
+    this.itemBackground.toggleAttribute('disabled', force);
+    this.actionEnlarge.toggleAttribute('disabled', force);
+    this.actionShrink.toggleAttribute('disabled', force);
+    this.actionFlatten.toggleAttribute('disabled', force);
+    this.actionRotate.toggleAttribute('disabled', force);
+    this.detailContainer.toggleAttribute('disabled', force);
+  }
+
+  /** @private */
+  clearInputs() {
+    this.itemTitle.value = '';
+    this.itemDesc.value = '';
+    this.itemWidth.value = '';
+    this.itemHeight.value = '';
+    this.itemBackground.value = '#000000';
+    this.itemStackSize.value = '';
+    this.itemImage.value = '';
+    this.itemImage.placeholder = '';
   }
 
   /**
@@ -455,50 +477,12 @@ export class ItemEditorElement extends HTMLElement {
 
   /** @private */
   resetSizeInputs(resizable) {
-    this.actionFoundry.toggleAttribute('disabled', resizable);
     this.itemWidth.toggleAttribute('disabled', !resizable);
     this.itemHeight.toggleAttribute('disabled', !resizable);
     this.actionEnlarge.toggleAttribute('disabled', !resizable);
     this.actionShrink.toggleAttribute('disabled', !resizable);
     this.actionFlatten.toggleAttribute('disabled', !resizable);
     this.actionRotate.toggleAttribute('disabled', !resizable);
-    
-    this.socketMarginContainer.classList.toggle('socketFixedContainer', resizable);
-  }
-
-  /** @private */
-  saveInputs() {
-    const invId = this._invId;
-    const itemId = this._itemId;
-    const socketInvId = this.socket.invId;
-    const store = getInventoryStore();
-    if (invId && itemId) {
-      const sourceInv = getInventoryInStore(store, invId);
-      const sourceItem = getItemByItemId(sourceInv, itemId);
-      const socketItem = getItemAtSlotIndex(store, socketInvId, 0);
-      cloneItem(socketItem, sourceItem);
-      dispatchItemChange(store, sourceItem.itemId);
-    } else {
-      const socketItem = getItemAtSlotIndex(store, socketInvId, 0);
-      clearItemsInInventory(store, socketInvId);
-      dropOnGround(socketItem);
-    }
-  }
-
-  /** @private */
-  onActionFoundry() {
-    if (!this._containerElement || !this._invId || !this._itemId) {
-      return;
-    }
-    this.saveInputs();
-    this.dialog.toggleAttribute('open', false);
-
-    const store = getInventoryStore();
-    const item = tryTakeItemFromInventory(store, this._containerElement, this._itemId);
-    if (item) {
-      let newItem = copyItem(item);
-      openFoundry(newItem);
-    }
   }
 
   /**
@@ -598,19 +582,6 @@ export class ItemEditorElement extends HTMLElement {
   }
 
   /** @private */
-  onActionSave() {
-    this.saveInputs();
-    this.dialog.toggleAttribute('open', false);
-  }
-
-  /** @private */
-  onDialogClose(e) {
-    if (e.detail.from !== 'cancel') {
-      this.saveInputs();
-    }
-  }
-
-  /** @private */
   onClickSelectAll(e) {
     e.target.select();
   }
@@ -676,22 +647,23 @@ export class ItemEditorElement extends HTMLElement {
     socketItem.description = desc;
     dispatchItemChange(store, socketItem.itemId);
   }
+
+  /** @private */
+  onItemDrop(e) {
+    if (!this.hasAttribute('editable')) {
+      return;
+    }
+    const containerElement = this.socket;
+    let cursor = getCursor();
+    let result = cursor.putDown(containerElement.invId, 0, 0, true);
+    if (result) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+  }
 }
 ItemEditorElement.define();
-
-function tryTakeItemFromInventory(store, containerElement, itemId) {
-  const containerInvId = containerElement.invId;
-  if (containerElement.hasAttribute('nooutput')) {
-    return null;
-  }
-  const inv = getInventoryInStore(store, containerInvId);
-  const item = getItemByItemId(inv, itemId);
-  if (containerElement.hasAttribute('copyoutput')) {
-    return copyItem(item);
-  }
-  removeItemFromInventory(store, containerInvId, itemId);
-  return item;
-}
 
 function getDefaultImageSourceByDimensions(width, height, stackSize) {
   if (width < height) {
