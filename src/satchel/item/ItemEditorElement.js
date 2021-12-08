@@ -241,7 +241,7 @@ export class ItemEditorElement extends HTMLElement {
   }
 
   static define(customElements = window.customElements) {
-    customElements.define('item-editor2', this);
+    customElements.define('item-editor', this);
   }
 
   constructor() {
@@ -385,7 +385,7 @@ export class ItemEditorElement extends HTMLElement {
     removeInventoryChangeListener(this.socket.invId, this.onSocketInventoryChange);
   }
 
-  putSocketedItem(item, resizable) {
+  putSocketedItem(item, resizable = false) {
     const store = getInventoryStore();
     const socketInvId = this.socket.invId;
     if (!isInventoryEmpty(store, socketInvId)) {
@@ -393,10 +393,12 @@ export class ItemEditorElement extends HTMLElement {
       clearItemsInInventory(store, socketInvId);
       dropOnGround(item);
     }
-    removeInventoryChangeListener(socketInvId, this.onSocketInventoryChange);
-    addItemToInventory(store, socketInvId, item, 0, 0);
+    if (item) {
+      removeInventoryChangeListener(socketInvId, this.onSocketInventoryChange);
+      addItemToInventory(store, socketInvId, item, 0, 0);
+      addInventoryChangeListener(socketInvId, this.onSocketInventoryChange);
+    }
     this.setupSocketInventory(resizable);
-    addInventoryChangeListener(socketInvId, this.onSocketInventoryChange);
   }
 
   getSocketedItem() {

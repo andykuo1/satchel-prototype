@@ -17,7 +17,7 @@ import { addAlbumInStore, createAlbumInStore } from './satchel/album/AlbumStore.
 import { copyAlbum } from './satchel/album/Album.js';
 import { dispatchAlbumChange } from './satchel/album/AlbumEvents.js';
 import { dispatchInventoryChange } from './satchel/inv/InvEvents.js';
-import { openFoundry } from './inventory/FoundryHelper.js';
+import { closeFoundry, copyFoundry, isFoundryOpen, openFoundry } from './inventory/FoundryHelper.js';
 
 function elementEventListener(selector, event, callback) {
   document.querySelector(selector).addEventListener(event, callback);
@@ -113,13 +113,26 @@ async function onActionAlbumImport() {
 }
 
 function onActionItemEdit() {
-  let editorContainer = document.querySelector('.editorContainer');
-  editorContainer.classList.toggle('open');
+  if (isFoundryOpen()) {
+    closeFoundry();
+  } else {
+    openFoundry(null);
+  }
 }
 
 function onActionNewItem() {
-  let newItem = new ItemBuilder().fromDefault().width(2).height(2).build();
-  openFoundry(newItem);
+  if (isFoundryOpen()) {
+    let item = copyFoundry();
+    if (item) {
+      dropOnGround(item);
+    } else {
+      let newItem = new ItemBuilder().fromDefault().width(2).height(2).build();
+      openFoundry(newItem);
+    }
+  } else {
+    let newItem = new ItemBuilder().fromDefault().width(2).height(2).build();
+    openFoundry(newItem);
+  }
 }
 
 function onDownloadClick() {
