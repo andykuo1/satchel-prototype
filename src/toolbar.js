@@ -75,8 +75,8 @@ function onGiftSubmit() {
   let giftTarget = document.querySelector('#giftTarget');
   if (giftTarget.value) {
     /** @type {import('./satchel/item/ItemDialogElement.js').ItemDialogElement} */
-    const itemEditor = document.querySelector('#itemDialog');
-    const socketedItem = itemEditor.getSocketedItem();
+    const itemDialog = document.querySelector('#itemDialog');
+    const socketedItem = itemDialog.copySocketedItem();
     const target = giftTarget.value;
     const ctx = getCursorContext();
     if (ctx.server && ctx.server.instance) {

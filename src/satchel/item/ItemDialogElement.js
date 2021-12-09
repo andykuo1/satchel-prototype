@@ -1,4 +1,5 @@
 import { DialogPromptElement } from '../../app/DialogPromptElement.js';
+import { getCursorContext } from '../../inventory/CursorHelper.js';
 import { openFoundry } from '../../inventory/FoundryHelper.js';
 import { getInventoryInStore, getInventoryStore } from '../../inventory/InventoryStore.js';
 import { removeItemFromInventory } from '../../inventory/InventoryTransfer.js';
@@ -12,7 +13,7 @@ import { dispatchItemChange } from './ItemEvents.js';
 const INNER_HTML = /* html */`
 <dialog-prompt>
   <item-editor>
-    <icon-button slot="actions" id="actionFoundryShare" icon="res/share.svg" alt="send" title="Send Item" disabled></icon-button>
+    <icon-button slot="actions" id="actionFoundryShare" icon="res/share.svg" alt="send" title="Send Item"></icon-button>
   </item-editor>
   <button id="actionSave">Save & Close</button>
   <button id="actionFoundry">Send to Foundry</button>
@@ -120,6 +121,15 @@ export class ItemDialogElement extends HTMLElement {
     this.dialog.toggleAttribute('open', true);
   }
 
+  copySocketedItem() {
+    const item = this.itemEditor.getSocketedItem();
+    if (!item) {
+      return null;
+    } else {
+      return copyItem(item);
+    }
+  }
+
   /** @private */
   applyChanges() {
     const invId = this._invId;
@@ -156,6 +166,27 @@ export class ItemDialogElement extends HTMLElement {
 
   /** @private */
   onActionFoundryShare() {
+    const socketedItem = this.itemEditor.getSocketedItem();
+    try {
+      if (socketedItem) {
+        /** @type {HTMLSelectElement} */
+        let giftTarget = document.querySelector('#giftTarget');
+        let ctx = getCursorContext();
+        if (ctx.server && ctx.server.instance) {
+          let content = ctx.server.instance.getActiveClientNames().map(clientName => `<option>${clientName.toLowerCase()}</option>`).join('\n');
+          giftTarget.innerHTML = content;
+        } else if (ctx.client && ctx.client.instance) {
+          let content = ctx.client.instance.getOtherClientNames().map(clientName => `<option>${clientName.toLowerCase()}</option>`).join('\n');
+          giftTarget.innerHTML = content;
+        } else {
+          giftTarget.innerHTML = '';
+        }
+        let giftDialog = document.querySelector('#giftDialog');
+        giftDialog.toggleAttribute('open', true);
+      }
+    } catch (e) {
+      console.error('Failed to export item', e);
+    }
   }
 
   /** @private */
