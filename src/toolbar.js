@@ -74,7 +74,7 @@ function onGiftSubmit() {
   /** @type {HTMLSelectElement} */
   let giftTarget = document.querySelector('#giftTarget');
   if (giftTarget.value) {
-    /** @type {import('./satchel/item/ItemDialogElement.js').ItemEditorElement} */
+    /** @type {import('./satchel/item/ItemDialogElement.js').ItemDialogElement} */
     const itemEditor = document.querySelector('#itemDialog');
     const socketedItem = itemEditor.getSocketedItem();
     const target = giftTarget.value;

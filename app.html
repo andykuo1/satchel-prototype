@@ -80,7 +80,7 @@
           .editorContainer {
             display: none;
             flex-direction: column;
-            width: 25em;
+            width: 20em;
             background-color: #333333;
             padding: 0.5em;
             z-index: 1;
@@ -100,7 +100,9 @@
           }
         </style>
         <div class="editorContainer">
-          <item-editor id="itemEditor" editable></item-editor>
+          <item-editor id="itemEditor" editable>
+            <icon-button slot="actions" id="actionFoundryShare" icon="res/share.svg" alt="send" title="Send Item" disabled></icon-button>
+          </item-editor>
         </div>
       </div>
       <sidebar-layout style="flex-direction: row-reverse; --background-color: none">

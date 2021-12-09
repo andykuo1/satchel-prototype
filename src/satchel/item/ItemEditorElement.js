@@ -14,7 +14,7 @@ const MAX_ITEM_HEIGHT = 8;
 const INNER_HTML = /* html */`
 <div class="rootContainer">
   <fieldset class="portraitContainer">
-    <legend>Item</legend>
+    <legend>Foundry</legend>
     <div class="foundrySocketContainer">
       <div class="foundryContainer">
         <icon-button id="actionEnlarge" icon="res/more.svg"></icon-button>
@@ -145,8 +145,8 @@ img {
 }
 
 .socketContainer {
-  max-width: 16em;
-  max-height: 16em;
+  max-width: 10em;
+  max-height: 10em;
   overflow: auto;
 }
 .socketSpacing {
@@ -154,8 +154,6 @@ img {
 }
 .socketXContainer {
   flex: 1;
-  width: 100%;
-  height: 100%;
   display: flex;
   flex-direction: row;
   text-align: left;
@@ -387,7 +385,7 @@ export class ItemEditorElement extends HTMLElement {
   putSocketedItem(item, resizable = false) {
     const store = getInventoryStore();
     const socketInvId = this.socket.invId;
-    if (!isInventoryEmpty(store, socketInvId)) {
+    if (item && !isInventoryEmpty(store, socketInvId)) {
       const item = getItemAtSlotIndex(store, socketInvId, 0);
       clearItemsInInventory(store, socketInvId);
       dropOnGround(item);
@@ -431,10 +429,13 @@ export class ItemEditorElement extends HTMLElement {
     }
   }
 
-  disableInputs(force = true) {
+  /** @private */
+  disableInputs(force) {
     this.rootContainer.toggleAttribute('disabled', force);
     this.itemImage.toggleAttribute('disabled', force);
     this.itemBackground.toggleAttribute('disabled', force);
+    this.itemWidth.toggleAttribute('disabled', force);
+    this.itemHeight.toggleAttribute('disabled', force);
     this.actionEnlarge.toggleAttribute('disabled', force);
     this.actionShrink.toggleAttribute('disabled', force);
     this.actionFlatten.toggleAttribute('disabled', force);

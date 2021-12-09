@@ -1,3 +1,2 @@
 import './ItemEditorElement.js';
-
-export { ItemEditorElement } from './ItemDialogElement.js';
+import './ItemDialogElement.js';

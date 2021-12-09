@@ -11,9 +11,6 @@ export function openFoundry(item = undefined) {
 export function closeFoundry() {
   let editorContainer = document.querySelector('.editorContainer');
   editorContainer.classList.toggle('open', false);
-  /** @type {import('../satchel/item/ItemEditorElement.js').ItemEditorElement} */
-  let itemEditor = document.querySelector('#itemEditor');
-  itemEditor.putSocketedItem(null);
 }
 
 export function isFoundryOpen() {
