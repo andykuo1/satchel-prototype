@@ -115,19 +115,19 @@ export class ItemDialogElement extends HTMLElement {
     const inv = getInventoryInStore(store, invId);
     const item = getItemByItemId(inv, itemId);
     const newItem = cloneItem(item);
+    this.itemEditor.clearSocketedItem();
     this.itemEditor.putSocketedItem(newItem, false);
     this.dialog.toggleAttribute('open', true);
   }
 
   /** @private */
   applyChanges() {
-    const socketItem = this.itemEditor.getSocketedItem();
-
     const invId = this._invId;
     const itemId = this._itemId;
     const store = getInventoryStore();
     const inv = getInventoryInStore(store, invId);
     const sourceItem = getItemByItemId(inv, itemId);
+    const socketItem = this.itemEditor.getSocketedItem();
     cloneItem(socketItem, sourceItem);
     dispatchItemChange(store, itemId);
   }

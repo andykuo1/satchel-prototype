@@ -382,6 +382,13 @@ export class ItemEditorElement extends HTMLElement {
     removeInventoryChangeListener(this.socket.invId, this.onSocketInventoryChange);
   }
 
+  clearSocketedItem() {
+    const store = getInventoryStore();
+    const socketInvId = this.socket.invId;
+    clearItemsInInventory(store, socketInvId);
+    this.setupSocketInventory(false);
+  }
+
   putSocketedItem(item, resizable = false) {
     const store = getInventoryStore();
     const socketInvId = this.socket.invId;
