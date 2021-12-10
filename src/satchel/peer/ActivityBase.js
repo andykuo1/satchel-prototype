@@ -1,5 +1,5 @@
 /**
- * @typedef {import('../peerful/PeerfulConnection.js').PeerfulConnection} PeerfulConnection
+ * @typedef {import('../../peerful/PeerfulConnection.js').PeerfulConnection} PeerfulConnection
  */
 
 /**

@@ -1,8 +1,8 @@
-import { uuid } from '../util/uuid.js';
+import { uuid } from '../../util/uuid.js';
 
 /**
- * @typedef {import('../peerful/Peerful.js').Peerful} Peerful
- * @typedef {import('../peerful/PeerfulConnection.js').PeerfulConnection} PeerfulConnection
+ * @typedef {import('../../peerful/Peerful.js').Peerful} Peerful
+ * @typedef {import('../../peerful/PeerfulConnection.js').PeerfulConnection} PeerfulConnection
  */
 
 export class SatchelLocal {

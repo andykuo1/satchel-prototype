@@ -6,11 +6,11 @@ import {
 } from '../inventory/InventoryStore.js';
 import { exportItemToJSON } from '../satchel/item/ItemLoader.js';
 
-import { ActivityPlayerGift } from './ActivityPlayerGift.js';
-import { ActivityPlayerList } from './ActivityPlayerList.js';
-import { ActivityPlayerHandshake } from './ActivityPlayerHandshake.js';
-import { ActivityPlayerInventory } from './ActivityPlayerInventory.js';
-import { SatchelLocal } from './SatchelLocal.js';
+import { ActivityPlayerGift } from '../satchel/peer/ActivityPlayerGift.js';
+import { ActivityPlayerList } from '../satchel/peer/ActivityPlayerList.js';
+import { ActivityPlayerHandshake } from '../satchel/peer/ActivityPlayerHandshake.js';
+import { ActivityPlayerInventory } from '../satchel/peer/ActivityPlayerInventory.js';
+import { SatchelLocal } from '../satchel/peer/SatchelLocal.js';
 
 /**
  * @typedef {import('../peerful/PeerfulConnection.js').PeerfulConnection} PeerfulConnection

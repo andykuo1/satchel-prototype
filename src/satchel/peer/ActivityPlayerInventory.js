@@ -1,12 +1,12 @@
 import { ActivityBase } from './ActivityBase.js';
 
-import { getInventoryStore, isInventoryInStore, createGridInventoryInStore, addInventoryToStore, getInventoryInStore } from '../inventory/InventoryStore.js';
-import { getExistingInventory } from '../inventory/InventoryTransfer.js';
-import { createGridInventory } from '../satchel/inv/Inv.js';
-import { dispatchInventoryChange } from '../satchel/inv/InvEvents.js';
-import { exportInventoryToJSON, importInventoryFromJSON } from '../satchel/inv/InvLoader.js';
+import { getInventoryStore, isInventoryInStore, createGridInventoryInStore, addInventoryToStore, getInventoryInStore } from '../../inventory/InventoryStore.js';
+import { getExistingInventory } from '../../inventory/InventoryTransfer.js';
+import { createGridInventory } from '../../satchel/inv/Inv.js';
+import { dispatchInventoryChange } from '../../satchel/inv/InvEvents.js';
+import { exportInventoryToJSON, importInventoryFromJSON } from '../../satchel/inv/InvLoader.js';
 
-/** @typedef {import('../inventory/element/InventoryGridElement.js').InventoryGridElement} InventoryGridElement */
+/** @typedef {import('../../inventory/element/InventoryGridElement.js').InventoryGridElement} InventoryGridElement */
 
 export class ActivityPlayerInventory extends ActivityBase {
   static get observedMessages() {

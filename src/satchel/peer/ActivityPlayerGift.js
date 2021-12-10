@@ -1,7 +1,7 @@
 import { ActivityBase } from './ActivityBase.js';
 
-import { dropOnGround } from '../inventory/GroundHelper.js';
-import { exportItemToJSON, importItemFromJSON } from '../satchel/item/ItemLoader.js';
+import { dropOnGround } from '../../inventory/GroundHelper.js';
+import { exportItemToJSON, importItemFromJSON } from '../../satchel/item/ItemLoader.js';
 
 export class ActivityPlayerGift extends ActivityBase {
   static get observedMessages() {
