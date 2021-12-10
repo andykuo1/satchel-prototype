@@ -5,6 +5,7 @@ import { getExistingInventory } from '../../inventory/InventoryTransfer.js';
 import { createGridInventory } from '../../satchel/inv/Inv.js';
 import { dispatchInventoryChange } from '../../satchel/inv/InvEvents.js';
 import { exportInventoryToJSON, importInventoryFromJSON } from '../../satchel/inv/InvLoader.js';
+import { SatchelLocal, SatchelRemote } from './SatchelLocal.js';
 
 /** @typedef {import('../../inventory/element/InventoryGridElement.js').InventoryGridElement} InventoryGridElement */
 
@@ -31,7 +32,11 @@ export class ActivityPlayerInventory extends ActivityBase {
     return false;
   }
 
-  /** @override */
+  /**
+   * @override
+   * @param {SatchelLocal} localClient
+   * @param {SatchelRemote} remoteServer
+   */
   static onRemoteServerNanny(localClient, remoteServer) {
     const store = getInventoryStore();
     if (!isInventoryInStore(store, 'main')) {
@@ -39,23 +44,20 @@ export class ActivityPlayerInventory extends ActivityBase {
     }
     const inv = getExistingInventory(store, 'main');
     const jsonData = exportInventoryToJSON(inv);
-    const wrappedData = {
-      type: 'sync',
-      message: jsonData,
-    };
-    const stringToSend = JSON.stringify(wrappedData);
-    remoteServer.connection.send(stringToSend);
+    remoteServer.sendMessage('sync', jsonData);
   }
 
-  /** @override */
+  /**
+   * @override
+   * @param {SatchelLocal} localServer
+   * @param {SatchelRemote} remoteClient
+   */
   static onRemoteClientMessage(localServer, remoteClient, messageType, messageData) {
     switch(messageType) {
       case 'sync':
         const name = remoteClient.name;
         if (!name) {
-          let dataToSend = { type: 'error', message: 'Not yet signed in.' };
-          let stringToSend = JSON.stringify(dataToSend);
-          remoteClient.connection.send(stringToSend);
+          remoteClient.sendMessage('error', 'Not yet signed in.');
           return;
         }
         console.log('Syncing client...', name);
@@ -93,6 +95,10 @@ export class ActivityPlayerInventory extends ActivityBase {
     return false;
   }
 
+  /**
+   * @param {SatchelRemote} remoteClient 
+   * @param {object} invData 
+   */
   static sendPlayerReset(remoteClient, invData) {
     if (!invData) {
       // Create a new inventory for a new user
@@ -101,10 +107,6 @@ export class ActivityPlayerInventory extends ActivityBase {
       let jsonData = exportInventoryToJSON(inv);
       invData = jsonData;
     }
-    let stringToSend = JSON.stringify({
-      type: 'reset',
-      message: invData,
-    });
-    remoteClient.connection.send(stringToSend);
+    remoteClient.sendMessage('reset', invData);
   }
 }

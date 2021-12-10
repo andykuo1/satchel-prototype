@@ -1,4 +1,5 @@
 import { ActivityBase } from './ActivityBase.js';
+import { SatchelLocal, SatchelRemote } from './SatchelLocal.js';
 
 export class ActivityPlayerList extends ActivityBase {
   static get observedMessages() {
@@ -26,8 +27,12 @@ export class ActivityPlayerList extends ActivityBase {
     this.sendPlayerList(localServer, remoteClient);
   }
   
+  /**
+   * @param {SatchelLocal} localServer 
+   * @param {SatchelRemote} remoteClient 
+   */
   static sendPlayerList(localServer, remoteClient) {
     let clientNames = localServer.remotes.map((client) => client.name).filter((name) => name.length > 0);
-    remoteClient.connection.send(JSON.stringify({ type: 'clients', message: clientNames }));
+    remoteClient.sendMessage('clients', clientNames);
   }
 }

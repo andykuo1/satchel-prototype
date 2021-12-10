@@ -10,7 +10,7 @@ import { ActivityPlayerGift } from '../satchel/peer/ActivityPlayerGift.js';
 import { ActivityPlayerList } from '../satchel/peer/ActivityPlayerList.js';
 import { ActivityPlayerHandshake } from '../satchel/peer/ActivityPlayerHandshake.js';
 import { ActivityPlayerInventory } from '../satchel/peer/ActivityPlayerInventory.js';
-import { SatchelLocal } from '../satchel/peer/SatchelLocal.js';
+import { SatchelLocal, SatchelRemote } from '../satchel/peer/SatchelLocal.js';
 
 /**
  * @typedef {import('../peerful/PeerfulConnection.js').PeerfulConnection} PeerfulConnection
@@ -88,7 +88,12 @@ export class SatchelServer extends SatchelLocal {
     }
   }
 
-  /** @override */
+  /**
+   * @override
+   * @param {SatchelRemote} remoteClient
+   * @param {string} type
+   * @param {object} data
+   */
   onRemoteMessage(remoteClient, type, data) {
     for(let activity of ACTIVITY_REGISTRY) {
       let result = activity.onRemoteClientMessage(this, remoteClient, type, data);
@@ -100,9 +105,7 @@ export class SatchelServer extends SatchelLocal {
       default:
         {
           console.error(`Found unknown message from client - ${data}`);
-          let dataToSend = { type: 'error', message: 'Unknown message.' };
-          let stringToSend = JSON.stringify(dataToSend);
-          remoteClient.connection.send(stringToSend);
+          remoteClient.sendMessage('error', 'Unknown message.');
         }
         break;
     }
@@ -151,6 +154,7 @@ export class SatchelClient extends SatchelLocal {
   constructor(peerful) {
     super(peerful);
 
+    /** @type {SatchelRemote} */
     this.remoteServer = null;
     this.localData = {};
     this.clientName = '';
@@ -164,6 +168,7 @@ export class SatchelClient extends SatchelLocal {
   onRemoteConnected(remoteServer) {
     console.log('Local connection established.');
     remoteServer.data = null;
+    remoteServer.clientNames = [];
     this.remoteServer = remoteServer;
     for(let activity of ACTIVITY_REGISTRY) {
       activity.onRemoteServerConnected(this, remoteServer);
@@ -216,16 +221,11 @@ export class SatchelClient extends SatchelLocal {
       return false;
     }
     console.log('Sending item to client...', clientName);
-    let dataToSend = {
-      type: 'gift',
-      message: {
-        from: this.clientName,
-        target: clientName,
-        item: exportItemToJSON(item),
-      },
-    };
-    let stringToSend = JSON.stringify(dataToSend);
-    this.remoteServer.connection.send(stringToSend);
+    this.remoteServer.sendMessage('gift', {
+      from: this.clientName,
+      target: clientName,
+      item: exportItemToJSON(item),
+    });
     return true;
   }
 }

@@ -1,5 +1,6 @@
 import { ActivityBase } from './ActivityBase.js';
 import { ActivityPlayerInventory } from './ActivityPlayerInventory.js';
+import { SatchelLocal, SatchelRemote } from './SatchelLocal.js';
 
 export class ActivityPlayerHandshake extends ActivityBase {
   static get observedMessages() {
@@ -8,7 +9,11 @@ export class ActivityPlayerHandshake extends ActivityBase {
     ];
   }
 
-  /** @override */
+  /**
+   * @override
+   * @param {SatchelLocal} localClient
+   * @param {SatchelRemote} remoteServer
+   */
   static onRemoteServerConnected(localClient, remoteServer) {
     let name;
     while (!name) {
@@ -17,21 +22,22 @@ export class ActivityPlayerHandshake extends ActivityBase {
         window.alert('Invalid name.');
       }
     }
-    remoteServer.connection.send(JSON.stringify({ type: 'name', message: name }));
+    remoteServer.sendMessage('name', name);
     localClient.clientName = name;
   }
 
-  /** @override */
+  /**
+   * @override
+   * @param {SatchelLocal} localServer
+   * @param {SatchelRemote} remoteClient
+   */
   static onRemoteClientMessage(localServer, remoteClient, messageType, messageData) {
     if (messageType !== 'name') {
       return false;
     }
-    const conn = remoteClient.connection;
     const name = messageData.toLowerCase().replace(/\s/g, '_');
     if (!name) {
-      let dataToSend = { type: 'error', message: 'Invalid user name.' };
-      let stringToSend = JSON.stringify(dataToSend);
-      conn.send(stringToSend);
+      remoteClient.sendMessage('error', 'Invalid user name.');
       return;
     }
     console.log('Setting up client...', name);

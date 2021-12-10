@@ -120,18 +120,18 @@ export class SatchelLocal {
 
   /**
    * @private
-   * @param {object} data
+   * @param {object} message
    * @param {PeerfulConnection} connection
    */
-  onMessage(data, connection) {
+  onMessage(message, connection) {
     try {
       const remote = this.getRemoteByConnection(connection);
       if (remote) {
-        const { type, message } = JSON.parse(data);
-        this.onRemoteMessage(remote, type, message);
+        const { type, data } = JSON.parse(message);
+        this.onRemoteMessage(remote, type, data);
       }
     } catch (e) {
-      console.error(`Could not process remote message - ${data}`, e);
+      console.error(`Could not process remote message - ${message}`, e);
     }
   }
 
@@ -144,8 +144,20 @@ export class SatchelLocal {
 }
 
 export class SatchelRemote {
+  /**
+   * @param {PeerfulConnection} connection 
+   * @param {string} name 
+   */
   constructor(connection, name) {
     this.connection = connection;
     this.name = name;
+  }
+
+  /**
+   * @param {string} type
+   * @param {object} data
+   */
+  sendMessage(type, data) {
+    this.connection.send(JSON.stringify({ type, data }));
   }
 }
