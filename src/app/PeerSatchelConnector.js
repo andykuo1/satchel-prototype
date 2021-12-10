@@ -12,22 +12,10 @@ export async function connectAsClient(ctx, remoteId) {
     const peerful = new Peerful();
     ctx.client = {
       peerful,
-      instance: new SatchelClient(),
+      instance: new SatchelClient(peerful),
     };
     peerful.on('error', (err) => {
       window.alert('Oh no! Failed to connect to server! ' + err);
-    });
-    peerful.on('connect', (conn) => {
-      console.log('Client connection established.');
-      ctx.client.instance.onClientConnected(conn);
-      conn.on('error', (error) => {
-        console.error(`Client connection errored: ${error}`);
-        conn.close();
-      });
-      conn.on('close', () => {
-        console.error('Client connection closed.');
-        ctx.client.instance.onClientDisconnected(conn);
-      });
     });
   }
 
@@ -58,22 +46,10 @@ export async function connectAsServer(ctx, localId) {
     const peerful = new Peerful(localId);
     ctx.server = {
       peerful,
-      instance: new SatchelServer(),
+      instance: new SatchelServer(peerful),
     };
     peerful.on('error', (err) => {
       window.alert('Oh no! Failed to start server! ' + err);
-    });
-    peerful.on('connect', (conn) => {
-      console.log('Client connection established.');
-      ctx.server.instance.onClientConnected(conn);
-      conn.on('error', (error) => {
-        console.error(`Client connection errored: ${error}`);
-        conn.close();
-      });
-      conn.on('close', () => {
-        console.error('Client connection closed.');
-        ctx.server.instance.onClientDisconnected(conn);
-      });
     });
     peerful
       .listen()
