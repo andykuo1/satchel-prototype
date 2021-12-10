@@ -94,18 +94,24 @@ export class PeerfulConnection extends Eventable {
    * @param {RTCDataChannel} channel
    */
   setDataChannel(channel) {
-    if (this.dataChannel) {
-      const previous = this.dataChannel;
-      this.dataChannel = null;
-      previous.removeEventListener('message', this.onDataChannelMessage);
-      previous.removeEventListener('error', this.onDataChannelError);
-      previous.removeEventListener('close', this.onDataChannelClose);
-      previous.removeEventListener('open', this.onDataChannelOpen);
-      previous.close();
+    let prevChannel = this.dataChannel;
+    if (prevChannel === channel) {
+      return;
     }
-
+    if (prevChannel) {
+      prevChannel.removeEventListener('message', this.onDataChannelMessage);
+      prevChannel.removeEventListener('error', this.onDataChannelError);
+      prevChannel.removeEventListener('close', this.onDataChannelClose);
+      prevChannel.removeEventListener('open', this.onDataChannelOpen);
+      prevChannel.close();
+      if (!channel) {
+        // NOTE: Force close the data channel callback.
+        this.onDataChannelClose();
+      }
+    }
+    // Setup new data channel
+    this.dataChannel = channel;
     if (channel) {
-      this.dataChannel = channel;
       channel.binaryType = 'arraybuffer';
       channel.addEventListener('message', this.onDataChannelMessage);
       channel.addEventListener('error', this.onDataChannelError);

@@ -32,6 +32,22 @@ export class ActivityPlayerInventory extends ActivityBase {
   }
 
   /** @override */
+  static onRemoteServerNanny(localClient, remoteServer) {
+    const store = getInventoryStore();
+    if (!isInventoryInStore(store, 'main')) {
+      return;
+    }
+    const inv = getExistingInventory(store, 'main');
+    const jsonData = exportInventoryToJSON(inv);
+    const wrappedData = {
+      type: 'sync',
+      message: jsonData,
+    };
+    const stringToSend = JSON.stringify(wrappedData);
+    remoteServer.connection.send(stringToSend);
+  }
+
+  /** @override */
   static onRemoteClientMessage(localServer, remoteClient, messageType, messageData) {
     switch(messageType) {
       case 'sync':
