@@ -19,6 +19,28 @@
 export class ActivityBase {
   /**
    * @abstract
+   * @param {LocalServer} localServer
+   */
+  static onLocalServerCreated(localServer) {}
+  /**
+   * @abstract
+   * @param {LocalClient} localClient
+   */
+  static onLocalClientCreated(localClient) {}
+  
+  /**
+   * @abstract
+   * @param {LocalServer} localServer
+   */
+  static onLocalServerDestroyed(localServer) {}
+  /**
+   * @abstract
+   * @param {LocalClient} localClient
+   */
+  static onLocalClientDestroyed(localClient) {}
+
+  /**
+   * @abstract
    * @param {LocalClient} localClient 
    * @param {RemoteServer} remoteServer 
    */
@@ -29,6 +51,19 @@ export class ActivityBase {
    * @param {RemoteClient} remoteClient 
    */
   static onRemoteClientConnected(localServer, remoteClient) {}
+
+  /**
+   * @abstract
+   * @param {LocalClient} localClient 
+   * @param {RemoteServer} remoteServer 
+   */
+  static onRemoteServerDisconnected(localClient, remoteServer) {}
+  /**
+   * @abstract
+   * @param {LocalServer} localServer 
+   * @param {RemoteClient} remoteClient 
+   */
+  static onRemoteClientDisconnected(localServer, remoteClient) {}
   
   /**
    * @abstract
@@ -57,12 +92,14 @@ export class ActivityBase {
    * @abstract
    * @param {LocalClient} localClient 
    * @param {RemoteServer} remoteServer 
+   * @param {number} now
    */
-  static onRemoteServerNanny(localClient, remoteServer) {}
+  static onRemoteServerNanny(localClient, remoteServer, now) {}
   /**
    * @abstract
    * @param {LocalServer} localServer 
    * @param {RemoteClient} remoteClient 
+   * @param {number} now
    */
-  static onRemoteClientNanny(localServer, remoteClient) {}
+  static onRemoteClientNanny(localServer, remoteClient, now) {}
 }

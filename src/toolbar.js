@@ -18,6 +18,8 @@ import { copyAlbum } from './satchel/album/Album.js';
 import { dispatchAlbumChange } from './satchel/album/AlbumEvents.js';
 import { dispatchInventoryChange } from './satchel/inv/InvEvents.js';
 import { closeFoundry, copyFoundry, isFoundryOpen, openFoundry } from './inventory/FoundryHelper.js';
+import { ActivityPlayerList } from './satchel/peer/ActivityPlayerList.js';
+import { ActivityPlayerInventory } from './satchel/peer/ActivityPlayerInventory.js';
 
 function elementEventListener(selector, event, callback) {
   document.querySelector(selector).addEventListener(event, callback);
@@ -53,10 +55,14 @@ function onActionShareItem() {
       let giftTarget = document.querySelector('#giftTarget');
       let ctx = getCursorContext();
       if (ctx.server && ctx.server.instance) {
-        let content = ctx.server.instance.getActiveClientNames().map(clientName => `<option>${clientName.toLowerCase()}</option>`).join('\n');
+        const localServer = /** @type {import('./app/PeerSatchel.js').SatchelServer} */ (ctx.server.instance);
+        const playerNames = ActivityPlayerList.getPlayerNameListOnServer(localServer);
+        let content = playerNames.map(clientName => `<option>${clientName.toLowerCase()}</option>`).join('\n');
         giftTarget.innerHTML = content;
       } else if (ctx.client && ctx.client.instance) {
-        let content = ctx.client.instance.getOtherClientNames().map(clientName => `<option>${clientName.toLowerCase()}</option>`).join('\n');
+        const localClient = /** @type {import('./app/PeerSatchel.js').SatchelClient} */ (ctx.client.instance);
+        const playerNames = ActivityPlayerList.getPlayerNameListOnClient(localClient);
+        let content = playerNames.map(clientName => `<option>${clientName.toLowerCase()}</option>`).join('\n');
         giftTarget.innerHTML = content;
       } else {
         giftTarget.innerHTML = '';
@@ -196,7 +202,7 @@ async function onUploadClick() {
       localStorage.setItem('server_data', JSON.stringify(data));
       const ctx = getCursorContext();
       if (ctx.server && ctx.server.instance) {
-        ctx.server.instance.localData = data;
+        ActivityPlayerInventory.resetLocalServerData(ctx.server.instance, data);
       }
     } break;
     default:
@@ -237,7 +243,7 @@ function onItemContext(e) {
   e.preventDefault();
   e.stopPropagation();
 
-  /** @type {import('./satchel/item/ItemDialogElement.js').ItemEditorElement} */
+  /** @type {import('./satchel/item/ItemDialogElement.js').ItemDialogElement} */
   const itemDialog = document.querySelector('#itemDialog');
   // @ts-ignore
   const { container, invId, itemId, clientX, clientY } = e.detail;

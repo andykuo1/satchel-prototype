@@ -1,9 +1,3 @@
-import {
-  deleteInventoryFromStore,
-  getInventoryInStore,
-  getInventoryStore,
-  isInventoryInStore,
-} from '../inventory/InventoryStore.js';
 import { exportItemToJSON } from '../satchel/item/ItemLoader.js';
 
 import { ActivityPlayerGift } from '../satchel/peer/ActivityPlayerGift.js';
@@ -11,6 +5,8 @@ import { ActivityPlayerList } from '../satchel/peer/ActivityPlayerList.js';
 import { ActivityPlayerHandshake } from '../satchel/peer/ActivityPlayerHandshake.js';
 import { ActivityPlayerInventory } from '../satchel/peer/ActivityPlayerInventory.js';
 import { SatchelLocal, SatchelRemote } from '../satchel/peer/SatchelLocal.js';
+import { ActivityError } from '../satchel/peer/ActivityError.js';
+import { getPlayerName } from '../satchel/peer/PlayerState.js';
 
 /**
  * @typedef {import('../peerful/PeerfulConnection.js').PeerfulConnection} PeerfulConnection
@@ -18,127 +14,106 @@ import { SatchelLocal, SatchelRemote } from '../satchel/peer/SatchelLocal.js';
  */
 
 const ACTIVITY_REGISTRY = [
-  ActivityPlayerInventory,
+  ActivityError,
   ActivityPlayerHandshake,
-  ActivityPlayerGift,
   ActivityPlayerList,
+  ActivityPlayerInventory,
+  ActivityPlayerGift,
 ];
 
 export class SatchelServer extends SatchelLocal {
   constructor(peerful) {
     super(peerful);
+    /** @protected */
+    this.activities = [];
+    
+    this.initialize();
+  }
 
-    // Load from local storage
-    this.onAutoLoad();
-
-    // Save to local storage every 5 seconds
-    /** @private */
-    this.onAutoSave = this.onAutoSave.bind(this);
-    /** @private */
-    this.autoSaveHandle = setInterval(this.onAutoSave, 5_000);
+  /** @protected */
+  initialize() {
+    const toBeCreated = ACTIVITY_REGISTRY;
+    for(let activity of toBeCreated) {
+      try {
+        activity.onLocalServerCreated(this);
+        this.activities.push(activity);
+      } catch (e) {
+        console.error(e);
+      }
+    }
   }
 
   destroy() {
-    clearInterval(this.autoSaveHandle);
-    this.autoSaveHandle = null;
-  }
-
-  /** @private */
-  onAutoLoad() {
-    let serverData;
-    try {
-      serverData = JSON.parse(localStorage.getItem('server_data')) || {};
-    } catch {
-      serverData = {};
+    const toBeDestroyed = this.activities.slice().reverse();
+    this.activities.length = 0;
+    for(let activity of toBeDestroyed) {
+      try {
+        activity.onLocalServerDestroyed(this);
+      } catch (e) {
+        console.error(e);
+      }
     }
-    this.localData = serverData;
-    console.log('Loading server data...', serverData);
-  }
-
-  /** @private */
-  onAutoSave() {
-    localStorage.setItem('server_data', JSON.stringify(this.localData));
   }
 
   /** @override */
   onRemoteConnected(remoteClient) {
     console.log('Remote connection established.');
-    remoteClient.element = null;
-    remoteClient.lastHeartbeat = 0;
-    for(let activity of ACTIVITY_REGISTRY) {
-      activity.onRemoteClientConnected(this, remoteClient);
+    for(let activity of this.activities) {
+      try {
+        activity.onRemoteClientConnected(this, remoteClient);
+      } catch (e) {
+        console.error(e);
+      }
     }
   }
 
   /** @override */
   onRemoteDisconnected(remoteClient) {
-    const clientDataName = `remote_data#${remoteClient.name}`;
-    try {
-      let store = getInventoryStore();
-      if (isInventoryInStore(store, clientDataName)) {
-        let inv = getInventoryInStore(store, clientDataName);
-        deleteInventoryFromStore(store, clientDataName, inv);
+    const reversedActivities = this.activities.slice().reverse();
+    for(let activity of reversedActivities) {
+      try {
+        activity.onRemoteClientDisconnected(this, remoteClient);
+      } catch (e) {
+        console.error(e);
       }
-      if (remoteClient.element) {
-        let child = /** @type {InventoryGridElement} */ (remoteClient.element);
-        child.parentElement.removeChild(child);
-      }
-    } catch (e) {
-      console.error(`Failed to unload client inventory - ${e}`);
     }
   }
 
   /**
    * @override
-   * @param {SatchelRemote} remoteClient
+   * @param {SatchelRemote} remote
    * @param {string} type
    * @param {object} data
    */
-  onRemoteMessage(remoteClient, type, data) {
-    for(let activity of ACTIVITY_REGISTRY) {
-      let result = activity.onRemoteClientMessage(this, remoteClient, type, data);
-      if (result) {
-        return;
+  onRemoteMessage(remote, type, data) {
+    for(let activity of this.activities) {
+      try {
+        let result = activity.onRemoteClientMessage(this, remote, type, data);
+        if (result) {
+          return;
+        }
+      } catch(e) {
+        console.error(e);
       }
     }
-    switch (type) {
-      default:
-        {
-          console.error(`Found unknown message from client - ${data}`);
-          remoteClient.sendMessage('error', 'Unknown message.');
-        }
-        break;
-    }
+    console.error(`Found unknown message from client - ${data}`);
+    ActivityError.sendError(remote, 'Unknown message.');
   }
 
   /** @override */
   onRemoteNanny(remote) {
-    let now = performance.now();
-    if (remote.lastHeartbeat <= 0) {
-      return;
-    }
     if (remote.connection.closed) {
       console.log('Closing connection since already closed.');
       return;
     }
-    for(let activity of ACTIVITY_REGISTRY) {
-      activity.onRemoteClientNanny(this, remote);
+    const now = performance.now();
+    for(let activity of this.activities) {
+      try {
+        activity.onRemoteClientNanny(this, remote, now);
+      } catch (e) {
+        console.error(e);
+      }
     }
-    // Calculate heartbeat
-    let delta = now - remote.lastHeartbeat;
-    if (delta > 10_000) {
-      console.log('Closing connection due to staleness.');
-      remote.connection.close();
-      return;
-    }
-  }
-
-  getActiveClientNames() {
-    return ActivityPlayerHandshake.getActiveClientNames(this);
-  }
-
-  getActiveClientByName(clientName) {
-    return ActivityPlayerHandshake.getActiveClientByName(this, clientName);
   }
 
   sendItemTo(clientName, item) {
@@ -151,78 +126,103 @@ export class SatchelServer extends SatchelLocal {
 }
 
 export class SatchelClient extends SatchelLocal {
+
+  /** @returns {SatchelRemote} */
+  get remoteServer() {
+    return this.remotes[0];
+  }
+
   constructor(peerful) {
     super(peerful);
+    /** @protected */
+    this.activities = [];
 
-    /** @type {SatchelRemote} */
-    this.remoteServer = null;
-    this.localData = {};
-    this.clientName = '';
+    this.initialize();
+  }
+
+  /** @protected */
+  initialize() {
+    const toBeCreated = ACTIVITY_REGISTRY;
+    for(let activity of toBeCreated) {
+      try {
+        activity.onLocalClientCreated(this);
+        this.activities.push(activity);
+      } catch (e) {
+        console.error(e);
+      }
+    }
   }
 
   destroy() {
-    // Do nothing. No clean up needed.
+    const toBeDestroyed = this.activities.slice().reverse();
+    this.activities.length = 0;
+    for(let activity of toBeDestroyed) {
+      try {
+        activity.onLocalClientDestroyed(this);
+      } catch (e) {
+        console.error(e);
+      }
+    }
   }
 
   /** @override */
   onRemoteConnected(remoteServer) {
     console.log('Local connection established.');
-    remoteServer.data = null;
-    remoteServer.clientNames = [];
-    this.remoteServer = remoteServer;
-    for(let activity of ACTIVITY_REGISTRY) {
-      activity.onRemoteServerConnected(this, remoteServer);
+    for(let activity of this.activities) {
+      try {
+        activity.onRemoteServerConnected(this, remoteServer);
+      } catch (e) {
+        console.error(e);
+      }
     }
   }
 
   /** @override */
   onRemoteDisconnected(remoteServer) {
     console.error('Local connection closed.');
-    this.remoteServer = null;
+    const reversedActivities = this.activities.slice().reverse();
+    for(let activity of reversedActivities) {
+      activity.onRemoteServerDisconnected(this, remoteServer);
+    }
     window.alert('Connection lost! Please refresh the browser and try again.');
   }
 
   /** @override */
   onRemoteMessage(remoteServer, type, data) {
-    for(let activity of ACTIVITY_REGISTRY) {
-      let result = activity.onRemoteServerMessage(this, remoteServer, type, data);
-      if (result) {
-        return;
+    for(let activity of this.activities) {
+      try {
+        let result = activity.onRemoteServerMessage(this, remoteServer, type, data);
+        if (result) {
+          return;
+        }
+      } catch (e) {
+        console.error(e);
       }
     }
-    switch (type) {
-      case 'error':
-        window.alert(`Oops! Server error message: ${data.message}`);
-        remoteServer.connection.close();
-        break;
-      default:
-        console.error(`Found unknown message from server - ${data}`);
-        break;
-    }
+    console.error(`Found unknown message from server - ${data}`);
   }
 
   /** @override */
   onRemoteNanny(remoteServer) {
-    for(let activity of ACTIVITY_REGISTRY) {
-      activity.onRemoteServerNanny(this, remoteServer);
-    }
-  }
-
-  getOtherClientNames() {
-    if (this.remoteServer) {
-      return this.remoteServer.clientNames.filter((name) => name !== this.clientName);
-    } else {
-      return [];
+    const now = performance.now();
+    for(let activity of this.activities) {
+      try {
+        activity.onRemoteServerNanny(this, remoteServer, now);
+      } catch (e) {
+        console.error(e);
+      }
     }
   }
 
   sendItemTo(clientName, item) {
-    if (!this.remoteServer.clientNames.includes(clientName)) {
+    const playerNames = ActivityPlayerList.getPlayerNameListOnClient(this);
+    if (!playerNames.includes(clientName)) {
       return false;
     }
     console.log('Sending item to client...', clientName);
+    const localClientName = getPlayerName(this);
     this.remoteServer.sendMessage('gift', {
-      from: this.clientName,
+      from: localClientName,
       target: clientName,
       item: exportItemToJSON(item),
     });

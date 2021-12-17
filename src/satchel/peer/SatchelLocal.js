@@ -1,5 +1,3 @@
-import { uuid } from '../../util/uuid.js';
-
 /**
  * @typedef {import('../../peerful/Peerful.js').Peerful} Peerful
  * @typedef {import('../../peerful/PeerfulConnection.js').PeerfulConnection} PeerfulConnection
@@ -12,6 +10,7 @@ export class SatchelLocal {
   constructor(peerful) {
     this.peerful = peerful;
     this.remotes = [];
+    this.detail = {};
 
     /** @private */
     this.onConnected = this.onConnected.bind(this);
@@ -82,7 +81,7 @@ export class SatchelLocal {
    * @param {PeerfulConnection} connection
    */
   onConnected(connection) {
-    const remote = new SatchelRemote(connection, uuid());
+    const remote = new SatchelRemote(connection);
     connection.on('error', this.onError);
     connection.on('close', this.onDisconnected);
     connection.on('data', this.onMessage);
@@ -145,12 +144,11 @@ export class SatchelLocal {
 
 export class SatchelRemote {
   /**
-   * @param {PeerfulConnection} connection 
-   * @param {string} name 
+   * @param {PeerfulConnection} connection
    */
-  constructor(connection, name) {
+  constructor(connection) {
     this.connection = connection;
-    this.name = name;
+    this.detail = {};
   }
 
   /**

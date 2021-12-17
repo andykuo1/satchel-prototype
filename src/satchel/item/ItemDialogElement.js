@@ -4,6 +4,7 @@ import { openFoundry } from '../../inventory/FoundryHelper.js';
 import { getInventoryInStore, getInventoryStore } from '../../inventory/InventoryStore.js';
 import { removeItemFromInventory } from '../../inventory/InventoryTransfer.js';
 import { getItemByItemId } from '../inv/InvItems.js';
+import { ActivityPlayerList } from '../peer/ActivityPlayerList.js';
 import { cloneItem, copyItem } from './Item.js';
 import { ItemEditorElement } from './ItemEditorElement.js';
 import { dispatchItemChange } from './ItemEvents.js';
@@ -173,10 +174,14 @@ export class ItemDialogElement extends HTMLElement {
         let giftTarget = document.querySelector('#giftTarget');
         let ctx = getCursorContext();
         if (ctx.server && ctx.server.instance) {
-          let content = ctx.server.instance.getActiveClientNames().map(clientName => `<option>${clientName.toLowerCase()}</option>`).join('\n');
+          const localServer = /** @type {import('../../app/PeerSatchel.js').SatchelServer} */ (ctx.server.instance);
+          const playerNames = ActivityPlayerList.getPlayerNameListOnServer(localServer);
+          let content = playerNames.map(clientName => `<option>${clientName.toLowerCase()}</option>`).join('\n');
           giftTarget.innerHTML = content;
         } else if (ctx.client && ctx.client.instance) {
-          let content = ctx.client.instance.getOtherClientNames().map(clientName => `<option>${clientName.toLowerCase()}</option>`).join('\n');
+          const localClient = /** @type {import('../../app/PeerSatchel.js').SatchelClient} */ (ctx.client.instance);
+          const playerNames = ActivityPlayerList.getPlayerNameListOnClient(localClient);
+          let content = playerNames.map(clientName => `<option>${clientName.toLowerCase()}</option>`).join('\n');
           giftTarget.innerHTML = content;
         } else {
           giftTarget.innerHTML = '';

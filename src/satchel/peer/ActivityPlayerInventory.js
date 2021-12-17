@@ -1,13 +1,19 @@
 import { ActivityBase } from './ActivityBase.js';
 
-import { getInventoryStore, isInventoryInStore, createGridInventoryInStore, addInventoryToStore, getInventoryInStore } from '../../inventory/InventoryStore.js';
+import { getInventoryStore, isInventoryInStore, createGridInventoryInStore, addInventoryToStore, getInventoryInStore, deleteInventoryFromStore } from '../../inventory/InventoryStore.js';
 import { getExistingInventory } from '../../inventory/InventoryTransfer.js';
 import { createGridInventory } from '../../satchel/inv/Inv.js';
 import { dispatchInventoryChange } from '../../satchel/inv/InvEvents.js';
 import { exportInventoryToJSON, importInventoryFromJSON } from '../../satchel/inv/InvLoader.js';
 import { SatchelLocal, SatchelRemote } from './SatchelLocal.js';
+import { getPlayerLastHeartbeat, getPlayerName, hasPlayerHeartbeat, setPlayerLastHeartbeat } from './PlayerState.js';
 
 /** @typedef {import('../../inventory/element/InventoryGridElement.js').InventoryGridElement} InventoryGridElement */
+
+function onAutoSave(localServer) {
+  const serverData = ActivityPlayerInventory.getLocalServerData(localServer);
+  localStorage.setItem('server_data', JSON.stringify(serverData));
+}
 
 export class ActivityPlayerInventory extends ActivityBase {
   static get observedMessages() {
@@ -15,11 +21,67 @@ export class ActivityPlayerInventory extends ActivityBase {
   }
 
   /** @override */
+  static onLocalServerCreated(localServer) {
+    // Load server data from localStorage...
+    let serverData;
+    try {
+      serverData = JSON.parse(localStorage.getItem('server_data')) || {};
+    } catch {
+      serverData = {};
+    }
+    localServer.localData = serverData;
+    console.log('Loading server data...', serverData);
+    // Start saving server data to localStorage...
+    localServer.autoSave = onAutoSave.bind(undefined, localServer);
+    localServer.autoSaveHandle = setInterval(localServer.autoSave, 5_000);
+  }
+
+  /** @override */
+  static onLocalServerDestroyed(localServer) {
+    // Stop saving server data
+    clearInterval(localServer.autoSaveHandle);
+    localServer.autoSaveHandle = null;
+    localServer.autoSave = null;
+    // Reset server data
+    localServer.localData = {};
+  }
+
+  /** @override */
+  static onRemoteClientConnected(localServer, remoteClient) {
+    remoteClient.element = null;
+  }
+
+  /** @override */
+  static onRemoteClientDisconnected(localServer, remoteClient) {
+    const remotePlayerName = getPlayerName(remoteClient);
+    const clientDataName = `remote_data#${remotePlayerName}`;
+    try {
+      let store = getInventoryStore();
+      if (isInventoryInStore(store, clientDataName)) {
+        let inv = getInventoryInStore(store, clientDataName);
+        deleteInventoryFromStore(store, clientDataName, inv);
+      }
+      if (remoteClient.element) {
+        let child = /** @type {InventoryGridElement} */ (remoteClient.element);
+        child.parentElement.removeChild(child);
+        remoteClient.element = null;
+      }
+    } catch (e) {
+      console.error(`Failed to unload client inventory - ${e}`);
+    }
+  }
+
+  /** @override */
+  static onRemoteServerConnected(localClient, remoteServer) {
+    remoteServer.remoteData = {};
+  }
+
+  /** @override */
   static onRemoteServerMessage(localClient, remoteServer, messageType, messageData) {
     switch(messageType) {
       case 'reset':
         const serverData = messageData;
-        remoteServer.data = serverData;
+        remoteServer.remoteData = serverData;
         const store = getInventoryStore();
         if (!isInventoryInStore(store, 'main')) {
           createGridInventoryInStore(store, 'main', 12, 9);
@@ -49,21 +111,39 @@ export class ActivityPlayerInventory extends ActivityBase {
 
   /**
    * @override
+   * @param {SatchelLocal} local
+   * @param {SatchelRemote} remote
+   * @param {number} now
+   */
+  static onRemoteClientNanny(local, remote, now) {
+    if (!hasPlayerHeartbeat(remote)) {
+      return;
+    }
+    const lastHeartbeat = getPlayerLastHeartbeat(remote);
+    let delta = now - lastHeartbeat;
+    if (delta > 10_000) {
+      console.log('Closing connection due to staleness.');
+      remote.connection.close();
+    }
+  }
+
+  /**
+   * @override
    * @param {SatchelLocal} localServer
    * @param {SatchelRemote} remoteClient
    */
   static onRemoteClientMessage(localServer, remoteClient, messageType, messageData) {
     switch(messageType) {
       case 'sync':
-        const name = remoteClient.name;
-        if (!name) {
-          remoteClient.sendMessage('error', 'Not yet signed in.');
-          return;
+        const remotePlayerName = getPlayerName(remoteClient);
+        if (!remotePlayerName) {
+          throw new Error('Missing remote player name.');
         }
-        console.log('Syncing client...', name);
-        remoteClient.lastHeartbeat = performance.now(); // TODO: Disconnect if heartbeat is too much
+        console.log('Syncing client...', remotePlayerName);
+        const now = performance.now();
+        setPlayerLastHeartbeat(remoteClient, now);
         // Update server's copy of client data
-        const clientDataName = `remote_data#${remoteClient.name}`;
+        const clientDataName = `remote_data#${remotePlayerName}`;
         const clientData = messageData;
         localServer.localData[clientDataName] = clientData;
         let store = getInventoryStore();
@@ -103,10 +183,19 @@ export class ActivityPlayerInventory extends ActivityBase {
     if (!invData) {
       // Create a new inventory for a new user
       let inv = createGridInventory('main', 12, 9);
-      inv.displayName = remoteClient.name.toUpperCase();
+      const remotePlayerName = getPlayerName(remoteClient);
+      inv.displayName = remotePlayerName.toUpperCase();
       let jsonData = exportInventoryToJSON(inv);
       invData = jsonData;
     }
     remoteClient.sendMessage('reset', invData);
+  }
+
+  static resetLocalServerData(localServer, serverData) {
+    localServer.localData = serverData;
+  }
+  
+  static getLocalServerData(localServer) {
+    return localServer.localData;
   }
 }

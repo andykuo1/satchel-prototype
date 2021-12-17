@@ -1,5 +1,12 @@
 import { ActivityBase } from './ActivityBase.js';
-import { SatchelLocal, SatchelRemote } from './SatchelLocal.js';
+import { ActivityPlayerHandshake } from './ActivityPlayerHandshake.js';
+import { getPlayerName } from './PlayerState.js';
+
+/**
+ * @typedef {import('../../app/PeerSatchel.js').SatchelServer} SatchelServer
+ * @typedef {import('../../app/PeerSatchel.js').SatchelClient} SatchelClient
+ * @typedef {import('./SatchelLocal.js').SatchelRemote} SatchelRemote
+ */
 
 export class ActivityPlayerList extends ActivityBase {
   static get observedMessages() {
@@ -26,13 +33,30 @@ export class ActivityPlayerList extends ActivityBase {
   static onRemoteClientNanny(localServer, remoteClient) {
     this.sendPlayerList(localServer, remoteClient);
   }
+
+  /**
+   * @param {SatchelServer} localServer 
+   * @returns {Array<string>}
+   */
+  static getPlayerNameListOnServer(localServer) {
+    return ActivityPlayerHandshake.getActiveClientNames(localServer).filter(name => name.length > 0);
+  }
+
+  /**
+   * @param {SatchelClient} localClient 
+   * @returns {Array<string>}
+   */
+  static getPlayerNameListOnClient(localClient) {
+    const localPlayerName = getPlayerName(localClient);
+    return localClient.remoteServer.clientNames.filter(name => name !== localPlayerName);
+  }
   
   /**
-   * @param {SatchelLocal} localServer 
+   * @param {SatchelServer} localServer 
    * @param {SatchelRemote} remoteClient 
    */
   static sendPlayerList(localServer, remoteClient) {
-    let clientNames = localServer.remotes.map((client) => client.name).filter((name) => name.length > 0);
-    remoteClient.sendMessage('clients', clientNames);
+    const validClientNames = this.getPlayerNameListOnServer(localServer);
+    remoteClient.sendMessage('clients', validClientNames);
   }
 }

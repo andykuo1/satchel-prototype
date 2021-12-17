@@ -4,6 +4,8 @@ import { dropOnGround } from '../../inventory/GroundHelper.js';
 import { exportItemToJSON, importItemFromJSON } from '../../satchel/item/ItemLoader.js';
 import { SatchelLocal, SatchelRemote } from './SatchelLocal.js';
 
+import { ActivityPlayerHandshake } from './ActivityPlayerHandshake.js';
+
 /** @typedef {import('../item/Item.js').Item} Item */
 
 export class ActivityPlayerGift extends ActivityBase {
@@ -27,7 +29,7 @@ export class ActivityPlayerGift extends ActivityBase {
         window.alert(
           `You received a gift from ${
             from || 'the server'
-          }! Remember to pick it up before closing the browser!`
+          }!`
         );
         remoteServer.sendMessage('giftack', { from, target });
         return true;
@@ -52,7 +54,7 @@ export class ActivityPlayerGift extends ActivityBase {
     switch(messageType) {
       case 'gift':
         const target = messageData.target;
-        const targetClient = localServer.getActiveClientByName(target);
+        const targetClient = ActivityPlayerHandshake.getActiveClientByName(localServer, target);
         if (targetClient) {
           // Forward the request to the target client.
           targetClient.sendMessage(messageType, messageData);
@@ -63,7 +65,7 @@ export class ActivityPlayerGift extends ActivityBase {
       case 'giftack':
         const from = messageData.from;
         if (from) {
-          const fromClient = localServer.getActiveClientByName(from);
+          const fromClient = ActivityPlayerHandshake.getActiveClientByName(localServer, from);
           if (fromClient) {
             // Forward the request to the source client.
             fromClient.sendMessage(messageType, messageData);
