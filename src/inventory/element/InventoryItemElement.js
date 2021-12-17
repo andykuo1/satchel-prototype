@@ -211,7 +211,6 @@ export class InventoryItemElement extends HTMLElement {
    * @protected
    */
   onItemChange(store, itemId) {
-    console.log('ITEM CHANGE');
     const fixed = this._containerElement.fixed;
     const invId = this._containerElement.invId;
     const inv = getExistingInventory(store, invId);
