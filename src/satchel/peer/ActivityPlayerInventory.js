@@ -83,12 +83,13 @@ export class ActivityPlayerInventory extends ActivityBase {
         const serverData = messageData;
         remoteServer.remoteData = serverData;
         const store = getInventoryStore();
-        if (!isInventoryInStore(store, 'main')) {
-          createGridInventoryInStore(store, 'main', 12, 9);
+        const invId = 'main';
+        if (!isInventoryInStore(store, invId)) {
+          createGridInventoryInStore(store, invId, 12, 9);
         }
-        let inv = getExistingInventory(store, 'main');
+        let inv = getExistingInventory(store, invId);
         importInventoryFromJSON(serverData, inv);
-        dispatchInventoryChange(store, inv.invId);
+        dispatchInventoryChange(store, invId);
         return true;
     }
     return false;

@@ -157,11 +157,11 @@ export class InventoryItemElement extends HTMLElement {
         'Cannot create item element with item id not in given inventory.'
       );
     }
-    this.attachShadow({ mode: 'open' });
-    this.shadowRoot.append(
+    const shadowRoot = this.attachShadow({ mode: 'open' });
+    shadowRoot.append(
       this.constructor[Symbol.for('templateNode')].content.cloneNode(true)
     );
-    this.shadowRoot.append(
+    shadowRoot.append(
       this.constructor[Symbol.for('styleNode')].cloneNode(true)
     );
 
@@ -211,6 +211,7 @@ export class InventoryItemElement extends HTMLElement {
    * @protected
    */
   onItemChange(store, itemId) {
+    console.log('ITEM CHANGE');
     const fixed = this._containerElement.fixed;
     const invId = this._containerElement.invId;
     const inv = getExistingInventory(store, invId);

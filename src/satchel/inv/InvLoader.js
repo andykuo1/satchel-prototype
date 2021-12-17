@@ -10,29 +10,17 @@ export function importInventoryFromJSON(jsonData, dst = undefined) {
       // Current version.
       break;
   }
-  return importDataFromJSON(jsonData, 'inv_v2', data => cloneInventoryWithSlotted(data, dst));
+  return importDataFromJSON(jsonData, 'inv_v2', data => cloneInventoryWithSlottedToV1(data, dst));
 }
 
 export function exportInventoryToJSON(inv, dst = undefined) {
-  return exportDataToJSON('inv_v2', cloneInventoryWithSlotted(inv), {}, dst);
+  return exportDataToJSON('inv_v2', cloneInventoryWithSlottedToV2(inv), {}, dst);
 }
 
-export function cloneInventoryWithSlotted(inv, dst = undefined) {
+export function cloneInventoryWithSlottedToV2(inv, dst = undefined) {
   if ('__slotsMap' in inv) {
-    const slots = inv.slots;
-    const slotsMapping = inv['__slotsMap'];
-    const length = inv.length;
-    let newSlots = new Array(length).fill(null);
-    for(let i = 0; i < length; ++i) {
-      let slottedId = slots[i];
-      if (slottedId) {
-        let itemId = slotsMapping[slottedId];
-        newSlots[i] = itemId;
-      }
-    }
-    delete inv['__slotsMap'];
-    inv.slots = newSlots;
     let result = cloneInventory(inv, dst);
+    dst['__slotsMap'] = inv['__slotsMap'];
     return result;
   } else {
     let result = cloneInventory(inv, dst);
@@ -56,5 +44,27 @@ export function cloneInventoryWithSlotted(inv, dst = undefined) {
     result['__slotsMap'] = slotsMapping;
     result.slots = newSlots;
     return result;
+  }
+}
+
+export function cloneInventoryWithSlottedToV1(inv, dst = undefined) {
+  if ('__slotsMap' in inv) {
+    const slots = inv.slots;
+    const slotsMapping = inv['__slotsMap'];
+    const length = inv.length;
+    let newSlots = new Array(length).fill(null);
+    for(let i = 0; i < length; ++i) {
+      let slottedId = slots[i];
+      if (slottedId) {
+        let itemId = slotsMapping[slottedId];
+        newSlots[i] = itemId;
+      }
+    }
+    delete inv['__slotsMap'];
+    inv.slots = newSlots;
+    let result = cloneInventory(inv, dst);
+    return result;
+  } else {
+    return cloneInventory(inv, dst);
   }
 }

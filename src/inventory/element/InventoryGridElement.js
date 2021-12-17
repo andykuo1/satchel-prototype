@@ -141,13 +141,9 @@ export class InventoryGridElement extends HTMLElement {
 
   constructor() {
     super();
-    this.attachShadow({ mode: 'open' });
-    this.shadowRoot.append(
-      this.constructor[Symbol.for('templateNode')].content.cloneNode(true)
-    );
-    this.shadowRoot.append(
-      this.constructor[Symbol.for('styleNode')].cloneNode(true)
-    );
+    const shadowRoot = this.attachShadow({ mode: 'open' });
+    shadowRoot.append(this.constructor[Symbol.for('templateNode')].content.cloneNode(true));
+    shadowRoot.append(this.constructor[Symbol.for('styleNode')].cloneNode(true));
     
     /** @private */
     this._invId = undefined;
