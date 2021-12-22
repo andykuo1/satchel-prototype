@@ -1,4 +1,4 @@
-import { cloneAlbum, createAlbum } from '../satchel/album/Album.js';
+import { cloneAlbum } from '../satchel/album/Album.js';
 import { dispatchAlbumChange } from '../satchel/album/AlbumEvents.js';
 import { exportAlbumToJSON, importAlbumFromJSON } from '../satchel/album/AlbumLoader.js';
 import {
@@ -15,6 +15,7 @@ import {
   isInventoryInStore,
 } from '../inventory/InventoryStore.js';
 import { dispatchInventoryChange } from '../satchel/inv/InvEvents.js';
+import { loadFromStorage, saveToStorage } from '../Storage.js';
 
 export function loadSatchelFromStorage() {
   const store = getInventoryStore();
@@ -28,7 +29,7 @@ export function loadSatchelFromStorage() {
   }
 
   // Load from storage...
-  let invData = localStorage.getItem('satchel_data_v3');
+  let invData = loadFromStorage('satchel_data_v3');
   if (invData) {
     try {
       let jsonData = JSON.parse(invData);
@@ -36,11 +37,11 @@ export function loadSatchelFromStorage() {
       mainInventory.displayName = '';
       dispatchInventoryChange(store, mainInventory.invId);
     } catch (e) {
-      console.error('Failed to load inventory from localStorage.');
+      console.error('Failed to load inventory from storage.');
       console.error(e);
     }
   }
-  let albumData = localStorage.getItem('satchel_album_v3');
+  let albumData = loadFromStorage('satchel_album_v3');
   if (albumData) {
     try {
       let jsonData = JSON.parse(albumData);
@@ -56,7 +57,7 @@ export function loadSatchelFromStorage() {
         }
       }
     } catch (e) {
-      console.error('Failed to load album from localStorage.');
+      console.error('Failed to load album from storage.');
       console.error(e);
     }
   }
@@ -64,12 +65,11 @@ export function loadSatchelFromStorage() {
 
 export function saveSatchelToStorage() {
   const store = getInventoryStore();
-
   if (isInventoryInStore(store, 'main')) {
     try {
       let mainInventory = getInventoryInStore(store, 'main');
       let invData = exportInventoryToJSON(mainInventory);
-      localStorage.setItem('satchel_data_v3', JSON.stringify(invData));
+      saveToStorage('satchel_data_v3', JSON.stringify(invData));
     } catch (e) {
       console.error(e);
     }
@@ -84,5 +84,5 @@ export function saveSatchelToStorage() {
       console.error(e);
     }
   }
-  localStorage.setItem('satchel_album_v3', JSON.stringify(albumData));
+  saveToStorage('satchel_album_v3', JSON.stringify(albumData));
 }

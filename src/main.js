@@ -70,6 +70,8 @@ async function onDocumentFocusUpdate() {
       albumElement.albumId = album.albumId;
       albumContainer.appendChild(albumElement);
     }
-    setInterval(() => saveSatchelToStorage(), 1000);
+    setInterval(() => {
+      saveSatchelToStorage();
+    }, 1_000);
   }
 }

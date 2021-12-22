@@ -7,12 +7,13 @@ import { dispatchInventoryChange } from '../../satchel/inv/InvEvents.js';
 import { exportInventoryToJSON, importInventoryFromJSON } from '../../satchel/inv/InvLoader.js';
 import { SatchelLocal, SatchelRemote } from './SatchelLocal.js';
 import { getPlayerLastHeartbeat, getPlayerName, hasPlayerHeartbeat, setPlayerLastHeartbeat } from './PlayerState.js';
+import { loadFromStorage, saveToStorage } from '../../Storage.js';
 
 /** @typedef {import('../../inventory/element/InventoryGridElement.js').InventoryGridElement} InventoryGridElement */
 
 function onAutoSave(localServer) {
   const serverData = ActivityPlayerInventory.getLocalServerData(localServer);
-  localStorage.setItem('server_data', JSON.stringify(serverData));
+  saveToStorage('server_data', JSON.stringify(serverData));
 }
 
 export class ActivityPlayerInventory extends ActivityBase {
@@ -22,16 +23,16 @@ export class ActivityPlayerInventory extends ActivityBase {
 
   /** @override */
   static onLocalServerCreated(localServer) {
-    // Load server data from localStorage...
+    // Load server data from storage...
     let serverData;
     try {
-      serverData = JSON.parse(localStorage.getItem('server_data')) || {};
+      serverData = JSON.parse(loadFromStorage('server_data')) || {};
     } catch {
       serverData = {};
     }
     localServer.localData = serverData;
     console.log('Loading server data...', serverData);
-    // Start saving server data to localStorage...
+    // Start saving server data to storage...
     localServer.autoSave = onAutoSave.bind(undefined, localServer);
     localServer.autoSaveHandle = setInterval(localServer.autoSave, 5_000);
   }

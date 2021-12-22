@@ -20,6 +20,7 @@ import { closeFoundry, copyFoundry, isFoundryOpen, openFoundry } from './invento
 import { ActivityPlayerList } from './satchel/peer/ActivityPlayerList.js';
 import { ActivityPlayerInventory } from './satchel/peer/ActivityPlayerInventory.js';
 import { dropItemOnGround } from './satchel/GroundAlbum.js';
+import { forceEmptyStorage, loadFromStorage, saveToStorage } from './Storage.js';
 
 function elementEventListener(selector, event, callback) {
   document.querySelector(selector).addEventListener(event, callback);
@@ -46,9 +47,9 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 function onActionShareItem() {
-  /** @type {import('./satchel/item/ItemDialogElement.js').ItemEditorElement} */
+  /** @type {import('./satchel/item/ItemDialogElement.js').ItemDialogElement} */
   const itemEditor = document.querySelector('#itemDialog');
-  const socketedItem = itemEditor.getSocketedItem();
+  const socketedItem = itemEditor.copySocketedItem();
   try {
     if (socketedItem) {
       /** @type {HTMLSelectElement} */
@@ -95,7 +96,7 @@ function onGiftSubmit() {
 }
 
 function onActionEraseAll() {
-  localStorage.clear();
+  forceEmptyStorage();
   window.location.reload();
 }
 
@@ -146,7 +147,8 @@ function onDownloadClick() {
   if (isServerSide()) {
     let serverData;
     try {
-      serverData = JSON.parse(localStorage.getItem('server_data'));
+      let string = loadFromStorage('server_data');
+      serverData = JSON.parse(string);
     } catch {
       serverData = {};
     }
@@ -199,7 +201,7 @@ async function onUploadClick() {
       throw new Error('Not yet implemented.');
     case 'server_v1': {
       const data = jsonData._data;
-      localStorage.setItem('server_data', JSON.stringify(data));
+      saveToStorage('server_data', JSON.stringify(data));
       const ctx = getCursorContext();
       if (ctx.server && ctx.server.instance) {
         ActivityPlayerInventory.resetLocalServerData(ctx.server.instance, data);
