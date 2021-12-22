@@ -14,6 +14,7 @@ import { IconButtonElement } from '../../app/IconButtonElement.js';
 import { addInventoryChangeListener, removeInventoryChangeListener } from '../inv/InvEvents.js';
 import { addItemToAlbum, clearItemsInAlbum, getItemIdsInAlbum, getItemInAlbum, removeItemFromAlbum } from './AlbumItems.js';
 import { isGroundAlbum } from '../GroundAlbum.js';
+import { isFoundryAlbum } from '../FoundryAlbum.js';
 
 const INNER_HTML = /* html */`
 <fieldset>
@@ -60,6 +61,9 @@ legend[contenteditable] {
   width: 1.5em;
   height: 1.5em;
   margin: 0;
+}
+.internal {
+  opacity: 0.3;
 }
 `;
 
@@ -237,6 +241,7 @@ export class ItemAlbumElement extends HTMLElement {
     const name = album.displayName;
 
     if (isGroundAlbum(album)) {
+      // Cannot change lock state for a ground album
       this.buttonLock.toggleAttribute('disabled', true);
     }
 
@@ -247,6 +252,10 @@ export class ItemAlbumElement extends HTMLElement {
     this.buttonDelete.toggleAttribute('disabled', locked);
     this.inputTitle.toggleAttribute('contenteditable', !locked);
     this.container.classList.toggle('unlocked', !locked);
+
+    // Change style for internal albums
+    let isInternalAlbum = isFoundryAlbum(album) || isGroundAlbum(album);
+    this.inputTitle.classList.toggle('internal', isInternalAlbum);
 
     // Update name
     this.inputTitle.textContent = name;
