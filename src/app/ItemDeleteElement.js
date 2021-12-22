@@ -1,4 +1,4 @@
-import { clearGround } from '../inventory/GroundHelper.js';
+import { clearItemsOnGround } from '../satchel/GroundAlbum.js';
 
 /** @typedef {import('../inventory/element/InventoryCursorElement.js').InventoryCursorElement} InventoryCursorElement */
 
@@ -81,7 +81,7 @@ export class ItemDeleteElement extends HTMLElement {
     let result = this.onActionDelete(e);
     if (result !== false) {
       if (window.confirm('Clear all items on the ground?')) {
-        clearGround();
+        clearItemsOnGround();
       }
     }
   }

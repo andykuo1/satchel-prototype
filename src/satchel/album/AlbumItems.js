@@ -31,9 +31,14 @@ export function getItemIdsInAlbum(store, albumId) {
   return Object.keys(album.items);
 }
 
+/**
+ * @param {import('../../inventory/InventoryStore.js').InventoryStore} store 
+ * @param {string} albumId 
+ * @returns {Array<import('../item/Item.js').Item>}
+ */
 export function getItemsInAlbum(store, albumId) {
   let album = getExistingAlbumInStore(store, albumId);
-  return Object.keys(album.items);
+  return Object.values(album.items);
 }
 
 export function clearItemsInAlbum(store, albumId) {

@@ -1,9 +1,11 @@
 import { getCursor } from '../../inventory/element/InventoryCursorElement.js';
 import { InventoryGridElement } from '../../inventory/element/InventoryGridElement.js';
-import { dropOnGround } from '../../inventory/GroundHelper.js';
 import { getInventoryStore } from '../../inventory/InventoryStore.js';
 import { addItemToInventory, clearItemsInInventory, getItemAtSlotIndex, isInventoryEmpty } from '../../inventory/InventoryTransfer.js';
+import { saveItemToFoundryAlbum, shouldSaveItemToFoundryAlbum } from '../FoundryAlbum.js';
+import { dropItemOnGround } from '../GroundAlbum.js';
 import { addInventoryChangeListener, dispatchInventoryChange, removeInventoryChangeListener } from '../inv/InvEvents.js';
+import { ItemBuilder } from './Item.js';
 import { dispatchItemChange } from './ItemEvents.js';
 
 /** @typedef {import('./Item.js').Item} Item */
@@ -395,7 +397,7 @@ export class ItemEditorElement extends HTMLElement {
     if (item && !isInventoryEmpty(store, socketInvId)) {
       const item = getItemAtSlotIndex(store, socketInvId, 0);
       clearItemsInInventory(store, socketInvId);
-      dropOnGround(item);
+      dropItemOnGround(item);
     }
     if (item) {
       removeInventoryChangeListener(socketInvId, this.onSocketInventoryChange);
@@ -421,6 +423,13 @@ export class ItemEditorElement extends HTMLElement {
   setupSocketInventory(resizable) {
     const item = this.getSocketedItem();
     if (!item) {
+      // Only save items that have a custom image
+      if (this.itemImage.value) {
+        let currentItem = this.createItemFromInputs();
+        if (shouldSaveItemToFoundryAlbum(currentItem)) {
+          saveItemToFoundryAlbum(currentItem);
+        }
+      }
       this.disableInputs(true);
       this.clearInputs();
       return;
@@ -577,8 +586,13 @@ export class ItemEditorElement extends HTMLElement {
   }
 
   /** @private */
+  onClickSelectAll(e) {
+    e.target.select();
+  }
+
+  /** @private */
   onItemWidth() {
-    const width = Math.min(Math.max(Number(this.itemWidth.value) || 1, 1), MAX_ITEM_WIDTH);
+    const width = this.parseItemWidth();
     const store = getInventoryStore();
     const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
     this.updateItemSize(store, socketItem, width, socketItem.height);
@@ -586,33 +600,24 @@ export class ItemEditorElement extends HTMLElement {
 
   /** @private */
   onItemHeight() {
-    const height = Math.min(Math.max(Number(this.itemHeight.value) || 1, 1), MAX_ITEM_HEIGHT);
+    const height = this.parseItemHeight();
     const store = getInventoryStore();
     const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
     this.updateItemSize(store, socketItem, socketItem.width, height);
   }
 
   /** @private */
-  onClickSelectAll(e) {
-    e.target.select();
-  }
-
-  /** @private */
   onItemBackground() {
-    const background = this.itemBackground.value;
+    const background = this.parseItemBackground();
     const store = getInventoryStore();
     const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
-    if (background === '#000000') {
-      socketItem.background = '';
-    } else {
-      socketItem.background = background;
-    }
+    socketItem.background = background;
     dispatchItemChange(store, socketItem.itemId);
   }
 
   /** @private */
   onItemImage() {
-    const imgSrc = this.itemImage.value;
+    const imgSrc = this.parseItemImage();
     const store = getInventoryStore();
     const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
     const defaultImgSrc = getDefaultImageSourceByDimensions(socketItem.width, socketItem.height, socketItem.stackSize);
@@ -622,20 +627,11 @@ export class ItemEditorElement extends HTMLElement {
 
   /** @private */
   onItemStackSize() {
-    let stackSize;
-    try {
-      stackSize = Number.parseInt(this.itemStackSize.value);
-      if (!Number.isSafeInteger(stackSize) || stackSize < 0) {
-        stackSize = -1;
-      }
-    } catch (e) {
-      stackSize = -1;
-    }
+    const stackSize = this.parseItemStackSize();
     const store = getInventoryStore();
     const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
     socketItem.stackSize = stackSize;
     dispatchItemChange(store, socketItem.itemId);
-
     if (stackSize < 0) {
       this.itemStackSize.value = '';
     }
@@ -643,7 +639,7 @@ export class ItemEditorElement extends HTMLElement {
 
   /** @private */
   onItemTitle() {
-    const title = this.itemTitle.value.trim();
+    const title = this.parseItemTitle();
     const store = getInventoryStore();
     const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
     socketItem.displayName = title;
@@ -652,7 +648,7 @@ export class ItemEditorElement extends HTMLElement {
 
   /** @private */
   onItemDesc() {
-    const desc = this.itemDesc.value;
+    const desc = this.parseItemDesc();
     const store = getInventoryStore();
     const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
     socketItem.description = desc;
@@ -672,6 +668,75 @@ export class ItemEditorElement extends HTMLElement {
       e.stopPropagation();
       return false;
     }
+  }
+
+  /** @private */
+  parseItemWidth() {
+    return Math.min(Math.max(Number(this.itemWidth.value) || 1, 1), MAX_ITEM_WIDTH);
+  }
+  
+  /** @private */
+  parseItemHeight() {
+    return Math.min(Math.max(Number(this.itemHeight.value) || 1, 1), MAX_ITEM_HEIGHT);
+  }
+
+  /** @private */
+  parseItemBackground() {
+    const background = this.itemBackground.value;
+    if (background === '#000000') {
+      return '';
+    }
+    return background;
+  }
+
+  /** @private */
+  parseItemImage() {
+    return this.itemImage.value;
+  }
+
+  /** @private */
+  parseItemStackSize() {
+    let stackSize;
+    try {
+      stackSize = Number.parseInt(this.itemStackSize.value);
+      if (!Number.isSafeInteger(stackSize) || stackSize < 0) {
+        return -1;
+      }
+    } catch (e) {
+      return -1;
+    }
+    return stackSize;
+  }
+
+  /** @private */
+  parseItemTitle() {
+    return this.itemTitle.value.trim();
+  }
+
+  /** @private */
+  parseItemDesc() {
+    return this.itemDesc.value;
+  }
+
+  /** @private */
+  createItemFromInputs() {
+    const width = this.parseItemWidth();
+    const height = this.parseItemHeight();
+    const stackSize = this.parseItemStackSize();
+    const background = this.parseItemBackground();
+    const image = this.parseItemImage() || getDefaultImageSourceByDimensions(width, height, stackSize);
+    const title = this.parseItemTitle();
+    const desc = this.parseItemDesc();
+    return new ItemBuilder()
+      .fromDefault()
+      .width(width)
+      .height(height)
+      .stackSize(stackSize)
+      .background(background)
+      .imageSrc(image)
+      .displayName(title)
+      .description(desc)
+      .build();
   }
 }
 ItemEditorElement.define();

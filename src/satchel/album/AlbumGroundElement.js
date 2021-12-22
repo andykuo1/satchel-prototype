@@ -4,11 +4,11 @@ import { createInventoryView } from '../../inventory/InvView.js';
 import { cloneItem } from '../item/Item.js';
 import { uuid } from '../../util/uuid.js';
 import { getCursor } from '../../inventory/element/InventoryCursorElement.js';
-import { dropOnGround } from '../../inventory/GroundHelper.js';
 import { getAlbumInStore } from './AlbumStore.js';
 import { addAlbumChangeListener, removeAlbumChangeListener } from './AlbumEvents.js';
 import { addInventoryChangeListener, removeInventoryChangeListener } from '../inv/InvEvents.js';
 import { getItemIdsInAlbum, getItemInAlbum, hasItemInAlbum, removeItemFromAlbum } from './AlbumItems.js';
+import { dropItemOnGround, getGroundAlbumId } from '../GroundAlbum.js';
 
 
 const INNER_HTML = /* html */`
@@ -70,7 +70,8 @@ export class AlbumGroundElement extends HTMLElement {
   }
 
   get albumId() {
-    return 'ground';
+    const store = getInventoryStore();
+    return getGroundAlbumId(store);
   }
 
   /** @protected */
@@ -111,7 +112,7 @@ export class AlbumGroundElement extends HTMLElement {
       return;
     }
     cursor.clearHeldItem();
-    dropOnGround(item);
+    dropItemOnGround(item);
   }
 
   /**

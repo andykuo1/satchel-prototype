@@ -59,12 +59,6 @@ export function loadSatchelFromStorage() {
       console.error('Failed to load album from localStorage.');
       console.error(e);
     }
-  } else {
-    if (!isAlbumInStore(store, 'ground')) {
-      let album = createAlbum('ground');
-      album.displayName = 'Ground';
-      addAlbumInStore(store, album.albumId, album);
-    }
   }
 }
 

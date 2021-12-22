@@ -13,6 +13,7 @@ import { addAlbumChangeListener, dispatchAlbumChange, removeAlbumChangeListener 
 import { IconButtonElement } from '../../app/IconButtonElement.js';
 import { addInventoryChangeListener, removeInventoryChangeListener } from '../inv/InvEvents.js';
 import { addItemToAlbum, clearItemsInAlbum, getItemIdsInAlbum, getItemInAlbum, removeItemFromAlbum } from './AlbumItems.js';
+import { isGroundAlbum } from '../GroundAlbum.js';
 
 const INNER_HTML = /* html */`
 <fieldset>
@@ -235,7 +236,7 @@ export class ItemAlbumElement extends HTMLElement {
     const locked = isAlbumLocked(store, albumId);
     const name = album.displayName;
 
-    if (albumId === 'ground') {
+    if (isGroundAlbum(album)) {
       this.buttonLock.toggleAttribute('disabled', true);
     }
 
@@ -338,11 +339,9 @@ export class ItemAlbumElement extends HTMLElement {
     const store = getInventoryStore();
     const albumId = this.albumId;
     clearItemsInAlbum(store, albumId);
-    if (albumId !== 'ground') {
-      const album = getAlbumInStore(store, albumId);
-      deleteAlbumInStore(store, albumId, album);
-      this.remove();
-    }
+    const album = getAlbumInStore(store, albumId);
+    deleteAlbumInStore(store, albumId, album);
+    this.remove();
   }
 
   /** @private */

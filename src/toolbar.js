@@ -1,5 +1,4 @@
 import { downloadText } from './util/downloader.js';
-import { dropOnGround } from './inventory/GroundHelper.js';
 import { exportInventoryToJSON, importInventoryFromJSON } from './satchel/inv/InvLoader.js';
 import { getInventoryStore } from './inventory/InventoryStore.js';
 import { connectAsServer, isServerSide } from './app/PeerSatchelConnector.js';
@@ -20,6 +19,7 @@ import { dispatchInventoryChange } from './satchel/inv/InvEvents.js';
 import { closeFoundry, copyFoundry, isFoundryOpen, openFoundry } from './inventory/FoundryHelper.js';
 import { ActivityPlayerList } from './satchel/peer/ActivityPlayerList.js';
 import { ActivityPlayerInventory } from './satchel/peer/ActivityPlayerInventory.js';
+import { dropItemOnGround } from './satchel/GroundAlbum.js';
 
 function elementEventListener(selector, event, callback) {
   document.querySelector(selector).addEventListener(event, callback);
@@ -130,7 +130,7 @@ function onActionNewItem() {
   if (isFoundryOpen()) {
     let item = copyFoundry();
     if (item) {
-      dropOnGround(item);
+      dropItemOnGround(item);
     } else {
       let newItem = new ItemBuilder().fromDefault().width(2).height(2).build();
       openFoundry(newItem);
@@ -193,7 +193,7 @@ async function onUploadClick() {
     } break;
     case 'item_v1': {
       let item = importItemFromJSON(jsonData);
-      dropOnGround(item);
+      dropItemOnGround(item);
     } break;
     case 'client_v1':
       throw new Error('Not yet implemented.');

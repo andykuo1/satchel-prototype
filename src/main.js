@@ -14,6 +14,7 @@ import './inventory/element/index.js';
 import './satchel/cards/index.js';
 import './satchel/album/index.js';
 import './toolbar.js';
+import { isGroundAlbum } from './satchel/GroundAlbum.js';
 
 async function connect() {
   let session = resolveSessionStatus();
@@ -61,7 +62,8 @@ async function onDocumentFocusUpdate() {
     const store = getInventoryStore();
     const albumContainer = document.querySelector('#albumList');
     for(let album of getAlbumsInStore(store)) {
-      if (album.albumId === 'ground') {
+      if (isGroundAlbum(album)) {
+        // Ground album is always displayed in a separate sidebar
         continue;
       }
       const albumElement = new ItemAlbumElement();
