@@ -22,6 +22,7 @@ const INNER_HTML = /* html */`
         <icon-button id="actionShrink" icon="res/less.svg"></icon-button>
         <icon-button id="actionFlatten" icon="res/flatten.svg"></icon-button>
         <icon-button id="actionRotate" icon="res/rotate.svg"></icon-button>
+        <icon-button id="actionFit" icon="res/aspectratio.svg"></icon-button>
       </div>
       <div class="socketXContainer">
         <div class="socketSpacing"></div>
@@ -309,6 +310,8 @@ export class ItemEditorElement extends HTMLElement {
     this.actionFlatten = shadowRoot.querySelector('#actionFlatten');
     /** @private */
     this.actionRotate = shadowRoot.querySelector('#actionRotate');
+    /** @private */
+    this.actionFit = shadowRoot.querySelector('#actionFit');
 
     /** @private */
     this.onItemTitle = this.onItemTitle.bind(this);
@@ -330,6 +333,8 @@ export class ItemEditorElement extends HTMLElement {
     this.onActionFlatten = this.onActionFlatten.bind(this);
     /** @private */
     this.onActionRotate = this.onActionRotate.bind(this);
+    /** @private */
+    this.onActionFit = this.onActionFit.bind(this);
     /** @private */
     this.onItemWidth = this.onItemWidth.bind(this);
     /** @private */
@@ -357,6 +362,7 @@ export class ItemEditorElement extends HTMLElement {
     this.actionShrink.addEventListener('click', this.onActionShrink);
     this.actionFlatten.addEventListener('click', this.onActionFlatten);
     this.actionRotate.addEventListener('click', this.onActionRotate);
+    this.actionFit.addEventListener('click', this.onActionFit);
     this.itemWidth.addEventListener('change', this.onItemWidth);
     this.itemHeight.addEventListener('change', this.onItemHeight);
 
@@ -378,6 +384,7 @@ export class ItemEditorElement extends HTMLElement {
     this.actionShrink.removeEventListener('click', this.onActionShrink);
     this.actionFlatten.removeEventListener('click', this.onActionFlatten);
     this.actionRotate.removeEventListener('click', this.onActionRotate);
+    this.actionFit.removeEventListener('click', this.onActionFit);
     this.itemWidth.removeEventListener('change', this.onItemWidth);
     this.itemHeight.removeEventListener('change', this.onItemHeight);
 
@@ -457,6 +464,7 @@ export class ItemEditorElement extends HTMLElement {
     this.actionShrink.toggleAttribute('disabled', force);
     this.actionFlatten.toggleAttribute('disabled', force);
     this.actionRotate.toggleAttribute('disabled', force);
+    this.actionFit.toggleAttribute('disabled', force);
     this.detailContainer.toggleAttribute('disabled', force);
   }
 
@@ -504,6 +512,7 @@ export class ItemEditorElement extends HTMLElement {
     this.actionShrink.toggleAttribute('disabled', !resizable);
     this.actionFlatten.toggleAttribute('disabled', !resizable);
     this.actionRotate.toggleAttribute('disabled', !resizable);
+    this.actionFit.toggleAttribute('disabled', !resizable);
   }
 
   /**
@@ -584,6 +593,16 @@ export class ItemEditorElement extends HTMLElement {
     let newWidth = oldHeight;
     let newHeight = oldWidth;
     this.updateItemSize(store, socketItem, newWidth, newHeight);
+  }
+
+  /** @private */
+  onActionFit() {
+    const store = getInventoryStore();
+    const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
+    const oldWidth = socketItem.width;
+    const oldHeight = socketItem.height;
+    let newSize = Math.max(1, Math.floor((oldWidth + oldHeight) / 2));
+    this.updateItemSize(store, socketItem, newSize, newSize);
   }
 
   /** @private */
