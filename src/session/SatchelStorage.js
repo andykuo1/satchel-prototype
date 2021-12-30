@@ -25,7 +25,7 @@ export function loadSatchelFromStorage() {
   if (isInventoryInStore(store, 'main')) {
     mainInventory = getInventoryInStore(store, 'main');
   } else {
-    mainInventory = createGridInventoryInStore(store, 'main', 12, 9);
+    mainInventory = createGridInventoryInStore(store, 'main', 12, 7);
   }
 
   // Load from storage...

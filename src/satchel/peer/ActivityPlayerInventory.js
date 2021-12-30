@@ -86,7 +86,7 @@ export class ActivityPlayerInventory extends ActivityBase {
         const store = getInventoryStore();
         const invId = 'main';
         if (!isInventoryInStore(store, invId)) {
-          createGridInventoryInStore(store, invId, 12, 9);
+          createGridInventoryInStore(store, invId, 12, 7);
         }
         let inv = getExistingInventory(store, invId);
         importInventoryFromJSON(serverData, inv);
@@ -184,7 +184,7 @@ export class ActivityPlayerInventory extends ActivityBase {
   static sendPlayerReset(remoteClient, invData) {
     if (!invData) {
       // Create a new inventory for a new user
-      let inv = createGridInventory('main', 12, 9);
+      let inv = createGridInventory('main', 12, 7);
       const remotePlayerName = getPlayerName(remoteClient);
       inv.displayName = remotePlayerName.toUpperCase();
       let jsonData = exportInventoryToJSON(inv);
