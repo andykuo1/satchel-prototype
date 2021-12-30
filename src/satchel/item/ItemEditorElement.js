@@ -16,7 +16,6 @@ const MAX_ITEM_HEIGHT = 8;
 const INNER_HTML = /* html */`
 <div class="rootContainer">
   <fieldset class="portraitContainer">
-    <legend>Foundry</legend>
     <div class="foundrySocketContainer">
       <div class="foundryContainer">
         <icon-button id="actionEnlarge" icon="res/more.svg"></icon-button>
@@ -50,7 +49,6 @@ const INNER_HTML = /* html */`
     </p>
   </fieldset>
   <fieldset class="detailContainer">
-    <legend>Detail</legend>
     <p class="titleContainer">
       <input type="text" id="itemTitle" placeholder="Item">
       <span id="itemStackSizeContainer">
@@ -99,12 +97,15 @@ img {
   position: relative;
   display: flex;
   flex-direction: column;
+  border: none;
 }
 .detailContainer {
   flex: 2;
   position: relative;
   display: flex;
   flex-direction: column;
+  margin-top: 0.5em;
+  border: none;
 }
 .detailContainer:disabled {
   display: none;

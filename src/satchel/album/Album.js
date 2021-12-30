@@ -4,6 +4,26 @@ import { uuid } from '../../util/uuid.js';
 import { dispatchAlbumChange } from './AlbumEvents.js';
 import { getExistingAlbumInStore } from './AlbumStore.js';
 
+/**
+ * @typedef {import('../inv/Inv.js').InventoryId} InvId
+ * @typedef {import('../item/Item.js').Item} Item
+ * @typedef {import('../item/Item.js').ItemId} ItemId
+ */
+
+/**
+ * @typedef {string} AlbumId
+ * 
+ * @typedef Album
+ * @property {AlbumId} albumId
+ * @property {Record<ItemId, Item>} items
+ * @property {boolean} locked
+ * @property {string} displayName
+ */
+
+/**
+ * @param {AlbumId} albumId 
+ * @returns {Album}
+ */
 export function createAlbum(albumId) {
   let album = {
     albumId,
@@ -14,6 +34,11 @@ export function createAlbum(albumId) {
   return album;
 }
 
+/**
+ * @param {Album} other 
+ * @param {Album} dst 
+ * @returns {Album}
+ */
 export function copyAlbum(other, dst = undefined) {
   let result = cloneAlbum(other, dst, { preserveItemId: false });
   if (result.albumId === other.albumId) {
@@ -22,6 +47,13 @@ export function copyAlbum(other, dst = undefined) {
   return result;
 }
 
+/**
+ * @param {Album} other 
+ * @param {Album} dst 
+ * @param {object} [opts]
+ * @param {boolean} [opts.preserveItemId]
+ * @returns {Album}
+ */
 export function cloneAlbum(other, dst = undefined, opts = {}) {
   const { preserveItemId = true } = opts;
   const albumId = other.albumId || uuid();
@@ -48,6 +80,11 @@ export function cloneAlbum(other, dst = undefined, opts = {}) {
   return dst;
 }
 
+/**
+ * @param {import('../../inventory/InventoryStore').InventoryStore} store
+ * @param {AlbumId} albumId 
+ * @param {boolean} locked 
+ */
 export function setAlbumLocked(store, albumId, locked) {
   let album = getExistingAlbumInStore(store, albumId);
   if (album.locked !== locked) {
@@ -56,6 +93,11 @@ export function setAlbumLocked(store, albumId, locked) {
   }
 }
 
+/**
+ * @param {import('../../inventory/InventoryStore').InventoryStore} store
+ * @param {AlbumId} albumId 
+ * @returns {boolean}
+ */
 export function isAlbumLocked(store, albumId) {
   let album = getExistingAlbumInStore(store, albumId);
   return album.locked;

@@ -17,6 +17,10 @@ export function getAlbumsInStore(store) {
   return Object.values(store.data.album);
 }
 
+export function getAlbumIdsInStore(store) {
+  return Object.keys(store.data.album);
+}
+
 export function isAlbumInStore(store, albumId) {
   return albumId in store.data.album;
 }
