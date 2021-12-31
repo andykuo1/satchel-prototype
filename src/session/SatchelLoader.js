@@ -40,11 +40,6 @@ export function loadSatchelProfilesFromData(store, jsonData) {
       addProfileInStore(store, profileId, profile);
     }
   }
-  /** @type {import('../satchel/profile/ProfileSelectElement.js').ProfileSelectElement} */
-  let profileSelector = document.querySelector('#actionProfile');
-  if (profileSelector) {
-    profileSelector.forceUpdate();
-  }
 }
 
 export function saveSatchelProfilesToData(store, profileIds, dst = {}) {

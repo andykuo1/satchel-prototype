@@ -1,6 +1,6 @@
 import { downloadText } from './util/downloader.js';
 import { importInventoryFromJSON } from './satchel/inv/InvLoader.js';
-import { addInventoryToStore, createGridInventoryInStore, deleteInventoryFromStore, getInventoryInStore, getInventoryStore } from './inventory/InventoryStore.js';
+import { addInventoryToStore, deleteInventoryFromStore, getInventoryInStore, getInventoryStore, isInventoryInStore } from './inventory/InventoryStore.js';
 import { connectAsServer, isServerSide } from './app/PeerSatchelConnector.js';
 import { getCursorContext } from './inventory/CursorHelper.js';
 import { getExistingInventory } from './inventory/InventoryTransfer.js';
@@ -21,11 +21,12 @@ import { ActivityPlayerList } from './satchel/peer/ActivityPlayerList.js';
 import { ActivityPlayerInventory } from './satchel/peer/ActivityPlayerInventory.js';
 import { dropItemOnGround } from './satchel/GroundAlbum.js';
 import { forceEmptyStorage, loadFromStorage, saveToStorage } from './Storage.js';
-import { addProfileInStore, deleteProfileInStore, getActiveProfileInStore, getProfileIdsInStore, getProfileInStore, hasActiveProfileInStore, setActiveProfileInStore } from './satchel/profile/ProfileStore.js';
+import { addProfileInStore, deleteProfileInStore, getActiveProfileInStore, getProfileIdsInStore, getProfileInStore, isProfileInStore, setActiveProfileInStore } from './satchel/profile/ProfileStore.js';
 import { loadSatchelProfilesFromData, saveSatchelProfilesToData } from './session/SatchelLoader.js';
 import { createProfile } from './satchel/profile/Profile.js';
-import { createGridInventory } from './satchel/inv/Inv.js';
 import { dispatchProfileChange } from './satchel/profile/ProfileEvents.js';
+import { resolveActiveProfile } from './satchel/ActiveProfile.js';
+import { createGridInventory, createSocketInventory } from './satchel/inv/Inv.js';
 
 function elementEventListener(selector, event, callback) {
   document.querySelector(selector).addEventListener(event, callback);
@@ -51,12 +52,11 @@ window.addEventListener('DOMContentLoaded', () => {
   elementEventListener('#actionFoundryReset', 'click', onActionFoundryReset);
   elementEventListener('#giftCodeExport', 'click', onGiftCodeExport);
 
-  elementEventListener('#actionProfileEdit', 'click', onActionProfileEdit);
+  elementEventListener('#actionProfileEditName', 'input', onActionProfileEditName);
+
+  elementEventListener('#actionProfile', 'click', onActionProfile);
   elementEventListener('#actionProfileNew', 'click', onActionProfileNew);
-  elementEventListener('#actionProfileDelete', 'click', onActionProfileDelete);
-  elementEventListener('#actionProfileChange', 'click', onActionProfileChange);
-  elementEventListener('#actionProfileSelect', 'input', onActionProfileChangeSubmit);
-  elementEventListener('#actionProfileName', 'input', onActionProfileName);
+
   elementEventListener('#actionProfileInvNew', 'click', onActionProfileInvNew);
   elementEventListener('#actionProfileInvSubmit', 'click', onActionProfileInvSubmit);
 
@@ -326,35 +326,66 @@ function onActionFoundryReset() {
   itemEditor.clearSocketedItem();
 }
 
-function onActionProfileEdit() {
+function onActionProfile() {
   const store = getInventoryStore();
-  if (!hasActiveProfileInStore(store)) {
-    const profileIds = getProfileIdsInStore(store);
-    if (profileIds.length > 0) {
-      changeActiveProfile(store, profileIds[0]);
-    } else {
-      onActionProfileNew();
+  const profileIds = getProfileIdsInStore(store);
+  const activeProfile = resolveActiveProfile(store);
+  const rootContainerElement = document.querySelector('#activeProfileList');
+  rootContainerElement.innerHTML = '';
+  for(let profileId of profileIds) {
+    let profile = getProfileInStore(store, profileId);
+    let elementId = `activeProfile-${profileId}`;
+    let element = document.createElement('input');
+    element.type = 'radio';
+    element.name = 'activeProfile';
+    element.id = elementId;
+    element.value = profileId;
+    let isActive = profileId === activeProfile.profileId;
+    if (isActive) {
+      element.checked = true;
     }
-  } else {
-    const activeProfile = getActiveProfileInStore(store);
-    /** @type {HTMLInputElement} */
-    const actionProfileName = document.querySelector('#actionProfileName');
-    actionProfileName.value = activeProfile.displayName;
-    const activeProfileInvList = document.querySelector('#activeProfileInvList');
-    activeProfileInvList.innerHTML = '';
-    for(let invId of activeProfile.invs) {
-      let inv = getInventoryInStore(store, invId);
-      let element = document.createElement('li');
-      element.textContent = `${inv.displayName || 'Inventory'} | ${inv.width} x ${inv.height}`;
-      activeProfileInvList.appendChild(element);
-    }
-    /** @type {import('./app/DialogPromptElement.js').DialogPromptElement} */
-    const profilesDialog = document.querySelector('#profilesDialog');
-    profilesDialog.toggleAttribute('open', true);
+    element.addEventListener('click', onActionProfileActive);
+    let labelElement = document.createElement('label');
+    labelElement.setAttribute('for', elementId);
+    labelElement.textContent = profile.displayName;
+    let editElement = document.createElement('icon-button');
+    editElement.setAttribute('data-profile', profileId);
+    editElement.setAttribute('icon', 'res/edit.svg');
+    editElement.setAttribute('alt', 'edit');
+    editElement.setAttribute('title', 'Edit Profile');
+    editElement.addEventListener('click', onActionProfileEdit);
+    let deleteElement = document.createElement('icon-button');
+    deleteElement.setAttribute('data-profile', profileId);
+    deleteElement.setAttribute('icon', 'res/delete.svg');
+    deleteElement.setAttribute('alt', 'delete');
+    deleteElement.setAttribute('title', 'Delete Profile');
+    deleteElement.toggleAttribute('disabled', profileIds.length <= 1);
+    deleteElement.addEventListener('click', onActionProfileDelete);
+    let containerElement = document.createElement('div');
+    containerElement.appendChild(element);
+    containerElement.appendChild(labelElement);
+    containerElement.appendChild(editElement);
+    containerElement.appendChild(deleteElement);
+    rootContainerElement.appendChild(containerElement);
   }
-  return false;
+  /** @type {import('./app/DialogPromptElement.js').DialogPromptElement} */
+  const profilesDialog = document.querySelector('#profilesDialog');
+  profilesDialog.toggleAttribute('open', true);
 }
 
+function onActionProfileActive(e) {
+  const store = getInventoryStore();
+  let profileId = e.target.value;
+  if (!isProfileInStore(store, profileId)) {
+    return;
+  }
+  let activeProfile = getActiveProfileInStore(store);
+  if (activeProfile && activeProfile.profileId === profileId) {
+    return;
+  }
+  setActiveProfileInStore(store, profileId);
+  onActionProfile();
+}
 
 function onActionProfileNew() {
   const store = getInventoryStore();
@@ -362,85 +393,36 @@ function onActionProfileNew() {
   const displayName = `Satchel ${profileIds.length + 1}`;
   let newProfile = createProfile(uuid());
   newProfile.displayName = displayName;
-  let newInv = createGridInventory(uuid(), 3, 3);
-  newProfile.invs.push(newInv.invId);
-  addInventoryToStore(store, newInv.invId, newInv);
   addProfileInStore(store, newProfile.profileId, newProfile);
-  changeActiveProfile(store, newProfile.profileId);
-  const actionProfileChange = document.querySelector('#actionProfileChange');
-  actionProfileChange.toggleAttribute('disabled', profileIds.length < 1);
-  return false;
+  setActiveProfileInStore(store, newProfile.profileId);
+  onActionProfile();
 }
 
-function onActionProfileDelete() {
+function onActionProfileEdit(e) {
   const store = getInventoryStore();
+  /** @type {HTMLButtonElement} */
+  const target = e.target;
+  const profileId = target.getAttribute('data-profile');
+  if (!isProfileInStore(store, profileId)) {
+    return;
+  }
   const activeProfile = getActiveProfileInStore(store);
-  let profileIds = getProfileIdsInStore(store);
-  let index = profileIds.indexOf(activeProfile.profileId);
-  if (index >= 0) {
-    profileIds.splice(index, 1);
+  if (activeProfile.profileId !== profileId) {
+    setActiveProfileInStore(store, profileId);
   }
-  for(let invId of activeProfile.invs) {
-    let inv = getInventoryInStore(store, invId);
-    deleteInventoryFromStore(store, invId, inv);
-  }
-  deleteProfileInStore(store, activeProfile.profileId, activeProfile);
-  if (profileIds.length > 0) {
-    changeActiveProfile(store, profileIds.shift());
-  } else {
-    onActionProfileNew();
-  }
-  const actionProfileChange = document.querySelector('#actionProfileChange');
-  actionProfileChange.toggleAttribute('disabled', profileIds.length <= 1);
-  return false;
-}
-
-function onActionProfileChangeSubmit() {
-  /** @type {HTMLSelectElement} */
-  const actionProfileSelect = document.querySelector('#actionProfileSelect');
-  let value = actionProfileSelect.value;
-  if (value) {
-    const store = getInventoryStore();
-    changeActiveProfile(store, value);
-  }
-  /** @type {import('./app/DialogPromptElement.js').DialogPromptElement} */
-  const profileSelectDialog = document.querySelector('#profileSelectDialog');
-  profileSelectDialog.toggleAttribute('open', false);
-  return false;
-}
-
-function onActionProfileChange() {
-  const actionProfileSelect = document.querySelector('#actionProfileSelect');
-  const store = getInventoryStore();
-  const profileIds = getProfileIdsInStore(store);
-  actionProfileSelect.innerHTML = '';
-  const activeProfile = getActiveProfileInStore(store);
-  for(let profileId of profileIds) {
-    let option = document.createElement('option');
-    option.value = profileId;
-    if (profileId === activeProfile.profileId) {
-      option.toggleAttribute('selected', true);
-    }
-    let profile = getProfileInStore(store, profileId);
-    option.textContent = profile.displayName;
-    actionProfileSelect.appendChild(option);
-  }
-  /** @type {import('./app/DialogPromptElement.js').DialogPromptElement} */
-  const profileSelectDialog = document.querySelector('#profileSelectDialog');
-  profileSelectDialog.toggleAttribute('open', true);
-  return false;
-}
-
-function changeActiveProfile(store, profileId) {
-  setActiveProfileInStore(store, profileId);
-  // Re-open dialog
   /** @type {import('./app/DialogPromptElement.js').DialogPromptElement} */
   const profilesDialog = document.querySelector('#profilesDialog');
   profilesDialog.toggleAttribute('open', false);
-  onActionProfileEdit();
+  
+  // Prepare edit dialog
+  prepareEditProfileDialog(store, profileId);
+
+  /** @type {import('./app/DialogPromptElement.js').DialogPromptElement} */
+  const inventoriesDialog = document.querySelector('#inventoriesDialog');
+  inventoriesDialog.toggleAttribute('open', true);
 }
 
-function onActionProfileName(e) {
+function onActionProfileEditName(e) {
   const store = getInventoryStore();
   const activeProfile = getActiveProfileInStore(store);
   if (!activeProfile) {
@@ -448,10 +430,83 @@ function onActionProfileName(e) {
   }
   activeProfile.displayName = e.target.value;
   dispatchProfileChange(store, activeProfile.profileId);
-  return false;
+}
+
+function prepareEditProfileDialog(store, profileId) {
+  const profile = getProfileInStore(store, profileId);
+  const rootContainerElement = document.querySelector('#activeInventoryList');
+  rootContainerElement.innerHTML = '';
+  for(let invId of profile.invs) {
+    let inv = getInventoryInStore(store, invId);
+    let labelElement = document.createElement('label');
+    labelElement.textContent = `${inv.displayName || 'Inventory'} | ${inv.width}⨯${inv.height}`;
+    let deleteElement = document.createElement('icon-button');
+    deleteElement.setAttribute('data-profile', profileId);
+    deleteElement.setAttribute('data-inv', invId);
+    deleteElement.setAttribute('icon', 'res/delete.svg');
+    deleteElement.setAttribute('alt', 'delete');
+    deleteElement.setAttribute('title', 'Delete Inventory');
+    deleteElement.addEventListener('click', onActionProfileInvDelete);
+    let containerElement = document.createElement('div');
+    containerElement.appendChild(labelElement);
+    containerElement.appendChild(deleteElement);
+    rootContainerElement.appendChild(containerElement);
+  }
+  /** @type {HTMLInputElement} */
+  const titleElement = document.querySelector('#actionProfileEditName');
+  titleElement.value = profile.displayName;
+}
+
+function onActionProfileDelete(e) {
+  if (!window.confirm('Are you sure you want to delete this profile?')) {
+    return;
+  }
+  const store = getInventoryStore();
+  /** @type {HTMLButtonElement} */
+  const target = e.target;
+  const profileId = target.getAttribute('data-profile');
+  if (!isProfileInStore(store, profileId)) {
+    return;
+  }
+  let profile = getProfileInStore(store, profileId);
+  for(let invId of profile.invs) {
+    let inv = getInventoryInStore(store, invId);
+    deleteInventoryFromStore(store, invId, inv);
+  }
+  deleteProfileInStore(store, profile.profileId, profile);
+  onActionProfile();
+}
+
+function onActionProfileInvDelete(e) {
+  if (!window.confirm('Are you sure you want to delete this inventory?')) {
+    return;
+  }
+  const store = getInventoryStore();
+  const profileId = e.target.getAttribute('data-profile');
+  if (!isProfileInStore(store, profileId)) {
+    return;
+  }
+  const invId = e.target.getAttribute('data-inv');
+  if (!isInventoryInStore(store, invId)) {
+    return;
+  }
+  let profile = getProfileInStore(store, profileId);
+  let i = profile.invs.indexOf(invId);
+  if (i >= 0) {
+    profile.invs.splice(i, 1);
+    dispatchProfileChange(store, profileId);
+  }
+  let inv = getInventoryInStore(store, invId);
+  deleteInventoryFromStore(store, invId, inv);
+  prepareEditProfileDialog(store, profileId);
 }
 
 function onActionProfileInvNew() {
+  const store = getInventoryStore();
+  const activeProfile = getActiveProfileInStore(store);
+  if (!activeProfile) {
+    return;
+  }
   /** @type {import('./app/DialogPromptElement.js').DialogPromptElement} */
   const profileInventoryDialog = document.querySelector('#profileInventoryDialog');
   profileInventoryDialog.toggleAttribute('open', true);
@@ -464,16 +519,34 @@ function onActionProfileInvSubmit() {
     return;
   }
   /** @type {HTMLInputElement} */
+  const actionProfileInvType = document.querySelector('#actionProfileInvType');
+  /** @type {HTMLInputElement} */
+  const actionProfileInvTitle = document.querySelector('#actionProfileInvTitle');
+  /** @type {HTMLInputElement} */
   const actionProfileInvWidth = document.querySelector('#actionProfileInvWidth');
   /** @type {HTMLInputElement} */
   const actionProfileInvHeight = document.querySelector('#actionProfileInvHeight');
+  let type = actionProfileInvType.value;
+  let title = actionProfileInvTitle.value.trim();
   let width = Math.min(99, Math.max(1, Number(actionProfileInvWidth.value) || 0));
   let height = Math.min(99, Math.max(1, Number(actionProfileInvHeight.value) || 0));
   const newInvId = uuid();
-  createGridInventoryInStore(store, newInvId, width, height);
+  let newInv;
+  switch(type) {
+    case 'grid':
+      newInv = createGridInventory(newInvId, width, height);
+      break;
+    case 'socket':
+      newInv = createSocketInventory(newInvId);
+      break;
+    default:
+      throw new Error('Unknown inventory type.');
+  }
+  newInv.displayName = title;
+  addInventoryToStore(store, newInv.invId, newInv);
   activeProfile.invs.push(newInvId);
   dispatchProfileChange(store, activeProfile.profileId);
-
+  prepareEditProfileDialog(store, activeProfile.profileId);
   /** @type {import('./app/DialogPromptElement.js').DialogPromptElement} */
   const profileInventoryDialog = document.querySelector('#profileInventoryDialog');
   profileInventoryDialog.toggleAttribute('open', false);

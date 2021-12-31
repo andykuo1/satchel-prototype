@@ -61,7 +61,7 @@
       <div slot="sidebar" class="foundryContainer">
         <div class="sideContainer">
           <div class="sidebarActions">
-            <icon-button id="actionItemEdit" icon="res/edit.svg" alt="foundry" title="Open Foundry"></icon-button>
+            <icon-button id="actionItemEdit" icon="res/anvil.svg" alt="foundry" title="Open Foundry"></icon-button>
           </div>
           <div class="sidebarActions">
             <icon-button id="actionNewItem" icon="res/add.svg" alt="new" title="New Item"></icon-button>
@@ -171,7 +171,9 @@
                 margin: 0.5em 0;
               }
             </style>
-            <icon-button id="actionProfileEdit" icon="res/profile.svg" alt="profile" title="Profile"></icon-button>
+            <div>
+              <icon-button id="actionProfile" icon="res/profile.svg" alt="profile" title="Profile"></icon-button>
+            </div>
             <div class="spacer"></div>
             <h1 id="appTitle">Satchel</h1>
             <small id="onlineStatus"></small>
@@ -316,37 +318,92 @@
         #profilesDialog h3 {
           margin: 0;
         }
-      </style>
-      <h3>Profile Options</h3>
-      <p>
-        <button id="actionProfileChange">Change Profile</button>
-        <button id="actionProfileDuplicate" disabled>Duplicate Profile</button>
-        <button id="actionProfileNew">New Profile</button>
-        <button id="actionProfileDelete">Delete Profile</button>
-      </p>
-      <input id="actionProfileName" placeholder="Untitled">
-      <p>
-        <button id="actionProfileInvNew">Create Inventory</button>
-        <ul id="activeProfileInvList">
-        </ul>
-      </p>
-    </dialog-prompt>
-    <dialog-prompt id="profileSelectDialog">
-      <style>
-        #profileSelectDialog > * {
-          margin: 1em;
+        #activeProfileList {
+          display: flex;
+          flex-direction: column;
+        }
+        #activeProfileList > * {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          height: 2.5em;
+        }
+        #activeProfileList > *:hover {
+          background-color: #333333;
+        }
+        #activeProfileList > * > label {
+          flex: 1;
+          margin: 0 0.5em;
+        }
+        #activeProfileList icon-button {
+          width: 2em;
+          height: 2em;
         }
       </style>
-      <h3>Select Profile</h3>
-      <select id="actionProfileSelect"></select>
+      <h3>Profiles</h3>
+      <p id="activeProfileList"></p>
+      <button id="actionProfileNew">New Profile</button>
     </dialog-prompt>
+
+    <dialog-prompt id="inventoriesDialog">
+      <style>
+        #inventoriesDialog h3 {
+          margin: 0;
+        }
+        #activeInventoryList {
+          display: flex;
+          flex-direction: column;
+          border: 4px solid #ffffff;
+          overflow-y: auto;
+          min-height: 1em;
+          max-height: 30vh;
+        }
+        #activeInventoryList > * {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          height: 2.5em;
+        }
+        #activeInventoryList > *:hover {
+          background-color: #333333;
+        }
+        #activeInventoryList > * > label {
+          flex: 1;
+          margin: 0 0.5em;
+        }
+        #activeInventoryList icon-button {
+          width: 2em;
+          height: 2em;
+        }
+      </style>
+      <h3>Edit Profile</h3>
+      <br>
+      <fieldset>
+        <legend>Name</legend>
+        <input type="text" id="actionProfileEditName">
+      </fieldset>
+      <fieldset>
+        <legend>Inventory</legend>
+        <p id="activeInventoryList"></p>
+        <button id="actionProfileInvNew">New Inventory</button>
+      </fieldset>
+    </dialog-prompt>
+
     <dialog-prompt id="profileInventoryDialog">
-      <h3>Create Inventory</h3>
-      <label>Width</label>
+      <h3>New Inventory</h3>
+      <label for="actionProfileInvType">Type</label>
+      <select id="actionProfileInvType">
+        <option value="grid">Grid</option>
+        <option value="socket">Socket</option>
+      </select>
+      <label for="actionProfileInvTitle">Title</label>
+      <input id="actionProfileInvTitle" placeholder="Default">
+      <label for="actionProfileInvWidth">Width</label>
       <input type="number" min="1" max="12" id="actionProfileInvWidth" value="1">
-      <label>Height</label>
+      <label for="actionProfileInvHeight">Height</label>
       <input type="number" min="1" max="12" id="actionProfileInvHeight" value="1">
-      <button id="actionProfileInvSubmit">Create</button>
+      <br>
+      <button id="actionProfileInvSubmit">Apply</button>
     </dialog-prompt>
     <script type="module" src="src/main.js"></script>
   </body>

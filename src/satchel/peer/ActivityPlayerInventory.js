@@ -115,11 +115,6 @@ export class ActivityPlayerInventory extends ActivityBase {
         profile.displayName = displayName;
         profile.invs.push(inv.invId);
         dispatchProfileChange(store, profileId);
-        /** @type {import('../profile/ProfileSelectElement.js').ProfileSelectElement} */
-        let profileSelector = document.querySelector('#actionProfile');
-        if (profileSelector) {
-          profileSelector.forceUpdate();
-        }
         return true;
     }
     return false;

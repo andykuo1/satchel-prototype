@@ -31,7 +31,10 @@ export function changeActiveProfile(store, profileId) {
 
 export function resolveActiveProfile(store) {
   if (hasActiveProfileInStore(store)) {
-    return getActiveProfileInStore(store);
+    let activeProfile = getActiveProfileInStore(store);
+    if (activeProfile) {
+      return activeProfile;
+    }
   }
   let profileIds = getProfileIdsInStore(store);
   if (profileIds.length > 0) {
@@ -72,6 +75,7 @@ function onProfileChange() {
     invElement.invId = invId;
     invsContainer.appendChild(invElement);
   }
+  /** @type {HTMLInputElement} */
   let profileTitle = document.querySelector('#appTitle');
   profileTitle.textContent = activeProfile.displayName;
 }
