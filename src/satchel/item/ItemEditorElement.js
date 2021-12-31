@@ -629,7 +629,8 @@ export class ItemEditorElement extends HTMLElement {
     const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
     const oldWidth = socketItem.width;
     const oldHeight = socketItem.height;
-    let newSize = Math.max(1, Math.floor((oldWidth + oldHeight) / 2));
+    // NOTE: Finds the nearest square size that is even (min 1)
+    let newSize = Math.max(1, Math.floor(Math.floor((oldWidth + oldHeight) / 2) / 2) * 2);
     this.updateItemSize(store, socketItem, newSize, newSize);
   }
 
