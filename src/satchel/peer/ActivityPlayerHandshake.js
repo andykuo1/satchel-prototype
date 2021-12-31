@@ -62,7 +62,7 @@ export class ActivityPlayerHandshake extends ActivityBase {
     const now = performance.now();
     setPlayerName(remote, remotePlayerName);
     setPlayerLastHeartbeat(remote, now);
-    const clientDataName = `remote_data#${remotePlayerName}`;
+    const clientDataName = `remote_data-${remotePlayerName}`;
     // Send to client their first data store
     const clientData = ActivityPlayerInventory.getLocalServerData(local)[clientDataName];
     ActivityPlayerInventory.sendPlayerReset(remote, clientData);

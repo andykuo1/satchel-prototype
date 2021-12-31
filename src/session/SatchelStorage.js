@@ -1,11 +1,5 @@
-import { cloneAlbum } from '../satchel/album/Album.js';
-import { dispatchAlbumChange } from '../satchel/album/AlbumEvents.js';
-import { exportAlbumToJSON, importAlbumFromJSON } from '../satchel/album/AlbumLoader.js';
 import {
-  addAlbumInStore,
-  getAlbumInStore,
-  getAlbumsInStore,
-  isAlbumInStore,
+  getAlbumIdsInStore,
 } from '../satchel/album/AlbumStore.js';
 import { exportInventoryToJSON, importInventoryFromJSON } from '../satchel/inv/InvLoader.js';
 import {
@@ -16,6 +10,8 @@ import {
 } from '../inventory/InventoryStore.js';
 import { dispatchInventoryChange } from '../satchel/inv/InvEvents.js';
 import { loadFromStorage, saveToStorage } from '../Storage.js';
+import { getProfileIdsInStore } from '../satchel/profile/ProfileStore.js';
+import { loadSatchelAlbumsFromData, loadSatchelProfilesFromData, saveSatchelAlbumsToData, saveSatchelProfilesToData } from './SatchelLoader.js';
 
 export function loadSatchelFromStorage() {
   const store = getInventoryStore();
@@ -45,19 +41,19 @@ export function loadSatchelFromStorage() {
   if (albumData) {
     try {
       let jsonData = JSON.parse(albumData);
-      for (let albumJson of jsonData) {
-        const album = importAlbumFromJSON(albumJson);
-        const albumId = album.albumId;
-        if (isAlbumInStore(store, albumId)) {
-          const oldAlbum = getAlbumInStore(store, albumId);
-          cloneAlbum(album, oldAlbum);
-          dispatchAlbumChange(store, albumId);
-        } else {
-          addAlbumInStore(store, albumId, album);
-        }
-      }
+      loadSatchelAlbumsFromData(store, jsonData);
     } catch (e) {
       console.error('Failed to load album from storage.');
+      console.error(e);
+    }
+  }
+  let profileData = loadFromStorage('satchel_profile_v1');
+  if (profileData) {
+    try {
+      let jsonData = JSON.parse(profileData);
+      loadSatchelProfilesFromData(store, jsonData);
+    } catch (e) {
+      console.error('Failed to load profile from storage.');
       console.error(e);
     }
   }
@@ -75,14 +71,11 @@ export function saveSatchelToStorage() {
     }
   }
 
-  let albums = getAlbumsInStore(store);
-  let albumData = [];
-  for (let album of albums) {
-    try {
-      albumData.push(exportAlbumToJSON(album));
-    } catch (e) {
-      console.error(e);
-    }
-  }
+  let albumIds = getAlbumIdsInStore(store);
+  let albumData = saveSatchelAlbumsToData(store, albumIds);
   saveToStorage('satchel_album_v3', JSON.stringify(albumData));
+
+  let profileIds = getProfileIdsInStore(store);
+  let profileData = saveSatchelProfilesToData(store, profileIds);
+  saveToStorage('satchel_profile_v1', JSON.stringify(profileData));
 }

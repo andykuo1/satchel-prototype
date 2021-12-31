@@ -158,7 +158,7 @@
                 display: flex;
                 flex-direction: row;
                 align-items: center;
-                padding: 0 2em;
+                padding: 0 1em;
               }
               .spacer {
                 flex: 1;
@@ -167,11 +167,14 @@
                 white-space: nowrap;
                 overflow-x: auto;
               }
+              #appTitle {
+                margin: 0.5em 0;
+              }
             </style>
+            <icon-button id="actionProfileEdit" icon="res/profile.svg" alt="profile" title="Profile"></icon-button>
             <div class="spacer"></div>
-            <h1>Satchel</h1>
+            <h1 id="appTitle">Satchel</h1>
             <small id="onlineStatus"></small>
-            <small id="appVersion">v-.-.-</small>
             <div class="spacer"></div>
             <div class="toolbar">
               <style>
@@ -213,7 +216,7 @@
               }
             </style>
             <div id="workspace">
-              <inventory-grid invid="main"></inventory-grid>
+              <div id="localWorkspace"></div>
               <div id="remoteWorkspace"></div>
             </div>
           </main>
@@ -291,6 +294,7 @@
         <button id="uploadButton">Import Data</button>
         <button id="downloadButton">Export Data</button>
       </p>
+      <small id="appVersion">v-.-.-</small>
       <p>
         <style>
           #author {
@@ -306,6 +310,43 @@
           <small>Made with ❤ by Andrew Kuo</small>
         </a>
       </p>
+    </dialog-prompt>
+    <dialog-prompt id="profilesDialog">
+      <style>
+        #profilesDialog h3 {
+          margin: 0;
+        }
+      </style>
+      <h3>Profile Options</h3>
+      <p>
+        <button id="actionProfileChange">Change Profile</button>
+        <button id="actionProfileDuplicate" disabled>Duplicate Profile</button>
+        <button id="actionProfileNew">New Profile</button>
+        <button id="actionProfileDelete">Delete Profile</button>
+      </p>
+      <input id="actionProfileName" placeholder="Untitled">
+      <p>
+        <button id="actionProfileInvNew">Create Inventory</button>
+        <ul id="activeProfileInvList">
+        </ul>
+      </p>
+    </dialog-prompt>
+    <dialog-prompt id="profileSelectDialog">
+      <style>
+        #profileSelectDialog > * {
+          margin: 1em;
+        }
+      </style>
+      <h3>Select Profile</h3>
+      <select id="actionProfileSelect"></select>
+    </dialog-prompt>
+    <dialog-prompt id="profileInventoryDialog">
+      <h3>Create Inventory</h3>
+      <label>Width</label>
+      <input type="number" min="1" max="12" id="actionProfileInvWidth" value="1">
+      <label>Height</label>
+      <input type="number" min="1" max="12" id="actionProfileInvHeight" value="1">
+      <button id="actionProfileInvSubmit">Create</button>
     </dialog-prompt>
     <script type="module" src="src/main.js"></script>
   </body>

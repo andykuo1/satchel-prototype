@@ -1,13 +1,17 @@
 import { ActivityBase } from './ActivityBase.js';
 
-import { getInventoryStore, isInventoryInStore, createGridInventoryInStore, addInventoryToStore, getInventoryInStore, deleteInventoryFromStore } from '../../inventory/InventoryStore.js';
+import { getInventoryStore, isInventoryInStore, addInventoryToStore, getInventoryInStore, deleteInventoryFromStore } from '../../inventory/InventoryStore.js';
 import { getExistingInventory } from '../../inventory/InventoryTransfer.js';
-import { createGridInventory } from '../../satchel/inv/Inv.js';
+import { cloneInventory, createGridInventory } from '../../satchel/inv/Inv.js';
 import { dispatchInventoryChange } from '../../satchel/inv/InvEvents.js';
 import { exportInventoryToJSON, importInventoryFromJSON } from '../../satchel/inv/InvLoader.js';
 import { SatchelLocal, SatchelRemote } from './SatchelLocal.js';
 import { getPlayerLastHeartbeat, getPlayerName, hasPlayerHeartbeat, setPlayerLastHeartbeat } from './PlayerState.js';
 import { loadFromStorage, saveToStorage } from '../../Storage.js';
+import { addProfileInStore, getProfileInStore, isProfileInStore } from '../profile/ProfileStore.js';
+import { createProfile } from '../profile/Profile.js';
+import { uuid } from '../../util/uuid.js';
+import { dispatchProfileChange } from '../profile/ProfileEvents.js';
 
 /** @typedef {import('../../inventory/element/InventoryGridElement.js').InventoryGridElement} InventoryGridElement */
 
@@ -55,7 +59,7 @@ export class ActivityPlayerInventory extends ActivityBase {
   /** @override */
   static onRemoteClientDisconnected(localServer, remoteClient) {
     const remotePlayerName = getPlayerName(remoteClient);
-    const clientDataName = `remote_data#${remotePlayerName}`;
+    const clientDataName = `remote_data-${remotePlayerName}`;
     try {
       let store = getInventoryStore();
       if (isInventoryInStore(store, clientDataName)) {
@@ -77,20 +81,45 @@ export class ActivityPlayerInventory extends ActivityBase {
     remoteServer.remoteData = {};
   }
 
+  // FIXME: Create a new Profile, it comes with no inventory. You can then create as many inventories in that profile as you want.
+  // For connected clients, they connect in a remote-only profile and then add/create new inventories. the server data should have an id
+  // This is preserved across clients. So when a client reconnects, they know whether to create a new profile or re-use an existing one.
+  // Offline profiles should be overwritten.
+  // Sync happens with profiles instead of just inventories.
   /** @override */
   static onRemoteServerMessage(localClient, remoteServer, messageType, messageData) {
     switch(messageType) {
       case 'reset':
         const serverData = messageData;
         remoteServer.remoteData = serverData;
-        const store = getInventoryStore();
-        const invId = 'main';
-        if (!isInventoryInStore(store, invId)) {
-          createGridInventoryInStore(store, invId, 12, 7);
-        }
-        let inv = getExistingInventory(store, invId);
+        let inv = createGridInventory(uuid(), 12, 9);
         importInventoryFromJSON(serverData, inv);
-        dispatchInventoryChange(store, invId);
+        const displayName = inv.displayName;
+        const profileId = `profile_remote-${displayName.toLowerCase()}`;
+        const store = getInventoryStore();
+        let profile;
+        if (isProfileInStore(store, profileId)) {
+          profile = getProfileInStore(store, profileId);
+          let invId = profile.invs[0];
+          if (invId) {
+            let existing = getInventoryInStore(store, invId);
+            cloneInventory(inv, existing);
+            dispatchInventoryChange(store, invId);
+            return;
+          }
+        } else {
+          profile = createProfile(profileId);
+          addProfileInStore(store, profile.profileId, profile);
+        }
+        addInventoryToStore(store, inv.invId, inv);
+        profile.displayName = displayName;
+        profile.invs.push(inv.invId);
+        dispatchProfileChange(store, profileId);
+        /** @type {import('../profile/ProfileSelectElement.js').ProfileSelectElement} */
+        let profileSelector = document.querySelector('#actionProfile');
+        if (profileSelector) {
+          profileSelector.forceUpdate();
+        }
         return true;
     }
     return false;
@@ -145,7 +174,7 @@ export class ActivityPlayerInventory extends ActivityBase {
         const now = performance.now();
         setPlayerLastHeartbeat(remoteClient, now);
         // Update server's copy of client data
-        const clientDataName = `remote_data#${remotePlayerName}`;
+        const clientDataName = `remote_data-${remotePlayerName}`;
         const clientData = messageData;
         localServer.localData[clientDataName] = clientData;
         let store = getInventoryStore();
