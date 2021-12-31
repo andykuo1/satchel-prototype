@@ -5,12 +5,12 @@ import { connectAsServer, isServerSide } from './app/PeerSatchelConnector.js';
 import { getCursorContext } from './inventory/CursorHelper.js';
 import { getExistingInventory } from './inventory/InventoryTransfer.js';
 import { uploadFile } from './util/uploader.js';
-import { copyToClipboard } from './util/clipboard.js';
+import { copyToClipboard, pasteFromClipboard } from './util/clipboard.js';
 import { ItemBuilder } from './satchel/item/Item.js';
 import { uuid } from './util/uuid.js';
 import { ItemAlbumElement } from './satchel/album/ItemAlbumElement.js';
 import { exportDataToJSON } from './session/SatchelDataLoader.js';
-import { importItemFromJSON } from './satchel/item/ItemLoader.js';
+import { exportItemToString, importItemFromJSON, importItemFromString } from './satchel/item/ItemLoader.js';
 import { importAlbumFromJSON } from './satchel/album/AlbumLoader.js';
 import { addAlbumInStore, createAlbumInStore } from './satchel/album/AlbumStore.js';
 import { copyAlbum } from './satchel/album/Album.js';
@@ -41,6 +41,11 @@ window.addEventListener('DOMContentLoaded', () => {
   elementEventListener('#actionShareItem', 'click', onActionShareItem);
   elementEventListener('#actionSettings', 'click', onActionSettings);
 
+  elementEventListener('#actionItemCodeImport', 'click', onActionItemCodeImport);
+  elementEventListener('#actionItemCodeExport', 'click', onActionItemCodeExport);
+  elementEventListener('#actionFoundryReset', 'click', onActionFoundryReset);
+
+  elementEventListener('#giftCodeExport', 'click', onGiftCodeExport);
   elementEventListener('#giftSubmit', 'click', onGiftSubmit);
 
   document.addEventListener('itemcontext', onItemContext);
@@ -77,7 +82,6 @@ function onActionShareItem() {
 }
 
 function onGiftSubmit() {
-  let giftDialog = document.querySelector('#giftDialog');
   /** @type {HTMLSelectElement} */
   let giftTarget = document.querySelector('#giftTarget');
   if (giftTarget.value) {
@@ -92,7 +96,18 @@ function onGiftSubmit() {
       ctx.client.instance.sendItemTo(target, socketedItem);
     }
   }
+  let giftDialog = document.querySelector('#giftDialog');
   giftDialog.toggleAttribute('open', false);
+}
+
+function onGiftCodeExport() {
+  /** @type {import('./satchel/item/ItemDialogElement.js').ItemDialogElement} */
+  const itemDialog = document.querySelector('#itemDialog');
+  const socketedItem = itemDialog.copySocketedItem();
+  const itemString = exportItemToString(socketedItem);
+  copyToClipboard(itemString).then(() => {
+    window.alert('Copied to clipboard!\n\nShare this code with a friend, then import item by pasting in Foundry.');
+  });
 }
 
 function onActionEraseAll() {
@@ -253,4 +268,34 @@ function onItemContext(e) {
     itemDialog.openDialog(container, invId, itemId, clientX, clientY);
   }
   return false;
+}
+
+function onActionItemCodeExport() {
+  /** @type {import('./satchel/item/ItemEditorElement.js').ItemEditorElement} */
+  const itemEditor = document.querySelector('#itemEditor');
+  let item = itemEditor.getSocketedItem();
+  if (!item) {
+    window.alert('No item to copy :(\n\nPut an item in Foundry to copy item code.');
+    return;
+  }
+  let itemString = exportItemToString(item);
+  copyToClipboard(itemString).then(() => {
+    window.alert('Copied to clipboard!\n\nShare with a friend, then paste the code in Foundry.');
+  });
+}
+
+async function onActionItemCodeImport() {
+  /** @type {import('./satchel/item/ItemEditorElement.js').ItemEditorElement} */
+  const itemEditor = document.querySelector('#itemEditor');
+  let itemString = await pasteFromClipboard();
+  let newItem = importItemFromString(itemString);
+  itemEditor.clearSocketedItem();
+  itemEditor.putSocketedItem(newItem, true);
+  window.alert('Pasted from clipboard!');
+}
+
+function onActionFoundryReset() {
+  /** @type {import('./satchel/item/ItemEditorElement.js').ItemEditorElement} */
+  const itemEditor = document.querySelector('#itemEditor');
+  itemEditor.clearSocketedItem();
 }

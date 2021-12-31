@@ -101,8 +101,10 @@
         </style>
         <div class="editorContainer">
           <item-editor id="itemEditor" editable>
-            <icon-button slot="actions" id="actionFoundryShare" icon="res/share.svg" alt="send" title="Send Item" disabled></icon-button>
           </item-editor>
+          <button id="actionItemCodeExport">Copy Item Code</button>
+          <button id="actionItemCodeImport">Paste Item Code</button>
+          <button id="actionFoundryReset">Reset to Default</button>
         </div>
       </div>
       <sidebar-layout style="flex-direction: row-reverse; --background-color: none">
@@ -266,13 +268,20 @@
       <icon-button slot="actions" id="actionShareItem" icon="res/share.svg" alt="send" title="Send Item"></icon-button>
     </item-dialog>
     <dialog-prompt id="giftDialog">
-      <h3>Send item to...</h3>
-      <p>
-        <select id="giftTarget"></select>
-      </p>
-      <p>
-        <button id="giftSubmit">Send</button>
-      </p>
+      <h3>Share Item</h3>
+      <fieldset id="giftCode">
+        <legend>Item Code</legend>
+        <button id="giftCodeExport">Copy Item Code</button>
+      </fieldset>
+      <fieldset id="giftSend">
+        <legend>Send Item</legend>
+        <p>
+          <select id="giftTarget"></select>
+        </p>
+        <p>
+          <button id="giftSubmit">Send</button>
+        </p>
+      </fieldset>
     </dialog-prompt>
     <dialog-prompt id="settingsDialog" style="text-align: center;">
       <h3>Settings</h3>
