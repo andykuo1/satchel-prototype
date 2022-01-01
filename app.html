@@ -43,7 +43,7 @@
   <body>
     <sidebar-layout>
       <style>
-        .foundryContainer {
+        .leftSideContainer {
           flex-direction: row;
         }
         .sideContainer {
@@ -58,7 +58,7 @@
           scroll-behavior: smooth;
         }
       </style>
-      <div slot="sidebar" class="foundryContainer">
+      <div slot="sidebar" class="leftSideContainer">
         <div class="sideContainer">
           <div class="sidebarActions">
             <icon-button id="actionItemEdit" icon="res/anvil.svg" alt="foundry" title="Open Foundry"></icon-button>
@@ -109,6 +109,9 @@
       </div>
       <sidebar-layout style="flex-direction: row-reverse; --background-color: none">
         <style>
+          .rightSideContainer {
+            flex-direction: row;
+          }
           .groundContainer {
             display: flex;
             flex-direction: column;
@@ -124,13 +127,49 @@
             padding: 0.5em 0;
           }
         </style>
-        <div slot="sidebar" class="groundContainer">
-          <div class="sidebarActions">
-            <icon-button id="actionAlbumOpen" icon="res/bookmarks.svg" alt="album" title="Open Album"></icon-button>
+        <div slot="sidebar" class="rightSideContainer">
+          <!-- ALBUM CONTENT -->
+          <style>
+            .albumContainer {
+              display: none;
+              flex-direction: column;
+              background-color: #333333;
+              text-align: left;
+            }
+            .albumContainer.open {
+              display: flex;
+            }
+            .albumContainer > * {
+              visibility: hidden;
+            }
+            .albumContainer.open > * {
+              visibility: visible;
+            }
+            .albumActions {
+              display: flex;
+              flex-direction: column;
+            }
+            #albumList {
+              flex: 1;
+              overflow-y: auto;
+            }
+          </style>
+          <div class="albumContainer">
+            <div id="albumList"></div>
+            <div class="albumActions">
+              <button id="actionAlbumNew">New Album</button>
+              <button id="actionAlbumImport">Import Album</button>
+            </div>
           </div>
-          <album-ground id="ground"></album-ground>
-          <div class="sidebarActions">
-            <item-delete id="delete"></item-delete>
+          <!-- GROUND CONTENT -->
+          <div class="groundContainer">
+            <div class="sidebarActions">
+              <icon-button id="actionAlbumOpen" icon="res/bookmarks.svg" alt="album" title="Open Album"></icon-button>
+            </div>
+            <album-ground id="ground"></album-ground>
+            <div class="sidebarActions">
+              <item-delete id="delete"></item-delete>
+            </div>
           </div>
         </div>
         <style>
@@ -222,46 +261,6 @@
               <div id="remoteWorkspace"></div>
             </div>
           </main>
-        </div>
-        <!-- ALBUM CONTENT -->
-        <style>
-          .albumContainer {
-            display: flex;
-            flex-direction: column;
-            position: absolute;
-            right: 0;
-            top: 0;
-            bottom: 0;
-            background-color: #333333;
-            padding: 0.5em;
-            z-index: 1;
-            transform: translateX(110%);
-            transition: transform 0.2s ease;
-          }
-          .albumContainer.open {
-            transform: translateX(0);
-          }
-          .albumContainer > * {
-            visibility: hidden;
-          }
-          .albumContainer.open > * {
-            visibility: visible;
-          }
-          .albumActions {
-            display: flex;
-            flex-direction: column;
-          }
-          #albumList {
-            flex: 1;
-            overflow-y: auto;
-          }
-        </style>
-        <div class="albumContainer">
-          <div id="albumList"></div>
-          <div class="albumActions">
-            <button id="actionAlbumNew">New Album</button>
-            <button id="actionAlbumImport">Import Album</button>
-          </div>
         </div>
       </sidebar-layout>
     </sidebar-layout>

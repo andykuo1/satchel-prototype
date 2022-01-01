@@ -26,7 +26,7 @@ export function loadSatchelFromStorage() {
   if (albumData) {
     try {
       let jsonData = JSON.parse(albumData);
-      loadSatchelAlbumsFromData(store, jsonData);
+      loadSatchelAlbumsFromData(store, jsonData, true);
     } catch (e) {
       console.error('Failed to load album from storage.');
       console.error(e);

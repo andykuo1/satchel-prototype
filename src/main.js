@@ -60,18 +60,6 @@ async function onDocumentFocusUpdate() {
   } finally {
     // Initialize satchel from storage.
     loadSatchelFromStorage();
-    // Add all albums to the panel
-    const store = getInventoryStore();
-    const albumContainer = document.querySelector('#albumList');
-    for(let album of getAlbumsInStore(store)) {
-      if (isGroundAlbum(album)) {
-        // Ground album is always displayed in a separate sidebar
-        continue;
-      }
-      const albumElement = new ItemAlbumElement();
-      albumElement.albumId = album.albumId;
-      albumContainer.appendChild(albumElement);
-    }
     // Set up active profile
     setupActiveProfile();
     // Set up autosave

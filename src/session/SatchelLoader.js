@@ -1,21 +1,54 @@
 import { addInventoryToStore, getInventoryInStore, isInventoryInStore } from '../inventory/InventoryStore.js';
-import { cloneAlbum } from '../satchel/album/Album.js';
+import { cloneAlbum, copyAlbum } from '../satchel/album/Album.js';
 import { dispatchAlbumChange } from '../satchel/album/AlbumEvents.js';
 import { exportAlbumToJSON, importAlbumFromJSON } from '../satchel/album/AlbumLoader.js';
-import { addAlbumInStore, getAlbumInStore, isAlbumInStore } from '../satchel/album/AlbumStore.js';
+import { addAlbumInStore, getAlbumIdsInStore, getAlbumInStore, isAlbumInStore } from '../satchel/album/AlbumStore.js';
 import { cloneInventory, copyInventory } from '../satchel/inv/Inv.js';
 import { dispatchInventoryChange } from '../satchel/inv/InvEvents.js';
 import { exportInventoryToJSON, importInventoryFromJSON } from '../satchel/inv/InvLoader.js';
 import { cloneProfile, copyProfile } from '../satchel/profile/Profile.js';
 import { dispatchProfileChange } from '../satchel/profile/ProfileEvents.js';
 import { exportProfileToJSON, importProfileFromJSON } from '../satchel/profile/ProfileLoader.js';
-import { addProfileInStore, getProfileInStore, isProfileInStore } from '../satchel/profile/ProfileStore.js';
+import { addProfileInStore, getProfileIdsInStore, getProfileInStore, isProfileInStore } from '../satchel/profile/ProfileStore.js';
 import { exportDataToJSON, importDataFromJSON } from './SatchelDataLoader.js';
 
+export function loadSatchelFromData(store, jsonData, overrideData) {
+  return importDataFromJSON(jsonData, 'satchel_v2', data => {
+    const {
+      profiles,
+      albums,
+    } = data;
+    try {
+      loadSatchelProfilesFromData(store, profiles, overrideData);
+    } catch (e) {
+      console.error('Failed to load satchel from data.');
+      console.error(e);
+    }
+    try {
+      loadSatchelAlbumsFromData(store, albums, overrideData);
+    } catch (e) {
+      console.error('Failed to load album from data.');
+      console.error(e);
+    }
+  });
+}
+
+export function saveSatchelToData(store, dst = {}) {
+  const profileIds = getProfileIdsInStore(store);
+  const albumIds = getAlbumIdsInStore(store);
+  const profilesData = saveSatchelProfilesToData(store, profileIds);
+  const albumsData = saveSatchelAlbumsToData(store, albumIds);
+  const data = {
+    profiles: profilesData,
+    albums: albumsData,
+  };
+  return exportDataToJSON('satchel_v2', data, {}, dst);
+}
+
 export function loadSatchelProfilesFromData(store, jsonData, overrideData) {
-  return importDataFromJSON(jsonData, 'satchel_v1', (data) => {
+  return importDataFromJSON(jsonData, 'profile_v2', (data) => {
     let result = [];
-    let inProfiles = data.profiles;
+    let inProfiles = data.profdata;
     let inInvs = data.invdata;
     let overrideInvIds = {};
     for(let invId of Object.keys(inInvs)) {
@@ -79,23 +112,28 @@ export function saveSatchelProfilesToData(store, profileIds, dst = {}) {
     }
   }
   let result = {
-    profiles: outProfiles,
+    profdata: outProfiles,
     invdata: outInvs,
   };
-  return exportDataToJSON('satchel_v1', result, {}, dst);
+  return exportDataToJSON('profile_v2', result, {}, dst);
 }
 
-export function loadSatchelAlbumsFromData(store, jsonData) {
+export function loadSatchelAlbumsFromData(store, jsonData, overrideData) {
   let inAlbums = jsonData.albums;
   for (let albumJson of inAlbums) {
     const album = importAlbumFromJSON(albumJson);
     const albumId = album.albumId;
-    if (isAlbumInStore(store, albumId)) {
-      const oldAlbum = getAlbumInStore(store, albumId);
-      cloneAlbum(album, oldAlbum);
-      dispatchAlbumChange(store, albumId);
+    if (!overrideData) {
+      const newAlbum = copyAlbum(album);
+      addAlbumInStore(store, newAlbum.albumId, newAlbum);
     } else {
-      addAlbumInStore(store, albumId, album);
+      if (isAlbumInStore(store, albumId)) {
+        const oldAlbum = getAlbumInStore(store, albumId);
+        cloneAlbum(album, oldAlbum);
+        dispatchAlbumChange(store, albumId);
+      } else {
+        addAlbumInStore(store, albumId, album);
+      }
     }
   }
 }

@@ -11,7 +11,7 @@ import { cloneProfile } from './Profile.js';
  * @returns {object}
  */
 export function exportProfileToJSON(profile, dst = undefined) {
-  return exportDataToJSON('profile_v1', cloneProfile(profile), {}, dst);
+  return exportDataToJSON('profile_links_v1', cloneProfile(profile), {}, dst);
 }
 
 /**
@@ -20,5 +20,5 @@ export function exportProfileToJSON(profile, dst = undefined) {
  * @returns {Profile}
  */
 export function importProfileFromJSON(jsonData, dst = undefined) {
-  return importDataFromJSON(jsonData, 'profile_v1', (data) => cloneProfile(data, dst));
+  return importDataFromJSON(jsonData, 'profile_links_v1', (data) => cloneProfile(data, dst));
 }

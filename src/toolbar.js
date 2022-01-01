@@ -1,5 +1,5 @@
 import { downloadText } from './util/downloader.js';
-import { addInventoryToStore, deleteInventoryFromStore, getInventoryInStore, getInventoryStore, isInventoryInStore } from './inventory/InventoryStore.js';
+import { addInventoryToStore, createGridInventoryInStore, deleteInventoryFromStore, getInventoryInStore, getInventoryStore, isInventoryInStore } from './inventory/InventoryStore.js';
 import { connectAsServer } from './app/PeerSatchelConnector.js';
 import { getCursorContext } from './inventory/CursorHelper.js';
 import { uploadFile } from './util/uploader.js';
@@ -9,15 +9,15 @@ import { uuid } from './util/uuid.js';
 import { ItemAlbumElement } from './satchel/album/ItemAlbumElement.js';
 import { exportItemToString, importItemFromJSON, importItemFromString } from './satchel/item/ItemLoader.js';
 import { importAlbumFromJSON } from './satchel/album/AlbumLoader.js';
-import { addAlbumInStore, createAlbumInStore } from './satchel/album/AlbumStore.js';
+import { addAlbumInStore, createAlbumInStore, getAlbumIdsInStore, getAlbumInStore } from './satchel/album/AlbumStore.js';
 import { copyAlbum } from './satchel/album/Album.js';
 import { dispatchAlbumChange } from './satchel/album/AlbumEvents.js';
 import { closeFoundry, copyFoundry, isFoundryOpen, openFoundry } from './inventory/FoundryHelper.js';
 import { ActivityPlayerList } from './satchel/peer/ActivityPlayerList.js';
-import { dropItemOnGround } from './satchel/GroundAlbum.js';
+import { dropItemOnGround, isGroundAlbum } from './satchel/GroundAlbum.js';
 import { forceEmptyStorage } from './Storage.js';
 import { addProfileInStore, deleteProfileInStore, getActiveProfileInStore, getProfileIdsInStore, getProfileInStore, isProfileInStore, setActiveProfileInStore } from './satchel/profile/ProfileStore.js';
-import { loadSatchelProfilesFromData, saveSatchelProfilesToData } from './session/SatchelLoader.js';
+import { loadSatchelFromData, loadSatchelProfilesFromData, saveSatchelProfilesToData, saveSatchelToData } from './session/SatchelLoader.js';
 import { createProfile } from './satchel/profile/Profile.js';
 import { dispatchProfileChange } from './satchel/profile/ProfileEvents.js';
 import { resolveActiveProfile } from './satchel/ActiveProfile.js';
@@ -139,6 +139,33 @@ function onActionAlbumNew() {
 }
 
 function onActionAlbumOpen(e) {
+  const store = getInventoryStore();
+  const albumIds = getAlbumIdsInStore(store);
+  const albumElementList = document.querySelector('#albumList');
+  /** @type {NodeListOf<ItemAlbumElement>} */
+  const albumElementChildren = albumElementList.querySelectorAll('item-album');
+  for(let album of albumElementChildren) {
+    let i = albumIds.indexOf(album.albumId);
+    if (i >= 0) {
+      // Ignore this element as it is already created and in store.
+      albumIds.splice(i, 1);
+    } else {
+      // Delete this element as it no longer exists in store.
+      album.remove();
+    }
+  }
+  // Create any albums not matched with one in store
+  for(let albumId of albumIds) {
+    const album = getAlbumInStore(store, albumId);
+    if (isGroundAlbum(album)) {
+      // Ground album is always displayed in a separate sidebar
+      continue;
+    }
+    const albumElement = new ItemAlbumElement();
+    albumElement.albumId = albumId;
+    albumElementList.appendChild(albumElement);
+  }
+  // Actually open the container
   let albumContainer = document.querySelector('.albumContainer');
   albumContainer.classList.toggle('open');
 }
@@ -173,7 +200,7 @@ function onActionNewItem() {
 function onDownloadClick() {
   const timestamp = Date.now();
   const store = getInventoryStore();
-  const json = saveSatchelProfilesToData(store, getProfileIdsInStore(store));
+  const json = saveSatchelToData(store);
   downloadText(`satchel-data-${timestamp}.json`, JSON.stringify(json, null, 4));
 }
 
@@ -189,6 +216,27 @@ async function onUploadClick() {
   }
 
   switch(jsonData._type) {
+    case 'satchel_v2': {
+      if (!window.confirm('This may overwrite data. Do you want to continue?')) {
+        return;
+      }
+      const store = getInventoryStore();
+      try {
+        loadSatchelFromData(store, jsonData, true);
+      } catch (e) {
+        console.error('Failed to load satchel from file.');
+        console.error(e);
+      }
+    } break;
+    case 'profile_v2': {
+      const store = getInventoryStore();
+      try {
+        loadSatchelProfilesFromData(store, jsonData, false);
+      } catch (e) {
+        console.error('Failed to load satchel from file.');
+        console.error(e);
+      }
+    } break;
     case 'album_v1': {
       const store = getInventoryStore();
       try {
@@ -211,18 +259,6 @@ async function onUploadClick() {
         dropItemOnGround(item);
       } catch (e) {
         console.error('Failed to load item from file.');
-        console.error(e);
-      }
-    } break;
-    case 'satchel_v1': {
-      if (!window.confirm('This may overwrite data. Do you want to continue?')) {
-        return;
-      }
-      const store = getInventoryStore();
-      try {
-        loadSatchelProfilesFromData(store, jsonData, true);
-      } catch (e) {
-        console.error('Failed to load satchel from file.');
         console.error(e);
       }
     } break;
@@ -378,6 +414,8 @@ function onActionProfileNew() {
   const displayName = `Satchel ${profileIds.length + 1}`;
   let newProfile = createProfile(uuid());
   newProfile.displayName = displayName;
+  let newInv = createGridInventoryInStore(store, uuid(), 12, 9);
+  newProfile.invs.push(newInv.invId);
   addProfileInStore(store, newProfile.profileId, newProfile);
   setActiveProfileInStore(store, newProfile.profileId);
   onActionProfile();
@@ -457,7 +495,7 @@ async function onActionProfileImport() {
   }
 
   switch(jsonData._type) {
-    case 'satchel_v1': {
+    case 'profile_v2': {
       const store = getInventoryStore();
       try {
         loadSatchelProfilesFromData(store, jsonData, false);
