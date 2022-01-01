@@ -227,7 +227,7 @@ async function onUploadClick() {
       }
     } break;
     default:
-      window.alert('Cannot load json with unknown data type.');
+      window.alert('Cannot load json - this is not a known format.');
   }
 }
 
@@ -464,7 +464,7 @@ async function onActionProfileImport() {
       }
     } break;
     default:
-      window.alert('Cannot load json with unknown data type.');
+      window.alert('Cannot load json - this is not a profile.');
       return;
   }
   onActionProfile();
