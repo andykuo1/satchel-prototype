@@ -13,7 +13,8 @@ import { addProfileInStore, getProfileInStore, isProfileInStore } from '../satch
 import { exportDataToJSON, importDataFromJSON } from './SatchelDataLoader.js';
 
 export function loadSatchelProfilesFromData(store, jsonData, overrideData) {
-  importDataFromJSON(jsonData, 'satchel_v1', (data) => {
+  return importDataFromJSON(jsonData, 'satchel_v1', (data) => {
+    let result = [];
     let inProfiles = data.profiles;
     let inInvs = data.invdata;
     let overrideInvIds = {};
@@ -46,6 +47,7 @@ export function loadSatchelProfilesFromData(store, jsonData, overrideData) {
       if (!overrideData) {
         const newProfile = copyProfile(store, profile);
         addProfileInStore(store, newProfile.profileId, newProfile);
+        result.push(newProfile.profileId);
       } else {
         if (isProfileInStore(store, profileId)) {
           const oldProfile = getProfileInStore(store, profileId);
@@ -54,8 +56,10 @@ export function loadSatchelProfilesFromData(store, jsonData, overrideData) {
         } else {
           addProfileInStore(store, profileId, profile);
         }
+        result.push(profileId);
       }
     }
+    return result;
   });
 }
 

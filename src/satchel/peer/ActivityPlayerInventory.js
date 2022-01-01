@@ -1,17 +1,13 @@
 import { ActivityBase } from './ActivityBase.js';
 
-import { getInventoryStore, isInventoryInStore, addInventoryToStore, getInventoryInStore, deleteInventoryFromStore } from '../../inventory/InventoryStore.js';
-import { getExistingInventory } from '../../inventory/InventoryTransfer.js';
-import { cloneInventory, createGridInventory } from '../../satchel/inv/Inv.js';
-import { dispatchInventoryChange } from '../../satchel/inv/InvEvents.js';
-import { exportInventoryToJSON, importInventoryFromJSON } from '../../satchel/inv/InvLoader.js';
+import { getInventoryStore, getInventoryInStore, deleteInventoryFromStore, createGridInventoryInStore } from '../../inventory/InventoryStore.js';
 import { SatchelLocal, SatchelRemote } from './SatchelLocal.js';
 import { getPlayerLastHeartbeat, getPlayerName, hasPlayerHeartbeat, setPlayerLastHeartbeat } from './PlayerState.js';
 import { loadFromStorage, saveToStorage } from '../../Storage.js';
-import { addProfileInStore, getProfileInStore, isProfileInStore } from '../profile/ProfileStore.js';
+import { addProfileInStore, deleteProfileInStore, getProfileInStore, isProfileInStore, setActiveProfileInStore } from '../profile/ProfileStore.js';
 import { createProfile } from '../profile/Profile.js';
 import { uuid } from '../../util/uuid.js';
-import { dispatchProfileChange } from '../profile/ProfileEvents.js';
+import { loadSatchelProfilesFromData, saveSatchelProfilesToData } from '../../session/SatchelLoader.js';
 
 /** @typedef {import('../../inventory/element/InventoryGridElement.js').InventoryGridElement} InventoryGridElement */
 
@@ -57,64 +53,22 @@ export class ActivityPlayerInventory extends ActivityBase {
   }
 
   /** @override */
-  static onRemoteClientDisconnected(localServer, remoteClient) {
-    const remotePlayerName = getPlayerName(remoteClient);
-    const clientDataName = `remote_data-${remotePlayerName}`;
-    try {
-      let store = getInventoryStore();
-      if (isInventoryInStore(store, clientDataName)) {
-        let inv = getInventoryInStore(store, clientDataName);
-        deleteInventoryFromStore(store, clientDataName, inv);
-      }
-      if (remoteClient.element) {
-        let child = /** @type {InventoryGridElement} */ (remoteClient.element);
-        child.parentElement.removeChild(child);
-        remoteClient.element = null;
-      }
-    } catch (e) {
-      console.error(`Failed to unload client inventory - ${e}`);
-    }
-  }
-
-  /** @override */
   static onRemoteServerConnected(localClient, remoteServer) {
     remoteServer.remoteData = {};
   }
 
-  // FIXME: Create a new Profile, it comes with no inventory. You can then create as many inventories in that profile as you want.
-  // For connected clients, they connect in a remote-only profile and then add/create new inventories. the server data should have an id
-  // This is preserved across clients. So when a client reconnects, they know whether to create a new profile or re-use an existing one.
-  // Offline profiles should be overwritten.
-  // Sync happens with profiles instead of just inventories.
   /** @override */
   static onRemoteServerMessage(localClient, remoteServer, messageType, messageData) {
     switch(messageType) {
       case 'reset':
-        const serverData = messageData;
-        remoteServer.remoteData = serverData;
-        let inv = createGridInventory(uuid(), 12, 9);
-        importInventoryFromJSON(serverData, inv);
-        const displayName = inv.displayName;
-        const profileId = `profile_remote-${displayName.toLowerCase()}`;
         const store = getInventoryStore();
-        let profile;
-        if (isProfileInStore(store, profileId)) {
-          profile = getProfileInStore(store, profileId);
-          let invId = profile.invs[0];
-          if (invId) {
-            let existing = getInventoryInStore(store, invId);
-            cloneInventory(inv, existing);
-            dispatchInventoryChange(store, invId);
-            return;
-          }
-        } else {
-          profile = createProfile(profileId);
-          addProfileInStore(store, profile.profileId, profile);
+        const playerName = getPlayerName(localClient);
+        const playerDataName = `remote-profile-${playerName}`;
+        let profiles = loadSatchelProfilesFromData(store, messageData, true);
+        if (profiles[0] !== playerDataName) {
+          console.error('Server and client disagree on data name!');
         }
-        addInventoryToStore(store, inv.invId, inv);
-        profile.displayName = displayName;
-        profile.invs.push(inv.invId);
-        dispatchProfileChange(store, profileId);
+        setActiveProfileInStore(store, profiles[0]);
         return true;
     }
     return false;
@@ -127,12 +81,13 @@ export class ActivityPlayerInventory extends ActivityBase {
    */
   static onRemoteServerNanny(localClient, remoteServer) {
     const store = getInventoryStore();
-    if (!isInventoryInStore(store, 'main')) {
+    const playerName = getPlayerName(localClient);
+    const playerDataName = `remote-profile-${playerName}`;
+    if (!isProfileInStore(store, playerDataName)) {
       return;
     }
-    const inv = getExistingInventory(store, 'main');
-    const jsonData = exportInventoryToJSON(inv);
-    remoteServer.sendMessage('sync', jsonData);
+    const satchelData = saveSatchelProfilesToData(store, [playerDataName]);
+    remoteServer.sendMessage('sync', satchelData);
   }
 
   /**
@@ -169,29 +124,13 @@ export class ActivityPlayerInventory extends ActivityBase {
         const now = performance.now();
         setPlayerLastHeartbeat(remoteClient, now);
         // Update server's copy of client data
-        const clientDataName = `remote_data-${remotePlayerName}`;
+        const clientDataName = `remote-profile-${remotePlayerName}`;
         const clientData = messageData;
-        localServer.localData[clientDataName] = clientData;
         let store = getInventoryStore();
         try {
-          if (!isInventoryInStore(store, clientDataName)) {
-            let inv = importInventoryFromJSON(clientData);
-            // Override id
-            inv.invId = clientDataName;
-            addInventoryToStore(store, clientDataName, inv);
-            let element = /** @type {InventoryGridElement} */ (
-              document.createElement('inventory-grid')
-            );
-            element.id = clientDataName;
-            element.invId = clientDataName;
-            remoteClient.element = element;
-            document.querySelector('#remoteWorkspace').appendChild(element);
-          } else {
-            let inv = getInventoryInStore(store, clientDataName);
-            importInventoryFromJSON(clientData, inv);
-            // Override id
-            inv.invId = clientDataName;
-            dispatchInventoryChange(store, clientDataName);
+          let profileIds = loadSatchelProfilesFromData(store, clientData, true);
+          if (profileIds[0] !== clientDataName) {
+            console.error('Server and client disagree on player data name!');
           }
         } catch (e) {
           console.error(`Failed to load client inventory - ${e}`);
@@ -203,18 +142,18 @@ export class ActivityPlayerInventory extends ActivityBase {
 
   /**
    * @param {SatchelRemote} remoteClient 
-   * @param {object} invData 
+   * @param {string} profileId 
    */
-  static sendPlayerReset(remoteClient, invData) {
-    if (!invData) {
-      // Create a new inventory for a new user
-      let inv = createGridInventory('main', 12, 7);
-      const remotePlayerName = getPlayerName(remoteClient);
-      inv.displayName = remotePlayerName.toUpperCase();
-      let jsonData = exportInventoryToJSON(inv);
-      invData = jsonData;
+  static sendPlayerReset(remoteClient, profileId) {
+    const store = getInventoryStore();
+    if (!isProfileInStore(store, profileId)) {
+      let newProfile = createProfile(profileId);
+      let newInv = createGridInventoryInStore(store, uuid(), 12, 9);
+      newProfile.invs.push(newInv.invId);
+      addProfileInStore(store, newProfile.profileId, newProfile);
     }
-    remoteClient.sendMessage('reset', invData);
+    let satchelData = saveSatchelProfilesToData(store, [profileId]);
+    remoteClient.sendMessage('reset', satchelData);
   }
 
   static resetLocalServerData(localServer, serverData) {
