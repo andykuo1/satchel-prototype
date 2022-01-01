@@ -351,6 +351,11 @@
         #inventoriesDialog h3 {
           margin: 0;
         }
+        #inventoriesDialog output {
+          display: block;
+          opacity: 0.6;
+          font-size: 0.4em;
+        }
         #activeInventoryList {
           display: flex;
           flex-direction: column;
@@ -382,6 +387,7 @@
       <fieldset>
         <legend>Name</legend>
         <input type="text" id="actionProfileEditName">
+        <output id="outputProfileEditId"></output>
       </fieldset>
       <fieldset>
         <legend>Inventory</legend>

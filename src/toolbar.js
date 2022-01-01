@@ -440,6 +440,9 @@ function prepareEditProfileDialog(store, profileId) {
   /** @type {HTMLInputElement} */
   const titleElement = document.querySelector('#actionProfileEditName');
   titleElement.value = profile.displayName;
+  /** @type {HTMLOutputElement} */
+  const outputElement = document.querySelector('#outputProfileEditId');
+  outputElement.textContent = profileId;
 }
 
 async function onActionProfileImport() {
