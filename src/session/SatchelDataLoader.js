@@ -1,6 +1,6 @@
 export function importDataFromJSON(jsonData, expectedType, dataCallback) {
   if (jsonData._type === expectedType) {
-    return dataCallback(jsonData._data);
+    return dataCallback(jsonData._data, jsonData._metadata);
   } else {
     throw new Error(`Invalid json data format for imported type '${expectedType}'.`);
   }

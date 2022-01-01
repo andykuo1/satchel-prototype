@@ -1,26 +1,21 @@
 import { downloadText } from './util/downloader.js';
-import { importInventoryFromJSON } from './satchel/inv/InvLoader.js';
 import { addInventoryToStore, deleteInventoryFromStore, getInventoryInStore, getInventoryStore, isInventoryInStore } from './inventory/InventoryStore.js';
-import { connectAsServer, isServerSide } from './app/PeerSatchelConnector.js';
+import { connectAsServer } from './app/PeerSatchelConnector.js';
 import { getCursorContext } from './inventory/CursorHelper.js';
-import { getExistingInventory } from './inventory/InventoryTransfer.js';
 import { uploadFile } from './util/uploader.js';
 import { copyToClipboard, pasteFromClipboard } from './util/clipboard.js';
 import { ItemBuilder } from './satchel/item/Item.js';
 import { uuid } from './util/uuid.js';
 import { ItemAlbumElement } from './satchel/album/ItemAlbumElement.js';
-import { exportDataToJSON } from './session/SatchelDataLoader.js';
 import { exportItemToString, importItemFromJSON, importItemFromString } from './satchel/item/ItemLoader.js';
 import { importAlbumFromJSON } from './satchel/album/AlbumLoader.js';
 import { addAlbumInStore, createAlbumInStore } from './satchel/album/AlbumStore.js';
 import { copyAlbum } from './satchel/album/Album.js';
 import { dispatchAlbumChange } from './satchel/album/AlbumEvents.js';
-import { dispatchInventoryChange } from './satchel/inv/InvEvents.js';
 import { closeFoundry, copyFoundry, isFoundryOpen, openFoundry } from './inventory/FoundryHelper.js';
 import { ActivityPlayerList } from './satchel/peer/ActivityPlayerList.js';
-import { ActivityPlayerInventory } from './satchel/peer/ActivityPlayerInventory.js';
 import { dropItemOnGround } from './satchel/GroundAlbum.js';
-import { forceEmptyStorage, loadFromStorage, saveToStorage } from './Storage.js';
+import { forceEmptyStorage } from './Storage.js';
 import { addProfileInStore, deleteProfileInStore, getActiveProfileInStore, getProfileIdsInStore, getProfileInStore, isProfileInStore, setActiveProfileInStore } from './satchel/profile/ProfileStore.js';
 import { loadSatchelProfilesFromData, saveSatchelProfilesToData } from './session/SatchelLoader.js';
 import { createProfile } from './satchel/profile/Profile.js';
@@ -56,6 +51,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   elementEventListener('#actionProfile', 'click', onActionProfile);
   elementEventListener('#actionProfileNew', 'click', onActionProfileNew);
+  elementEventListener('#actionProfileImport', 'click', onActionProfileImport);
 
   elementEventListener('#actionProfileInvNew', 'click', onActionProfileInvNew);
   elementEventListener('#actionProfileInvSubmit', 'click', onActionProfileInvSubmit);
@@ -125,6 +121,9 @@ function onGiftCodeExport() {
 }
 
 function onActionEraseAll() {
+  if (!window.confirm('This will erase all content. Are you sure?')) {
+    return;
+  }
   forceEmptyStorage();
   window.location.reload();
 }
@@ -173,27 +172,9 @@ function onActionNewItem() {
 
 function onDownloadClick() {
   const timestamp = Date.now();
-  if (isServerSide()) {
-    let serverData;
-    try {
-      let string = loadFromStorage('server_data');
-      serverData = JSON.parse(string);
-    } catch {
-      serverData = {};
-    }
-    const jsonData = exportDataToJSON('server_v1', serverData, {});
-    const dataString = JSON.stringify(jsonData, null, 4);
-    downloadText(`satchel-server-data-${timestamp}.json`, dataString);
-  } else {
-    const store = getInventoryStore();
-    const activeProfile = getActiveProfileInStore(store);
-    if (activeProfile) {
-      const profileData = saveSatchelProfilesToData(store, [activeProfile.profileId]);
-      const jsonData = exportDataToJSON('client_v1', profileData, {});
-      const dataString = JSON.stringify(jsonData, null, 4);
-      downloadText(`satchel-client-data-${timestamp}.json`, dataString);
-    }
-  }
+  const store = getInventoryStore();
+  const json = saveSatchelProfilesToData(store, getProfileIdsInStore(store));
+  downloadText(`satchel-data-${timestamp}.json`, JSON.stringify(json, null, 4));
 }
 
 async function onUploadClick() {
@@ -208,44 +189,41 @@ async function onUploadClick() {
   }
 
   switch(jsonData._type) {
-    case 'inv_v2':
-    case 'inv_v1': {
-      const store = getInventoryStore();
-      let inv = getExistingInventory(store, 'main');
-      importInventoryFromJSON(jsonData, inv);
-      dispatchInventoryChange(store, 'main');
-    } break;
     case 'album_v1': {
       const store = getInventoryStore();
-      const album = importAlbumFromJSON(jsonData);
-      const newAlbum = copyAlbum(album);
-      addAlbumInStore(store, newAlbum.albumId, newAlbum);
-      const albumContainer = document.querySelector('#albumList');
-      const albumElement = new ItemAlbumElement();
-      albumElement.albumId = newAlbum.albumId;
-      albumContainer.appendChild(albumElement);
-      dispatchAlbumChange(store, newAlbum.albumId);
-    } break;
-    case 'item_v1': {
-      let item = importItemFromJSON(jsonData);
-      dropItemOnGround(item);
-    } break;
-    case 'client_v1': {
-      const store = getInventoryStore();
-      const data = jsonData._data;
       try {
-        loadSatchelProfilesFromData(store, data);
+        const album = importAlbumFromJSON(jsonData);
+        const newAlbum = copyAlbum(album);
+        addAlbumInStore(store, newAlbum.albumId, newAlbum);
+        const albumContainer = document.querySelector('#albumList');
+        const albumElement = new ItemAlbumElement();
+        albumElement.albumId = newAlbum.albumId;
+        albumContainer.appendChild(albumElement);
+        dispatchAlbumChange(store, newAlbum.albumId);
       } catch (e) {
-        console.error('Failed to load client profile from file.');
+        console.error('Failed to load album from file.');
         console.error(e);
       }
     } break;
-    case 'server_v1': {
-      const data = jsonData._data;
-      saveToStorage('server_data', JSON.stringify(data));
-      const ctx = getCursorContext();
-      if (ctx.server && ctx.server.instance) {
-        ActivityPlayerInventory.resetLocalServerData(ctx.server.instance, data);
+    case 'item_v1': {
+      try {
+        let item = importItemFromJSON(jsonData);
+        dropItemOnGround(item);
+      } catch (e) {
+        console.error('Failed to load item from file.');
+        console.error(e);
+      }
+    } break;
+    case 'satchel_v1': {
+      if (!window.confirm('This may overwrite data. Do you want to continue?')) {
+        return;
+      }
+      const store = getInventoryStore();
+      try {
+        loadSatchelProfilesFromData(store, jsonData, true);
+      } catch (e) {
+        console.error('Failed to load satchel from file.');
+        console.error(e);
       }
     } break;
     default:
@@ -354,6 +332,12 @@ function onActionProfile() {
     editElement.setAttribute('alt', 'edit');
     editElement.setAttribute('title', 'Edit Profile');
     editElement.addEventListener('click', onActionProfileEdit);
+    let exportElement = document.createElement('icon-button');
+    exportElement.setAttribute('data-profile', profileId);
+    exportElement.setAttribute('icon', 'res/download.svg');
+    exportElement.setAttribute('alt', 'export');
+    exportElement.setAttribute('title', 'Export Profile');
+    exportElement.addEventListener('click', onActionProfileExport);
     let deleteElement = document.createElement('icon-button');
     deleteElement.setAttribute('data-profile', profileId);
     deleteElement.setAttribute('icon', 'res/delete.svg');
@@ -365,6 +349,7 @@ function onActionProfile() {
     containerElement.appendChild(element);
     containerElement.appendChild(labelElement);
     containerElement.appendChild(editElement);
+    containerElement.appendChild(exportElement);
     containerElement.appendChild(deleteElement);
     rootContainerElement.appendChild(containerElement);
   }
@@ -455,6 +440,48 @@ function prepareEditProfileDialog(store, profileId) {
   /** @type {HTMLInputElement} */
   const titleElement = document.querySelector('#actionProfileEditName');
   titleElement.value = profile.displayName;
+}
+
+async function onActionProfileImport() {
+  let files = await uploadFile('.json');
+  let file = files[0];
+
+  let jsonData;
+  try {
+    jsonData = JSON.parse(await file.text());
+  } catch {
+    window.alert('Cannot load file with invalid json format.');
+  }
+
+  switch(jsonData._type) {
+    case 'satchel_v1': {
+      const store = getInventoryStore();
+      try {
+        loadSatchelProfilesFromData(store, jsonData, false);
+      } catch (e) {
+        console.error('Failed to load satchel from file.');
+        console.error(e);
+      }
+    } break;
+    default:
+      window.alert('Cannot load json with unknown data type.');
+      return;
+  }
+  onActionProfile();
+}
+
+function onActionProfileExport(e) {
+  const store = getInventoryStore();
+  /** @type {HTMLButtonElement} */
+  const target = e.target;
+  const profileId = target.getAttribute('data-profile');
+  if (!isProfileInStore(store, profileId)) {
+    return;
+  }
+  const profile = getProfileInStore(store, profileId);
+  const name = profile.displayName || 'Profile';
+  const json = saveSatchelProfilesToData(store, [profile.profileId]);
+  downloadText(`${name}-profile.json`, JSON.stringify(json, null, 4));
 }
 
 function onActionProfileDelete(e) {

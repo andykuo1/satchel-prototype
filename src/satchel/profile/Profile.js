@@ -40,17 +40,6 @@ export function copyProfile(store, other, dst = undefined) {
   if (result.profileId === other.profileId) {
     result.profileId = uuid();
   }
-  if (Array.isArray(result.invs)) {
-    // Copy all inventories
-    let newInvIds = [];
-    for(let invId of result.invs) {
-      let inv = getInventoryInStore(store, invId);
-      let newInv = copyInventory(inv);
-      addInventoryToStore(store, newInv.invId, newInv);
-      newInvIds.push(newInv.invId);
-    }
-    result.invs = newInvIds;
-  }
   return result;
 }
 
