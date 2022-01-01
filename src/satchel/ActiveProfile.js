@@ -1,8 +1,9 @@
 import { getCursorContext } from '../inventory/CursorHelper.js';
-import { getInventoryStore } from '../inventory/InventoryStore.js';
+import { createGridInventoryInStore, getInventoryStore } from '../inventory/InventoryStore.js';
 import { uuid } from '../util/uuid.js';
+import { createProfile } from './profile/Profile.js';
 import { addActiveProfileChangeListener, addProfileChangeListener, removeActiveProfileChangeListener, removeProfileChangeListener } from './profile/ProfileEvents.js';
-import { createProfileInStore, getActiveProfileInStore, getProfileInStore, getProfileIdsInStore, hasActiveProfileInStore, isProfileInStore, setActiveProfileInStore } from './profile/ProfileStore.js';
+import { getActiveProfileInStore, getProfileInStore, getProfileIdsInStore, hasActiveProfileInStore, isProfileInStore, setActiveProfileInStore, addProfileInStore } from './profile/ProfileStore.js';
 
 export function setupActiveProfile() {
   const store = getInventoryStore();
@@ -12,6 +13,9 @@ export function setupActiveProfile() {
   addActiveProfileChangeListener(onActiveProfileChange);
   addProfileChangeListener(activeProfile.profileId, onProfileChange);
   onProfileChange();
+
+  // Enable profile editing
+  document.querySelector('#actionProfile').toggleAttribute('disabled', false);
 }
 
 export function teardownActiveProfile() {
@@ -42,7 +46,11 @@ export function resolveActiveProfile(store) {
     setActiveProfileInStore(store, nextProfileId);
     return getProfileInStore(store, nextProfileId);
   }
-  let newProfile = createProfileInStore(store, uuid());
+  // Create the default active profile if none exists.
+  let newProfile = createProfile(uuid());
+  let newInv = createGridInventoryInStore(store, uuid(), 12, 9);
+  newProfile.invs.push(newInv.invId);
+  addProfileInStore(store, newProfile.profileId, newProfile);
   setActiveProfileInStore(store, newProfile.profileId);
   return newProfile;
 }
