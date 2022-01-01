@@ -2,6 +2,8 @@ const GLOBAL_LISTENERS = {
   item: {},
   inventory: {},
   album: {},
+  profile: {},
+  activeProfile: {},
 };
 
 /**

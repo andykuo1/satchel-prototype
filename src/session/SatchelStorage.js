@@ -1,43 +1,24 @@
-import { cloneAlbum } from '../satchel/album/Album.js';
-import { dispatchAlbumChange } from '../satchel/album/AlbumEvents.js';
-import { exportAlbumToJSON, importAlbumFromJSON } from '../satchel/album/AlbumLoader.js';
 import {
-  addAlbumInStore,
-  getAlbumInStore,
-  getAlbumsInStore,
-  isAlbumInStore,
+  getAlbumIdsInStore,
 } from '../satchel/album/AlbumStore.js';
-import { exportInventoryToJSON, importInventoryFromJSON } from '../satchel/inv/InvLoader.js';
 import {
-  createGridInventoryInStore,
-  getInventoryInStore,
   getInventoryStore,
-  isInventoryInStore,
 } from '../inventory/InventoryStore.js';
-import { dispatchInventoryChange } from '../satchel/inv/InvEvents.js';
 import { loadFromStorage, saveToStorage } from '../Storage.js';
+import { getProfileIdsInStore } from '../satchel/profile/ProfileStore.js';
+import { loadSatchelAlbumsFromData, loadSatchelProfilesFromData, saveSatchelAlbumsToData, saveSatchelProfilesToData } from './SatchelLoader.js';
 
 export function loadSatchelFromStorage() {
   const store = getInventoryStore();
 
-  // Resolve store data
-  let mainInventory;
-  if (isInventoryInStore(store, 'main')) {
-    mainInventory = getInventoryInStore(store, 'main');
-  } else {
-    mainInventory = createGridInventoryInStore(store, 'main', 12, 7);
-  }
-
   // Load from storage...
-  let invData = loadFromStorage('satchel_data_v3');
-  if (invData) {
+  let satchelData = loadFromStorage('satchel_data_v4');
+  if (satchelData) {
     try {
-      let jsonData = JSON.parse(invData);
-      importInventoryFromJSON(jsonData, mainInventory);
-      mainInventory.displayName = '';
-      dispatchInventoryChange(store, mainInventory.invId);
+      let jsonData = JSON.parse(satchelData);
+      loadSatchelProfilesFromData(store, jsonData, true);
     } catch (e) {
-      console.error('Failed to load inventory from storage.');
+      console.error('Failed to load satchel from storage.');
       console.error(e);
     }
   }
@@ -45,17 +26,7 @@ export function loadSatchelFromStorage() {
   if (albumData) {
     try {
       let jsonData = JSON.parse(albumData);
-      for (let albumJson of jsonData) {
-        const album = importAlbumFromJSON(albumJson);
-        const albumId = album.albumId;
-        if (isAlbumInStore(store, albumId)) {
-          const oldAlbum = getAlbumInStore(store, albumId);
-          cloneAlbum(album, oldAlbum);
-          dispatchAlbumChange(store, albumId);
-        } else {
-          addAlbumInStore(store, albumId, album);
-        }
-      }
+      loadSatchelAlbumsFromData(store, jsonData);
     } catch (e) {
       console.error('Failed to load album from storage.');
       console.error(e);
@@ -65,24 +36,18 @@ export function loadSatchelFromStorage() {
 
 export function saveSatchelToStorage() {
   const store = getInventoryStore();
-  if (isInventoryInStore(store, 'main')) {
-    try {
-      let mainInventory = getInventoryInStore(store, 'main');
-      let invData = exportInventoryToJSON(mainInventory);
-      saveToStorage('satchel_data_v3', JSON.stringify(invData));
-    } catch (e) {
-      console.error(e);
-    }
+  try {
+    let profileIds = getProfileIdsInStore(store);
+    let profileData = saveSatchelProfilesToData(store, profileIds);
+    saveToStorage('satchel_data_v4', JSON.stringify(profileData));
+  } catch (e) {
+    console.error(e);
   }
-
-  let albums = getAlbumsInStore(store);
-  let albumData = [];
-  for (let album of albums) {
-    try {
-      albumData.push(exportAlbumToJSON(album));
-    } catch (e) {
-      console.error(e);
-    }
+  try {
+    let albumIds = getAlbumIdsInStore(store);
+    let albumData = saveSatchelAlbumsToData(store, albumIds);
+    saveToStorage('satchel_album_v3', JSON.stringify(albumData));
+  } catch (e) {
+    console.error(e);
   }
-  saveToStorage('satchel_album_v3', JSON.stringify(albumData));
 }

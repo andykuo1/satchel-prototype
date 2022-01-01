@@ -13,8 +13,10 @@ import './app/index.js';
 import './inventory/element/index.js';
 import './satchel/cards/index.js';
 import './satchel/album/index.js';
+import './satchel/profile/index.js';
 import './toolbar.js';
 import { isGroundAlbum } from './satchel/GroundAlbum.js';
+import { setupActiveProfile } from './satchel/ActiveProfile.js';
 
 async function connect() {
   let session = resolveSessionStatus();
@@ -70,6 +72,9 @@ async function onDocumentFocusUpdate() {
       albumElement.albumId = album.albumId;
       albumContainer.appendChild(albumElement);
     }
+    // Set up active profile
+    setupActiveProfile();
+    // Set up autosave
     setInterval(() => {
       saveSatchelToStorage();
     }, 1_000);

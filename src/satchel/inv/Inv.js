@@ -114,23 +114,34 @@ export function cloneInventory(other, dst = undefined, opts = {}) {
     dst.height = height;
     dst.length = length;
   }
+  let overrideItemIds = {};
   if (typeof other.items === 'object') {
     if (preserveItemId) {
       for(let item of Object.values(other.items)) {
         let newItem = cloneItem(item);
-        dst.items[newItem.itemId] = item;
+        dst.items[newItem.itemId] = newItem;
       }
     } else {
       for(let item of Object.values(other.items)) {
         let newItem = copyItem(item);
-        dst.items[newItem.itemId] = item;
+        overrideItemIds[item.itemId] = newItem.itemId;
+        dst.items[newItem.itemId] = newItem;
       }
     }
   }
   if (Array.isArray(other.slots)) {
-    const length = Math.min(other.slots.length, dst.slots.length);
-    for (let i = 0; i < length; ++i) {
-      dst.slots[i] = other.slots[i];
+    if (preserveItemId) {
+      const length = Math.min(other.slots.length, dst.slots.length);
+      for (let i = 0; i < length; ++i) {
+        dst.slots[i] = other.slots[i];
+      }
+    } else {
+      const length = Math.min(other.slots.length, dst.slots.length);
+      for (let i = 0; i < length; ++i) {
+        let otherItemId = other.slots[i];
+        let newItemId = overrideItemIds[otherItemId];
+        dst.slots[i] = newItemId || null;
+      }
     }
   }
   if (typeof other.displayName === 'string') {
