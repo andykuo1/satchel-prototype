@@ -5,6 +5,7 @@ import { dispatchAlbumChange } from './AlbumEvents.js';
 import { getExistingAlbumInStore } from './AlbumStore.js';
 
 /**
+ * @typedef {import('../../inventory/InventoryStore').InventoryStore} Store
  * @typedef {import('../inv/Inv.js').InventoryId} InvId
  * @typedef {import('../item/Item.js').Item} Item
  * @typedef {import('../item/Item.js').ItemId} ItemId
@@ -16,8 +17,9 @@ import { getExistingAlbumInStore } from './AlbumStore.js';
  * @typedef Album
  * @property {AlbumId} albumId
  * @property {Record<ItemId, Item>} items
- * @property {boolean} locked
  * @property {string} displayName
+ * @property {boolean} locked
+ * @property {boolean} hidden
  */
 
 /**
@@ -30,6 +32,7 @@ export function createAlbum(albumId) {
     items: {},
     locked: false,
     displayName: 'Untitled',
+    hidden: false,
   };
   return album;
 }
@@ -77,11 +80,12 @@ export function cloneAlbum(other, dst = undefined, opts = {}) {
   }
   dst.displayName = String(other.displayName);
   dst.locked = Boolean(other.locked);
+  dst.hidden = Boolean(other.hidden);
   return dst;
 }
 
 /**
- * @param {import('../../inventory/InventoryStore').InventoryStore} store
+ * @param {Store} store
  * @param {AlbumId} albumId 
  * @param {boolean} locked 
  */
@@ -94,11 +98,34 @@ export function setAlbumLocked(store, albumId, locked) {
 }
 
 /**
- * @param {import('../../inventory/InventoryStore').InventoryStore} store
+ * @param {Store} store
  * @param {AlbumId} albumId 
  * @returns {boolean}
  */
 export function isAlbumLocked(store, albumId) {
   let album = getExistingAlbumInStore(store, albumId);
   return album.locked;
+}
+
+/**
+ * @param {Store} store
+ * @param {AlbumId} albumId 
+ * @param {boolean} hidden 
+ */
+ export function setAlbumHidden(store, albumId, hidden) {
+  let album = getExistingAlbumInStore(store, albumId);
+  if (album.hidden !== hidden) {
+    album.hidden = hidden;
+    dispatchAlbumChange(store, albumId);
+  }
+}
+
+/**
+ * @param {Store} store
+ * @param {AlbumId} albumId 
+ * @returns {boolean}
+ */
+ export function isAlbumHidden(store, albumId) {
+  let album = getExistingAlbumInStore(store, albumId);
+  return album.hidden;
 }

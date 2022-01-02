@@ -53,7 +53,7 @@ h2 {
   padding-bottom: 2rem;
   margin: 0;
   overflow: hidden;
-  text-overflow: ellipsis;
+  text-overflow: clip;
   border-radius: 1em;
   text-align: center;
   color: white;

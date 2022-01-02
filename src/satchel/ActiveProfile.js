@@ -99,6 +99,16 @@ function onProfileChange() {
     invElement.invId = invId;
     invsContainer.appendChild(invElement);
   }
+  for(let albumId of activeProfile.albums) {
+    let elementId = `profile_album-${albumId}`;
+    let albumElement =
+    /** @type {import('./album/AlbumSpaceElement.js').AlbumSpaceElement} */ (
+      document.createElement('album-space')
+    );
+    albumElement.id = elementId;
+    albumElement.albumId = albumId;
+    invsContainer.appendChild(albumElement);
+  }
   /** @type {HTMLInputElement} */
   let profileTitle = document.querySelector('#appTitle');
   profileTitle.textContent = activeProfile.displayName;

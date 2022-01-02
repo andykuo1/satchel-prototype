@@ -1,10 +1,10 @@
-import { addInventoryToStore, getInventoryInStore } from '../../inventory/InventoryStore.js';
 import { uuid } from '../../util/uuid.js';
-import { copyInventory } from '../inv/Inv.js';
 
 /**
  * @typedef {import('../inv/Inv.js').InventoryId} InvId
  * @typedef {import('../../inventory/InventoryStore').InventoryStore} Store
+ * 
+ * @typedef {import('../album/Album.js').AlbumId} AlbumId
  */
 
 /**
@@ -13,6 +13,7 @@ import { copyInventory } from '../inv/Inv.js';
  * @typedef Profile
  * @property {ProfileId} profileId
  * @property {Array<InvId>} invs
+ * @property {Array<AlbumId>} albums
  * @property {string} displayName
  */
 
@@ -24,6 +25,7 @@ export function createProfile(profileId) {
   let profile = {
     profileId,
     invs: [],
+    albums: [],
     displayName: 'Satchel',
   };
   return profile;
@@ -58,6 +60,9 @@ export function cloneProfile(other, dst = undefined) {
   if (Array.isArray(other.invs)) {
     dst.invs = [...other.invs];
   }
+  if (Array.isArray(other.albums)) {
+    dst.albums = [...other.albums];
+  }
   dst.displayName = String(other.displayName);
   return dst;
 }
@@ -68,4 +73,12 @@ export function cloneProfile(other, dst = undefined) {
  */
 export function getProfileInvIds(profile) {
   return profile.invs;
+}
+
+/**
+ * @param {Profile} profile 
+ * @returns {Array<AlbumId>}
+ */
+ export function getProfileAlbumIds(profile) {
+  return profile.albums;
 }

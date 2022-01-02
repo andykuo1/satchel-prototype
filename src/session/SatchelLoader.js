@@ -1,5 +1,5 @@
 import { addInventoryToStore, getInventoryInStore, isInventoryInStore } from '../inventory/InventoryStore.js';
-import { cloneAlbum, copyAlbum } from '../satchel/album/Album.js';
+import { cloneAlbum, copyAlbum, isAlbumHidden } from '../satchel/album/Album.js';
 import { dispatchAlbumChange } from '../satchel/album/AlbumEvents.js';
 import { exportAlbumToJSON, importAlbumFromJSON } from '../satchel/album/AlbumLoader.js';
 import {
@@ -43,6 +43,8 @@ export function loadSatchelFromData(store, jsonData, overrideData) {
 export function saveSatchelToData(store, dst = {}) {
   const profileIds = getProfileIdsInStore(store);
   const albumIds = getAlbumIdsInStore(store);
+  // Do not save hidden albums
+  albumIds.filter(albumId => !isAlbumHidden(store, albumId));
   const profilesData = saveSatchelProfilesToData(store, profileIds);
   const albumsData = saveSatchelAlbumsToData(store, albumIds);
   const data = {
@@ -57,7 +59,9 @@ export function loadSatchelProfilesFromData(store, jsonData, overrideData) {
     let result = [];
     let inProfiles = data.profdata;
     let inInvs = data.invdata;
+    let inAlbums = data.albdata;
     let overrideInvIds = {};
+    let overrideAlbumIds = {};
     for (let invId of Object.keys(inInvs)) {
       let invJson = inInvs[invId];
       if (invJson) {
@@ -77,6 +81,25 @@ export function loadSatchelProfilesFromData(store, jsonData, overrideData) {
         }
       }
     }
+    for(let albumId of Object.keys(inAlbums)) {
+      let albumJson = inAlbums[albumId];
+      if (albumJson) {
+        const album = importAlbumFromJSON(albumJson);
+        if (!overrideData) {
+          const newAlbum = copyAlbum(album);
+          overrideAlbumIds[albumId] = newAlbum.albumId;
+          addAlbumInStore(store, newAlbum.albumId, newAlbum);
+        } else {
+          if (isAlbumInStore(store, albumId)) {
+            const oldAlbum = getAlbumInStore(store, albumId);
+            cloneAlbum(album, oldAlbum);
+            dispatchAlbumChange(store, albumId);
+          } else {
+            addAlbumInStore(store, albumId, album);
+          }
+        }
+      }
+    }
     for (let profileJson of inProfiles) {
       const profile = importProfileFromJSON(profileJson);
       const profileId = profile.profileId;
@@ -84,6 +107,10 @@ export function loadSatchelProfilesFromData(store, jsonData, overrideData) {
       profile.invs = profile.invs
         .map((invId) => overrideInvIds[invId] || invId)
         .filter((invId) => isInventoryInStore(store, invId));
+      // NOTE: Same with albums
+      profile.albums = profile.albums
+        .map((albumId) => overrideAlbumIds[albumId] || albumId)
+        .filter((albumId) => isAlbumInStore(store, albumId));
       if (!overrideData) {
         const newProfile = copyProfile(store, profile);
         addProfileInStore(store, newProfile.profileId, newProfile);
@@ -106,12 +133,17 @@ export function loadSatchelProfilesFromData(store, jsonData, overrideData) {
 export function saveSatchelProfilesToData(store, profileIds, dst = {}) {
   let outProfiles = [];
   let outInvs = {};
+  let outAlbums = {};
   for (let profileId of profileIds) {
     let profile = getProfileInStore(store, profileId);
     try {
       for (let invId of profile.invs) {
         let inv = getInventoryInStore(store, invId);
         outInvs[invId] = exportInventoryToJSON(inv);
+      }
+      for(let albumId of profile.albums) {
+        let album = getAlbumInStore(store, albumId);
+        outAlbums[albumId] = exportAlbumToJSON(album);
       }
       outProfiles.push(exportProfileToJSON(profile));
     } catch (e) {
@@ -121,6 +153,7 @@ export function saveSatchelProfilesToData(store, profileIds, dst = {}) {
   let result = {
     profdata: outProfiles,
     invdata: outInvs,
+    albdata: outAlbums,
   };
   return exportDataToJSON('profile_v2', result, {}, dst);
 }

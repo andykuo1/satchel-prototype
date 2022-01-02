@@ -9,8 +9,8 @@ import { uuid } from './util/uuid.js';
 import { ItemAlbumElement } from './satchel/album/ItemAlbumElement.js';
 import { exportItemToString, importItemFromJSON, importItemFromString } from './satchel/item/ItemLoader.js';
 import { importAlbumFromJSON } from './satchel/album/AlbumLoader.js';
-import { addAlbumInStore, createAlbumInStore, getAlbumIdsInStore, getAlbumInStore } from './satchel/album/AlbumStore.js';
-import { copyAlbum } from './satchel/album/Album.js';
+import { addAlbumInStore, createAlbumInStore, deleteAlbumInStore, getAlbumIdsInStore, getAlbumInStore, isAlbumInStore } from './satchel/album/AlbumStore.js';
+import { copyAlbum, createAlbum, isAlbumHidden } from './satchel/album/Album.js';
 import { dispatchAlbumChange } from './satchel/album/AlbumEvents.js';
 import { clearFoundry, closeFoundry, copyFoundry, isFoundryOpen, openFoundry } from './inventory/FoundryHelper.js';
 import { ActivityPlayerList } from './satchel/peer/ActivityPlayerList.js';
@@ -139,7 +139,7 @@ function onActionAlbumNew() {
   albumContainer.appendChild(albumElement);
 }
 
-function onActionAlbumOpen(e) {
+function onActionAlbumOpen() {
   const store = getInventoryStore();
   const albumIds = getAlbumIdsInStore(store);
   const albumElementList = document.querySelector('#albumList');
@@ -160,6 +160,10 @@ function onActionAlbumOpen(e) {
     const album = getAlbumInStore(store, albumId);
     if (isGroundAlbum(album)) {
       // Ground album is always displayed in a separate sidebar
+      continue;
+    }
+    // Hidden albums are not shown, so don't create it.
+    if (isAlbumHidden(store, albumId)) {
       continue;
     }
     const albumElement = new ItemAlbumElement();
@@ -236,7 +240,13 @@ async function onUploadClick() {
     case 'profile_v2': {
       const store = getInventoryStore();
       try {
-        loadSatchelProfilesFromData(store, jsonData, false);
+        let loadedProfileIds = loadSatchelProfilesFromData(store, jsonData, false);
+        if (loadedProfileIds) {
+          let profileId = loadedProfileIds[0];
+          if (profileId) {
+            setActiveProfileInStore(store, profileId);
+          }
+        }
       } catch (e) {
         console.error('Failed to load satchel from file.');
         console.error(e);
@@ -248,11 +258,17 @@ async function onUploadClick() {
         const album = importAlbumFromJSON(jsonData);
         const newAlbum = copyAlbum(album);
         addAlbumInStore(store, newAlbum.albumId, newAlbum);
-        const albumContainer = document.querySelector('#albumList');
+        const albumList = document.querySelector('#albumList');
         const albumElement = new ItemAlbumElement();
         albumElement.albumId = newAlbum.albumId;
-        albumContainer.appendChild(albumElement);
+        albumList.appendChild(albumElement);
         dispatchAlbumChange(store, newAlbum.albumId);
+
+        // Make sure to open the container
+        let albumContainer = document.querySelector('.albumContainer');
+        if (!albumContainer.classList.contains('open')) {
+          onActionAlbumOpen();
+        }
       } catch (e) {
         console.error('Failed to load album from file.');
         console.error(e);
@@ -483,6 +499,22 @@ function prepareEditProfileDialog(store, profileId) {
     containerElement.appendChild(deleteElement);
     rootContainerElement.appendChild(containerElement);
   }
+  for(let albumId of profile.albums) {
+    let album = getAlbumInStore(store, albumId);
+    let labelElement = document.createElement('label');
+    labelElement.textContent = `${album.displayName || 'Inventory'} | ∞`;
+    let deleteElement = document.createElement('icon-button');
+    deleteElement.setAttribute('data-profile', profileId);
+    deleteElement.setAttribute('data-album', albumId);
+    deleteElement.setAttribute('icon', 'res/delete.svg');
+    deleteElement.setAttribute('alt', 'delete');
+    deleteElement.setAttribute('title', 'Delete Inventory');
+    deleteElement.addEventListener('click', onActionProfileAlbumDelete);
+    let containerElement = document.createElement('div');
+    containerElement.appendChild(labelElement);
+    containerElement.appendChild(deleteElement);
+    rootContainerElement.appendChild(containerElement);
+  }
   /** @type {HTMLInputElement} */
   const titleElement = document.querySelector('#actionProfileEditName');
   titleElement.value = profile.displayName;
@@ -506,7 +538,13 @@ async function onActionProfileImport() {
     case 'profile_v2': {
       const store = getInventoryStore();
       try {
-        loadSatchelProfilesFromData(store, jsonData, false);
+        let loadedProfileIds = loadSatchelProfilesFromData(store, jsonData, false);
+        if (loadedProfileIds) {
+          let profileId = loadedProfileIds[0];
+          if (profileId) {
+            setActiveProfileInStore(store, profileId);
+          }
+        }
       } catch (e) {
         console.error('Failed to load satchel from file.');
         console.error(e);
@@ -551,6 +589,30 @@ function onActionProfileDelete(e) {
   }
   deleteProfileInStore(store, profile.profileId, profile);
   onActionProfile();
+}
+
+function onActionProfileAlbumDelete(e) {
+  if (!window.confirm('Are you sure you want to delete this inventory?')) {
+    return;
+  }
+  const store = getInventoryStore();
+  const profileId = e.target.getAttribute('data-profile');
+  if (!isProfileInStore(store, profileId)) {
+    return;
+  }
+  const albumId = e.target.getAttribute('data-album');
+  if (!isAlbumInStore(store, albumId)) {
+    return;
+  }
+  let profile = getProfileInStore(store, profileId);
+  let i = profile.albums.indexOf(albumId);
+  if (i >= 0) {
+    profile.albums.splice(i, 1);
+    dispatchProfileChange(store, profileId);
+  }
+  let album = getAlbumInStore(store, albumId);
+  deleteAlbumInStore(store, albumId, album);
+  prepareEditProfileDialog(store, profileId);
 }
 
 function onActionProfileInvDelete(e) {
@@ -607,22 +669,32 @@ function onActionProfileInvSubmit() {
   let width = Math.min(99, Math.max(1, Number(actionProfileInvWidth.value) || 0));
   let height = Math.min(99, Math.max(1, Number(actionProfileInvHeight.value) || 0));
   const newInvId = uuid();
-  let newInv;
-  switch(type) {
-    case 'grid':
-      newInv = createGridInventory(newInvId, width, height);
-      break;
-    case 'socket':
-      newInv = createSocketInventory(newInvId);
-      break;
-    default:
-      throw new Error('Unknown inventory type.');
+  if (type === 'space') {
+    const newAlbumId = uuid();
+    const newAlbum = createAlbum(newAlbumId);
+    newAlbum.displayName = title;
+    newAlbum.hidden = true;
+    addAlbumInStore(store, newAlbumId, newAlbum);
+    activeProfile.albums.push(newAlbumId);
+  } else {
+    let newInv;
+    switch(type) {
+      case 'grid':
+        newInv = createGridInventory(newInvId, width, height);
+        break;
+      case 'socket':
+        newInv = createSocketInventory(newInvId);
+        break;
+      default:
+        throw new Error('Unknown inventory type.');
+    }
+    newInv.displayName = title;
+    addInventoryToStore(store, newInv.invId, newInv);
+    activeProfile.invs.push(newInvId);
   }
-  newInv.displayName = title;
-  addInventoryToStore(store, newInv.invId, newInv);
-  activeProfile.invs.push(newInvId);
   dispatchProfileChange(store, activeProfile.profileId);
   prepareEditProfileDialog(store, activeProfile.profileId);
+  
   /** @type {import('./app/DialogPromptElement.js').DialogPromptElement} */
   const profileInventoryDialog = document.querySelector('#profileInventoryDialog');
   profileInventoryDialog.toggleAttribute('open', false);

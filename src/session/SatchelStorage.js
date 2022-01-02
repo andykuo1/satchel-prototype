@@ -8,6 +8,7 @@ import {
   saveSatchelAlbumsToData,
   saveSatchelProfilesToData,
 } from './SatchelLoader.js';
+import { isAlbumHidden } from '../satchel/album/Album.js';
 
 export function loadSatchelFromStorage() {
   const store = getInventoryStore();
@@ -46,6 +47,8 @@ export function saveSatchelToStorage() {
   }
   try {
     let albumIds = getAlbumIdsInStore(store);
+    // Do not save hidden albums
+    albumIds.filter(albumId => !isAlbumHidden(store, albumId));
     let albumData = saveSatchelAlbumsToData(store, albumIds);
     saveToStorage('satchel_album_v3', JSON.stringify(albumData));
   } catch (e) {

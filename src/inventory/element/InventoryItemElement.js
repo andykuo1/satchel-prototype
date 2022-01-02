@@ -67,7 +67,7 @@ figcaption {
   color: #ffffff;
   background-color: rgba(0, 0, 0, 0.1);
   text-align: center;
-  text-overflow: ellipsis;
+  text-overflow: clip;
   text-shadow: 0.1em 0.1em 0.05em #000000;
   white-space: nowrap;
   overflow: hidden;
