@@ -12,7 +12,7 @@ import { importAlbumFromJSON } from './satchel/album/AlbumLoader.js';
 import { addAlbumInStore, createAlbumInStore, getAlbumIdsInStore, getAlbumInStore } from './satchel/album/AlbumStore.js';
 import { copyAlbum } from './satchel/album/Album.js';
 import { dispatchAlbumChange } from './satchel/album/AlbumEvents.js';
-import { closeFoundry, copyFoundry, isFoundryOpen, openFoundry } from './inventory/FoundryHelper.js';
+import { clearFoundry, closeFoundry, copyFoundry, isFoundryOpen, openFoundry } from './inventory/FoundryHelper.js';
 import { ActivityPlayerList } from './satchel/peer/ActivityPlayerList.js';
 import { dropItemOnGround, isGroundAlbum } from './satchel/GroundAlbum.js';
 import { forceEmptyStorage } from './Storage.js';
@@ -37,14 +37,15 @@ window.addEventListener('DOMContentLoaded', () => {
   elementEventListener('#actionAlbumOpen', 'click', onActionAlbumOpen);
   elementEventListener('#actionAlbumImport', 'click', onActionAlbumImport);
   elementEventListener('#actionAlbumNew', 'click', onActionAlbumNew);
-  elementEventListener('#actionNewItem', 'click', onActionNewItem);
 
   elementEventListener('#actionShareItem', 'click', onActionShareItem);
   elementEventListener('#actionSettings', 'click', onActionSettings);
 
   elementEventListener('#actionItemCodeImport', 'click', onActionItemCodeImport);
   elementEventListener('#actionItemCodeExport', 'click', onActionItemCodeExport);
+  elementEventListener('#actionItemDuplicate', 'click', onActionItemDuplicate);
   elementEventListener('#actionFoundryReset', 'click', onActionFoundryReset);
+  elementEventListener('#actionFoundryNew', 'click', onActionFoundryNew);
   elementEventListener('#giftCodeExport', 'click', onGiftCodeExport);
 
   elementEventListener('#actionProfileEditName', 'input', onActionProfileEditName);
@@ -182,19 +183,23 @@ function onActionItemEdit() {
   }
 }
 
-function onActionNewItem() {
-  if (isFoundryOpen()) {
-    let item = copyFoundry();
-    if (item) {
-      dropItemOnGround(item);
-    } else {
-      let newItem = new ItemBuilder().fromDefault().width(2).height(2).build();
-      openFoundry(newItem);
-    }
-  } else {
-    let newItem = new ItemBuilder().fromDefault().width(2).height(2).build();
-    openFoundry(newItem);
+function onActionItemDuplicate() {
+  if (!isFoundryOpen()) {
+    return;
   }
+  const newItem = copyFoundry();
+  if (newItem) {
+    dropItemOnGround(newItem);
+  }
+}
+
+function onActionFoundryNew() {
+  if (!isFoundryOpen()) {
+    return;
+  }
+  clearFoundry();
+  const newItem = new ItemBuilder().fromDefault().width(2).height(2).build();
+  openFoundry(newItem);
 }
 
 function onDownloadClick() {
@@ -331,13 +336,16 @@ async function onActionItemCodeImport() {
   let newItem = importItemFromString(itemString);
   itemEditor.clearSocketedItem();
   itemEditor.putSocketedItem(newItem, true);
-  window.alert('Pasted from clipboard!');
 }
 
 function onActionFoundryReset() {
-  /** @type {import('./satchel/item/ItemEditorElement.js').ItemEditorElement} */
-  const itemEditor = document.querySelector('#itemEditor');
-  itemEditor.clearSocketedItem();
+  if (!isFoundryOpen()) {
+    return;
+  }
+  const prevItem = clearFoundry();
+  if (!prevItem) {
+    closeFoundry();
+  }
 }
 
 function onActionProfile() {

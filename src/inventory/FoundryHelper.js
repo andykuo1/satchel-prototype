@@ -28,3 +28,15 @@ export function copyFoundry() {
     return null;
   }
 }
+
+export function clearFoundry() {
+  /** @type {import('../satchel/item/ItemEditorElement.js').ItemEditorElement} */
+  let itemEditor = document.querySelector('#itemEditor');
+  let item = itemEditor.getSocketedItem();
+  if (item) {
+    itemEditor.clearSocketedItem();
+    return item;
+  } else {
+    return null;
+  }
+}

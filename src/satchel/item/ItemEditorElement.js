@@ -392,6 +392,10 @@ export class ItemEditorElement extends HTMLElement {
     removeInventoryChangeListener(this.socket.invId, this.onSocketInventoryChange);
   }
 
+  grabDefaultFocus() {
+    this.itemDesc.focus();
+  }
+
   clearSocketedItem() {
     const store = getInventoryStore();
     const socketInvId = this.socket.invId;

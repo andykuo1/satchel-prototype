@@ -17,7 +17,7 @@ const INNER_HTML = /* html */`
   <item-editor>
   <icon-button slot="actions" id="actionFoundry" icon="res/anvil.svg" alt="foundry" title="Edit in Foundry"></icon-button>
     <icon-button slot="actions" id="actionFoundryShare" icon="res/share.svg" alt="share" title="Share Item"></icon-button>
-    <icon-button slot="actions" id="actionDuplicate" icon="res/copy.svg" alt="duplicate" title="Duplicate Item"></icon-button>
+    <icon-button slot="actions" id="actionDuplicate" icon="res/duplicate.svg" alt="duplicate" title="Duplicate Item"></icon-button>
   </item-editor>
 </dialog-prompt>
 `;
@@ -121,6 +121,7 @@ export class ItemDialogElement extends HTMLElement {
     this.itemEditor.clearSocketedItem();
     this.itemEditor.putSocketedItem(newItem, false);
     this.dialog.toggleAttribute('open', true);
+    this.itemEditor.grabDefaultFocus();
   }
 
   copySocketedItem() {

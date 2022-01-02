@@ -63,9 +63,6 @@
           <div class="sidebarActions">
             <icon-button id="actionItemEdit" icon="res/anvil.svg" alt="foundry" title="Open Foundry"></icon-button>
           </div>
-          <div class="sidebarActions">
-            <icon-button id="actionNewItem" icon="res/add.svg" alt="new" title="New Item"></icon-button>
-          </div>
           <div class="spacing">
           </div>
           <div class="sidebarActions">
@@ -94,17 +91,31 @@
           .editorContainer.open > * {
             visibility: visible;
           }
+          .editorControls {
+            position: absolute;
+            top: 0;
+            right: 0;
+            z-index: 1;
+            display: flex;
+            flex-direction: row;
+            font-size: 0.8em;
+          }
           #itemEditor {
             flex: 1;
             overflow-y: auto;
           }
         </style>
         <div class="editorContainer">
+          <div class="editorControls">
+            <icon-button id="actionFoundryNew" icon="res/add.svg" alt="new" title="New Item"></icon-button>
+            <icon-button id="actionFoundryReset" icon="res/cancel.svg" alt="reset" title="Clear Foundry"></icon-button>
+          </div>
           <item-editor id="itemEditor" editable>
+            <icon-button slot="actions" icon="res/anvil.svg" alt="foundry" title="Edit in Foundry" disabled></icon-button>
+            <icon-button slot="actions" id="actionItemCodeExport" icon="res/share.svg" alt="share" title="Share Item"></icon-button>
+            <icon-button slot="actions" id="actionItemDuplicate" icon="res/duplicate.svg" alt="duplicate" title="Duplicate Item"></icon-button>
           </item-editor>
-          <button id="actionItemCodeExport">Copy Item Code</button>
           <button id="actionItemCodeImport">Paste Item Code</button>
-          <button id="actionFoundryReset">Reset to Default</button>
         </div>
       </div>
       <sidebar-layout style="flex-direction: row-reverse; --background-color: none">

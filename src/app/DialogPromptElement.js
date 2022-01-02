@@ -16,8 +16,9 @@ const INNER_STYLE = /* css */ `
   left: 50%;
   z-index: 100;
   --foreground-color: #ffffff;
-  --background-color: #444444;
-  --outline-color: #333333;
+  --background-color: #333333;
+  --outline-color: #444444;
+  --shadow-color: #222222;
 }
 dialog {
   position: relative;
@@ -27,8 +28,9 @@ dialog {
   border-radius: 0.2em;
   color: var(--foreground-color);
   background-color: var(--background-color);
-  border-top: 0.5em solid var(--outline-color);
+  box-shadow: inset 0 0 0.5em var(--shadow-color);
   overflow: auto;
+  outline: 0.5em solid var(--outline-color);
 }
 dialog[open] {
   display: flex;
