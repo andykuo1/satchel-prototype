@@ -3,6 +3,7 @@ import { getCursorContext } from '../../inventory/CursorHelper.js';
 import { openFoundry } from '../../inventory/FoundryHelper.js';
 import { getInventoryInStore, getInventoryStore } from '../../inventory/InventoryStore.js';
 import { removeItemFromInventory } from '../../inventory/InventoryTransfer.js';
+import { dropItemOnGround } from '../GroundAlbum.js';
 import { getItemByItemId } from '../inv/InvItems.js';
 import { ActivityPlayerList } from '../peer/ActivityPlayerList.js';
 import { cloneItem, copyItem } from './Item.js';
@@ -14,10 +15,10 @@ import { dispatchItemChange } from './ItemEvents.js';
 const INNER_HTML = /* html */`
 <dialog-prompt>
   <item-editor>
-    <icon-button slot="actions" id="actionFoundryShare" icon="res/share.svg" alt="send" title="Send Item"></icon-button>
+  <icon-button slot="actions" id="actionFoundry" icon="res/anvil.svg" alt="foundry" title="Edit in Foundry"></icon-button>
+    <icon-button slot="actions" id="actionFoundryShare" icon="res/share.svg" alt="share" title="Share Item"></icon-button>
+    <icon-button slot="actions" id="actionDuplicate" icon="res/copy.svg" alt="duplicate" title="Duplicate Item"></icon-button>
   </item-editor>
-  <button id="actionSave">Save & Close</button>
-  <button id="actionFoundry">Send to Foundry</button>
 </dialog-prompt>
 `;
 const INNER_STYLE = /* css */`
@@ -73,7 +74,7 @@ export class ItemDialogElement extends HTMLElement {
     this.itemEditor = shadowRoot.querySelector('item-editor');
 
     /** @private */
-    this.actionSave = shadowRoot.querySelector('#actionSave');
+    this.actionDuplicate = shadowRoot.querySelector('#actionDuplicate');
     /** @private */
     this.actionFoundry = shadowRoot.querySelector('#actionFoundry');
     /** @private */
@@ -82,7 +83,7 @@ export class ItemDialogElement extends HTMLElement {
     /** @private */
     this.onDialogClose = this.onDialogClose.bind(this);
     /** @private */
-    this.onActionSave = this.onActionSave.bind(this);
+    this.onActionDuplicate = this.onActionDuplicate.bind(this);
     /** @private */
     this.onActionFoundry = this.onActionFoundry.bind(this);
     /** @private */
@@ -92,7 +93,7 @@ export class ItemDialogElement extends HTMLElement {
   /** @protected */
   connectedCallback() {
     this.dialog.addEventListener('close', this.onDialogClose);
-    this.actionSave.addEventListener('click', this.onActionSave);
+    this.actionDuplicate.addEventListener('click', this.onActionDuplicate);
     this.actionFoundry.addEventListener('click', this.onActionFoundry);
     this.actionFoundryShare.addEventListener('click', this.onActionFoundryShare);
   }
@@ -100,7 +101,7 @@ export class ItemDialogElement extends HTMLElement {
   /** @protected */
   disconnectedCallback() {
     this.dialog.removeEventListener('close', this.onDialogClose);
-    this.actionSave.removeEventListener('click', this.onActionSave);
+    this.actionDuplicate.removeEventListener('click', this.onActionDuplicate);
     this.actionFoundry.removeEventListener('click', this.onActionFoundry);
     this.actionFoundryShare.removeEventListener('click', this.onActionFoundryShare);
   }
@@ -144,9 +145,17 @@ export class ItemDialogElement extends HTMLElement {
   }
 
   /** @private */
-  onActionSave() {
+  onActionDuplicate() {
+    if (!this._containerElement || !this._invId || !this._itemId) {
+      return;
+    }
     this.applyChanges();
-    this.dialog.toggleAttribute('open', false);
+
+    const socketedItem = this.itemEditor.getSocketedItem();
+    if (socketedItem) {
+      let newItem = copyItem(socketedItem);
+      dropItemOnGround(newItem);
+    }
   }
 
   /** @private */
@@ -196,9 +205,7 @@ export class ItemDialogElement extends HTMLElement {
 
   /** @private */
   onDialogClose(e) {
-    if (e.detail.from !== 'cancel') {
-      this.applyChanges();
-    }
+    this.applyChanges();
   }
 }
 ItemDialogElement.define();
