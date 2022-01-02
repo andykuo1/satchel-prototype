@@ -178,10 +178,12 @@ export class DialogPromptElement extends HTMLElement {
           this.backdrop.classList.toggle('hidden', !result);
           // Dispatch 'open' event. The 'close' events are handled elsewhere.
           if (prev !== result && result) {
-            this.dispatchEvent(new CustomEvent('open', {
-              composed: true,
-              bubbles: false,
-            }));
+            this.dispatchEvent(
+              new CustomEvent('open', {
+                composed: true,
+                bubbles: false,
+              })
+            );
           }
         }
         break;
@@ -206,13 +208,15 @@ export class DialogPromptElement extends HTMLElement {
     }
     document.activeElement.blur();
     this.toggleAttribute('open', false);
-    this.dispatchEvent(new CustomEvent('close', {
-      composed: true,
-      bubbles: false,
-      detail: {
-        from: 'blur'
-      }
-    }));
+    this.dispatchEvent(
+      new CustomEvent('close', {
+        composed: true,
+        bubbles: false,
+        detail: {
+          from: 'blur',
+        },
+      })
+    );
 
     e.preventDefault();
     e.stopPropagation();
@@ -223,13 +227,15 @@ export class DialogPromptElement extends HTMLElement {
   onCancelClick() {
     document.activeElement.blur();
     this.toggleAttribute('open', false);
-    this.dispatchEvent(new CustomEvent('close', {
-      composed: true,
-      bubbles: false,
-      detail: {
-        from: 'cancel'
-      }
-    }));
+    this.dispatchEvent(
+      new CustomEvent('close', {
+        composed: true,
+        bubbles: false,
+        detail: {
+          from: 'cancel',
+        },
+      })
+    );
   }
 }
 DialogPromptElement.define();

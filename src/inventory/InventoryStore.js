@@ -25,7 +25,7 @@ export function createInventoryStore() {
   return {
     metadata: {
       profile: {
-        activeProfileId: ''
+        activeProfileId: '',
       },
     },
     data: {

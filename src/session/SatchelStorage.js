@@ -1,12 +1,13 @@
-import {
-  getAlbumIdsInStore,
-} from '../satchel/album/AlbumStore.js';
-import {
-  getInventoryStore,
-} from '../inventory/InventoryStore.js';
+import { getAlbumIdsInStore } from '../satchel/album/AlbumStore.js';
+import { getInventoryStore } from '../inventory/InventoryStore.js';
 import { loadFromStorage, saveToStorage } from '../Storage.js';
 import { getProfileIdsInStore } from '../satchel/profile/ProfileStore.js';
-import { loadSatchelAlbumsFromData, loadSatchelProfilesFromData, saveSatchelAlbumsToData, saveSatchelProfilesToData } from './SatchelLoader.js';
+import {
+  loadSatchelAlbumsFromData,
+  loadSatchelProfilesFromData,
+  saveSatchelAlbumsToData,
+  saveSatchelProfilesToData,
+} from './SatchelLoader.js';
 
 export function loadSatchelFromStorage() {
   const store = getInventoryStore();

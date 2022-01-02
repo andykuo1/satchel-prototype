@@ -31,7 +31,7 @@ export function saveItemToFoundryAlbum(freedItem) {
 }
 
 /**
- * @param {import('./item/Item.js').Item} item 
+ * @param {import('./item/Item.js').Item} item
  * @returns {boolean}
  */
 export function shouldSaveItemToFoundryAlbum(item) {
@@ -46,7 +46,7 @@ export function shouldSaveItemToFoundryAlbum(item) {
   // Save it as long as the image is different.
   const imgSrc = item.imgSrc;
   const items = getItemsInAlbum(store, foundryAlbumId);
-  for(let albumItem of items) {
+  for (let albumItem of items) {
     if (albumItem.imgSrc === imgSrc) {
       return false;
     }
@@ -55,7 +55,7 @@ export function shouldSaveItemToFoundryAlbum(item) {
 }
 
 /**
- * @param {import('./album/Album.js').Album} album 
+ * @param {import('./album/Album.js').Album} album
  * @returns {boolean}
  */
 export function isFoundryAlbum(album) {
@@ -64,7 +64,7 @@ export function isFoundryAlbum(album) {
 
 export function getFoundryAlbumId(store) {
   const albums = getAlbumsInStore(store);
-  for(let album of albums) {
+  for (let album of albums) {
     if (isFoundryAlbum(album)) {
       return album.albumId;
     }

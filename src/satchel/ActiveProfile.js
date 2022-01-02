@@ -2,8 +2,21 @@ import { getCursorContext } from '../inventory/CursorHelper.js';
 import { createGridInventoryInStore, getInventoryStore } from '../inventory/InventoryStore.js';
 import { uuid } from '../util/uuid.js';
 import { createProfile } from './profile/Profile.js';
-import { addActiveProfileChangeListener, addProfileChangeListener, removeActiveProfileChangeListener, removeProfileChangeListener } from './profile/ProfileEvents.js';
-import { getActiveProfileInStore, getProfileInStore, getProfileIdsInStore, hasActiveProfileInStore, isProfileInStore, setActiveProfileInStore, addProfileInStore } from './profile/ProfileStore.js';
+import {
+  addActiveProfileChangeListener,
+  addProfileChangeListener,
+  removeActiveProfileChangeListener,
+  removeProfileChangeListener,
+} from './profile/ProfileEvents.js';
+import {
+  getActiveProfileInStore,
+  getProfileInStore,
+  getProfileIdsInStore,
+  hasActiveProfileInStore,
+  isProfileInStore,
+  setActiveProfileInStore,
+  addProfileInStore,
+} from './profile/ProfileStore.js';
 
 export function setupActiveProfile() {
   const store = getInventoryStore();
@@ -76,9 +89,12 @@ function onProfileChange() {
   if (!activeProfile) {
     return;
   }
-  for(let invId of activeProfile.invs) {
+  for (let invId of activeProfile.invs) {
     let elementId = `profile_inv-${invId}`;
-    let invElement = /** @type {import('../inventory/element/InventoryGridElement.js').InventoryGridElement} */ (document.createElement('inventory-grid'));
+    let invElement =
+      /** @type {import('../inventory/element/InventoryGridElement.js').InventoryGridElement} */ (
+        document.createElement('inventory-grid')
+      );
     invElement.id = elementId;
     invElement.invId = invId;
     invsContainer.appendChild(invElement);
