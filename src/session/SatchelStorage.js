@@ -1,5 +1,5 @@
 import { getAlbumIdsInStore } from '../satchel/album/AlbumStore.js';
-import { getInventoryStore } from '../inventory/InventoryStore.js';
+import { getInventoryStore } from '../store/InventoryStore.js';
 import { loadFromStorage, saveToStorage } from '../Storage.js';
 import { getProfileIdsInStore } from '../satchel/profile/ProfileStore.js';
 import {

@@ -1,12 +1,12 @@
 import { downloadText } from './util/downloader.js';
-import { addInventoryToStore, createGridInventoryInStore, deleteInventoryFromStore, getInventoryInStore, getInventoryStore, isInventoryInStore } from './inventory/InventoryStore.js';
+import { addInventoryToStore, createGridInventoryInStore, deleteInventoryFromStore, getInventoryInStore, getInventoryStore, isInventoryInStore } from './store/InventoryStore.js';
 import { connectAsServer } from './app/PeerSatchelConnector.js';
 import { getCursorContext } from './inventory/CursorHelper.js';
 import { uploadFile } from './util/uploader.js';
 import { copyToClipboard, pasteFromClipboard } from './util/clipboard.js';
 import { ItemBuilder } from './satchel/item/Item.js';
 import { uuid } from './util/uuid.js';
-import { ItemAlbumElement } from './satchel/album/ItemAlbumElement.js';
+import { ItemAlbumElement } from './components/album/ItemAlbumElement.js';
 import { exportItemToString, importItemFromJSON, importItemFromString } from './satchel/item/ItemLoader.js';
 import { importAlbumFromJSON } from './satchel/album/AlbumLoader.js';
 import { addAlbumInStore, createAlbumInStore, deleteAlbumInStore, getAlbumIdsInStore, getAlbumInStore, isAlbumInStore } from './satchel/album/AlbumStore.js';
@@ -63,7 +63,7 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 function onActionShareItem() {
-  /** @type {import('./satchel/item/ItemDialogElement.js').ItemDialogElement} */
+  /** @type {import('./components/itemeditor/ItemDialogElement.js').ItemDialogElement} */
   const itemEditor = document.querySelector('#itemDialog');
   const socketedItem = itemEditor.copySocketedItem();
   try {
@@ -96,7 +96,7 @@ function onGiftSubmit() {
   /** @type {HTMLSelectElement} */
   let giftTarget = document.querySelector('#giftTarget');
   if (giftTarget.value) {
-    /** @type {import('./satchel/item/ItemDialogElement.js').ItemDialogElement} */
+    /** @type {import('./components/itemeditor/ItemDialogElement.js').ItemDialogElement} */
     const itemDialog = document.querySelector('#itemDialog');
     const socketedItem = itemDialog.copySocketedItem();
     const target = giftTarget.value;
@@ -112,7 +112,7 @@ function onGiftSubmit() {
 }
 
 function onGiftCodeExport() {
-  /** @type {import('./satchel/item/ItemDialogElement.js').ItemDialogElement} */
+  /** @type {import('./components/itemeditor/ItemDialogElement.js').ItemDialogElement} */
   const itemDialog = document.querySelector('#itemDialog');
   const socketedItem = itemDialog.copySocketedItem();
   const itemString = exportItemToString(socketedItem);
@@ -321,7 +321,7 @@ function onItemContext(e) {
   e.preventDefault();
   e.stopPropagation();
 
-  /** @type {import('./satchel/item/ItemDialogElement.js').ItemDialogElement} */
+  /** @type {import('./components/itemeditor/ItemDialogElement.js').ItemDialogElement} */
   const itemDialog = document.querySelector('#itemDialog');
   // @ts-ignore
   const { container, invId, itemId, clientX, clientY } = e.detail;
@@ -332,7 +332,7 @@ function onItemContext(e) {
 }
 
 function onActionItemCodeExport() {
-  /** @type {import('./satchel/item/ItemEditorElement.js').ItemEditorElement} */
+  /** @type {import('./components/itemeditor/ItemEditorElement.js').ItemEditorElement} */
   const itemEditor = document.querySelector('#itemEditor');
   let item = itemEditor.getSocketedItem();
   if (!item) {
@@ -346,7 +346,7 @@ function onActionItemCodeExport() {
 }
 
 async function onActionItemCodeImport() {
-  /** @type {import('./satchel/item/ItemEditorElement.js').ItemEditorElement} */
+  /** @type {import('./components/itemeditor/ItemEditorElement.js').ItemEditorElement} */
   const itemEditor = document.querySelector('#itemEditor');
   let itemString = await pasteFromClipboard();
   let newItem = importItemFromString(itemString);
@@ -413,7 +413,7 @@ function onActionProfile() {
     containerElement.appendChild(deleteElement);
     rootContainerElement.appendChild(containerElement);
   }
-  /** @type {import('./app/DialogPromptElement.js').DialogPromptElement} */
+  /** @type {import('./components/lib/DialogPromptElement.js').DialogPromptElement} */
   const profilesDialog = document.querySelector('#profilesDialog');
   profilesDialog.toggleAttribute('open', true);
 }
@@ -457,14 +457,14 @@ function onActionProfileEdit(e) {
   if (activeProfile.profileId !== profileId) {
     setActiveProfileInStore(store, profileId);
   }
-  /** @type {import('./app/DialogPromptElement.js').DialogPromptElement} */
+  /** @type {import('./components/lib/DialogPromptElement.js').DialogPromptElement} */
   const profilesDialog = document.querySelector('#profilesDialog');
   profilesDialog.toggleAttribute('open', false);
   
   // Prepare edit dialog
   prepareEditProfileDialog(store, profileId);
 
-  /** @type {import('./app/DialogPromptElement.js').DialogPromptElement} */
+  /** @type {import('./components/lib/DialogPromptElement.js').DialogPromptElement} */
   const inventoriesDialog = document.querySelector('#inventoriesDialog');
   inventoriesDialog.toggleAttribute('open', true);
 }
@@ -645,7 +645,7 @@ function onActionProfileInvNew() {
   if (!activeProfile) {
     return;
   }
-  /** @type {import('./app/DialogPromptElement.js').DialogPromptElement} */
+  /** @type {import('./components/lib/DialogPromptElement.js').DialogPromptElement} */
   const profileInventoryDialog = document.querySelector('#profileInventoryDialog');
   profileInventoryDialog.toggleAttribute('open', true);
 }
@@ -695,7 +695,7 @@ function onActionProfileInvSubmit() {
   dispatchProfileChange(store, activeProfile.profileId);
   prepareEditProfileDialog(store, activeProfile.profileId);
   
-  /** @type {import('./app/DialogPromptElement.js').DialogPromptElement} */
+  /** @type {import('./components/lib/DialogPromptElement.js').DialogPromptElement} */
   const profileInventoryDialog = document.querySelector('#profileInventoryDialog');
   profileInventoryDialog.toggleAttribute('open', false);
 }

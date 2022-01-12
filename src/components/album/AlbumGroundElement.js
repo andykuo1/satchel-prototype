@@ -1,14 +1,14 @@
-import { createSocketInventoryInStore, deleteInventoryFromStore, getInventoryInStore, getInventoryStore, isInventoryInStore } from '../../inventory/InventoryStore.js';
+import { createSocketInventoryInStore, deleteInventoryFromStore, getInventoryInStore, getInventoryStore, isInventoryInStore } from '../../store/InventoryStore.js';
 import { addItemToInventory, getItemAtSlotIndex } from '../../inventory/InventoryTransfer.js';
 import { createInventoryView } from '../../inventory/InvView.js';
-import { cloneItem } from '../item/Item.js';
+import { cloneItem } from '../../satchel/item/Item.js';
 import { uuid } from '../../util/uuid.js';
-import { getCursor } from '../../inventory/element/InventoryCursorElement.js';
-import { getAlbumInStore } from './AlbumStore.js';
-import { addAlbumChangeListener, removeAlbumChangeListener } from './AlbumEvents.js';
-import { addInventoryChangeListener, removeInventoryChangeListener } from '../inv/InvEvents.js';
-import { getItemIdsInAlbum, getItemInAlbum, hasItemInAlbum, removeItemFromAlbum } from './AlbumItems.js';
-import { dropItemOnGround, getGroundAlbumId } from '../GroundAlbum.js';
+import { getCursor } from '../cursor/index.js';
+import { getAlbumInStore } from '../../satchel/album/AlbumStore.js';
+import { addAlbumChangeListener, removeAlbumChangeListener } from '../../satchel/album/AlbumEvents.js';
+import { addInventoryChangeListener, removeInventoryChangeListener } from '../../satchel/inv/InvEvents.js';
+import { getItemIdsInAlbum, getItemInAlbum, hasItemInAlbum, removeItemFromAlbum } from '../../satchel/album/AlbumItems.js';
+import { dropItemOnGround, getGroundAlbumId } from '../../satchel/GroundAlbum.js';
 
 
 const INNER_HTML = /* html */`
@@ -95,7 +95,7 @@ export class AlbumGroundElement extends HTMLElement {
     const store = getInventoryStore();
     for (const node of this.slotItems.assignedNodes()) {
       const invNode =
-        /** @type {import('../../inventory/element/InventoryGridElement.js').InventoryGridElement} */ (node);
+        /** @type {import('../invgrid/InventoryGridElement.js').InventoryGridElement} */ (node);
       const invId = invNode.invId;
       const inv = getInventoryInStore(store, invId);
       if (inv) {
@@ -131,7 +131,7 @@ export class AlbumGroundElement extends HTMLElement {
     const preservedInvs = {};
     for (const node of this.slotItems.assignedNodes()) {
       const invNode =
-        /** @type {import('../../inventory/element/InventoryGridElement.js').InventoryGridElement} */ (node);
+        /** @type {import('../invgrid/InventoryGridElement.js').InventoryGridElement} */ (node);
       const invId = invNode.invId;
       const item = getItemAtSlotIndex(getInventoryStore(), invId, 0);
       if (item) {

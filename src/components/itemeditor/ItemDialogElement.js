@@ -1,16 +1,16 @@
-import { DialogPromptElement } from '../../app/DialogPromptElement.js';
+import { DialogPromptElement } from '../lib/DialogPromptElement.js';
 import { getCursorContext } from '../../inventory/CursorHelper.js';
 import { openFoundry } from '../../inventory/FoundryHelper.js';
-import { getInventoryInStore, getInventoryStore } from '../../inventory/InventoryStore.js';
+import { getInventoryInStore, getInventoryStore } from '../../store/InventoryStore.js';
 import { removeItemFromInventory } from '../../inventory/InventoryTransfer.js';
-import { dropItemOnGround } from '../GroundAlbum.js';
-import { getItemByItemId } from '../inv/InvItems.js';
-import { ActivityPlayerList } from '../peer/ActivityPlayerList.js';
-import { cloneItem, copyItem } from './Item.js';
+import { dropItemOnGround } from '../../satchel/GroundAlbum.js';
+import { getItemByItemId } from '../../satchel/inv/InvItems.js';
+import { ActivityPlayerList } from '../../satchel/peer/ActivityPlayerList.js';
+import { cloneItem, copyItem } from '../../satchel/item/Item.js';
 import { ItemEditorElement } from './ItemEditorElement.js';
-import { dispatchItemChange } from './ItemEvents.js';
+import { dispatchItemChange } from '../../satchel/item/ItemEvents.js';
 
-/** @typedef {import('./Item.js').Item} Item */
+/** @typedef {import('../../satchel/item/Item.js').Item} Item */
 
 const INNER_HTML = /* html */`
 <dialog-prompt>

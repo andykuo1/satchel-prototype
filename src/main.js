@@ -4,19 +4,11 @@ import { resolveSessionStatus } from './session/SatchelSession.js';
 import { getCursorContext } from './inventory/CursorHelper.js';
 import { connectAsClient } from './app/PeerSatchelConnector.js';
 import { loadSatchelFromStorage, saveSatchelToStorage } from './session/SatchelStorage.js';
-import { getInventoryStore } from './inventory/InventoryStore.js';
-import { ItemAlbumElement } from './satchel/album/ItemAlbumElement.js';
-import { getAlbumsInStore } from './satchel/album/AlbumStore.js';
-
-import './satchel/item/index.js';
-import './app/index.js';
-import './inventory/element/index.js';
-import './satchel/cards/index.js';
-import './satchel/album/index.js';
-import './satchel/profile/index.js';
-import './toolbar.js';
-import { isGroundAlbum } from './satchel/GroundAlbum.js';
 import { setupActiveProfile } from './satchel/ActiveProfile.js';
+
+import './app/index.js';
+import './components/index.js';
+import './toolbar.js';
 
 async function connect() {
   let session = resolveSessionStatus();

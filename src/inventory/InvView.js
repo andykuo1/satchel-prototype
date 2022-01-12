@@ -1,6 +1,6 @@
 import { getExistingInventory } from './InventoryTransfer.js';
 
-/** @typedef {import('./element/InventoryGridElement.js').InventoryGridElement} InventoryGridElement */
+/** @typedef {import('../components/invgrid/InventoryGridElement.js').InventoryGridElement} InventoryGridElement */
 
 /**
  * @param store

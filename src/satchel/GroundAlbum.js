@@ -1,5 +1,5 @@
 import { addItemToAlbum, clearItemsInAlbum } from '../satchel/album/AlbumItems.js';
-import { getInventoryStore } from '../inventory/InventoryStore.js';
+import { getInventoryStore } from '../store/InventoryStore.js';
 import { createAlbum } from './album/Album.js';
 import { addAlbumInStore, isAlbumInStore } from './album/AlbumStore.js';
 import { dispatchAlbumChange } from './album/AlbumEvents.js';

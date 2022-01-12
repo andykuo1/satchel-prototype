@@ -1,6 +1,6 @@
 import { clearItemsOnGround } from '../satchel/GroundAlbum.js';
 
-/** @typedef {import('../inventory/element/InventoryCursorElement.js').InventoryCursorElement} InventoryCursorElement */
+/** @typedef {import('./cursor/InventoryCursorElement.js').InventoryCursorElement} InventoryCursorElement */
 
 const INNER_HTML = /* html */ `
 <icon-button id="actionDelete" icon="res/delete.svg" alt="delete" title="Delete Item"></icon-button>

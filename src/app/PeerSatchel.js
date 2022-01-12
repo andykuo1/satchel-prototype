@@ -10,7 +10,7 @@ import { getPlayerName } from '../satchel/peer/PlayerState.js';
 
 /**
  * @typedef {import('../peerful/PeerfulConnection.js').PeerfulConnection} PeerfulConnection
- * @typedef {import('../inventory/element/InventoryGridElement.js').InventoryGridElement} InventoryGridElement
+ * @typedef {import('../components/invgrid/InventoryGridElement.js').InventoryGridElement} InventoryGridElement
  * @typedef {import('../satchel/peer/SatchelLocal.js').SatchelRemote} SatchelRemote
  */
 

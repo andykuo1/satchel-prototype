@@ -2,7 +2,7 @@ import { createProfile } from './Profile.js';
 import { dispatchActiveProfileChange, dispatchProfileChange } from './ProfileEvents.js';
 
 /**
- * @typedef {import('../../inventory/InventoryStore.js').InventoryStore} Store
+ * @typedef {import('../../store/InventoryStore.js').InventoryStore} Store
  * @typedef {import('./Profile.js').Profile} Profile
  * @typedef {import('./Profile.js').ProfileId} ProfileId
  */

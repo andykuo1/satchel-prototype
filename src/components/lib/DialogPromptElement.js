@@ -1,4 +1,4 @@
-import { upgradeProperty } from '../util/wc.js';
+import { upgradeProperty } from '../../util/wc.js';
 
 import './IconButtonElement.js';
 

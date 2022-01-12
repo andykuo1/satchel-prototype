@@ -1,14 +1,14 @@
-import { getCursor } from '../../inventory/element/InventoryCursorElement.js';
-import { InventoryGridElement } from '../../inventory/element/InventoryGridElement.js';
-import { getInventoryStore } from '../../inventory/InventoryStore.js';
+import { getCursor } from '../cursor/index.js';
+import { InventoryGridElement } from '../invgrid/InventoryGridElement.js';
+import { getInventoryStore } from '../../store/InventoryStore.js';
 import { addItemToInventory, clearItemsInInventory, getItemAtSlotIndex, isInventoryEmpty } from '../../inventory/InventoryTransfer.js';
-import { saveItemToFoundryAlbum, shouldSaveItemToFoundryAlbum } from '../FoundryAlbum.js';
-import { dropItemOnGround } from '../GroundAlbum.js';
-import { addInventoryChangeListener, dispatchInventoryChange, removeInventoryChangeListener } from '../inv/InvEvents.js';
-import { ItemBuilder } from './Item.js';
-import { dispatchItemChange } from './ItemEvents.js';
+import { saveItemToFoundryAlbum, shouldSaveItemToFoundryAlbum } from '../../satchel/FoundryAlbum.js';
+import { dropItemOnGround } from '../../satchel/GroundAlbum.js';
+import { addInventoryChangeListener, dispatchInventoryChange, removeInventoryChangeListener } from '../../satchel/inv/InvEvents.js';
+import { ItemBuilder } from '../../satchel/item/Item.js';
+import { dispatchItemChange } from '../../satchel/item/ItemEvents.js';
 
-/** @typedef {import('./Item.js').Item} Item */
+/** @typedef {import('../../satchel/item/Item.js').Item} Item */
 
 const MAX_ITEM_WIDTH = 8;
 const MAX_ITEM_HEIGHT = 8;

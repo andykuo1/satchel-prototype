@@ -1,6 +1,6 @@
 import { DEFAULT_ITEM_UNIT_SIZE, itemMouseDownCallback } from './InventoryElementMouseHelper.js';
-import { getInventoryStore } from '../InventoryStore.js';
-import { getExistingInventory } from '../InventoryTransfer.js';
+import { getInventoryStore } from '../../store/InventoryStore.js';
+import { getExistingInventory } from '../../inventory/InventoryTransfer.js';
 import { hasItem, getItemByItemId } from '../../satchel/inv/InvItems.js';
 import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../../satchel/inv/InvSlots.js';
 import { addItemChangeListener, removeItemChangeListener } from '../../satchel/item/ItemEvents.js';

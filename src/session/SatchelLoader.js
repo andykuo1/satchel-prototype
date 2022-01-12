@@ -1,4 +1,4 @@
-import { addInventoryToStore, getInventoryInStore, isInventoryInStore } from '../inventory/InventoryStore.js';
+import { addInventoryToStore, getInventoryInStore, isInventoryInStore } from '../store/InventoryStore.js';
 import { cloneAlbum, copyAlbum, isAlbumHidden } from '../satchel/album/Album.js';
 import { dispatchAlbumChange } from '../satchel/album/AlbumEvents.js';
 import { exportAlbumToJSON, importAlbumFromJSON } from '../satchel/album/AlbumLoader.js';

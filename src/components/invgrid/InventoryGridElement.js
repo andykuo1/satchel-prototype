@@ -6,11 +6,11 @@ import {
   deleteInventoryFromStore,
   getInventoryInStore,
   getInventoryStore,
-} from '../InventoryStore.js';
+} from '../../store/InventoryStore.js';
 import { InventoryItemElement } from './InventoryItemElement.js';
 import {
   getItemAtSlotIndex, getItemIdsInSlots, isInventoryEmpty,
-} from '../InventoryTransfer.js';
+} from '../../inventory/InventoryTransfer.js';
 import { uuid } from '../../util/uuid.js';
 import { addInventoryChangeListener, removeInventoryChangeListener } from '../../satchel/inv/InvEvents.js';
 

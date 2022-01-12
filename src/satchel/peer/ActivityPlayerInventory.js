@@ -1,6 +1,6 @@
 import { ActivityBase } from './ActivityBase.js';
 
-import { getInventoryStore, getInventoryInStore, deleteInventoryFromStore, createGridInventoryInStore } from '../../inventory/InventoryStore.js';
+import { getInventoryStore, getInventoryInStore, deleteInventoryFromStore, createGridInventoryInStore } from '../../store/InventoryStore.js';
 import { SatchelLocal, SatchelRemote } from './SatchelLocal.js';
 import { getPlayerLastHeartbeat, getPlayerName, hasPlayerHeartbeat, setPlayerLastHeartbeat } from './PlayerState.js';
 import { loadFromStorage, saveToStorage } from '../../Storage.js';
@@ -9,7 +9,7 @@ import { createProfile } from '../profile/Profile.js';
 import { uuid } from '../../util/uuid.js';
 import { loadSatchelProfilesFromData, saveSatchelProfilesToData } from '../../session/SatchelLoader.js';
 
-/** @typedef {import('../../inventory/element/InventoryGridElement.js').InventoryGridElement} InventoryGridElement */
+/** @typedef {import('../../components/invgrid/InventoryGridElement.js').InventoryGridElement} InventoryGridElement */
 
 function onAutoSave(localServer) {
   const serverData = ActivityPlayerInventory.getLocalServerData(localServer);

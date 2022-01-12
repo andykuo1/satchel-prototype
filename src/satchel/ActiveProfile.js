@@ -1,5 +1,5 @@
 import { getCursorContext } from '../inventory/CursorHelper.js';
-import { createGridInventoryInStore, getInventoryStore } from '../inventory/InventoryStore.js';
+import { createGridInventoryInStore, getInventoryStore } from '../store/InventoryStore.js';
 import { uuid } from '../util/uuid.js';
 import { createProfile } from './profile/Profile.js';
 import {
@@ -92,7 +92,7 @@ function onProfileChange() {
   for (let invId of activeProfile.invs) {
     let elementId = `profile_inv-${invId}`;
     let invElement =
-      /** @type {import('../inventory/element/InventoryGridElement.js').InventoryGridElement} */ (
+      /** @type {import('../components/invgrid/InventoryGridElement.js').InventoryGridElement} */ (
         document.createElement('inventory-grid')
       );
     invElement.id = elementId;
@@ -102,7 +102,7 @@ function onProfileChange() {
   for(let albumId of activeProfile.albums) {
     let elementId = `profile_album-${albumId}`;
     let albumElement =
-    /** @type {import('./album/AlbumSpaceElement.js').AlbumSpaceElement} */ (
+    /** @type {import('../components/album/AlbumSpaceElement.js').AlbumSpaceElement} */ (
       document.createElement('album-space')
     );
     albumElement.id = elementId;

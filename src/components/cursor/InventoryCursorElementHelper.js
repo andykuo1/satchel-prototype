@@ -1,5 +1,5 @@
 import { dijkstra2d } from '../../util/dijkstra2d.js';
-import { getInventoryInStore } from '../InventoryStore.js';
+import { getInventoryInStore } from '../../store/InventoryStore.js';
 import {
   addItemToInventory,
   getExistingInventory,
@@ -7,14 +7,14 @@ import {
   getItemAtSlotIndex,
   getItemIdAtSlotCoords,
   removeItemFromInventory,
-} from '../InventoryTransfer.js';
+} from '../../inventory/InventoryTransfer.js';
 import { getItemByItemId } from '../../satchel/inv/InvItems.js';
 import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../../satchel/inv/InvSlots.js';
 
 /**
  * @typedef {import('../../satchel/inv/Inv.js').Inventory} Inventory
  * @typedef {import('../../satchel/inv/Inv.js').InventoryId} InventoryId
- * @typedef {import('../InventoryStore.js').InventoryStore} InventoryStore
+ * @typedef {import('../../store/InventoryStore.js').InventoryStore} InventoryStore
  *
  * @typedef {import('../../satchel/item/Item.js').Item} Item
  * @typedef {import('../../satchel/item/Item.js').ItemId} ItemId

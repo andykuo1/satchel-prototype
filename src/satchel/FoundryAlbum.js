@@ -1,10 +1,10 @@
-import { getInventoryStore } from '../inventory/InventoryStore.js';
+import { getInventoryStore } from '../store/InventoryStore.js';
 import { uuid } from '../util/uuid.js';
 import { createAlbum, isAlbumLocked } from './album/Album.js';
 import { dispatchAlbumChange } from './album/AlbumEvents.js';
 import { addItemToAlbum, getItemsInAlbum } from './album/AlbumItems.js';
 import { addAlbumInStore, getAlbumsInStore, isAlbumInStore } from './album/AlbumStore.js';
-import { ItemAlbumElement } from './album/ItemAlbumElement.js';
+import { ItemAlbumElement } from '../components/album/ItemAlbumElement.js';
 
 const FOUNDRY_ALBUM_DISPLAY_NAME = '[ Foundry ]';
 

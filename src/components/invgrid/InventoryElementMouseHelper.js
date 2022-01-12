@@ -1,9 +1,10 @@
-import { getInventoryStore } from '../InventoryStore.js';
-import { getExistingInventory } from '../InventoryTransfer.js';
+import { getInventoryStore } from '../../store/InventoryStore.js';
+import { getExistingInventory } from '../../inventory/InventoryTransfer.js';
 import { getItemByItemId } from '../../satchel/inv/InvItems.js';
 import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../../satchel/inv/InvSlots.js';
 import { copyItem } from '../../satchel/item/Item.js';
-import { getCursor } from './InventoryCursorElement.js';
+
+import { getCursor } from '../cursor/index.js';
 
 /**
  * @typedef {import('./InventoryItemElement.js').InventoryItemElement} InventoryItemElement

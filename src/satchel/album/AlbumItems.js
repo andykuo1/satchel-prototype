@@ -32,7 +32,7 @@ export function getItemIdsInAlbum(store, albumId) {
 }
 
 /**
- * @param {import('../../inventory/InventoryStore.js').InventoryStore} store 
+ * @param {import('../../store/InventoryStore.js').InventoryStore} store 
  * @param {string} albumId 
  * @returns {Array<import('../item/Item.js').Item>}
  */
