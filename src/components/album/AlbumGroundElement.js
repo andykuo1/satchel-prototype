@@ -79,7 +79,7 @@ export class AlbumGroundElement extends HTMLElement {
   connectedCallback() {
     const store = getSatchelStore();
     const albumId = this.albumId;
-    addAlbumChangeListener(albumId, this.onAlbumChange);
+    addAlbumChangeListener(store, albumId, this.onAlbumChange);
     this.onAlbumChange(store, albumId);
 
     document.addEventListener('mouseup', this.onMouseUp);
@@ -87,13 +87,13 @@ export class AlbumGroundElement extends HTMLElement {
 
   /** @protected */
   disconnectedCallback() {
+    const store = getSatchelStore();
     const albumId = this.albumId;
-    removeAlbumChangeListener(albumId, this.onAlbumChange);
+    removeAlbumChangeListener(store, albumId, this.onAlbumChange);
 
     document.removeEventListener('mouseup', this.onMouseUp);
     
     // Destroy all items
-    const store = getSatchelStore();
     for (const node of this.slotItems.assignedNodes()) {
       const invNode =
         /** @type {import('../invgrid/InventoryGridElement.js').InventoryGridElement} */ (node);
@@ -165,7 +165,7 @@ export class AlbumGroundElement extends HTMLElement {
         invElement.toggleAttribute('fixed', true);
         invElement.toggleAttribute('noinput', true);
         invElement.toggleAttribute('temp', true);
-        addInventoryChangeListener(invId, this.onSocketInventoryChange);
+        addInventoryChangeListener(store, invId, this.onSocketInventoryChange);
         element = invElement;
       }
       socketItems[element.invId] = itemId;
@@ -189,7 +189,7 @@ export class AlbumGroundElement extends HTMLElement {
   /** @private */
   onSocketInventoryChange(store, invId) {
     if (!isInvInStore(store, invId)) {
-      removeInventoryChangeListener(invId, this.onSocketInventoryChange);
+      removeInventoryChangeListener(store, invId, this.onSocketInventoryChange);
       const albumId = this.albumId;
       const itemId = this.socketItems[invId];
       if (hasItemInAlbum(store, albumId, itemId)) {

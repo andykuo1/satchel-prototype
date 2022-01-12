@@ -189,17 +189,20 @@ export class InventoryItemElement extends HTMLElement {
 
   /** @protected */
   connectedCallback() {
+    const store = getSatchelStore();
     this.addEventListener('mousedown', this.onMouseDown);
     this.addEventListener('contextmenu', this.onContextMenu);
-    addItemChangeListener(this.itemId, this.onItemChange);
-    this.onItemChange(getSatchelStore(), this.itemId);
+    addItemChangeListener(store, this.itemId, this.onItemChange);
+    this.onItemChange(store, this.itemId);
   }
 
   /** @protected */
   disconnectedCallback() {
+    const store = getSatchelStore();
     this.removeEventListener('mousedown', this.onMouseDown);
     this.removeEventListener('contextmenu', this.onContextMenu);
     removeItemChangeListener(
+      store,
       this.itemId,
       this.onItemChange
     );

@@ -20,19 +20,21 @@ export function dispatchProfileChange(store, profileId) {
 }
 
 /**
+ * @param {Store} store
  * @param {ProfileId} profileId 
  * @param {OnProfileChangeCallback} callback 
  */
-export function addProfileChangeListener(profileId, callback) {
-  addStoreEventListener('profile', profileId, callback);
+export function addProfileChangeListener(store, profileId, callback) {
+  addStoreEventListener(store, 'profile', profileId, callback);
 }
 
 /**
+ * @param {Store} store
  * @param {ProfileId} profileId 
  * @param {OnProfileChangeCallback} callback 
  */
-export function removeProfileChangeListener(profileId, callback) {
-  removeStoreEventListener('profile', profileId, callback);
+export function removeProfileChangeListener(store, profileId, callback) {
+  removeStoreEventListener(store, 'profile', profileId, callback);
 }
 
 /**
@@ -43,15 +45,17 @@ export function removeProfileChangeListener(profileId, callback) {
 }
 
 /**
+ * @param {Store} store
  * @param {OnProfileChangeCallback} callback 
  */
-export function addActiveProfileChangeListener(callback) {
-  addStoreEventListener('activeProfile', 'change', callback);
+export function addActiveProfileChangeListener(store, callback) {
+  addStoreEventListener(store, 'activeProfile', 'change', callback);
 }
 
 /**
+ * @param {Store} store
  * @param {OnProfileChangeCallback} callback 
  */
-export function removeActiveProfileChangeListener(callback) {
-  removeStoreEventListener('activeProfile', 'change', callback);
+export function removeActiveProfileChangeListener(store, callback) {
+  removeStoreEventListener(store, 'activeProfile', 'change', callback);
 }

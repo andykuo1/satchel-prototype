@@ -367,7 +367,8 @@ export class ItemEditorElement extends HTMLElement {
     this.itemHeight.addEventListener('change', this.onItemHeight);
 
     this.portraitContainer.addEventListener('mouseup', this.onItemDrop);
-    addInventoryChangeListener(this.socket.invId, this.onSocketInventoryChange);
+    const store = getSatchelStore();
+    addInventoryChangeListener(store, this.socket.invId, this.onSocketInventoryChange);
 
     this.disableInputs(true);
   }
@@ -389,7 +390,8 @@ export class ItemEditorElement extends HTMLElement {
     this.itemHeight.removeEventListener('change', this.onItemHeight);
 
     this.portraitContainer.removeEventListener('mouseup', this.onItemDrop);
-    removeInventoryChangeListener(this.socket.invId, this.onSocketInventoryChange);
+    const store = getSatchelStore();
+    removeInventoryChangeListener(store, this.socket.invId, this.onSocketInventoryChange);
   }
 
   grabDefaultFocus() {
@@ -412,9 +414,9 @@ export class ItemEditorElement extends HTMLElement {
       dropItemOnGround(item);
     }
     if (item) {
-      removeInventoryChangeListener(socketInvId, this.onSocketInventoryChange);
+      removeInventoryChangeListener(store, socketInvId, this.onSocketInventoryChange);
       addItemToInventory(store, socketInvId, item, 0, 0);
-      addInventoryChangeListener(socketInvId, this.onSocketInventoryChange);
+      addInventoryChangeListener(store, socketInvId, this.onSocketInventoryChange);
     }
     this.setupSocketInventory(resizable);
   }

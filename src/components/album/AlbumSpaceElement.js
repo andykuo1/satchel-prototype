@@ -110,7 +110,9 @@ export class AlbumSpaceElement extends HTMLElement {
   disconnectedCallback() {
     const albumId = this._albumId;
     if (albumId) {
+      const store = getSatchelStore();
       removeAlbumChangeListener(
+        store,
         albumId,
         this.onAlbumChange
       );
@@ -147,12 +149,13 @@ export class AlbumSpaceElement extends HTMLElement {
           this._albumId = nextAlbumId;
           if (prevAlbumId) {
             removeAlbumChangeListener(
+              store,
               prevAlbumId,
               this.onAlbumChange
             );
           }
           if (nextAlbumId) {
-            addAlbumChangeListener(nextAlbumId, this.onAlbumChange);
+            addAlbumChangeListener(store, nextAlbumId, this.onAlbumChange);
             this.onAlbumChange(store, nextAlbumId);
           }
         }
@@ -252,11 +255,11 @@ function createItemInv(store, item, albumId) {
   invElement.toggleAttribute('noinput', true);
   invElement.toggleAttribute('temp', true);
   const onChange = (store, invId) => {
-    removeInventoryChangeListener(invId, onChange);
+    removeInventoryChangeListener(store, invId, onChange);
     if (!isInvInStore(store, invId)) {
       removeItemFromAlbum(store, albumId, itemId);
     }
   }
-  addInventoryChangeListener(invId, onChange);
+  addInventoryChangeListener(store, invId, onChange);
   return invElement;
 }

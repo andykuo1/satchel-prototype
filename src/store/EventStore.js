@@ -1,56 +1,54 @@
 /**
  * @typedef {import('./SatchelStore.js').SatchelStore} Store
+ * @typedef {import('./SatchelStore.js').SatchelEvents} SatchelEvents
  */
 
 /**
- * @typedef {Function} SatchelEventCallback
- * @typedef {string} SatchelEventCallbackKey
- * @typedef {Record<SatchelEventCallbackKey, Array<SatchelEventCallback>>} SatchelEventMap
- * 
- * @typedef SatchelEvents
- * @property {SatchelEventMap} item
- * @property {SatchelEventMap} inventory
- * @property {SatchelEventMap} album
- * @property {SatchelEventMap} profile
- * @property {SatchelEventMap} activeProfile
+ * @param {Store} store 
+ * @param {keyof SatchelEvents} event 
+ * @param {string} key 
  */
-
-/** @type {SatchelEvents} */
-const SATCHEL_EVENTS = {
-  item: {},
-  inventory: {},
-  album: {},
-  profile: {},
-  activeProfile: {},
-};
-
-/**
- * @param {keyof SatchelEvents} event
- * @param {SatchelEventCallbackKey} key
- * @param {SatchelEventCallback} callback
- */
-export function addStoreEventListener(event, key, callback) {
-  if (!(event in SATCHEL_EVENTS)) {
-    throw new Error(`Cannot manage listener for unknown inventory event '${event}'.`);
+function getEventListenersInStore(store, event, key) {
+  if (!(event in store.session.events)) {
+    throw new Error(`Cannot find listener mapping for unknown event '${event}'.`);
   }
-  let listeners = SATCHEL_EVENTS[event][key];
+  return store.session.events[event][key];
+}
+
+/**
+ * @param {Store} store 
+ * @param {keyof SatchelEvents} event 
+ * @param {string} key 
+ * @returns {Array<Function>}
+ */
+function resolveEventListenersInStore(store, event, key) {
+  let listeners = getEventListenersInStore(store, event, key);
   if (!listeners) {
     listeners = [];
-    SATCHEL_EVENTS[event][key] = listeners;
+    store.session.events[event][key] = listeners;
   }
+  return listeners;
+}
+
+/**
+ * @param {Store} store
+ * @param {keyof SatchelEvents} event
+ * @param {string} key
+ * @param {Function} callback
+ */
+export function addStoreEventListener(store, event, key, callback) {
+  let listeners = resolveEventListenersInStore(store, event, key);
   listeners.push(callback);
 }
 
 /**
+ * @param {Store} store
  * @param {keyof SatchelEvents} event
- * @param {SatchelEventCallbackKey} key
- * @param {SatchelEventCallback} callback
+ * @param {string} key
+ * @param {Function} callback
  */
-export function removeStoreEventListener(event, key, callback) {
-  if (!(event in SATCHEL_EVENTS)) {
-    throw new Error(`Cannot manage listener for unknown inventory event '${event}'.`);
-  }
-  const listeners = SATCHEL_EVENTS[event][key];
+export function removeStoreEventListener(store, event, key, callback) {
+  let listeners = getEventListenersInStore(store, event, key);
   if (listeners) {
     const i = listeners.indexOf(callback);
     if (i >= 0) {
@@ -62,13 +60,10 @@ export function removeStoreEventListener(event, key, callback) {
 /**
  * @param {Store} store
  * @param {keyof SatchelEvents} event
- * @param {SatchelEventCallbackKey} key
+ * @param {string} key
  */
 export function dispatchStoreEvent(store, event, key) {
-  if (!(event in SATCHEL_EVENTS)) {
-    throw new Error(`Cannot dispatch event for unknown inventory event '${event}'.`);
-  }
-  const listeners = SATCHEL_EVENTS[event][key];
+  let listeners = getEventListenersInStore(store, event, key);
   if (listeners) {
     for (const listener of listeners) {
       listener.call(undefined, store, key);

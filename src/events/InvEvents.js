@@ -20,17 +20,19 @@ import { addStoreEventListener, dispatchStoreEvent, removeStoreEventListener } f
 }
 
 /**
+ * @param {Store} store
  * @param {InvId} invId
  * @param {OnInventoryChangeCallback} callback
  */
-export function addInventoryChangeListener(invId, callback) {
-  addStoreEventListener('inventory', invId, callback);
+export function addInventoryChangeListener(store, invId, callback) {
+  addStoreEventListener(store, 'inventory', invId, callback);
 }
 
 /**
+ * @param {Store} store
  * @param {InvId} invId
  * @param {OnInventoryChangeCallback} callback
  */
-export function removeInventoryChangeListener(invId, callback) {
-  removeStoreEventListener('inventory', invId, callback);
+export function removeInventoryChangeListener(store, invId, callback) {
+  removeStoreEventListener(store, 'inventory', invId, callback);
 }

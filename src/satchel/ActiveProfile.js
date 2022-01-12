@@ -24,8 +24,8 @@ export function setupActiveProfile() {
   const ctx = getCursorContext();
   const activeProfile = resolveActiveProfile(store);
   ctx.lastActiveProfileId = activeProfile.profileId;
-  addActiveProfileChangeListener(onActiveProfileChange);
-  addProfileChangeListener(activeProfile.profileId, onProfileChange);
+  addActiveProfileChangeListener(store, onActiveProfileChange);
+  addProfileChangeListener(store, activeProfile.profileId, onProfileChange);
   onProfileChange();
 
   // Enable profile editing
@@ -33,10 +33,11 @@ export function setupActiveProfile() {
 }
 
 export function teardownActiveProfile() {
+  const store = getSatchelStore();
   const ctx = getCursorContext();
   let lastActiveProfileId = ctx.lastActiveProfileId;
-  removeActiveProfileChangeListener(onActiveProfileChange);
-  removeProfileChangeListener(lastActiveProfileId, onProfileChange);
+  removeActiveProfileChangeListener(store, onActiveProfileChange);
+  removeProfileChangeListener(store, lastActiveProfileId, onProfileChange);
 }
 
 export function changeActiveProfile(store, profileId) {
@@ -74,10 +75,10 @@ function onActiveProfileChange() {
   let ctx = getCursorContext();
   let lastActiveProfileId = ctx.lastActiveProfileId;
   if (lastActiveProfileId) {
-    removeProfileChangeListener(lastActiveProfileId, onProfileChange);
+    removeProfileChangeListener(store, lastActiveProfileId, onProfileChange);
   }
   let nextActiveProfile = resolveActiveProfile(store);
-  addProfileChangeListener(nextActiveProfile.profileId, onProfileChange);
+  addProfileChangeListener(store, nextActiveProfile.profileId, onProfileChange);
   ctx.lastActiveProfileId = nextActiveProfile.profileId;
   onProfileChange();
 }

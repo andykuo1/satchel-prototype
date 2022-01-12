@@ -177,6 +177,7 @@ export class InventoryGridElement extends HTMLElement {
     if (invId) {
       let store = getSatchelStore();
       addInventoryChangeListener(
+        store,
         invId,
         this.onInventoryChange
       );
@@ -210,16 +211,17 @@ export class InventoryGridElement extends HTMLElement {
   disconnectedCallback() {
     this._container.removeEventListener('mouseup', this.onMouseUp);
     this._container.removeEventListener('contextmenu', this.onContextMenu);
+    const store = getSatchelStore();
     const invId = this._invId;
     if (invId) {
       removeInventoryChangeListener(
+        store,
         invId,
         this.onInventoryChange
       );
     }
     // Only stop init once.
     if (this.init) {
-      const store = getSatchelStore();
       const invId = this.invId;
       const inventory = getInvInStore(store, invId);
       if (inventory) {
@@ -244,12 +246,13 @@ export class InventoryGridElement extends HTMLElement {
           this._invId = nextInvId;
           if (prevInvId) {
             removeInventoryChangeListener(
+              store,
               prevInvId,
               this.onInventoryChange
             );
           }
           if (nextInvId) {
-            addInventoryChangeListener(nextInvId, this.onInventoryChange);
+            addInventoryChangeListener(store, nextInvId, this.onInventoryChange);
             this.onInventoryChange(store, nextInvId);
           }
         }

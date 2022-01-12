@@ -20,17 +20,19 @@ import { addStoreEventListener, dispatchStoreEvent, removeStoreEventListener } f
 }
 
 /**
+ * @param {Store} store
  * @param {ItemId} itemId
  * @param {OnItemChangeCallback} callback
  */
-export function addItemChangeListener(itemId, callback) {
-  addStoreEventListener('item', itemId, callback);
+export function addItemChangeListener(store, itemId, callback) {
+  addStoreEventListener(store, 'item', itemId, callback);
 }
 
 /**
+ * @param {Store} store
  * @param {ItemId} itemId
  * @param {OnItemChangeCallback} callback
  */
-export function removeItemChangeListener(itemId, callback) {
-  removeStoreEventListener('item', itemId, callback);
+export function removeItemChangeListener(store, itemId, callback) {
+  removeStoreEventListener(store, 'item', itemId, callback);
 }
