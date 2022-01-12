@@ -32,7 +32,7 @@ export function getItemIdsInAlbum(store, albumId) {
 }
 
 /**
- * @param {import('../../store/SatchelStore.js').InventoryStore} store 
+ * @param {import('../../store/SatchelStore.js').SatchelStore} store 
  * @param {string} albumId 
  * @returns {Array<import('../item/Item.js').Item>}
  */

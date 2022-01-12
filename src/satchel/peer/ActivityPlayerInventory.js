@@ -1,13 +1,14 @@
 import { ActivityBase } from './ActivityBase.js';
 
-import { getInventoryStore, getInventoryInStore, deleteInventoryFromStore, createGridInventoryInStore } from '../../store/SatchelStore.js';
+import { getSatchelStore } from '../../store/SatchelStore.js';
 import { SatchelLocal, SatchelRemote } from './SatchelLocal.js';
 import { getPlayerLastHeartbeat, getPlayerName, hasPlayerHeartbeat, setPlayerLastHeartbeat } from './PlayerState.js';
 import { loadFromStorage, saveToStorage } from '../../Storage.js';
-import { addProfileInStore, deleteProfileInStore, getProfileInStore, isProfileInStore, setActiveProfileInStore } from '../../store/ProfileStore.js';
+import { addProfileInStore, isProfileInStore, setActiveProfileInStore } from '../../store/ProfileStore.js';
 import { createProfile } from '../profile/Profile.js';
 import { uuid } from '../../util/uuid.js';
-import { loadSatchelProfilesFromData, saveSatchelProfilesToData } from '../session/SatchelLoader.js';
+import { loadSatchelProfilesFromData, saveSatchelProfilesToData } from '../../loader/SatchelLoader.js';
+import { createGridInvInStore } from '../../store/InvStore.js';
 
 /** @typedef {import('../../components/invgrid/InventoryGridElement.js').InventoryGridElement} InventoryGridElement */
 
@@ -61,7 +62,7 @@ export class ActivityPlayerInventory extends ActivityBase {
   static onRemoteServerMessage(localClient, remoteServer, messageType, messageData) {
     switch(messageType) {
       case 'reset':
-        const store = getInventoryStore();
+        const store = getSatchelStore();
         const playerName = getPlayerName(localClient);
         const playerDataName = `remote-profile-${playerName}`;
         let profiles = loadSatchelProfilesFromData(store, messageData, true);
@@ -80,7 +81,7 @@ export class ActivityPlayerInventory extends ActivityBase {
    * @param {SatchelRemote} remoteServer
    */
   static onRemoteServerNanny(localClient, remoteServer) {
-    const store = getInventoryStore();
+    const store = getSatchelStore();
     const playerName = getPlayerName(localClient);
     const playerDataName = `remote-profile-${playerName}`;
     if (!isProfileInStore(store, playerDataName)) {
@@ -126,7 +127,7 @@ export class ActivityPlayerInventory extends ActivityBase {
         // Update server's copy of client data
         const clientDataName = `remote-profile-${remotePlayerName}`;
         const clientData = messageData;
-        let store = getInventoryStore();
+        let store = getSatchelStore();
         try {
           let profileIds = loadSatchelProfilesFromData(store, clientData, true);
           if (profileIds[0] !== clientDataName) {
@@ -145,10 +146,10 @@ export class ActivityPlayerInventory extends ActivityBase {
    * @param {string} profileId 
    */
   static sendPlayerReset(remoteClient, profileId) {
-    const store = getInventoryStore();
+    const store = getSatchelStore();
     if (!isProfileInStore(store, profileId)) {
       let newProfile = createProfile(profileId);
-      let newInv = createGridInventoryInStore(store, uuid(), 12, 9);
+      let newInv = createGridInvInStore(store, uuid(), 12, 9);
       newProfile.invs.push(newInv.invId);
       addProfileInStore(store, newProfile.profileId, newProfile);
     }

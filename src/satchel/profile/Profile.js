@@ -1,8 +1,8 @@
 import { uuid } from '../../util/uuid.js';
 
 /**
- * @typedef {import('../inv/Inv.js').InventoryId} InvId
- * @typedef {import('../../store/SatchelStore').InventoryStore} Store
+ * @typedef {import('../inv/Inv.js').InvId} InvId
+ * @typedef {import('../../store/SatchelStore').SatchelStore} Store
  * 
  * @typedef {import('../album/Album.js').AlbumId} AlbumId
  */

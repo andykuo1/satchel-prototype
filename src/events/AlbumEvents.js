@@ -1,4 +1,9 @@
-import { addStoreEventListener, dispatchStoreEvent, removeStoreEventListener } from '../store/InventoryEventStore.js';
+import { addStoreEventListener, dispatchStoreEvent, removeStoreEventListener } from '../store/EventStore.js';
+
+/**
+ * @typedef {import('../store/SatchelStore.js').SatchelStore} Store
+ * @typedef {import('../satchel/album/Album.js').AlbumId} AlbumId
+ */
 
 /**
  * @callback OnAlbumChangeCallback
@@ -7,17 +12,15 @@ import { addStoreEventListener, dispatchStoreEvent, removeStoreEventListener } f
  */
 
 /**
- * 
- * @param {*} store 
- * @param {*} albumId 
+ * @param {Store} store 
+ * @param {AlbumId} albumId 
  */
 export function dispatchAlbumChange(store, albumId) {
   dispatchStoreEvent(store, 'album', albumId);
 }
 
 /**
- * 
- * @param {*} albumId 
+ * @param {AlbumId} albumId 
  * @param {OnAlbumChangeCallback} callback 
  */
 export function addAlbumChangeListener(albumId, callback) {
@@ -25,8 +28,7 @@ export function addAlbumChangeListener(albumId, callback) {
 }
 
 /**
- * 
- * @param {*} albumId 
+ * @param {AlbumId} albumId 
  * @param {OnAlbumChangeCallback} callback 
  */
 export function removeAlbumChangeListener(albumId, callback) {

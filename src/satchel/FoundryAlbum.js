@@ -1,4 +1,4 @@
-import { getInventoryStore } from '../store/SatchelStore.js';
+import { getSatchelStore } from '../store/SatchelStore.js';
 import { uuid } from '../util/uuid.js';
 import { createAlbum, isAlbumLocked } from './album/Album.js';
 import { dispatchAlbumChange } from '../events/AlbumEvents.js';
@@ -12,7 +12,7 @@ const FOUNDRY_ALBUM_DISPLAY_NAME = '[ Foundry ]';
  * @param {import('./item/Item.js').Item} freedItem
  */
 export function saveItemToFoundryAlbum(freedItem) {
-  const store = getInventoryStore();
+  const store = getSatchelStore();
   let foundryAlbumId = getFoundryAlbumId(store);
   if (!foundryAlbumId || !isAlbumInStore(store, foundryAlbumId)) {
     foundryAlbumId = uuid();
@@ -35,7 +35,7 @@ export function saveItemToFoundryAlbum(freedItem) {
  * @returns {boolean}
  */
 export function shouldSaveItemToFoundryAlbum(item) {
-  const store = getInventoryStore();
+  const store = getSatchelStore();
   const foundryAlbumId = getFoundryAlbumId(store);
   if (!foundryAlbumId || !isAlbumInStore(store, foundryAlbumId)) {
     return true;

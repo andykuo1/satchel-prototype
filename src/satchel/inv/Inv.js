@@ -7,11 +7,11 @@ import { cloneItem, copyItem } from '../item/Item.js';
  */
 
 /**
- * @typedef {string} InventoryId
+ * @typedef {string} InvId
  * @typedef {'grid'|'socket'} InventoryType
  *
  * @typedef Inventory
- * @property {InventoryId} invId
+ * @property {InvId} invId
  * @property {InventoryType} type
  * @property {Record<ItemId, Item>} items
  * @property {Array<ItemId>} slots
@@ -25,7 +25,7 @@ import { cloneItem, copyItem } from '../item/Item.js';
 /**
  * Create an inventory.
  *
- * @param {InventoryId} invId
+ * @param {InvId} invId
  * @param {InventoryType} invType
  * @param {number} slotCount
  * @param {number} maxCoordX
@@ -50,7 +50,7 @@ export function createInventory(invId, invType, slotCount, maxCoordX, maxCoordY)
 /**
  * Create a grid inventory of given size.
  *
- * @param {InventoryId} invId
+ * @param {InvId} invId
  * @param {number} width
  * @param {number} height
  * @returns {Inventory}
@@ -62,7 +62,7 @@ export function createGridInventory(invId, width, height) {
 /**
  * Create a socket inventory.
  *
- * @param {InventoryId} invId
+ * @param {InvId} invId
  * @returns {Inventory}
  */
 export function createSocketInventory(invId) {

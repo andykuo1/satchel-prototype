@@ -1,26 +1,26 @@
-import { addInventoryToStore, getInventoryInStore, isInventoryInStore } from '../../store/SatchelStore.js';
-import { cloneAlbum, copyAlbum, isAlbumHidden } from '../album/Album.js';
-import { dispatchAlbumChange } from '../../events/AlbumEvents.js';
-import { exportAlbumToJSON, importAlbumFromJSON } from '../../loader/AlbumLoader.js';
+import { cloneAlbum, copyAlbum, isAlbumHidden } from '../satchel/album/Album.js';
+import { dispatchAlbumChange } from '../events/AlbumEvents.js';
+import { exportAlbumToJSON, importAlbumFromJSON } from './AlbumLoader.js';
 import {
   addAlbumInStore,
   getAlbumIdsInStore,
   getAlbumInStore,
   isAlbumInStore,
-} from '../../store/AlbumStore.js';
-import { cloneInventory, copyInventory } from '../inv/Inv.js';
-import { dispatchInventoryChange } from '../../events/InvEvents.js';
-import { exportInventoryToJSON, importInventoryFromJSON } from '../../loader/InvLoader.js';
-import { cloneProfile, copyProfile } from '../profile/Profile.js';
-import { dispatchProfileChange } from '../../events/ProfileEvents.js';
-import { exportProfileToJSON, importProfileFromJSON } from '../../loader/ProfileLoader.js';
+} from '../store/AlbumStore.js';
+import { cloneInventory, copyInventory } from '../satchel/inv/Inv.js';
+import { dispatchInventoryChange } from '../events/InvEvents.js';
+import { exportInventoryToJSON, importInventoryFromJSON } from './InvLoader.js';
+import { cloneProfile, copyProfile } from '../satchel/profile/Profile.js';
+import { dispatchProfileChange } from '../events/ProfileEvents.js';
+import { exportProfileToJSON, importProfileFromJSON } from './ProfileLoader.js';
 import {
   addProfileInStore,
   getProfileIdsInStore,
   getProfileInStore,
   isProfileInStore,
-} from '../../store/ProfileStore.js';
-import { exportDataToJSON, importDataFromJSON } from './SatchelDataLoader.js';
+} from '../store/ProfileStore.js';
+import { exportDataToJSON, importDataFromJSON } from './DataLoader.js';
+import { isInvInStore, getInvInStore, addInvInStore } from '../store/InvStore.js';
 
 export function loadSatchelFromData(store, jsonData, overrideData) {
   return importDataFromJSON(jsonData, 'satchel_v2', (data) => {
@@ -69,14 +69,14 @@ export function loadSatchelProfilesFromData(store, jsonData, overrideData) {
         if (!overrideData) {
           const newInv = copyInventory(inv);
           overrideInvIds[invId] = newInv.invId;
-          addInventoryToStore(store, newInv.invId, newInv);
+          addInvInStore(store, newInv.invId, newInv);
         } else {
-          if (isInventoryInStore(store, invId)) {
-            const oldInv = getInventoryInStore(store, invId);
+          if (isInvInStore(store, invId)) {
+            const oldInv = getInvInStore(store, invId);
             cloneInventory(inv, oldInv);
             dispatchInventoryChange(store, invId);
           } else {
-            addInventoryToStore(store, invId, inv);
+            addInvInStore(store, invId, inv);
           }
         }
       }
@@ -106,7 +106,7 @@ export function loadSatchelProfilesFromData(store, jsonData, overrideData) {
       // NOTE: Transform to use new inv ids and make sure we don't link inventories that cannot be loaded.
       profile.invs = profile.invs
         .map((invId) => overrideInvIds[invId] || invId)
-        .filter((invId) => isInventoryInStore(store, invId));
+        .filter((invId) => isInvInStore(store, invId));
       // NOTE: Same with albums
       profile.albums = profile.albums
         .map((albumId) => overrideAlbumIds[albumId] || albumId)
@@ -138,7 +138,7 @@ export function saveSatchelProfilesToData(store, profileIds, dst = {}) {
     let profile = getProfileInStore(store, profileId);
     try {
       for (let invId of profile.invs) {
-        let inv = getInventoryInStore(store, invId);
+        let inv = getInvInStore(store, invId);
         outInvs[invId] = exportInventoryToJSON(inv);
       }
       for(let albumId of profile.albums) {

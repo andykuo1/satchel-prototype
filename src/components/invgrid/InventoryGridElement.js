@@ -1,11 +1,7 @@
 import { upgradeProperty } from '../../util/wc.js';
 import { containerMouseUpCallback, DEFAULT_ITEM_UNIT_SIZE } from './InventoryElementMouseHelper.js';
 import {
-  createGridInventoryInStore,
-  createSocketInventoryInStore,
-  deleteInventoryFromStore,
-  getInventoryInStore,
-  getInventoryStore,
+  getSatchelStore,
 } from '../../store/SatchelStore.js';
 import { InventoryItemElement } from './InventoryItemElement.js';
 import {
@@ -13,6 +9,7 @@ import {
 } from '../../satchel/inv/InventoryTransfer.js';
 import { uuid } from '../../util/uuid.js';
 import { addInventoryChangeListener, removeInventoryChangeListener } from '../../events/InvEvents.js';
+import { createGridInvInStore, createSocketInvInStore, deleteInvInStore, getInvInStore } from '../../store/InvStore.js';
 
 const INNER_HTML = /* html */`
 <article>
@@ -178,7 +175,7 @@ export class InventoryGridElement extends HTMLElement {
     this._container.addEventListener('contextmenu', this.onContextMenu);
     let invId = this._invId;
     if (invId) {
-      let store = getInventoryStore();
+      let store = getSatchelStore();
       addInventoryChangeListener(
         invId,
         this.onInventoryChange
@@ -190,19 +187,19 @@ export class InventoryGridElement extends HTMLElement {
     // Only start init once.
     if (this.init) {
       const initType = this.init;
-      const store = getInventoryStore();
+      const store = getSatchelStore();
       let invId = this.invId;
       if (!invId) {
         invId = uuid();
         this.invId = invId;
       }
       if (initType === 'socket') {
-        createSocketInventoryInStore(store, invId);
+        createSocketInvInStore(store, invId);
       } else if (initType.startsWith('grid')) {
         let i = initType.indexOf('x');
         let w = Number(initType.substring(4, i)) || 1;
         let h = Number(initType.substring(i + 1)) || 1;
-        createGridInventoryInStore(store, invId, w, h);
+        createGridInvInStore(store, invId, w, h);
       } else {
         throw new Error(`Unknown init type '${initType}' for inventory-grid.`);
       }
@@ -222,11 +219,11 @@ export class InventoryGridElement extends HTMLElement {
     }
     // Only stop init once.
     if (this.init) {
-      const store = getInventoryStore();
+      const store = getSatchelStore();
       const invId = this.invId;
-      const inventory = getInventoryInStore(store, invId);
+      const inventory = getInvInStore(store, invId);
       if (inventory) {
-        deleteInventoryFromStore(getInventoryStore(), invId, inventory);
+        deleteInvInStore(getSatchelStore(), invId, inventory);
       }
     }
   }
@@ -240,7 +237,7 @@ export class InventoryGridElement extends HTMLElement {
   attributeChangedCallback(attribute, previous, value) {
     switch (attribute) {
       case 'invid': {
-        const store = getInventoryStore();
+        const store = getSatchelStore();
         const prevInvId = this._invId;
         const nextInvId = value;
         if (prevInvId !== nextInvId) {
@@ -266,7 +263,7 @@ export class InventoryGridElement extends HTMLElement {
    * @param invId
    */
   onInventoryChange(store, invId) {
-    const inv = getInventoryInStore(store, invId);
+    const inv = getInvInStore(store, invId);
     if (!inv) {
       // The inventory has been deleted.
       this.style.setProperty('--container-width', '0');
@@ -330,7 +327,7 @@ export class InventoryGridElement extends HTMLElement {
     if (this.hasAttribute('temp')) {
       if (isInventoryEmpty(store, invId)) {
         this.remove();
-        deleteInventoryFromStore(store, invId, inv);
+        deleteInvInStore(store, invId, inv);
         return;
       }
     }

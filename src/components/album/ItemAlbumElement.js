@@ -1,4 +1,4 @@
-import { createSocketInventoryInStore, deleteInventoryFromStore, getInventoryInStore, getInventoryStore, isInventoryInStore } from '../../store/SatchelStore.js';
+import { getSatchelStore } from '../../store/SatchelStore.js';
 import { addItemToInventory, getItemAtSlotIndex } from '../../satchel/inv/InventoryTransfer.js';
 import { createInventoryView } from '../../satchel/inv/InvView.js';
 import { uuid } from '../../util/uuid.js';
@@ -15,6 +15,7 @@ import { addInventoryChangeListener, removeInventoryChangeListener } from '../..
 import { addItemToAlbum, clearItemsInAlbum, getItemIdsInAlbum, getItemInAlbum, removeItemFromAlbum } from '../../satchel/album/AlbumItems.js';
 import { isGroundAlbum } from '../../satchel/GroundAlbum.js';
 import { isFoundryAlbum } from '../../satchel/FoundryAlbum.js';
+import { isInvInStore, getInvInStore, deleteInvInStore, createSocketInvInStore } from '../../store/InvStore.js';
 
 const INNER_HTML = /* html */`
 <fieldset>
@@ -178,14 +179,14 @@ export class ItemAlbumElement extends HTMLElement {
     }
     
     // Destroy all items
-    const store = getInventoryStore();
+    const store = getSatchelStore();
     for (const node of this.slotItems.assignedNodes()) {
       const invNode =
         /** @type {import('../invgrid/InventoryGridElement.js').InventoryGridElement} */ (node);
       const invId = invNode.invId;
-      const inv = getInventoryInStore(store, invId);
+      const inv = getInvInStore(store, invId);
       if (inv) {
-        deleteInventoryFromStore(store, invId, inv);
+        deleteInvInStore(store, invId, inv);
       }
     }
 
@@ -206,7 +207,7 @@ export class ItemAlbumElement extends HTMLElement {
   attributeChangedCallback(attribute, previous, value) {
     switch (attribute) {
       case 'albumid': {
-        const store = getInventoryStore();
+        const store = getSatchelStore();
         const prevAlbumId = this._albumId;
         const nextAlbumId = value;
         if (prevAlbumId !== nextAlbumId) {
@@ -266,7 +267,7 @@ export class ItemAlbumElement extends HTMLElement {
       const invNode =
         /** @type {import('../invgrid/InventoryGridElement.js').InventoryGridElement} */ (node);
       const invId = invNode.invId;
-      const item = getItemAtSlotIndex(getInventoryStore(), invId, 0);
+      const item = getItemAtSlotIndex(getSatchelStore(), invId, 0);
       if (item) {
         preservedInvs[item.itemId] = invNode;
       }
@@ -285,7 +286,7 @@ export class ItemAlbumElement extends HTMLElement {
         element = preservedInvs[itemId];
         delete preservedInvs[itemId];
       } else {
-        let store = getInventoryStore();
+        let store = getSatchelStore();
         let albumItem = getItemInAlbum(store, albumId, itemId);
         let newItem = cloneItem(albumItem);
         element = createItemInv(store, newItem, albumId, locked);
@@ -296,9 +297,9 @@ export class ItemAlbumElement extends HTMLElement {
     // Delete remaining inventories
     for(let invElement of Object.values(preservedInvs)) {
       const invId = invElement.invId;
-      const inv = getInventoryInStore(store, invId);
+      const inv = getInvInStore(store, invId);
       if (inv) {
-        deleteInventoryFromStore(store, invId, inv);
+        deleteInvInStore(store, invId, inv);
       }
     }
 
@@ -308,7 +309,7 @@ export class ItemAlbumElement extends HTMLElement {
 
   /** @private */
   onInputTitle(e) {
-    const store = getInventoryStore();
+    const store = getSatchelStore();
     const albumId = this.albumId;
     if (isAlbumInStore(store, albumId)) {
       const name = this.inputTitle.textContent;
@@ -320,7 +321,7 @@ export class ItemAlbumElement extends HTMLElement {
 
   /** @private */
   onButtonLock() {
-    const store = getInventoryStore();
+    const store = getSatchelStore();
     const albumId = this.albumId;
     if (isAlbumInStore(store, albumId)) {
       const locked = isAlbumLocked(store, albumId);
@@ -330,7 +331,7 @@ export class ItemAlbumElement extends HTMLElement {
 
   /** @private */
   onButtonExport() {
-    const store = getInventoryStore();
+    const store = getSatchelStore();
     const album = getAlbumInStore(store, this.albumId);
     if (album) {
       try {
@@ -345,7 +346,7 @@ export class ItemAlbumElement extends HTMLElement {
 
   /** @private */
   onButtonDelete() {
-    const store = getInventoryStore();
+    const store = getSatchelStore();
     const albumId = this.albumId;
     clearItemsInAlbum(store, albumId);
     const album = getAlbumInStore(store, albumId);
@@ -360,7 +361,7 @@ export class ItemAlbumElement extends HTMLElement {
 
   /** @private */
   onItemDrop(e) {
-    const store = getInventoryStore();
+    const store = getSatchelStore();
     const albumId = this.albumId;
     if (!isAlbumInStore(store, albumId)) {
       return;
@@ -384,7 +385,7 @@ ItemAlbumElement.define();
 function createItemInv(store, item, albumId, locked) {
   const invId = uuid();
   const itemId = item.itemId;
-  createSocketInventoryInStore(store, invId);
+  createSocketInvInStore(store, invId);
   addItemToInventory(store, invId, item, 0, 0);
   const invElement = createInventoryView(store, invId);
   invElement.fixed = true;
@@ -395,7 +396,7 @@ function createItemInv(store, item, albumId, locked) {
     invElement.toggleAttribute('temp', true);
     const onChange = (store, invId) => {
       removeInventoryChangeListener(invId, onChange);
-      if (!isInventoryInStore(store, invId)) {
+      if (!isInvInStore(store, invId)) {
         removeItemFromAlbum(store, albumId, itemId);
       }
     }

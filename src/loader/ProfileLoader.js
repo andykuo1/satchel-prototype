@@ -1,4 +1,4 @@
-import { exportDataToJSON, importDataFromJSON } from '../satchel/session/SatchelDataLoader.js';
+import { exportDataToJSON, importDataFromJSON } from './DataLoader.js';
 import { cloneProfile } from '../satchel/profile/Profile.js';
 
 /**

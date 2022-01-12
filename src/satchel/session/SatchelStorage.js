@@ -1,5 +1,5 @@
 import { getAlbumIdsInStore } from '../../store/AlbumStore.js';
-import { getInventoryStore } from '../../store/SatchelStore.js';
+import { getSatchelStore } from '../../store/SatchelStore.js';
 import { loadFromStorage, saveToStorage } from '../../Storage.js';
 import { getProfileIdsInStore } from '../../store/ProfileStore.js';
 import {
@@ -7,11 +7,11 @@ import {
   loadSatchelProfilesFromData,
   saveSatchelAlbumsToData,
   saveSatchelProfilesToData,
-} from './SatchelLoader.js';
+} from '../../loader/SatchelLoader.js';
 import { isAlbumHidden } from '../album/Album.js';
 
 export function loadSatchelFromStorage() {
-  const store = getInventoryStore();
+  const store = getSatchelStore();
 
   // Load from storage...
   let satchelData = loadFromStorage('satchel_data_v4');
@@ -37,7 +37,7 @@ export function loadSatchelFromStorage() {
 }
 
 export function saveSatchelToStorage() {
-  const store = getInventoryStore();
+  const store = getSatchelStore();
   try {
     let profileIds = getProfileIdsInStore(store);
     let profileData = saveSatchelProfilesToData(store, profileIds);

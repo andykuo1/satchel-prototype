@@ -1,5 +1,5 @@
 import { getCursorContext } from './inv/CursorHelper.js';
-import { createGridInventoryInStore, getInventoryStore } from '../store/SatchelStore.js';
+import { getSatchelStore } from '../store/SatchelStore.js';
 import { uuid } from '../util/uuid.js';
 import { createProfile } from './profile/Profile.js';
 import {
@@ -17,9 +17,10 @@ import {
   setActiveProfileInStore,
   addProfileInStore,
 } from '../store/ProfileStore.js';
+import { createGridInvInStore } from '../store/InvStore.js';
 
 export function setupActiveProfile() {
-  const store = getInventoryStore();
+  const store = getSatchelStore();
   const ctx = getCursorContext();
   const activeProfile = resolveActiveProfile(store);
   ctx.lastActiveProfileId = activeProfile.profileId;
@@ -61,7 +62,7 @@ export function resolveActiveProfile(store) {
   }
   // Create the default active profile if none exists.
   let newProfile = createProfile(uuid());
-  let newInv = createGridInventoryInStore(store, uuid(), 12, 9);
+  let newInv = createGridInvInStore(store, uuid(), 12, 9);
   newProfile.invs.push(newInv.invId);
   addProfileInStore(store, newProfile.profileId, newProfile);
   setActiveProfileInStore(store, newProfile.profileId);
@@ -69,7 +70,7 @@ export function resolveActiveProfile(store) {
 }
 
 function onActiveProfileChange() {
-  const store = getInventoryStore();
+  const store = getSatchelStore();
   let ctx = getCursorContext();
   let lastActiveProfileId = ctx.lastActiveProfileId;
   if (lastActiveProfileId) {
@@ -84,7 +85,7 @@ function onActiveProfileChange() {
 function onProfileChange() {
   let invsContainer = document.querySelector('#localWorkspace');
   invsContainer.innerHTML = '';
-  const store = getInventoryStore();
+  const store = getSatchelStore();
   const activeProfile = getActiveProfileInStore(store);
   if (!activeProfile) {
     return;

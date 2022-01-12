@@ -1,6 +1,6 @@
 import { getCursor } from '../cursor/index.js';
 import { InventoryGridElement } from '../invgrid/InventoryGridElement.js';
-import { getInventoryStore } from '../../store/SatchelStore.js';
+import { getSatchelStore } from '../../store/SatchelStore.js';
 import { addItemToInventory, clearItemsInInventory, getItemAtSlotIndex, isInventoryEmpty } from '../../satchel/inv/InventoryTransfer.js';
 import { saveItemToFoundryAlbum, shouldSaveItemToFoundryAlbum } from '../../satchel/FoundryAlbum.js';
 import { dropItemOnGround } from '../../satchel/GroundAlbum.js';
@@ -397,14 +397,14 @@ export class ItemEditorElement extends HTMLElement {
   }
 
   clearSocketedItem() {
-    const store = getInventoryStore();
+    const store = getSatchelStore();
     const socketInvId = this.socket.invId;
     clearItemsInInventory(store, socketInvId);
     this.setupSocketInventory(false);
   }
 
   putSocketedItem(item, resizable = false) {
-    const store = getInventoryStore();
+    const store = getSatchelStore();
     const socketInvId = this.socket.invId;
     if (item && !isInventoryEmpty(store, socketInvId)) {
       const item = getItemAtSlotIndex(store, socketInvId, 0);
@@ -420,7 +420,7 @@ export class ItemEditorElement extends HTMLElement {
   }
 
   getSocketedItem() {
-    const store = getInventoryStore();
+    const store = getSatchelStore();
     return getItemAtSlotIndex(store, this.socket.invId, 0);
   }
 
@@ -545,7 +545,7 @@ export class ItemEditorElement extends HTMLElement {
 
   /** @private */
   onActionEnlarge() {
-    const store = getInventoryStore();
+    const store = getSatchelStore();
     const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
     const oldWidth = socketItem.width;
     const oldHeight = socketItem.height;
@@ -560,7 +560,7 @@ export class ItemEditorElement extends HTMLElement {
 
   /** @private */
   onActionShrink() {
-    const store = getInventoryStore();
+    const store = getSatchelStore();
     const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
     const oldWidth = socketItem.width;
     const oldHeight = socketItem.height;
@@ -575,7 +575,7 @@ export class ItemEditorElement extends HTMLElement {
 
   /** @private */
   onActionFlatten() {
-    const store = getInventoryStore();
+    const store = getSatchelStore();
     const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
     const oldWidth = socketItem.width;
     const oldHeight = socketItem.height;
@@ -602,7 +602,7 @@ export class ItemEditorElement extends HTMLElement {
 
   /** @private */
   onActionFlattenRotated() {
-    const store = getInventoryStore();
+    const store = getSatchelStore();
     const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
     const oldWidth = socketItem.width;
     const oldHeight = socketItem.height;
@@ -629,7 +629,7 @@ export class ItemEditorElement extends HTMLElement {
 
   /** @private */
   onActionFit() {
-    const store = getInventoryStore();
+    const store = getSatchelStore();
     const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
     const oldWidth = socketItem.width;
     const oldHeight = socketItem.height;
@@ -646,7 +646,7 @@ export class ItemEditorElement extends HTMLElement {
   /** @private */
   onItemWidth() {
     const width = this.parseItemWidth();
-    const store = getInventoryStore();
+    const store = getSatchelStore();
     const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
     this.updateItemSize(store, socketItem, width, socketItem.height);
   }
@@ -654,7 +654,7 @@ export class ItemEditorElement extends HTMLElement {
   /** @private */
   onItemHeight() {
     const height = this.parseItemHeight();
-    const store = getInventoryStore();
+    const store = getSatchelStore();
     const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
     this.updateItemSize(store, socketItem, socketItem.width, height);
   }
@@ -662,7 +662,7 @@ export class ItemEditorElement extends HTMLElement {
   /** @private */
   onItemBackground() {
     const background = this.parseItemBackground();
-    const store = getInventoryStore();
+    const store = getSatchelStore();
     const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
     socketItem.background = background;
     dispatchItemChange(store, socketItem.itemId);
@@ -671,7 +671,7 @@ export class ItemEditorElement extends HTMLElement {
   /** @private */
   onItemImage() {
     const imgSrc = this.parseItemImage();
-    const store = getInventoryStore();
+    const store = getSatchelStore();
     const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
     const defaultImgSrc = getDefaultImageSourceByDimensions(socketItem.width, socketItem.height, socketItem.stackSize);
     socketItem.imgSrc = imgSrc || defaultImgSrc;
@@ -681,7 +681,7 @@ export class ItemEditorElement extends HTMLElement {
   /** @private */
   onItemStackSize() {
     const stackSize = this.parseItemStackSize();
-    const store = getInventoryStore();
+    const store = getSatchelStore();
     const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
     socketItem.stackSize = stackSize;
     dispatchItemChange(store, socketItem.itemId);
@@ -693,7 +693,7 @@ export class ItemEditorElement extends HTMLElement {
   /** @private */
   onItemTitle() {
     const title = this.parseItemTitle();
-    const store = getInventoryStore();
+    const store = getSatchelStore();
     const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
     socketItem.displayName = title;
     dispatchItemChange(store, socketItem.itemId);
@@ -702,7 +702,7 @@ export class ItemEditorElement extends HTMLElement {
   /** @private */
   onItemDesc() {
     const desc = this.parseItemDesc();
-    const store = getInventoryStore();
+    const store = getSatchelStore();
     const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
     socketItem.description = desc;
     dispatchItemChange(store, socketItem.itemId);

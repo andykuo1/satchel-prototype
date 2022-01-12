@@ -1,6 +1,17 @@
 import { createAlbum } from '../satchel/album/Album.js';
 import { dispatchAlbumChange } from '../events/AlbumEvents.js';
 
+/**
+ * @typedef {import('./SatchelStore.js').SatchelStore} Store
+ * @typedef {import('../satchel/album/Album.js').Album} Album
+ * @typedef {import('../satchel/album/Album.js').AlbumId} AlbumId
+ */
+
+/**
+ * @param {Store} store 
+ * @param {AlbumId} albumId 
+ * @returns {Album}
+ */
 export function getExistingAlbumInStore(store, albumId) {
   if (isAlbumInStore(store, albumId)) {
     return getAlbumInStore(store, albumId);
@@ -9,22 +20,45 @@ export function getExistingAlbumInStore(store, albumId) {
   }
 }
 
+/**
+ * @param {Store} store 
+ * @param {AlbumId} albumId 
+ * @returns {Album}
+ */
 export function getAlbumInStore(store, albumId) {
   return store.data.album[albumId];
 }
 
+/**
+ * @param {Store} store 
+ * @returns {Array<Album>}
+ */
 export function getAlbumsInStore(store) {
   return Object.values(store.data.album);
 }
 
+/**
+ * @param {Store} store 
+ * @returns {Array<AlbumId>}
+ */
 export function getAlbumIdsInStore(store) {
   return Object.keys(store.data.album);
 }
 
+/**
+ * @param {Store} store 
+ * @param {AlbumId} albumId
+ * @returns {boolean}
+ */
 export function isAlbumInStore(store, albumId) {
   return albumId in store.data.album;
 }
 
+/**
+ * @param {Store} store 
+ * @param {AlbumId} albumId 
+ * @returns {Album}
+ */
 export function  createAlbumInStore(store, albumId) {
   let album = createAlbum(albumId);
   if (!addAlbumInStore(store, albumId, album)) {
@@ -33,6 +67,12 @@ export function  createAlbumInStore(store, albumId) {
   return album;
 }
 
+/**
+ * @param {Store} store 
+ * @param {AlbumId} albumId 
+ * @param {Album} album 
+ * @returns {boolean}
+ */
 export function addAlbumInStore(store, albumId, album) {
   if (albumId !== album.albumId) {
     throw new Error(`Cannot add album '${album.albumId}' for mismatched id '${albumId}'.`);
@@ -45,6 +85,12 @@ export function addAlbumInStore(store, albumId, album) {
   return true;
 }
 
+/**
+ * @param {Store} store 
+ * @param {AlbumId} albumId 
+ * @param {Album} album 
+ * @returns {boolean}
+ */
 export function deleteAlbumInStore(store, albumId, album) {
   if (albumId !== album.albumId) {
     throw new Error(`Cannot delete album '${album.albumId}' for mismatched id '${albumId}'.`);

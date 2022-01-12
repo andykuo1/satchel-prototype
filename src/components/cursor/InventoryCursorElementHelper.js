@@ -1,5 +1,4 @@
 import { dijkstra2d } from '../../util/dijkstra2d.js';
-import { getInventoryInStore } from '../../store/SatchelStore.js';
 import {
   addItemToInventory,
   getExistingInventory,
@@ -10,11 +9,12 @@ import {
 } from '../../satchel/inv/InventoryTransfer.js';
 import { getItemByItemId } from '../../satchel/inv/InvItems.js';
 import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../../satchel/inv/InvSlots.js';
+import { getInvInStore } from '../../store/InvStore.js';
 
 /**
  * @typedef {import('../../satchel/inv/Inv.js').Inventory} Inventory
- * @typedef {import('../../satchel/inv/Inv.js').InventoryId} InventoryId
- * @typedef {import('../../store/SatchelStore.js').InventoryStore} InventoryStore
+ * @typedef {import('../../satchel/inv/Inv.js').InvId} InvId
+ * @typedef {import('../../store/SatchelStore.js').SatchelStore} SatchelStore
  *
  * @typedef {import('../../satchel/item/Item.js').Item} Item
  * @typedef {import('../../satchel/item/Item.js').ItemId} ItemId
@@ -24,8 +24,8 @@ import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../../satchel/inv/In
 
 /**
  * @param {InventoryCursorElement} cursor
- * @param {InventoryStore} store
- * @param {InventoryId} toInventoryId
+ * @param {SatchelStore} store
+ * @param {InvId} toInvId
  * @param {number} coordX
  * @param {number} coordY
  * @param {boolean} swappable
@@ -33,26 +33,26 @@ import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../../satchel/inv/In
 export function putDownToSocketInventory(
   cursor,
   store,
-  toInventoryId,
+  toInvId,
   coordX,
   coordY,
   swappable
 ) {
   let heldItem = cursor.getHeldItem();
-  let prevItem = getItemAtSlotIndex(store, toInventoryId, 0);
+  let prevItem = getItemAtSlotIndex(store, toInvId, 0);
   let prevItemX = -1;
   let prevItemY = -1;
   if (prevItem) {
     if (swappable) {
       // Has an item to swap. So pick up this one for later.
-      let inv = getExistingInventory(store, toInventoryId);
+      let inv = getExistingInventory(store, toInvId);
       let prevItemId = prevItem.itemId;
       let slotIndex = getSlotIndexByItemId(inv, prevItemId);
       let [x, y] = getSlotCoordsByIndex(inv, slotIndex);
       prevItemX = x;
       prevItemY = y;
       prevItem = getItemByItemId(inv, prevItemId);
-      removeItemFromInventory(store, toInventoryId, prevItemId);
+      removeItemFromInventory(store, toInvId, prevItemId);
     } else {
       // Cannot swap. Exit early.
       return false;
@@ -60,7 +60,7 @@ export function putDownToSocketInventory(
   }
   // Now there are no items in the way. Place it down!
   cursor.clearHeldItem();
-  addItemToInventory(store, toInventoryId, heldItem, 0, 0);
+  addItemToInventory(store, toInvId, heldItem, 0, 0);
   // ...finally put the remaining item back now that there is space.
   if (prevItem) {
     cursor.setHeldItem(
@@ -74,8 +74,8 @@ export function putDownToSocketInventory(
 
 /**
  * @param {InventoryCursorElement} cursor
- * @param {InventoryStore} store
- * @param {InventoryId} toInventoryId
+ * @param {SatchelStore} store
+ * @param {InvId} toInvId
  * @param {number} itemX The root slot coordinates to place item (includes holding offset)
  * @param {number} itemY The root slot coordinates to place item (includes holding offset)
  * @param {boolean} swappable
@@ -83,12 +83,12 @@ export function putDownToSocketInventory(
 export function putDownToGridInventory(
   cursor,
   store,
-  toInventoryId,
+  toInvId,
   itemX,
   itemY,
   swappable
 ) {
-  const toInventory = getInventoryInStore(store, toInventoryId);
+  const toInventory = getInvInStore(store, toInvId);
   const heldItem = cursor.getHeldItem();
   const invWidth = toInventory.width;
   const invHeight = toInventory.height;
@@ -107,7 +107,7 @@ export function putDownToGridInventory(
     for (let x = 0; x < itemWidth; ++x) {
       let itemId = getItemIdAtSlotCoords(
         store,
-        toInventoryId,
+        toInvId,
         targetCoordX + x,
         targetCoordY + y
       );
@@ -131,17 +131,17 @@ export function putDownToGridInventory(
     let prevItemY = -1;
     if (prevItemId) {
       // Has an item to swap. So pick up this one for later.
-      let inv = getExistingInventory(store, toInventoryId);
+      let inv = getExistingInventory(store, toInvId);
       let slotIndex = getSlotIndexByItemId(inv, prevItemId);
       let [x, y] = getSlotCoordsByIndex(inv, slotIndex);
       prevItemX = x;
       prevItemY = y;
       prevItem = getItemByItemId(inv, prevItemId);
-      removeItemFromInventory(store, toInventoryId, prevItemId);
+      removeItemFromInventory(store, toInvId, prevItemId);
     }
     // Now there are no items in the way. Place it down!
     cursor.clearHeldItem();
-    addItemToInventory(store, toInventoryId, heldItem, targetCoordX, targetCoordY);
+    addItemToInventory(store, toInvId, heldItem, targetCoordX, targetCoordY);
     // ...finally put the remaining item back now that there is space.
     if (prevItem) {
       cursor.setHeldItem(
@@ -158,11 +158,11 @@ export function putDownToGridInventory(
       targetCoordY,
       maxCoordX,
       maxCoordY,
-      (x, y) => canPlaceAt(store, toInventoryId, x, y, itemWidth, itemHeight)
+      (x, y) => canPlaceAt(store, toInvId, x, y, itemWidth, itemHeight)
     );
     if (x >= 0 && y >= 0) {
       cursor.clearHeldItem();
-      addItemToInventory(store, toInventoryId, heldItem, x, y);
+      addItemToInventory(store, toInvId, heldItem, x, y);
       return true;
     }
     // No can do :(
@@ -171,8 +171,8 @@ export function putDownToGridInventory(
 }
 
 /**
- * @param {InventoryStore} store
- * @param {InventoryId} invId
+ * @param {SatchelStore} store
+ * @param {InvId} invId
  * @param coordX
  * @param coordY
  * @param itemWidth

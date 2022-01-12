@@ -1,5 +1,5 @@
 import { DEFAULT_ITEM_UNIT_SIZE, itemMouseDownCallback } from './InventoryElementMouseHelper.js';
-import { getInventoryStore } from '../../store/SatchelStore.js';
+import { getSatchelStore } from '../../store/SatchelStore.js';
 import { getExistingInventory } from '../../satchel/inv/InventoryTransfer.js';
 import { hasItem, getItemByItemId } from '../../satchel/inv/InvItems.js';
 import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../../satchel/inv/InvSlots.js';
@@ -151,7 +151,7 @@ export class InventoryItemElement extends HTMLElement {
         'Cannot create item element with mismatched container and inventory id.'
       );
     }
-    const inv = getExistingInventory(getInventoryStore(), invId);
+    const inv = getExistingInventory(getSatchelStore(), invId);
     if (!hasItem(inv, itemId)) {
       throw new Error(
         'Cannot create item element with item id not in given inventory.'
@@ -192,7 +192,7 @@ export class InventoryItemElement extends HTMLElement {
     this.addEventListener('mousedown', this.onMouseDown);
     this.addEventListener('contextmenu', this.onContextMenu);
     addItemChangeListener(this.itemId, this.onItemChange);
-    this.onItemChange(getInventoryStore(), this.itemId);
+    this.onItemChange(getSatchelStore(), this.itemId);
   }
 
   /** @protected */

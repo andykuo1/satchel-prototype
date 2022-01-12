@@ -1,5 +1,5 @@
 import { downloadText } from './util/downloader.js';
-import { addInventoryToStore, createGridInventoryInStore, deleteInventoryFromStore, getInventoryInStore, getInventoryStore, isInventoryInStore } from './store/SatchelStore.js';
+import { getSatchelStore } from './store/SatchelStore.js';
 import { connectAsServer } from './satchel/app/PeerSatchelConnector.js';
 import { getCursorContext } from './satchel/inv/CursorHelper.js';
 import { uploadFile } from './util/uploader.js';
@@ -17,11 +17,12 @@ import { ActivityPlayerList } from './satchel/peer/ActivityPlayerList.js';
 import { dropItemOnGround, isGroundAlbum } from './satchel/GroundAlbum.js';
 import { forceEmptyStorage } from './Storage.js';
 import { addProfileInStore, deleteProfileInStore, getActiveProfileInStore, getProfileIdsInStore, getProfileInStore, isProfileInStore, setActiveProfileInStore } from './store/ProfileStore.js';
-import { loadSatchelFromData, loadSatchelProfilesFromData, saveSatchelProfilesToData, saveSatchelToData } from './satchel/session/SatchelLoader.js';
+import { loadSatchelFromData, loadSatchelProfilesFromData, saveSatchelProfilesToData, saveSatchelToData } from './loader/SatchelLoader.js';
 import { createProfile } from './satchel/profile/Profile.js';
 import { dispatchProfileChange } from './events/ProfileEvents.js';
 import { resolveActiveProfile } from './satchel/ActiveProfile.js';
 import { createGridInventory, createSocketInventory } from './satchel/inv/Inv.js';
+import { isInvInStore, getInvInStore, createGridInvInStore, deleteInvInStore, addInvInStore } from './store/InvStore.js';
 
 function elementEventListener(selector, event, callback) {
   document.querySelector(selector).addEventListener(event, callback);
@@ -130,7 +131,7 @@ function onActionEraseAll() {
 }
 
 function onActionAlbumNew() {
-  const store = getInventoryStore();
+  const store = getSatchelStore();
   const albumId = uuid();
   createAlbumInStore(store, albumId);
   const albumContainer = document.querySelector('#albumList');
@@ -140,7 +141,7 @@ function onActionAlbumNew() {
 }
 
 function onActionAlbumOpen() {
-  const store = getInventoryStore();
+  const store = getSatchelStore();
   const albumIds = getAlbumIdsInStore(store);
   const albumElementList = document.querySelector('#albumList');
   /** @type {NodeListOf<ItemAlbumElement>} */
@@ -208,7 +209,7 @@ function onActionFoundryNew() {
 
 function onDownloadClick() {
   const timestamp = Date.now();
-  const store = getInventoryStore();
+  const store = getSatchelStore();
   const json = saveSatchelToData(store);
   downloadText(`satchel-data-${timestamp}.json`, JSON.stringify(json, null, 4));
 }
@@ -229,7 +230,7 @@ async function onUploadClick() {
       if (!window.confirm('This may overwrite data. Do you want to continue?')) {
         return;
       }
-      const store = getInventoryStore();
+      const store = getSatchelStore();
       try {
         loadSatchelFromData(store, jsonData, true);
       } catch (e) {
@@ -238,7 +239,7 @@ async function onUploadClick() {
       }
     } break;
     case 'profile_v2': {
-      const store = getInventoryStore();
+      const store = getSatchelStore();
       try {
         let loadedProfileIds = loadSatchelProfilesFromData(store, jsonData, false);
         if (loadedProfileIds) {
@@ -253,7 +254,7 @@ async function onUploadClick() {
       }
     } break;
     case 'album_v1': {
-      const store = getInventoryStore();
+      const store = getSatchelStore();
       try {
         const album = importAlbumFromJSON(jsonData);
         const newAlbum = copyAlbum(album);
@@ -365,7 +366,7 @@ function onActionFoundryReset() {
 }
 
 function onActionProfile() {
-  const store = getInventoryStore();
+  const store = getSatchelStore();
   const profileIds = getProfileIdsInStore(store);
   const activeProfile = resolveActiveProfile(store);
   const rootContainerElement = document.querySelector('#activeProfileList');
@@ -419,7 +420,7 @@ function onActionProfile() {
 }
 
 function onActionProfileActive(e) {
-  const store = getInventoryStore();
+  const store = getSatchelStore();
   let profileId = e.target.value;
   if (!isProfileInStore(store, profileId)) {
     return;
@@ -433,12 +434,12 @@ function onActionProfileActive(e) {
 }
 
 function onActionProfileNew() {
-  const store = getInventoryStore();
+  const store = getSatchelStore();
   const profileIds = getProfileIdsInStore(store);
   const displayName = `Satchel ${profileIds.length + 1}`;
   let newProfile = createProfile(uuid());
   newProfile.displayName = displayName;
-  let newInv = createGridInventoryInStore(store, uuid(), 12, 9);
+  let newInv = createGridInvInStore(store, uuid(), 12, 9);
   newProfile.invs.push(newInv.invId);
   addProfileInStore(store, newProfile.profileId, newProfile);
   setActiveProfileInStore(store, newProfile.profileId);
@@ -446,7 +447,7 @@ function onActionProfileNew() {
 }
 
 function onActionProfileEdit(e) {
-  const store = getInventoryStore();
+  const store = getSatchelStore();
   /** @type {HTMLButtonElement} */
   const target = e.target;
   const profileId = target.getAttribute('data-profile');
@@ -470,7 +471,7 @@ function onActionProfileEdit(e) {
 }
 
 function onActionProfileEditName(e) {
-  const store = getInventoryStore();
+  const store = getSatchelStore();
   const activeProfile = getActiveProfileInStore(store);
   if (!activeProfile) {
     return;
@@ -484,7 +485,7 @@ function prepareEditProfileDialog(store, profileId) {
   const rootContainerElement = document.querySelector('#activeInventoryList');
   rootContainerElement.innerHTML = '';
   for(let invId of profile.invs) {
-    let inv = getInventoryInStore(store, invId);
+    let inv = getInvInStore(store, invId);
     let labelElement = document.createElement('label');
     labelElement.textContent = `${inv.displayName || 'Inventory'} | ${inv.width}⨯${inv.height}`;
     let deleteElement = document.createElement('icon-button');
@@ -536,7 +537,7 @@ async function onActionProfileImport() {
 
   switch(jsonData._type) {
     case 'profile_v2': {
-      const store = getInventoryStore();
+      const store = getSatchelStore();
       try {
         let loadedProfileIds = loadSatchelProfilesFromData(store, jsonData, false);
         if (loadedProfileIds) {
@@ -558,7 +559,7 @@ async function onActionProfileImport() {
 }
 
 function onActionProfileExport(e) {
-  const store = getInventoryStore();
+  const store = getSatchelStore();
   /** @type {HTMLButtonElement} */
   const target = e.target;
   const profileId = target.getAttribute('data-profile');
@@ -575,7 +576,7 @@ function onActionProfileDelete(e) {
   if (!window.confirm('Are you sure you want to delete this profile?')) {
     return;
   }
-  const store = getInventoryStore();
+  const store = getSatchelStore();
   /** @type {HTMLButtonElement} */
   const target = e.target;
   const profileId = target.getAttribute('data-profile');
@@ -584,8 +585,8 @@ function onActionProfileDelete(e) {
   }
   let profile = getProfileInStore(store, profileId);
   for(let invId of profile.invs) {
-    let inv = getInventoryInStore(store, invId);
-    deleteInventoryFromStore(store, invId, inv);
+    let inv = getInvInStore(store, invId);
+    deleteInvInStore(store, invId, inv);
   }
   deleteProfileInStore(store, profile.profileId, profile);
   onActionProfile();
@@ -595,7 +596,7 @@ function onActionProfileAlbumDelete(e) {
   if (!window.confirm('Are you sure you want to delete this inventory?')) {
     return;
   }
-  const store = getInventoryStore();
+  const store = getSatchelStore();
   const profileId = e.target.getAttribute('data-profile');
   if (!isProfileInStore(store, profileId)) {
     return;
@@ -619,13 +620,13 @@ function onActionProfileInvDelete(e) {
   if (!window.confirm('Are you sure you want to delete this inventory?')) {
     return;
   }
-  const store = getInventoryStore();
+  const store = getSatchelStore();
   const profileId = e.target.getAttribute('data-profile');
   if (!isProfileInStore(store, profileId)) {
     return;
   }
   const invId = e.target.getAttribute('data-inv');
-  if (!isInventoryInStore(store, invId)) {
+  if (!isInvInStore(store, invId)) {
     return;
   }
   let profile = getProfileInStore(store, profileId);
@@ -634,13 +635,13 @@ function onActionProfileInvDelete(e) {
     profile.invs.splice(i, 1);
     dispatchProfileChange(store, profileId);
   }
-  let inv = getInventoryInStore(store, invId);
-  deleteInventoryFromStore(store, invId, inv);
+  let inv = getInvInStore(store, invId);
+  deleteInvInStore(store, invId, inv);
   prepareEditProfileDialog(store, profileId);
 }
 
 function onActionProfileInvNew() {
-  const store = getInventoryStore();
+  const store = getSatchelStore();
   const activeProfile = getActiveProfileInStore(store);
   if (!activeProfile) {
     return;
@@ -651,7 +652,7 @@ function onActionProfileInvNew() {
 }
 
 function onActionProfileInvSubmit() {
-  const store = getInventoryStore();
+  const store = getSatchelStore();
   let activeProfile = getActiveProfileInStore(store);
   if (!activeProfile) {
     return;
@@ -689,7 +690,7 @@ function onActionProfileInvSubmit() {
         throw new Error('Unknown inventory type.');
     }
     newInv.displayName = title;
-    addInventoryToStore(store, newInv.invId, newInv);
+    addInvInStore(store, newInv.invId, newInv);
     activeProfile.invs.push(newInvId);
   }
   dispatchProfileChange(store, activeProfile.profileId);

@@ -1,22 +1,22 @@
-import { isInventoryInStore, getInventoryInStore } from '../../store/SatchelStore.js';
 import * as InvItems from './InvItems.js';
 import { getInventorySlotCount } from './Inv.js';
 import { cloneItem } from '../item/Item.js';
 import { dispatchItemChange } from '../../events/ItemEvents.js';
 import { dispatchInventoryChange } from '../../events/InvEvents.js';
+import { getInvInStore, isInvInStore } from '../../store/InvStore.js';
 
 /**
- * @typedef {import('../../store/SatchelStore.js').Item} Item
- * @typedef {import('../../store/SatchelStore.js').ItemId} ItemId
- * @typedef {import('../../store/SatchelStore.js').InventoryStore} InventoryStore
- * @typedef {import('../../store/SatchelStore.js').Inventory} Inventory
- * @typedef {import('../../store/SatchelStore.js').InventoryId} InventoryId
- * @typedef {import('../../store/SatchelStore.js').InventoryType} InventoryType
+ * @typedef {import('../item/Item.js').Item} Item
+ * @typedef {import('../item/Item.js').ItemId} ItemId
+ * @typedef {import('../../store/SatchelStore.js').SatchelStore} SatchelStore
+ * @typedef {import('./Inv.js').Inventory} Inventory
+ * @typedef {import('./Inv.js').InvId} InvId
+ * @typedef {import('./Inv.js').InventoryType} InventoryType
  */
 
 /**
- * @param {InventoryStore} store
- * @param {InventoryId} invId
+ * @param {SatchelStore} store
+ * @param {InvId} invId
  * @param {Item} item
  * @param {number} coordX
  * @param {number} coordY
@@ -28,8 +28,8 @@ export function addItemToInventory(store, invId, item, coordX, coordY) {
 }
 
 /**
- * @param {InventoryStore} store
- * @param {InventoryId} invId
+ * @param {SatchelStore} store
+ * @param {InvId} invId
  * @param {ItemId} itemId
  * @returns {boolean}
  */
@@ -77,8 +77,8 @@ export function getItemIdsInSlots(store, invId) {
 }
 
 /**
- * @param {InventoryStore} store
- * @param {InventoryId} invId
+ * @param {SatchelStore} store
+ * @param {InvId} invId
  * @returns {boolean}
  */
 export function isInventoryEmpty(store, invId) {
@@ -96,13 +96,13 @@ export function isInventoryEmpty(store, invId) {
 /**
  * Get an existing inventory. Will throw if it does not exist.
  *
- * @param {InventoryStore} store
- * @param {InventoryId} invId
+ * @param {SatchelStore} store
+ * @param {InvId} invId
  * @returns {Inventory}
  */
 export function getExistingInventory(store, invId) {
-  if (isInventoryInStore(store, invId)) {
-    return getInventoryInStore(store, invId);
+  if (isInvInStore(store, invId)) {
+    return getInvInStore(store, invId);
   } else {
     throw new Error(`Cannot get non-existant inventory '${invId}'.`);
   }

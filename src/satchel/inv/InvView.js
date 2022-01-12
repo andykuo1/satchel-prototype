@@ -4,10 +4,10 @@ import { getExistingInventory } from './InventoryTransfer.js';
 
 /**
  * @param store
- * @param inventoryId
+ * @param InvId
  */
-export function createInventoryView(store, inventoryId) {
-  const inv = getExistingInventory(store, inventoryId);
+export function createInventoryView(store, InvId) {
+  const inv = getExistingInventory(store, InvId);
   const element = /** @type {InventoryGridElement} */ (document.createElement('inventory-grid'));
   element.invId = inv.invId;
   return element;
@@ -15,10 +15,10 @@ export function createInventoryView(store, inventoryId) {
 
 /**
  * @param store
- * @param inventoryId
+ * @param InvId
  */
-export function createTemporaryInventoryView(store, inventoryId) {
-  const inv = getExistingInventory(store, inventoryId);
+export function createTemporaryInventoryView(store, InvId) {
+  const inv = getExistingInventory(store, InvId);
   const element = /** @type {InventoryGridElement} */ (document.createElement('inventory-grid'));
   element.invId = inv.invId;
   element.toggleAttribute('noinput', true); // Checked by cursor whether the inventory can input items.

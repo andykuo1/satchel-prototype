@@ -1,4 +1,4 @@
-import { exportDataToJSON, importDataFromJSON } from '../satchel/session/SatchelDataLoader.js';
+import { exportDataToJSON, importDataFromJSON } from './DataLoader.js';
 import { cloneItem } from '../satchel/item/Item.js';
 import { exportItemToBase64, importItemFromBase64 } from '../satchel/item/ItemBase64.js';
 

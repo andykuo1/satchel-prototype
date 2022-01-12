@@ -1,4 +1,4 @@
-import { createSocketInventoryInStore, deleteInventoryFromStore, getInventoryInStore, getInventoryStore, isInventoryInStore } from '../../store/SatchelStore.js';
+import { getSatchelStore } from '../../store/SatchelStore.js';
 import { addItemToInventory, getItemAtSlotIndex } from '../../satchel/inv/InventoryTransfer.js';
 import { createInventoryView } from '../../satchel/inv/InvView.js';
 import { cloneItem } from '../../satchel/item/Item.js';
@@ -9,6 +9,7 @@ import { addAlbumChangeListener, removeAlbumChangeListener } from '../../events/
 import { addInventoryChangeListener, removeInventoryChangeListener } from '../../events/InvEvents.js';
 import { getItemIdsInAlbum, getItemInAlbum, hasItemInAlbum, removeItemFromAlbum } from '../../satchel/album/AlbumItems.js';
 import { dropItemOnGround, getGroundAlbumId } from '../../satchel/GroundAlbum.js';
+import { isInvInStore, getInvInStore, deleteInvInStore, createSocketInvInStore } from '../../store/InvStore.js';
 
 
 const INNER_HTML = /* html */`
@@ -70,13 +71,13 @@ export class AlbumGroundElement extends HTMLElement {
   }
 
   get albumId() {
-    const store = getInventoryStore();
+    const store = getSatchelStore();
     return getGroundAlbumId(store);
   }
 
   /** @protected */
   connectedCallback() {
-    const store = getInventoryStore();
+    const store = getSatchelStore();
     const albumId = this.albumId;
     addAlbumChangeListener(albumId, this.onAlbumChange);
     this.onAlbumChange(store, albumId);
@@ -92,14 +93,14 @@ export class AlbumGroundElement extends HTMLElement {
     document.removeEventListener('mouseup', this.onMouseUp);
     
     // Destroy all items
-    const store = getInventoryStore();
+    const store = getSatchelStore();
     for (const node of this.slotItems.assignedNodes()) {
       const invNode =
         /** @type {import('../invgrid/InventoryGridElement.js').InventoryGridElement} */ (node);
       const invId = invNode.invId;
-      const inv = getInventoryInStore(store, invId);
+      const inv = getInvInStore(store, invId);
       if (inv) {
-        deleteInventoryFromStore(store, invId, inv);
+        deleteInvInStore(store, invId, inv);
       }
     }
   }
@@ -133,7 +134,7 @@ export class AlbumGroundElement extends HTMLElement {
       const invNode =
         /** @type {import('../invgrid/InventoryGridElement.js').InventoryGridElement} */ (node);
       const invId = invNode.invId;
-      const item = getItemAtSlotIndex(getInventoryStore(), invId, 0);
+      const item = getItemAtSlotIndex(getSatchelStore(), invId, 0);
       if (item) {
         preservedInvs[item.itemId] = invNode;
       }
@@ -153,12 +154,12 @@ export class AlbumGroundElement extends HTMLElement {
         element = preservedInvs[itemId];
         delete preservedInvs[itemId];
       } else {
-        let store = getInventoryStore();
+        let store = getSatchelStore();
         let albumItem = getItemInAlbum(store, albumId, itemId);
         let newItem = cloneItem(albumItem);
 
         const invId = uuid();
-        createSocketInventoryInStore(store, invId);
+        createSocketInvInStore(store, invId);
         addItemToInventory(store, invId, newItem, 0, 0);
         const invElement = createInventoryView(store, invId);
         invElement.toggleAttribute('fixed', true);
@@ -174,9 +175,9 @@ export class AlbumGroundElement extends HTMLElement {
     // Delete remaining inventories
     for(let invElement of Object.values(preservedInvs)) {
       const invId = invElement.invId;
-      const inv = getInventoryInStore(store, invId);
+      const inv = getInvInStore(store, invId);
       if (inv) {
-        deleteInventoryFromStore(store, invId, inv);
+        deleteInvInStore(store, invId, inv);
       }
     }
 
@@ -187,7 +188,7 @@ export class AlbumGroundElement extends HTMLElement {
 
   /** @private */
   onSocketInventoryChange(store, invId) {
-    if (!isInventoryInStore(store, invId)) {
+    if (!isInvInStore(store, invId)) {
       removeInventoryChangeListener(invId, this.onSocketInventoryChange);
       const albumId = this.albumId;
       const itemId = this.socketItems[invId];

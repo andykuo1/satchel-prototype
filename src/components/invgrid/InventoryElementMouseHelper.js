@@ -1,4 +1,4 @@
-import { getInventoryStore } from '../../store/SatchelStore.js';
+import { getSatchelStore } from '../../store/SatchelStore.js';
 import { getExistingInventory } from '../../satchel/inv/InventoryTransfer.js';
 import { getItemByItemId } from '../../satchel/inv/InvItems.js';
 import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../../satchel/inv/InvSlots.js';
@@ -49,7 +49,7 @@ export function itemMouseDownCallback(mouseEvent, itemElement, unitSize) {
       // NOTE: Swapping is performed on putDown(), so ignore for pick up.
       return;
     }
-    let store = getInventoryStore();
+    let store = getSatchelStore();
     let inv = getExistingInventory(store, invId);
     const slotIndex = getSlotIndexByItemId(inv, itemId);
     const [fromItemX, fromItemY] = getSlotCoordsByIndex(inv, slotIndex);

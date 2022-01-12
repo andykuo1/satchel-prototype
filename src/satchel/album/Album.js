@@ -5,8 +5,8 @@ import { dispatchAlbumChange } from '../../events/AlbumEvents.js';
 import { getExistingAlbumInStore } from '../../store/AlbumStore.js';
 
 /**
- * @typedef {import('../../store/SatchelStore').InventoryStore} Store
- * @typedef {import('../inv/Inv.js').InventoryId} InvId
+ * @typedef {import('../../store/SatchelStore').SatchelStore} Store
+ * @typedef {import('../inv/Inv.js').InvId} InvId
  * @typedef {import('../item/Item.js').Item} Item
  * @typedef {import('../item/Item.js').ItemId} ItemId
  */

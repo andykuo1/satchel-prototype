@@ -1,18 +1,18 @@
-import { addStoreEventListener, dispatchStoreEvent, removeStoreEventListener } from '../store/InventoryEventStore.js';
+import { addStoreEventListener, dispatchStoreEvent, removeStoreEventListener } from '../store/EventStore.js';
 
 /**
- * @typedef {import('../store/SatchelStore.js').InventoryStore} InventoryStore
+ * @typedef {import('../store/SatchelStore.js').SatchelStore} Store
  * @typedef {import('../satchel/profile/Profile.js').ProfileId} ProfileId
  */
 
 /**
  * @callback OnProfileChangeCallback
- * @param {InventoryStore} store
+ * @param {Store} store
  * @param {ProfileId} profileId
  */
 
 /**
- * @param {InventoryStore} store 
+ * @param {Store} store 
  * @param {ProfileId} profileId 
  */
 export function dispatchProfileChange(store, profileId) {
@@ -36,7 +36,7 @@ export function removeProfileChangeListener(profileId, callback) {
 }
 
 /**
- * @param {InventoryStore} store
+ * @param {Store} store
  */
  export function dispatchActiveProfileChange(store) {
   dispatchStoreEvent(store, 'activeProfile', 'change');

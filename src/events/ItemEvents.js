@@ -1,21 +1,26 @@
-import { addStoreEventListener, dispatchStoreEvent, removeStoreEventListener } from '../store/InventoryEventStore.js';
+import { addStoreEventListener, dispatchStoreEvent, removeStoreEventListener } from '../store/EventStore.js';
 
 /**
- * @callback OnItemChangeCallback
- * @param store
- * @param itemId
+ * @typedef {import('../store/SatchelStore.js').SatchelStore} Store
+ * @typedef {import('../satchel/item/Item.js').ItemId} ItemId
  */
 
 /**
- * @param store
- * @param itemId
+ * @callback OnItemChangeCallback
+ * @param {Store} store
+ * @param {ItemId} itemId
+ */
+
+/**
+ * @param {Store} store
+ * @param {ItemId} itemId
  */
  export function dispatchItemChange(store, itemId) {
   dispatchStoreEvent(store, 'item', itemId);
 }
 
 /**
- * @param itemId
+ * @param {ItemId} itemId
  * @param {OnItemChangeCallback} callback
  */
 export function addItemChangeListener(itemId, callback) {
@@ -23,7 +28,7 @@ export function addItemChangeListener(itemId, callback) {
 }
 
 /**
- * @param itemId
+ * @param {ItemId} itemId
  * @param {OnItemChangeCallback} callback
  */
 export function removeItemChangeListener(itemId, callback) {

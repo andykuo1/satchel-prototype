@@ -1,4 +1,4 @@
-import { exportDataToJSON, importDataFromJSON } from '../satchel/session/SatchelDataLoader.js';
+import { exportDataToJSON, importDataFromJSON } from './DataLoader.js';
 import { cloneInventory } from '../satchel/inv/Inv.js';
 
 export function importInventoryFromJSON(jsonData, dst = undefined) {

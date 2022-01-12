@@ -2,7 +2,7 @@ import { createProfile } from '../satchel/profile/Profile.js';
 import { dispatchActiveProfileChange, dispatchProfileChange } from '../events/ProfileEvents.js';
 
 /**
- * @typedef {import('./SatchelStore.js').InventoryStore} Store
+ * @typedef {import('./SatchelStore.js').SatchelStore} Store
  * @typedef {import('../satchel/profile/Profile.js').Profile} Profile
  * @typedef {import('../satchel/profile/Profile.js').ProfileId} ProfileId
  */

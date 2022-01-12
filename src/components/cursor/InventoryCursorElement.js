@@ -1,10 +1,6 @@
 import { distanceSquared } from '../../util/math.js';
 import {
-  createSocketInventoryInStore,
-  deleteInventoryFromStore,
-  getInventoryInStore,
-  getInventoryStore,
-  isInventoryInStore,
+  getSatchelStore,
 } from '../../store/SatchelStore.js';
 import {
   getExistingInventory,
@@ -17,13 +13,14 @@ import { getItemByItemId } from '../../satchel/inv/InvItems.js';
 import { getSlotCoordsByIndex, getSlotIndexByItemId, isSlotIndexEmpty } from '../../satchel/inv/InvSlots.js';
 import { putDownToGridInventory, putDownToSocketInventory } from './InventoryCursorElementHelper.js';
 import { DEFAULT_ITEM_UNIT_SIZE } from '../invgrid/InventoryElementMouseHelper.js';
+import { isInvInStore, getInvInStore, createSocketInvInStore, deleteInvInStore } from '../../store/InvStore.js';
 
 /**
  * @typedef {import('../invgrid/InventoryGridElement.js').InventoryGridElement} InventoryGridElement
  * 
  * @typedef {import('../../satchel/inv/Inv.js').Inventory} Inventory
- * @typedef {import('../../satchel/inv/Inv.js').InventoryId} InventoryId
- * @typedef {import('../../store/SatchelStore.js').InventoryStore} InventoryStore
+ * @typedef {import('../../satchel/inv/Inv.js').InvId} InvId
+ * @typedef {import('../../store/SatchelStore.js').SatchelStore} SatchelStore
  *
  * @typedef {import('../../satchel/item/Item.js').Item} Item
  * @typedef {import('../../satchel/item/Item.js').ItemId} ItemId
@@ -120,9 +117,9 @@ export class InventoryCursorElement extends HTMLElement {
 
   /** @protected */
   connectedCallback() {
-    let store = getInventoryStore();
-    if (!isInventoryInStore(store, CURSOR_INV_ID)) {
-      createSocketInventoryInStore(store, CURSOR_INV_ID);
+    let store = getSatchelStore();
+    if (!isInvInStore(store, CURSOR_INV_ID)) {
+      createSocketInvInStore(store, CURSOR_INV_ID);
     }
 
     document.addEventListener('mousemove', this.onMouseMove);
@@ -135,9 +132,9 @@ export class InventoryCursorElement extends HTMLElement {
     cancelAnimationFrame(this.animationHandle);
     this.animationHandle = null;
 
-    let store = getInventoryStore();
-    if (isInventoryInStore(store, CURSOR_INV_ID)) {
-      deleteInventoryFromStore(store, CURSOR_INV_ID, getInventoryInStore(store, CURSOR_INV_ID));
+    let store = getSatchelStore();
+    if (isInvInStore(store, CURSOR_INV_ID)) {
+      deleteInvInStore(store, CURSOR_INV_ID, getInvInStore(store, CURSOR_INV_ID));
     }
   }
 
@@ -172,7 +169,7 @@ export class InventoryCursorElement extends HTMLElement {
   /**
    * Pick up from target inventory to cursor if able to.
    *
-   * @param {InventoryId} invId The inventory to pick up from
+   * @param {InvId} invId The inventory to pick up from
    * @param {ItemId} itemId The item to pick up
    * @param {number} coordX The cursor pick up coordinates from the inventory
    * @param {number} coordY The cursor pick up coordinates from the inventory
@@ -186,7 +183,7 @@ export class InventoryCursorElement extends HTMLElement {
       // NOTE: Swapping is performed on putDown(), so ignore for pick up.
       return false;
     }
-    let store = getInventoryStore();
+    let store = getSatchelStore();
     let inv = getExistingInventory(store, invId);
     const slotIndex = getSlotIndexByItemId(inv, itemId);
     const [fromItemX, fromItemY] = getSlotCoordsByIndex(inv, slotIndex);
@@ -199,13 +196,13 @@ export class InventoryCursorElement extends HTMLElement {
   /**
    * Put down from cursor to destination inventory.
    *
-   * @param {InventoryId} invId
+   * @param {InvId} invId
    * @param {number} coordX
    * @param {number} coordY
    * @param {boolean} swappable
    */
   putDown(invId, coordX, coordY, swappable) {
-    let store = getInventoryStore();
+    let store = getSatchelStore();
     const heldItem = this.getHeldItem();
     if (!heldItem) {
       return false;
@@ -235,13 +232,13 @@ export class InventoryCursorElement extends HTMLElement {
   }
 
   hasHeldItem() {
-    let store = getInventoryStore();
+    let store = getSatchelStore();
     let inv = getExistingInventory(store, this.invId);
     return !isSlotIndexEmpty(inv, 0);
   }
 
   getHeldItem() {
-    let store = getInventoryStore();
+    let store = getSatchelStore();
     return getItemAtSlotIndex(store, this.invId, 0);
   }
 
@@ -259,7 +256,7 @@ export class InventoryCursorElement extends HTMLElement {
     if (this.hasHeldItem()) {
       throw new Error('Cannot set held item - already holding another item.');
     }
-    let store = getInventoryStore();
+    let store = getSatchelStore();
     addItemToInventory(store, this.invId, item, 0, 0);
     this.style.display = 'unset';
     this.ignoreFirstPutDown = true;
@@ -270,7 +267,7 @@ export class InventoryCursorElement extends HTMLElement {
   }
 
   clearHeldItem() {
-    let store = getInventoryStore();
+    let store = getSatchelStore();
     clearItemsInInventory(store, this.invId);
     this.style.display = 'none';
     this.ignoreFirstPutDown = false;

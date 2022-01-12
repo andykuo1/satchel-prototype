@@ -1,7 +1,7 @@
 import { DialogPromptElement } from '../lib/DialogPromptElement.js';
 import { getCursorContext } from '../../satchel/inv/CursorHelper.js';
 import { openFoundry } from '../../satchel/inv/FoundryHelper.js';
-import { getInventoryInStore, getInventoryStore } from '../../store/SatchelStore.js';
+import { getSatchelStore } from '../../store/SatchelStore.js';
 import { removeItemFromInventory } from '../../satchel/inv/InventoryTransfer.js';
 import { dropItemOnGround } from '../../satchel/GroundAlbum.js';
 import { getItemByItemId } from '../../satchel/inv/InvItems.js';
@@ -9,6 +9,7 @@ import { ActivityPlayerList } from '../../satchel/peer/ActivityPlayerList.js';
 import { cloneItem, copyItem } from '../../satchel/item/Item.js';
 import { ItemEditorElement } from './ItemEditorElement.js';
 import { dispatchItemChange } from '../../events/ItemEvents.js';
+import { getInvInStore } from '../../store/InvStore.js';
 
 /** @typedef {import('../../satchel/item/Item.js').Item} Item */
 
@@ -114,8 +115,8 @@ export class ItemDialogElement extends HTMLElement {
     this._invId = invId;
     this._itemId = itemId;
 
-    const store = getInventoryStore();
-    const inv = getInventoryInStore(store, invId);
+    const store = getSatchelStore();
+    const inv = getInvInStore(store, invId);
     const item = getItemByItemId(inv, itemId);
     const newItem = cloneItem(item);
     this.itemEditor.clearSocketedItem();
@@ -137,8 +138,8 @@ export class ItemDialogElement extends HTMLElement {
   applyChanges() {
     const invId = this._invId;
     const itemId = this._itemId;
-    const store = getInventoryStore();
-    const inv = getInventoryInStore(store, invId);
+    const store = getSatchelStore();
+    const inv = getInvInStore(store, invId);
     const sourceItem = getItemByItemId(inv, itemId);
     const socketItem = this.itemEditor.getSocketedItem();
     cloneItem(socketItem, sourceItem);
@@ -167,7 +168,7 @@ export class ItemDialogElement extends HTMLElement {
     this.applyChanges();
     this.dialog.toggleAttribute('open', false);
 
-    const store = getInventoryStore();
+    const store = getSatchelStore();
     const item = tryTakeItemFromInventory(store, this._containerElement, this._itemId);
     if (item) {
       let newItem = copyItem(item);
@@ -216,7 +217,7 @@ function tryTakeItemFromInventory(store, containerElement, itemId) {
   if (containerElement.hasAttribute('nooutput')) {
     return null;
   }
-  const inv = getInventoryInStore(store, containerInvId);
+  const inv = getInvInStore(store, containerInvId);
   const item = getItemByItemId(inv, itemId);
   if (containerElement.hasAttribute('copyoutput')) {
     return copyItem(item);

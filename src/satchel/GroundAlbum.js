@@ -1,5 +1,5 @@
 import { addItemToAlbum, clearItemsInAlbum } from '../satchel/album/AlbumItems.js';
-import { getInventoryStore } from '../store/SatchelStore.js';
+import { getSatchelStore } from '../store/SatchelStore.js';
 import { createAlbum } from './album/Album.js';
 import { addAlbumInStore, isAlbumInStore } from '../store/AlbumStore.js';
 import { dispatchAlbumChange } from '../events/AlbumEvents.js';
@@ -7,7 +7,7 @@ import { dispatchAlbumChange } from '../events/AlbumEvents.js';
 const GROUND_ALBUM_DISPLAY_NAME = '[ Ground ]';
 
 export function dropItemOnGround(freedItem) {
-  const store = getInventoryStore();
+  const store = getSatchelStore();
   let groundAlbumId = getGroundAlbumId(store);
   if (!groundAlbumId || !isAlbumInStore(store, groundAlbumId)) {
     groundAlbumId = 'ground';
@@ -22,7 +22,7 @@ export function dropItemOnGround(freedItem) {
 }
 
 export function clearItemsOnGround() {
-  const store = getInventoryStore();
+  const store = getSatchelStore();
   clearItemsInAlbum(store, 'ground');
 }
 
