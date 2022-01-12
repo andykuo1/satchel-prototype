@@ -6,8 +6,8 @@ import { cloneProfile } from '../satchel/profile/Profile.js';
  */
 
 /**
- * @param {Profile} profile 
- * @param {object} dst 
+ * @param {Profile} profile
+ * @param {object} dst
  * @returns {object}
  */
 export function exportProfileToJSON(profile, dst = undefined) {
@@ -15,8 +15,8 @@ export function exportProfileToJSON(profile, dst = undefined) {
 }
 
 /**
- * @param {object} jsonData 
- * @param {Profile} dst 
+ * @param {object} jsonData
+ * @param {Profile} dst
  * @returns {Profile}
  */
 export function importProfileFromJSON(jsonData, dst = undefined) {

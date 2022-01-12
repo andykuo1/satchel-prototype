@@ -1,12 +1,7 @@
 import { cloneAlbum, copyAlbum, isAlbumHidden } from '../satchel/album/Album.js';
 import { dispatchAlbumChange } from '../events/AlbumEvents.js';
 import { exportAlbumToJSON, importAlbumFromJSON } from './AlbumLoader.js';
-import {
-  addAlbumInStore,
-  getAlbumIdsInStore,
-  getAlbumInStore,
-  isAlbumInStore,
-} from '../store/AlbumStore.js';
+import { addAlbumInStore, getAlbumIdsInStore, getAlbumInStore, isAlbumInStore } from '../store/AlbumStore.js';
 import { cloneInventory, copyInventory } from '../satchel/inv/Inv.js';
 import { dispatchInventoryChange } from '../events/InvEvents.js';
 import { exportInventoryToJSON, importInventoryFromJSON } from './InvLoader.js';
@@ -44,7 +39,7 @@ export function saveSatchelToData(store, dst = {}) {
   const profileIds = getProfileIdsInStore(store);
   const albumIds = getAlbumIdsInStore(store);
   // Do not save hidden albums
-  albumIds.filter(albumId => !isAlbumHidden(store, albumId));
+  albumIds.filter((albumId) => !isAlbumHidden(store, albumId));
   const profilesData = saveSatchelProfilesToData(store, profileIds);
   const albumsData = saveSatchelAlbumsToData(store, albumIds);
   const data = {
@@ -81,7 +76,7 @@ export function loadSatchelProfilesFromData(store, jsonData, overrideData) {
         }
       }
     }
-    for(let albumId of Object.keys(inAlbums)) {
+    for (let albumId of Object.keys(inAlbums)) {
       let albumJson = inAlbums[albumId];
       if (albumJson) {
         const album = importAlbumFromJSON(albumJson);
@@ -141,7 +136,7 @@ export function saveSatchelProfilesToData(store, profileIds, dst = {}) {
         let inv = getInvInStore(store, invId);
         outInvs[invId] = exportInventoryToJSON(inv);
       }
-      for(let albumId of profile.albums) {
+      for (let albumId of profile.albums) {
         let album = getAlbumInStore(store, albumId);
         outAlbums[albumId] = exportAlbumToJSON(album);
       }

@@ -12,8 +12,8 @@ import { addStoreEventListener, dispatchStoreEvent, removeStoreEventListener } f
  */
 
 /**
- * @param {Store} store 
- * @param {AlbumId} albumId 
+ * @param {Store} store
+ * @param {AlbumId} albumId
  */
 export function dispatchAlbumChange(store, albumId) {
   dispatchStoreEvent(store, 'album', albumId);
@@ -21,8 +21,8 @@ export function dispatchAlbumChange(store, albumId) {
 
 /**
  * @param {Store} store
- * @param {AlbumId} albumId 
- * @param {OnAlbumChangeCallback} callback 
+ * @param {AlbumId} albumId
+ * @param {OnAlbumChangeCallback} callback
  */
 export function addAlbumChangeListener(store, albumId, callback) {
   addStoreEventListener(store, 'album', albumId, callback);
@@ -30,8 +30,8 @@ export function addAlbumChangeListener(store, albumId, callback) {
 
 /**
  * @param {Store} store
- * @param {AlbumId} albumId 
- * @param {OnAlbumChangeCallback} callback 
+ * @param {AlbumId} albumId
+ * @param {OnAlbumChangeCallback} callback
  */
 export function removeAlbumChangeListener(store, albumId, callback) {
   removeStoreEventListener(store, 'album', albumId, callback);

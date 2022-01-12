@@ -12,8 +12,8 @@ import { addStoreEventListener, dispatchStoreEvent, removeStoreEventListener } f
  */
 
 /**
- * @param {Store} store 
- * @param {ProfileId} profileId 
+ * @param {Store} store
+ * @param {ProfileId} profileId
  */
 export function dispatchProfileChange(store, profileId) {
   dispatchStoreEvent(store, 'profile', profileId);
@@ -21,8 +21,8 @@ export function dispatchProfileChange(store, profileId) {
 
 /**
  * @param {Store} store
- * @param {ProfileId} profileId 
- * @param {OnProfileChangeCallback} callback 
+ * @param {ProfileId} profileId
+ * @param {OnProfileChangeCallback} callback
  */
 export function addProfileChangeListener(store, profileId, callback) {
   addStoreEventListener(store, 'profile', profileId, callback);
@@ -30,8 +30,8 @@ export function addProfileChangeListener(store, profileId, callback) {
 
 /**
  * @param {Store} store
- * @param {ProfileId} profileId 
- * @param {OnProfileChangeCallback} callback 
+ * @param {ProfileId} profileId
+ * @param {OnProfileChangeCallback} callback
  */
 export function removeProfileChangeListener(store, profileId, callback) {
   removeStoreEventListener(store, 'profile', profileId, callback);
@@ -40,13 +40,13 @@ export function removeProfileChangeListener(store, profileId, callback) {
 /**
  * @param {Store} store
  */
- export function dispatchActiveProfileChange(store) {
+export function dispatchActiveProfileChange(store) {
   dispatchStoreEvent(store, 'activeProfile', 'change');
 }
 
 /**
  * @param {Store} store
- * @param {OnProfileChangeCallback} callback 
+ * @param {OnProfileChangeCallback} callback
  */
 export function addActiveProfileChangeListener(store, callback) {
   addStoreEventListener(store, 'activeProfile', 'change', callback);
@@ -54,7 +54,7 @@ export function addActiveProfileChangeListener(store, callback) {
 
 /**
  * @param {Store} store
- * @param {OnProfileChangeCallback} callback 
+ * @param {OnProfileChangeCallback} callback
  */
 export function removeActiveProfileChangeListener(store, callback) {
   removeStoreEventListener(store, 'activeProfile', 'change', callback);

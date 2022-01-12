@@ -8,8 +8,8 @@ import { dispatchAlbumChange } from '../events/AlbumEvents.js';
  */
 
 /**
- * @param {Store} store 
- * @param {AlbumId} albumId 
+ * @param {Store} store
+ * @param {AlbumId} albumId
  * @returns {Album}
  */
 export function getExistingAlbumInStore(store, albumId) {
@@ -21,8 +21,8 @@ export function getExistingAlbumInStore(store, albumId) {
 }
 
 /**
- * @param {Store} store 
- * @param {AlbumId} albumId 
+ * @param {Store} store
+ * @param {AlbumId} albumId
  * @returns {Album}
  */
 export function getAlbumInStore(store, albumId) {
@@ -30,7 +30,7 @@ export function getAlbumInStore(store, albumId) {
 }
 
 /**
- * @param {Store} store 
+ * @param {Store} store
  * @returns {Array<Album>}
  */
 export function getAlbumsInStore(store) {
@@ -38,7 +38,7 @@ export function getAlbumsInStore(store) {
 }
 
 /**
- * @param {Store} store 
+ * @param {Store} store
  * @returns {Array<AlbumId>}
  */
 export function getAlbumIdsInStore(store) {
@@ -46,7 +46,7 @@ export function getAlbumIdsInStore(store) {
 }
 
 /**
- * @param {Store} store 
+ * @param {Store} store
  * @param {AlbumId} albumId
  * @returns {boolean}
  */
@@ -55,11 +55,11 @@ export function isAlbumInStore(store, albumId) {
 }
 
 /**
- * @param {Store} store 
- * @param {AlbumId} albumId 
+ * @param {Store} store
+ * @param {AlbumId} albumId
  * @returns {Album}
  */
-export function  createAlbumInStore(store, albumId) {
+export function createAlbumInStore(store, albumId) {
   let album = createAlbum(albumId);
   if (!addAlbumInStore(store, albumId, album)) {
     throw new Error('Failed to create album in store.');
@@ -68,9 +68,9 @@ export function  createAlbumInStore(store, albumId) {
 }
 
 /**
- * @param {Store} store 
- * @param {AlbumId} albumId 
- * @param {Album} album 
+ * @param {Store} store
+ * @param {AlbumId} albumId
+ * @param {Album} album
  * @returns {boolean}
  */
 export function addAlbumInStore(store, albumId, album) {
@@ -86,9 +86,9 @@ export function addAlbumInStore(store, albumId, album) {
 }
 
 /**
- * @param {Store} store 
- * @param {AlbumId} albumId 
- * @param {Album} album 
+ * @param {Store} store
+ * @param {AlbumId} albumId
+ * @param {Album} album
  * @returns {boolean}
  */
 export function deleteAlbumInStore(store, albumId, album) {

@@ -7,8 +7,8 @@
  */
 
 /**
- * @param {ImportDataFormat} jsonData 
- * @param {string} expectedType 
+ * @param {ImportDataFormat} jsonData
+ * @param {string} expectedType
  * @param {(data: object, metadata: object) => any} dataCallback
  * @returns {any}
  */
@@ -21,9 +21,9 @@ export function importDataFromJSON(jsonData, expectedType, dataCallback) {
 }
 
 /**
- * @param {string} type 
- * @param {object} data 
- * @param {object} metadata 
+ * @param {string} type
+ * @param {object} data
+ * @param {object} metadata
  * @param {object} [dst]
  * @returns {ImportDataFormat}
  */

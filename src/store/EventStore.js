@@ -4,33 +4,6 @@
  */
 
 /**
- * @param {Store} store 
- * @param {keyof SatchelEvents} event 
- * @param {string} key 
- */
-function getEventListenersInStore(store, event, key) {
-  if (!(event in store.session.events)) {
-    throw new Error(`Cannot find listener mapping for unknown event '${event}'.`);
-  }
-  return store.session.events[event][key];
-}
-
-/**
- * @param {Store} store 
- * @param {keyof SatchelEvents} event 
- * @param {string} key 
- * @returns {Array<Function>}
- */
-function resolveEventListenersInStore(store, event, key) {
-  let listeners = getEventListenersInStore(store, event, key);
-  if (!listeners) {
-    listeners = [];
-    store.session.events[event][key] = listeners;
-  }
-  return listeners;
-}
-
-/**
  * @param {Store} store
  * @param {keyof SatchelEvents} event
  * @param {string} key
@@ -69,4 +42,31 @@ export function dispatchStoreEvent(store, event, key) {
       listener.call(undefined, store, key);
     }
   }
+}
+
+/**
+ * @param {Store} store
+ * @param {keyof SatchelEvents} event
+ * @param {string} key
+ */
+function getEventListenersInStore(store, event, key) {
+  if (!(event in store.session.events)) {
+    throw new Error(`Cannot find listener mapping for unknown event '${event}'.`);
+  }
+  return store.session.events[event][key];
+}
+
+/**
+ * @param {Store} store
+ * @param {keyof SatchelEvents} event
+ * @param {string} key
+ * @returns {Array<Function>}
+ */
+function resolveEventListenersInStore(store, event, key) {
+  let listeners = getEventListenersInStore(store, event, key);
+  if (!listeners) {
+    listeners = [];
+    store.session.events[event][key] = listeners;
+  }
+  return listeners;
 }

@@ -3,7 +3,7 @@ import { cloneItem } from '../satchel/item/Item.js';
 import { exportItemToBase64, importItemFromBase64 } from '../satchel/item/ItemBase64.js';
 
 export function importItemFromJSON(jsonData, dst = undefined) {
-  return importDataFromJSON(jsonData, 'item_v1', data => cloneItem(data, dst));
+  return importDataFromJSON(jsonData, 'item_v1', (data) => cloneItem(data, dst));
 }
 
 export function exportItemToJSON(item, dst = undefined) {

@@ -101,10 +101,9 @@ function onProfileChange() {
     invElement.invId = invId;
     invsContainer.appendChild(invElement);
   }
-  for(let albumId of activeProfile.albums) {
+  for (let albumId of activeProfile.albums) {
     let elementId = `profile_album-${albumId}`;
-    let albumElement =
-    /** @type {import('../components/album/AlbumSpaceElement.js').AlbumSpaceElement} */ (
+    let albumElement = /** @type {import('../components/album/AlbumSpaceElement.js').AlbumSpaceElement} */ (
       document.createElement('album-space')
     );
     albumElement.id = elementId;

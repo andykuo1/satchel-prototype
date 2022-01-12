@@ -15,7 +15,7 @@ import { addStoreEventListener, dispatchStoreEvent, removeStoreEventListener } f
  * @param {Store} store
  * @param {ItemId} itemId
  */
- export function dispatchItemChange(store, itemId) {
+export function dispatchItemChange(store, itemId) {
   dispatchStoreEvent(store, 'item', itemId);
 }
 

@@ -15,7 +15,7 @@ import { addStoreEventListener, dispatchStoreEvent, removeStoreEventListener } f
  * @param {Store} store
  * @param {InvId} invId
  */
- export function dispatchInventoryChange(store, invId) {
+export function dispatchInventoryChange(store, invId) {
   dispatchStoreEvent(store, 'inventory', invId);
 }
 

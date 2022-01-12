@@ -4,7 +4,7 @@ import { cloneAlbum } from '../satchel/album/Album.js';
 /** @typedef {import('../satchel/album/Album.js').Album} Album */
 
 /**
- * @param {Album} album 
+ * @param {Album} album
  * @param {object} [dst]
  * @returns {object}
  */
@@ -13,7 +13,7 @@ export function exportAlbumToJSON(album, dst = undefined) {
 }
 
 /**
- * @param {object} jsonData 
+ * @param {object} jsonData
  * @param {Album} [dst]
  * @returns {Album}
  */

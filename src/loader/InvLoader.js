@@ -2,15 +2,15 @@ import { exportDataToJSON, importDataFromJSON } from './DataLoader.js';
 import { cloneInventory } from '../satchel/inv/Inv.js';
 
 export function importInventoryFromJSON(jsonData, dst = undefined) {
-  switch(jsonData._type) {
+  switch (jsonData._type) {
     case 'inv_v1':
-      return importDataFromJSON(jsonData, 'inv_v1', data => cloneInventory(data, dst));
+      return importDataFromJSON(jsonData, 'inv_v1', (data) => cloneInventory(data, dst));
     case 'inv_v2':
     default:
       // Current version.
       break;
   }
-  return importDataFromJSON(jsonData, 'inv_v2', data => cloneInventoryWithSlottedToV1(data, dst));
+  return importDataFromJSON(jsonData, 'inv_v2', (data) => cloneInventoryWithSlottedToV1(data, dst));
 }
 
 export function exportInventoryToJSON(inv, dst = undefined) {
@@ -30,7 +30,7 @@ export function cloneInventoryWithSlottedToV2(inv, dst = undefined) {
     let nextAvailableSlottedId = 1;
     let itemMapping = {};
     let slotsMapping = {};
-    for(let i = 0; i < length; ++i) {
+    for (let i = 0; i < length; ++i) {
       let itemId = slots[i];
       if (itemId) {
         if (!(itemId in itemMapping)) {
@@ -53,7 +53,7 @@ export function cloneInventoryWithSlottedToV1(inv, dst = undefined) {
     const slotsMapping = inv['__slotsMap'];
     const length = inv.length;
     let newSlots = new Array(length).fill(null);
-    for(let i = 0; i < length; ++i) {
+    for (let i = 0; i < length; ++i) {
       let slottedId = slots[i];
       if (slottedId) {
         let itemId = slotsMapping[slottedId];

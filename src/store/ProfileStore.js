@@ -8,8 +8,8 @@ import { dispatchActiveProfileChange, dispatchProfileChange } from '../events/Pr
  */
 
 /**
- * @param {Store} store 
- * @param {ProfileId} profileId 
+ * @param {Store} store
+ * @param {ProfileId} profileId
  * @returns {Profile}
  */
 export function getExistingProfileInStore(store, profileId) {
@@ -21,8 +21,8 @@ export function getExistingProfileInStore(store, profileId) {
 }
 
 /**
- * @param {Store} store 
- * @param {ProfileId} profileId 
+ * @param {Store} store
+ * @param {ProfileId} profileId
  * @returns {Profile}
  */
 export function getProfileInStore(store, profileId) {
@@ -30,7 +30,7 @@ export function getProfileInStore(store, profileId) {
 }
 
 /**
- * @param {Store} store 
+ * @param {Store} store
  * @returns {Array<Profile>}
  */
 export function getProfilesInStore(store) {
@@ -38,7 +38,7 @@ export function getProfilesInStore(store) {
 }
 
 /**
- * @param {Store} store 
+ * @param {Store} store
  * @returns {Array<ProfileId>}
  */
 export function getProfileIdsInStore(store) {
@@ -46,8 +46,8 @@ export function getProfileIdsInStore(store) {
 }
 
 /**
- * @param {Store} store 
- * @param {ProfileId} profileId 
+ * @param {Store} store
+ * @param {ProfileId} profileId
  * @returns {boolean}
  */
 export function isProfileInStore(store, profileId) {
@@ -55,11 +55,11 @@ export function isProfileInStore(store, profileId) {
 }
 
 /**
- * @param {Store} store 
- * @param {ProfileId} profileId 
+ * @param {Store} store
+ * @param {ProfileId} profileId
  * @returns {Profile}
  */
-export function  createProfileInStore(store, profileId) {
+export function createProfileInStore(store, profileId) {
   let profile = createProfile(profileId);
   if (!addProfileInStore(store, profileId, profile)) {
     throw new Error('Failed to create profile in store.');
@@ -68,9 +68,9 @@ export function  createProfileInStore(store, profileId) {
 }
 
 /**
- * @param {Store} store 
- * @param {ProfileId} profileId 
- * @param {Profile} profile 
+ * @param {Store} store
+ * @param {ProfileId} profileId
+ * @param {Profile} profile
  * @returns {boolean}
  */
 export function addProfileInStore(store, profileId, profile) {
@@ -86,9 +86,9 @@ export function addProfileInStore(store, profileId, profile) {
 }
 
 /**
- * @param {Store} store 
- * @param {ProfileId} profileId 
- * @param {Profile} profile 
+ * @param {Store} store
+ * @param {ProfileId} profileId
+ * @param {Profile} profile
  * @returns {boolean}
  */
 export function deleteProfileInStore(store, profileId, profile) {
@@ -104,7 +104,7 @@ export function deleteProfileInStore(store, profileId, profile) {
 }
 
 /**
- * @param {Store} store 
+ * @param {Store} store
  * @returns {Profile}
  */
 export function getActiveProfileInStore(store) {
@@ -117,7 +117,7 @@ export function getActiveProfileInStore(store) {
 }
 
 /**
- * @param {Store} store 
+ * @param {Store} store
  * @param {ProfileId} profileId
  */
 export function setActiveProfileInStore(store, profileId) {
@@ -134,7 +134,7 @@ export function setActiveProfileInStore(store, profileId) {
 }
 
 /**
- * @param {Store} store 
+ * @param {Store} store
  * @returns {boolean}
  */
 export function hasActiveProfileInStore(store) {

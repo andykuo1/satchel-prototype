@@ -1,25 +1,25 @@
 /**
  * @typedef {Record<string, Array<Function>>} SatchelEventListenersMap
- * 
+ *
  * @typedef SatchelEvents
  * @property {SatchelEventListenersMap} item
  * @property {SatchelEventListenersMap} inventory
  * @property {SatchelEventListenersMap} album
  * @property {SatchelEventListenersMap} profile
  * @property {SatchelEventListenersMap} activeProfile
- * 
+ *
  * @typedef SatchelSessionStore
  * @property {SatchelEvents} events
- * 
+ *
  * @typedef SatchelMetadataStore
  * @property {object} profile
  * @property {string} profile.activeProfileId
- * 
+ *
  * @typedef SatchelDataStore
  * @property {object} inventory
  * @property {object} album
  * @property {object} profile
- * 
+ *
  * @typedef SatchelStore
  * @property {SatchelMetadataStore} metadata
  * @property {SatchelDataStore} data

@@ -8,8 +8,8 @@ import { dispatchInventoryChange } from '../events/InvEvents.js';
  */
 
 /**
- * @param {Store} store 
- * @param {InvId} invId 
+ * @param {Store} store
+ * @param {InvId} invId
  * @returns {Inv}
  */
 export function getExistingInvInStore(store, invId) {
@@ -21,8 +21,8 @@ export function getExistingInvInStore(store, invId) {
 }
 
 /**
- * @param {Store} store 
- * @param {InvId} invId 
+ * @param {Store} store
+ * @param {InvId} invId
  * @returns {Inv}
  */
 export function getInvInStore(store, invId) {
@@ -30,7 +30,7 @@ export function getInvInStore(store, invId) {
 }
 
 /**
- * @param {Store} store 
+ * @param {Store} store
  * @returns {Array<Inv>}
  */
 export function getInvsInStore(store) {
@@ -38,7 +38,7 @@ export function getInvsInStore(store) {
 }
 
 /**
- * @param {Store} store 
+ * @param {Store} store
  * @returns {Array<InvId>}
  */
 export function getInvIdsInStore(store) {
@@ -46,7 +46,7 @@ export function getInvIdsInStore(store) {
 }
 
 /**
- * @param {Store} store 
+ * @param {Store} store
  * @param {InvId} invId
  * @returns {boolean}
  */
@@ -61,7 +61,7 @@ export function isInvInStore(store, invId) {
  * @param {number} height
  * @returns {Inv}
  */
- export function createGridInvInStore(store, invId, width, height) {
+export function createGridInvInStore(store, invId, width, height) {
   let inv = createGridInventory(invId, width, height);
   if (!addInvInStore(store, invId, inv)) {
     throw new Error('Failed to create grid inventory in store.');
@@ -83,9 +83,9 @@ export function createSocketInvInStore(store, invId) {
 }
 
 /**
- * @param {Store} store 
- * @param {InvId} invId 
- * @param {Inv} inv 
+ * @param {Store} store
+ * @param {InvId} invId
+ * @param {Inv} inv
  * @returns {boolean}
  */
 export function addInvInStore(store, invId, inv) {
@@ -101,9 +101,9 @@ export function addInvInStore(store, invId, inv) {
 }
 
 /**
- * @param {Store} store 
- * @param {InvId} invId 
- * @param {Inv} inv 
+ * @param {Store} store
+ * @param {InvId} invId
+ * @param {Inv} inv
  * @returns {boolean}
  */
 export function deleteInvInStore(store, invId, inv) {
