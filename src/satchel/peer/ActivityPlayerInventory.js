@@ -1,13 +1,13 @@
 import { ActivityBase } from './ActivityBase.js';
 
-import { getInventoryStore, getInventoryInStore, deleteInventoryFromStore, createGridInventoryInStore } from '../../store/InventoryStore.js';
+import { getInventoryStore, getInventoryInStore, deleteInventoryFromStore, createGridInventoryInStore } from '../../store/SatchelStore.js';
 import { SatchelLocal, SatchelRemote } from './SatchelLocal.js';
 import { getPlayerLastHeartbeat, getPlayerName, hasPlayerHeartbeat, setPlayerLastHeartbeat } from './PlayerState.js';
 import { loadFromStorage, saveToStorage } from '../../Storage.js';
-import { addProfileInStore, deleteProfileInStore, getProfileInStore, isProfileInStore, setActiveProfileInStore } from '../profile/ProfileStore.js';
+import { addProfileInStore, deleteProfileInStore, getProfileInStore, isProfileInStore, setActiveProfileInStore } from '../../store/ProfileStore.js';
 import { createProfile } from '../profile/Profile.js';
 import { uuid } from '../../util/uuid.js';
-import { loadSatchelProfilesFromData, saveSatchelProfilesToData } from '../../session/SatchelLoader.js';
+import { loadSatchelProfilesFromData, saveSatchelProfilesToData } from '../session/SatchelLoader.js';
 
 /** @typedef {import('../../components/invgrid/InventoryGridElement.js').InventoryGridElement} InventoryGridElement */
 

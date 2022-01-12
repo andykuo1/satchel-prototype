@@ -1,12 +1,12 @@
 import { getCursor } from '../cursor/index.js';
 import { InventoryGridElement } from '../invgrid/InventoryGridElement.js';
-import { getInventoryStore } from '../../store/InventoryStore.js';
-import { addItemToInventory, clearItemsInInventory, getItemAtSlotIndex, isInventoryEmpty } from '../../inventory/InventoryTransfer.js';
+import { getInventoryStore } from '../../store/SatchelStore.js';
+import { addItemToInventory, clearItemsInInventory, getItemAtSlotIndex, isInventoryEmpty } from '../../satchel/inv/InventoryTransfer.js';
 import { saveItemToFoundryAlbum, shouldSaveItemToFoundryAlbum } from '../../satchel/FoundryAlbum.js';
 import { dropItemOnGround } from '../../satchel/GroundAlbum.js';
-import { addInventoryChangeListener, dispatchInventoryChange, removeInventoryChangeListener } from '../../satchel/inv/InvEvents.js';
+import { addInventoryChangeListener, dispatchInventoryChange, removeInventoryChangeListener } from '../../events/InvEvents.js';
 import { ItemBuilder } from '../../satchel/item/Item.js';
-import { dispatchItemChange } from '../../satchel/item/ItemEvents.js';
+import { dispatchItemChange } from '../../events/ItemEvents.js';
 
 /** @typedef {import('../../satchel/item/Item.js').Item} Item */
 

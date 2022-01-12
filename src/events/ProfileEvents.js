@@ -1,8 +1,8 @@
 import { addStoreEventListener, dispatchStoreEvent, removeStoreEventListener } from '../store/InventoryEventStore.js';
 
 /**
- * @typedef {import('../../store/InventoryStore.js').InventoryStore} InventoryStore
- * @typedef {import('./Profile.js').ProfileId} ProfileId
+ * @typedef {import('../store/SatchelStore.js').InventoryStore} InventoryStore
+ * @typedef {import('../satchel/profile/Profile.js').ProfileId} ProfileId
  */
 
 /**

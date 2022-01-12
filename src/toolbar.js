@@ -1,25 +1,25 @@
 import { downloadText } from './util/downloader.js';
-import { addInventoryToStore, createGridInventoryInStore, deleteInventoryFromStore, getInventoryInStore, getInventoryStore, isInventoryInStore } from './store/InventoryStore.js';
-import { connectAsServer } from './app/PeerSatchelConnector.js';
-import { getCursorContext } from './inventory/CursorHelper.js';
+import { addInventoryToStore, createGridInventoryInStore, deleteInventoryFromStore, getInventoryInStore, getInventoryStore, isInventoryInStore } from './store/SatchelStore.js';
+import { connectAsServer } from './satchel/app/PeerSatchelConnector.js';
+import { getCursorContext } from './satchel/inv/CursorHelper.js';
 import { uploadFile } from './util/uploader.js';
 import { copyToClipboard, pasteFromClipboard } from './util/clipboard.js';
 import { ItemBuilder } from './satchel/item/Item.js';
 import { uuid } from './util/uuid.js';
 import { ItemAlbumElement } from './components/album/ItemAlbumElement.js';
-import { exportItemToString, importItemFromJSON, importItemFromString } from './satchel/item/ItemLoader.js';
-import { importAlbumFromJSON } from './satchel/album/AlbumLoader.js';
-import { addAlbumInStore, createAlbumInStore, deleteAlbumInStore, getAlbumIdsInStore, getAlbumInStore, isAlbumInStore } from './satchel/album/AlbumStore.js';
+import { exportItemToString, importItemFromJSON, importItemFromString } from './loader/ItemLoader.js';
+import { importAlbumFromJSON } from './loader/AlbumLoader.js';
+import { addAlbumInStore, createAlbumInStore, deleteAlbumInStore, getAlbumIdsInStore, getAlbumInStore, isAlbumInStore } from './store/AlbumStore.js';
 import { copyAlbum, createAlbum, isAlbumHidden } from './satchel/album/Album.js';
-import { dispatchAlbumChange } from './satchel/album/AlbumEvents.js';
-import { clearFoundry, closeFoundry, copyFoundry, isFoundryOpen, openFoundry } from './inventory/FoundryHelper.js';
+import { dispatchAlbumChange } from './events/AlbumEvents.js';
+import { clearFoundry, closeFoundry, copyFoundry, isFoundryOpen, openFoundry } from './satchel/inv/FoundryHelper.js';
 import { ActivityPlayerList } from './satchel/peer/ActivityPlayerList.js';
 import { dropItemOnGround, isGroundAlbum } from './satchel/GroundAlbum.js';
 import { forceEmptyStorage } from './Storage.js';
-import { addProfileInStore, deleteProfileInStore, getActiveProfileInStore, getProfileIdsInStore, getProfileInStore, isProfileInStore, setActiveProfileInStore } from './satchel/profile/ProfileStore.js';
-import { loadSatchelFromData, loadSatchelProfilesFromData, saveSatchelProfilesToData, saveSatchelToData } from './session/SatchelLoader.js';
+import { addProfileInStore, deleteProfileInStore, getActiveProfileInStore, getProfileIdsInStore, getProfileInStore, isProfileInStore, setActiveProfileInStore } from './store/ProfileStore.js';
+import { loadSatchelFromData, loadSatchelProfilesFromData, saveSatchelProfilesToData, saveSatchelToData } from './satchel/session/SatchelLoader.js';
 import { createProfile } from './satchel/profile/Profile.js';
-import { dispatchProfileChange } from './satchel/profile/ProfileEvents.js';
+import { dispatchProfileChange } from './events/ProfileEvents.js';
 import { resolveActiveProfile } from './satchel/ActiveProfile.js';
 import { createGridInventory, createSocketInventory } from './satchel/inv/Inv.js';
 
@@ -72,12 +72,12 @@ function onActionShareItem() {
       let giftTarget = document.querySelector('#giftTarget');
       let ctx = getCursorContext();
       if (ctx.server && ctx.server.instance) {
-        const localServer = /** @type {import('./app/PeerSatchel.js').SatchelServer} */ (ctx.server.instance);
+        const localServer = /** @type {import('./satchel/app/PeerSatchel.js').SatchelServer} */ (ctx.server.instance);
         const playerNames = ActivityPlayerList.getPlayerNameListOnServer(localServer);
         let content = playerNames.map(clientName => `<option>${clientName.toLowerCase()}</option>`).join('\n');
         giftTarget.innerHTML = content;
       } else if (ctx.client && ctx.client.instance) {
-        const localClient = /** @type {import('./app/PeerSatchel.js').SatchelClient} */ (ctx.client.instance);
+        const localClient = /** @type {import('./satchel/app/PeerSatchel.js').SatchelClient} */ (ctx.client.instance);
         const playerNames = ActivityPlayerList.getPlayerNameListOnClient(localClient);
         let content = playerNames.map(clientName => `<option>${clientName.toLowerCase()}</option>`).join('\n');
         giftTarget.innerHTML = content;

@@ -1,9 +1,9 @@
 import { DEFAULT_ITEM_UNIT_SIZE, itemMouseDownCallback } from './InventoryElementMouseHelper.js';
-import { getInventoryStore } from '../../store/InventoryStore.js';
-import { getExistingInventory } from '../../inventory/InventoryTransfer.js';
+import { getInventoryStore } from '../../store/SatchelStore.js';
+import { getExistingInventory } from '../../satchel/inv/InventoryTransfer.js';
 import { hasItem, getItemByItemId } from '../../satchel/inv/InvItems.js';
 import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../../satchel/inv/InvSlots.js';
-import { addItemChangeListener, removeItemChangeListener } from '../../satchel/item/ItemEvents.js';
+import { addItemChangeListener, removeItemChangeListener } from '../../events/ItemEvents.js';
 
 /** @typedef {import('./InventoryGridElement.js').InventoryGridElement} InventoryGridElement */
 

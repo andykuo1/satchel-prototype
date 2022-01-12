@@ -1,5 +1,5 @@
-import { getInventoryStore } from '../../store/InventoryStore.js';
-import { getExistingInventory } from '../../inventory/InventoryTransfer.js';
+import { getInventoryStore } from '../../store/SatchelStore.js';
+import { getExistingInventory } from '../../satchel/inv/InventoryTransfer.js';
 import { getItemByItemId } from '../../satchel/inv/InvItems.js';
 import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../../satchel/inv/InvSlots.js';
 import { copyItem } from '../../satchel/item/Item.js';

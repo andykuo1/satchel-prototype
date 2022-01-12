@@ -1,4 +1,4 @@
-import { exportItemToJSON, importItemFromJSON } from './ItemLoader.js';
+import { exportItemToJSON, importItemFromJSON } from '../../loader/ItemLoader.js';
 
 export function exportItemToBase64(item) {
   let json = exportItemToJSON(item);

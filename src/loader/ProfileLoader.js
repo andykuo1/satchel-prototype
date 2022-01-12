@@ -1,8 +1,8 @@
-import { exportDataToJSON, importDataFromJSON } from '../../session/SatchelDataLoader.js';
-import { cloneProfile } from './Profile.js';
+import { exportDataToJSON, importDataFromJSON } from '../satchel/session/SatchelDataLoader.js';
+import { cloneProfile } from '../satchel/profile/Profile.js';
 
 /**
- * @typedef {import('./Profile.js').Profile} Profile
+ * @typedef {import('../satchel/profile/Profile.js').Profile} Profile
  */
 
 /**

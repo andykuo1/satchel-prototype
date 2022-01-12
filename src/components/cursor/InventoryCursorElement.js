@@ -5,14 +5,14 @@ import {
   getInventoryInStore,
   getInventoryStore,
   isInventoryInStore,
-} from '../../store/InventoryStore.js';
+} from '../../store/SatchelStore.js';
 import {
   getExistingInventory,
   removeItemFromInventory,
   clearItemsInInventory,
   addItemToInventory,
   getItemAtSlotIndex
-} from '../../inventory/InventoryTransfer.js';
+} from '../../satchel/inv/InventoryTransfer.js';
 import { getItemByItemId } from '../../satchel/inv/InvItems.js';
 import { getSlotCoordsByIndex, getSlotIndexByItemId, isSlotIndexEmpty } from '../../satchel/inv/InvSlots.js';
 import { putDownToGridInventory, putDownToSocketInventory } from './InventoryCursorElementHelper.js';
@@ -23,7 +23,7 @@ import { DEFAULT_ITEM_UNIT_SIZE } from '../invgrid/InventoryElementMouseHelper.j
  * 
  * @typedef {import('../../satchel/inv/Inv.js').Inventory} Inventory
  * @typedef {import('../../satchel/inv/Inv.js').InventoryId} InventoryId
- * @typedef {import('../../store/InventoryStore.js').InventoryStore} InventoryStore
+ * @typedef {import('../../store/SatchelStore.js').InventoryStore} InventoryStore
  *
  * @typedef {import('../../satchel/item/Item.js').Item} Item
  * @typedef {import('../../satchel/item/Item.js').ItemId} ItemId

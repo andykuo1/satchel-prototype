@@ -1,6 +1,6 @@
 import { ActivityBase } from './ActivityBase.js';
 
-import { exportItemToJSON, importItemFromJSON } from '../../satchel/item/ItemLoader.js';
+import { exportItemToJSON, importItemFromJSON } from '../../loader/ItemLoader.js';
 import { SatchelLocal, SatchelRemote } from './SatchelLocal.js';
 
 import { ActivityPlayerHandshake } from './ActivityPlayerHandshake.js';

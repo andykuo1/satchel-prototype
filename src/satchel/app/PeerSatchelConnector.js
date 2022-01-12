@@ -1,5 +1,5 @@
-import { Peerful } from '../peerful/Peerful.js';
-import { getCursorContext } from '../inventory/CursorHelper.js';
+import { Peerful } from '../../peerful/Peerful.js';
+import { getCursorContext } from '../inv/CursorHelper.js';
 import { SatchelClient, SatchelServer } from './PeerSatchel.js';
 
 export async function connectAsClient(ctx, remoteId) {

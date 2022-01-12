@@ -1,10 +1,10 @@
-import { createProfile } from './Profile.js';
-import { dispatchActiveProfileChange, dispatchProfileChange } from './ProfileEvents.js';
+import { createProfile } from '../satchel/profile/Profile.js';
+import { dispatchActiveProfileChange, dispatchProfileChange } from '../events/ProfileEvents.js';
 
 /**
- * @typedef {import('../../store/InventoryStore.js').InventoryStore} Store
- * @typedef {import('./Profile.js').Profile} Profile
- * @typedef {import('./Profile.js').ProfileId} ProfileId
+ * @typedef {import('./SatchelStore.js').InventoryStore} Store
+ * @typedef {import('../satchel/profile/Profile.js').Profile} Profile
+ * @typedef {import('../satchel/profile/Profile.js').ProfileId} ProfileId
  */
 
 /**

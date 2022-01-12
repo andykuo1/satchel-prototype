@@ -8,7 +8,7 @@ const INNER_HTML = /* html */ `
 const INNER_STYLE = /* css */ `
 `;
 
-export class ItemDeleteElement extends HTMLElement {
+export class TrashCanElement extends HTMLElement {
   /** @private */
   static get [Symbol.for('templateNode')]() {
     const t = document.createElement('template');
@@ -26,7 +26,7 @@ export class ItemDeleteElement extends HTMLElement {
   }
 
   static define(customElements = window.customElements) {
-    customElements.define('item-delete', this);
+    customElements.define('trash-can', this);
   }
 
   constructor() {
@@ -104,4 +104,4 @@ export class ItemDeleteElement extends HTMLElement {
     }
   }
 }
-ItemDeleteElement.define();
+TrashCanElement.define();

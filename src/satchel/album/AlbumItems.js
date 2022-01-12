@@ -1,5 +1,5 @@
-import { dispatchAlbumChange } from './AlbumEvents.js';
-import { getExistingAlbumInStore } from './AlbumStore.js';
+import { dispatchAlbumChange } from '../../events/AlbumEvents.js';
+import { getExistingAlbumInStore } from '../../store/AlbumStore.js';
 
 export function addItemToAlbum(store, albumId, item) {
   let album = getExistingAlbumInStore(store, albumId);
@@ -32,7 +32,7 @@ export function getItemIdsInAlbum(store, albumId) {
 }
 
 /**
- * @param {import('../../store/InventoryStore.js').InventoryStore} store 
+ * @param {import('../../store/SatchelStore.js').InventoryStore} store 
  * @param {string} albumId 
  * @returns {Array<import('../item/Item.js').Item>}
  */

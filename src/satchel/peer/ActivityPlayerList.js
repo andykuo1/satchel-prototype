@@ -3,8 +3,8 @@ import { ActivityPlayerHandshake } from './ActivityPlayerHandshake.js';
 import { getPlayerName } from './PlayerState.js';
 
 /**
- * @typedef {import('../../app/PeerSatchel.js').SatchelServer} SatchelServer
- * @typedef {import('../../app/PeerSatchel.js').SatchelClient} SatchelClient
+ * @typedef {import('../app/PeerSatchel.js').SatchelServer} SatchelServer
+ * @typedef {import('../app/PeerSatchel.js').SatchelClient} SatchelClient
  * @typedef {import('./SatchelLocal.js').SatchelRemote} SatchelRemote
  */
 

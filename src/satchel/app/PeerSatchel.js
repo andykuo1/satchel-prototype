@@ -1,17 +1,17 @@
-import { exportItemToJSON } from '../satchel/item/ItemLoader.js';
+import { exportItemToJSON } from '../../loader/ItemLoader.js';
 
-import { ActivityPlayerGift } from '../satchel/peer/ActivityPlayerGift.js';
-import { ActivityPlayerList } from '../satchel/peer/ActivityPlayerList.js';
-import { ActivityPlayerHandshake } from '../satchel/peer/ActivityPlayerHandshake.js';
-import { ActivityPlayerInventory } from '../satchel/peer/ActivityPlayerInventory.js';
-import { SatchelLocal } from '../satchel/peer/SatchelLocal.js';
-import { ActivityError } from '../satchel/peer/ActivityError.js';
-import { getPlayerName } from '../satchel/peer/PlayerState.js';
+import { ActivityPlayerGift } from '../peer/ActivityPlayerGift.js';
+import { ActivityPlayerList } from '../peer/ActivityPlayerList.js';
+import { ActivityPlayerHandshake } from '../peer/ActivityPlayerHandshake.js';
+import { ActivityPlayerInventory } from '../peer/ActivityPlayerInventory.js';
+import { SatchelLocal } from '../peer/SatchelLocal.js';
+import { ActivityError } from '../peer/ActivityError.js';
+import { getPlayerName } from '../peer/PlayerState.js';
 
 /**
- * @typedef {import('../peerful/PeerfulConnection.js').PeerfulConnection} PeerfulConnection
- * @typedef {import('../components/invgrid/InventoryGridElement.js').InventoryGridElement} InventoryGridElement
- * @typedef {import('../satchel/peer/SatchelLocal.js').SatchelRemote} SatchelRemote
+ * @typedef {import('../../peerful/PeerfulConnection.js').PeerfulConnection} PeerfulConnection
+ * @typedef {import('../../components/invgrid/InventoryGridElement.js').InventoryGridElement} InventoryGridElement
+ * @typedef {import('../peer/SatchelLocal.js').SatchelRemote} SatchelRemote
  */
 
 const ACTIVITY_REGISTRY = [

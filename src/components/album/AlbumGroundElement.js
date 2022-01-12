@@ -1,12 +1,12 @@
-import { createSocketInventoryInStore, deleteInventoryFromStore, getInventoryInStore, getInventoryStore, isInventoryInStore } from '../../store/InventoryStore.js';
-import { addItemToInventory, getItemAtSlotIndex } from '../../inventory/InventoryTransfer.js';
-import { createInventoryView } from '../../inventory/InvView.js';
+import { createSocketInventoryInStore, deleteInventoryFromStore, getInventoryInStore, getInventoryStore, isInventoryInStore } from '../../store/SatchelStore.js';
+import { addItemToInventory, getItemAtSlotIndex } from '../../satchel/inv/InventoryTransfer.js';
+import { createInventoryView } from '../../satchel/inv/InvView.js';
 import { cloneItem } from '../../satchel/item/Item.js';
 import { uuid } from '../../util/uuid.js';
 import { getCursor } from '../cursor/index.js';
-import { getAlbumInStore } from '../../satchel/album/AlbumStore.js';
-import { addAlbumChangeListener, removeAlbumChangeListener } from '../../satchel/album/AlbumEvents.js';
-import { addInventoryChangeListener, removeInventoryChangeListener } from '../../satchel/inv/InvEvents.js';
+import { getAlbumInStore } from '../../store/AlbumStore.js';
+import { addAlbumChangeListener, removeAlbumChangeListener } from '../../events/AlbumEvents.js';
+import { addInventoryChangeListener, removeInventoryChangeListener } from '../../events/InvEvents.js';
 import { getItemIdsInAlbum, getItemInAlbum, hasItemInAlbum, removeItemFromAlbum } from '../../satchel/album/AlbumItems.js';
 import { dropItemOnGround, getGroundAlbumId } from '../../satchel/GroundAlbum.js';
 

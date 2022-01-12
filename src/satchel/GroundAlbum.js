@@ -1,8 +1,8 @@
 import { addItemToAlbum, clearItemsInAlbum } from '../satchel/album/AlbumItems.js';
-import { getInventoryStore } from '../store/InventoryStore.js';
+import { getInventoryStore } from '../store/SatchelStore.js';
 import { createAlbum } from './album/Album.js';
-import { addAlbumInStore, isAlbumInStore } from './album/AlbumStore.js';
-import { dispatchAlbumChange } from './album/AlbumEvents.js';
+import { addAlbumInStore, isAlbumInStore } from '../store/AlbumStore.js';
+import { dispatchAlbumChange } from '../events/AlbumEvents.js';
 
 const GROUND_ALBUM_DISPLAY_NAME = '[ Ground ]';
 

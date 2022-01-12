@@ -1,12 +1,12 @@
-import { createSocketInventoryInStore, deleteInventoryFromStore, getInventoryInStore, getInventoryStore, isInventoryInStore } from '../../store/InventoryStore.js';
-import { addItemToInventory, getItemAtSlotIndex } from '../../inventory/InventoryTransfer.js';
+import { createSocketInventoryInStore, deleteInventoryFromStore, getInventoryInStore, getInventoryStore, isInventoryInStore } from '../../store/SatchelStore.js';
+import { addItemToInventory, getItemAtSlotIndex } from '../../satchel/inv/InventoryTransfer.js';
 import { uuid } from '../../util/uuid.js';
 import { upgradeProperty } from '../../util/wc.js';
 import { getCursor } from '../cursor/index.js';
 import { cloneItem } from '../../satchel/item/Item.js';
-import { getAlbumInStore, isAlbumInStore } from '../../satchel/album/AlbumStore.js';
-import { addAlbumChangeListener, removeAlbumChangeListener } from '../../satchel/album/AlbumEvents.js';
-import { addInventoryChangeListener, removeInventoryChangeListener } from '../../satchel/inv/InvEvents.js';
+import { getAlbumInStore, isAlbumInStore } from '../../store/AlbumStore.js';
+import { addAlbumChangeListener, removeAlbumChangeListener } from '../../events/AlbumEvents.js';
+import { addInventoryChangeListener, removeInventoryChangeListener } from '../../events/InvEvents.js';
 import { addItemToAlbum, getItemIdsInAlbum, getItemInAlbum, removeItemFromAlbum } from '../../satchel/album/AlbumItems.js';
 
 /**

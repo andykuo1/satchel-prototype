@@ -1,14 +1,14 @@
 import { DialogPromptElement } from '../lib/DialogPromptElement.js';
-import { getCursorContext } from '../../inventory/CursorHelper.js';
-import { openFoundry } from '../../inventory/FoundryHelper.js';
-import { getInventoryInStore, getInventoryStore } from '../../store/InventoryStore.js';
-import { removeItemFromInventory } from '../../inventory/InventoryTransfer.js';
+import { getCursorContext } from '../../satchel/inv/CursorHelper.js';
+import { openFoundry } from '../../satchel/inv/FoundryHelper.js';
+import { getInventoryInStore, getInventoryStore } from '../../store/SatchelStore.js';
+import { removeItemFromInventory } from '../../satchel/inv/InventoryTransfer.js';
 import { dropItemOnGround } from '../../satchel/GroundAlbum.js';
 import { getItemByItemId } from '../../satchel/inv/InvItems.js';
 import { ActivityPlayerList } from '../../satchel/peer/ActivityPlayerList.js';
 import { cloneItem, copyItem } from '../../satchel/item/Item.js';
 import { ItemEditorElement } from './ItemEditorElement.js';
-import { dispatchItemChange } from '../../satchel/item/ItemEvents.js';
+import { dispatchItemChange } from '../../events/ItemEvents.js';
 
 /** @typedef {import('../../satchel/item/Item.js').Item} Item */
 
@@ -184,12 +184,12 @@ export class ItemDialogElement extends HTMLElement {
         let giftTarget = document.querySelector('#giftTarget');
         let ctx = getCursorContext();
         if (ctx.server && ctx.server.instance) {
-          const localServer = /** @type {import('../../app/PeerSatchel.js').SatchelServer} */ (ctx.server.instance);
+          const localServer = /** @type {import('../../satchel/app/PeerSatchel.js').SatchelServer} */ (ctx.server.instance);
           const playerNames = ActivityPlayerList.getPlayerNameListOnServer(localServer);
           let content = playerNames.map(clientName => `<option>${clientName.toLowerCase()}</option>`).join('\n');
           giftTarget.innerHTML = content;
         } else if (ctx.client && ctx.client.instance) {
-          const localClient = /** @type {import('../../app/PeerSatchel.js').SatchelClient} */ (ctx.client.instance);
+          const localClient = /** @type {import('../../satchel/app/PeerSatchel.js').SatchelClient} */ (ctx.client.instance);
           const playerNames = ActivityPlayerList.getPlayerNameListOnClient(localClient);
           let content = playerNames.map(clientName => `<option>${clientName.toLowerCase()}</option>`).join('\n');
           giftTarget.innerHTML = content;

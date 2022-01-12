@@ -2,7 +2,7 @@
 import { BUILD_VERSION } from './globals.js';
 import { pasteFromClipboard } from './util/clipboard.js';
 import { uuid } from './util/uuid.js';
-import { prepareSessionStatus } from './session/SatchelSession.js';
+import { prepareSessionStatus } from './satchel/session/SatchelSession.js';
 
 import './components/lib/DialogPromptElement.js';
 

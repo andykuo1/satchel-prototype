@@ -1,9 +1,9 @@
-import { copyItem } from '../satchel/item/Item.js';
+import { copyItem } from '../item/Item.js';
 
 export function openFoundry(item = undefined) {
   let editorContainer = document.querySelector('.editorContainer');
   editorContainer.classList.toggle('open', true);
-  /** @type {import('../components/itemeditor/ItemEditorElement.js').ItemEditorElement} */
+  /** @type {import('../../components/itemeditor/ItemEditorElement.js').ItemEditorElement} */
   let itemEditor = document.querySelector('#itemEditor');
   itemEditor.putSocketedItem(item, true);
 }
@@ -19,7 +19,7 @@ export function isFoundryOpen() {
 }
 
 export function copyFoundry() {
-  /** @type {import('../components/itemeditor/ItemEditorElement.js').ItemEditorElement} */
+  /** @type {import('../../components/itemeditor/ItemEditorElement.js').ItemEditorElement} */
   let itemEditor = document.querySelector('#itemEditor');
   let item = itemEditor.getSocketedItem();
   if (item) {
@@ -30,7 +30,7 @@ export function copyFoundry() {
 }
 
 export function clearFoundry() {
-  /** @type {import('../components/itemeditor/ItemEditorElement.js').ItemEditorElement} */
+  /** @type {import('../../components/itemeditor/ItemEditorElement.js').ItemEditorElement} */
   let itemEditor = document.querySelector('#itemEditor');
   let item = itemEditor.getSocketedItem();
   if (item) {

@@ -1,5 +1,5 @@
-import { createAlbum } from './Album.js';
-import { dispatchAlbumChange } from './AlbumEvents.js';
+import { createAlbum } from '../satchel/album/Album.js';
+import { dispatchAlbumChange } from '../events/AlbumEvents.js';
 
 export function getExistingAlbumInStore(store, albumId) {
   if (isAlbumInStore(store, albumId)) {

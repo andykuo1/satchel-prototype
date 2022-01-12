@@ -1,9 +1,9 @@
-import { getInventoryStore } from '../store/InventoryStore.js';
+import { getInventoryStore } from '../store/SatchelStore.js';
 import { uuid } from '../util/uuid.js';
 import { createAlbum, isAlbumLocked } from './album/Album.js';
-import { dispatchAlbumChange } from './album/AlbumEvents.js';
+import { dispatchAlbumChange } from '../events/AlbumEvents.js';
 import { addItemToAlbum, getItemsInAlbum } from './album/AlbumItems.js';
-import { addAlbumInStore, getAlbumsInStore, isAlbumInStore } from './album/AlbumStore.js';
+import { addAlbumInStore, getAlbumsInStore, isAlbumInStore } from '../store/AlbumStore.js';
 import { ItemAlbumElement } from '../components/album/ItemAlbumElement.js';
 
 const FOUNDRY_ALBUM_DISPLAY_NAME = '[ Foundry ]';

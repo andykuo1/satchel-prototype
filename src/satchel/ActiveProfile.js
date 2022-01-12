@@ -1,5 +1,5 @@
-import { getCursorContext } from '../inventory/CursorHelper.js';
-import { createGridInventoryInStore, getInventoryStore } from '../store/InventoryStore.js';
+import { getCursorContext } from './inv/CursorHelper.js';
+import { createGridInventoryInStore, getInventoryStore } from '../store/SatchelStore.js';
 import { uuid } from '../util/uuid.js';
 import { createProfile } from './profile/Profile.js';
 import {
@@ -7,7 +7,7 @@ import {
   addProfileChangeListener,
   removeActiveProfileChangeListener,
   removeProfileChangeListener,
-} from './profile/ProfileEvents.js';
+} from '../events/ProfileEvents.js';
 import {
   getActiveProfileInStore,
   getProfileInStore,
@@ -16,7 +16,7 @@ import {
   isProfileInStore,
   setActiveProfileInStore,
   addProfileInStore,
-} from './profile/ProfileStore.js';
+} from '../store/ProfileStore.js';
 
 export function setupActiveProfile() {
   const store = getInventoryStore();

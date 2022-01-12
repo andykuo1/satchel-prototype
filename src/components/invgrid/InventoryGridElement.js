@@ -6,13 +6,13 @@ import {
   deleteInventoryFromStore,
   getInventoryInStore,
   getInventoryStore,
-} from '../../store/InventoryStore.js';
+} from '../../store/SatchelStore.js';
 import { InventoryItemElement } from './InventoryItemElement.js';
 import {
   getItemAtSlotIndex, getItemIdsInSlots, isInventoryEmpty,
-} from '../../inventory/InventoryTransfer.js';
+} from '../../satchel/inv/InventoryTransfer.js';
 import { uuid } from '../../util/uuid.js';
-import { addInventoryChangeListener, removeInventoryChangeListener } from '../../satchel/inv/InvEvents.js';
+import { addInventoryChangeListener, removeInventoryChangeListener } from '../../events/InvEvents.js';
 
 const INNER_HTML = /* html */`
 <article>

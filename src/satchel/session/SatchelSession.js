@@ -1,4 +1,4 @@
-import { uuid } from '../util/uuid.js';
+import { uuid } from '../../util/uuid.js';
 
 export function prepareSessionStatus(sessionId, remoteId) {
   let jsonData = {

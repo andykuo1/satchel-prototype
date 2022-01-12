@@ -1,11 +1,11 @@
 import { cloneItem, copyItem } from '../item/Item.js';
 import { uuid } from '../../util/uuid.js';
 
-import { dispatchAlbumChange } from './AlbumEvents.js';
-import { getExistingAlbumInStore } from './AlbumStore.js';
+import { dispatchAlbumChange } from '../../events/AlbumEvents.js';
+import { getExistingAlbumInStore } from '../../store/AlbumStore.js';
 
 /**
- * @typedef {import('../../store/InventoryStore').InventoryStore} Store
+ * @typedef {import('../../store/SatchelStore').InventoryStore} Store
  * @typedef {import('../inv/Inv.js').InventoryId} InvId
  * @typedef {import('../item/Item.js').Item} Item
  * @typedef {import('../item/Item.js').ItemId} ItemId

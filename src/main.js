@@ -1,12 +1,11 @@
 import { BUILD_VERSION } from './globals.js';
 
-import { resolveSessionStatus } from './session/SatchelSession.js';
-import { getCursorContext } from './inventory/CursorHelper.js';
-import { connectAsClient } from './app/PeerSatchelConnector.js';
-import { loadSatchelFromStorage, saveSatchelToStorage } from './session/SatchelStorage.js';
+import { resolveSessionStatus } from './satchel/session/SatchelSession.js';
+import { getCursorContext } from './satchel/inv/CursorHelper.js';
+import { connectAsClient } from './satchel/app/PeerSatchelConnector.js';
+import { loadSatchelFromStorage, saveSatchelToStorage } from './satchel/session/SatchelStorage.js';
 import { setupActiveProfile } from './satchel/ActiveProfile.js';
 
-import './app/index.js';
 import './components/index.js';
 import './toolbar.js';
 

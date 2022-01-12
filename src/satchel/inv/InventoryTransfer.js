@@ -1,17 +1,17 @@
-import { isInventoryInStore, getInventoryInStore } from '../store/InventoryStore.js';
-import * as InvItems from '../satchel/inv/InvItems.js';
-import { getInventorySlotCount } from '../satchel/inv/Inv.js';
-import { cloneItem } from '../satchel/item/Item.js';
-import { dispatchItemChange } from '../satchel/item/ItemEvents.js';
-import { dispatchInventoryChange } from '../satchel/inv/InvEvents.js';
+import { isInventoryInStore, getInventoryInStore } from '../../store/SatchelStore.js';
+import * as InvItems from './InvItems.js';
+import { getInventorySlotCount } from './Inv.js';
+import { cloneItem } from '../item/Item.js';
+import { dispatchItemChange } from '../../events/ItemEvents.js';
+import { dispatchInventoryChange } from '../../events/InvEvents.js';
 
 /**
- * @typedef {import('../store/InventoryStore.js').Item} Item
- * @typedef {import('../store/InventoryStore.js').ItemId} ItemId
- * @typedef {import('../store/InventoryStore.js').InventoryStore} InventoryStore
- * @typedef {import('../store/InventoryStore.js').Inventory} Inventory
- * @typedef {import('../store/InventoryStore.js').InventoryId} InventoryId
- * @typedef {import('../store/InventoryStore.js').InventoryType} InventoryType
+ * @typedef {import('../../store/SatchelStore.js').Item} Item
+ * @typedef {import('../../store/SatchelStore.js').ItemId} ItemId
+ * @typedef {import('../../store/SatchelStore.js').InventoryStore} InventoryStore
+ * @typedef {import('../../store/SatchelStore.js').Inventory} Inventory
+ * @typedef {import('../../store/SatchelStore.js').InventoryId} InventoryId
+ * @typedef {import('../../store/SatchelStore.js').InventoryType} InventoryType
  */
 
 /**

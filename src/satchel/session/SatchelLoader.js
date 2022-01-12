@@ -1,25 +1,25 @@
-import { addInventoryToStore, getInventoryInStore, isInventoryInStore } from '../store/InventoryStore.js';
-import { cloneAlbum, copyAlbum, isAlbumHidden } from '../satchel/album/Album.js';
-import { dispatchAlbumChange } from '../satchel/album/AlbumEvents.js';
-import { exportAlbumToJSON, importAlbumFromJSON } from '../satchel/album/AlbumLoader.js';
+import { addInventoryToStore, getInventoryInStore, isInventoryInStore } from '../../store/SatchelStore.js';
+import { cloneAlbum, copyAlbum, isAlbumHidden } from '../album/Album.js';
+import { dispatchAlbumChange } from '../../events/AlbumEvents.js';
+import { exportAlbumToJSON, importAlbumFromJSON } from '../../loader/AlbumLoader.js';
 import {
   addAlbumInStore,
   getAlbumIdsInStore,
   getAlbumInStore,
   isAlbumInStore,
-} from '../satchel/album/AlbumStore.js';
-import { cloneInventory, copyInventory } from '../satchel/inv/Inv.js';
-import { dispatchInventoryChange } from '../satchel/inv/InvEvents.js';
-import { exportInventoryToJSON, importInventoryFromJSON } from '../satchel/inv/InvLoader.js';
-import { cloneProfile, copyProfile } from '../satchel/profile/Profile.js';
-import { dispatchProfileChange } from '../satchel/profile/ProfileEvents.js';
-import { exportProfileToJSON, importProfileFromJSON } from '../satchel/profile/ProfileLoader.js';
+} from '../../store/AlbumStore.js';
+import { cloneInventory, copyInventory } from '../inv/Inv.js';
+import { dispatchInventoryChange } from '../../events/InvEvents.js';
+import { exportInventoryToJSON, importInventoryFromJSON } from '../../loader/InvLoader.js';
+import { cloneProfile, copyProfile } from '../profile/Profile.js';
+import { dispatchProfileChange } from '../../events/ProfileEvents.js';
+import { exportProfileToJSON, importProfileFromJSON } from '../../loader/ProfileLoader.js';
 import {
   addProfileInStore,
   getProfileIdsInStore,
   getProfileInStore,
   isProfileInStore,
-} from '../satchel/profile/ProfileStore.js';
+} from '../../store/ProfileStore.js';
 import { exportDataToJSON, importDataFromJSON } from './SatchelDataLoader.js';
 
 export function loadSatchelFromData(store, jsonData, overrideData) {
