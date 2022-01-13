@@ -14,6 +14,7 @@ import { getSlotCoordsByIndex, getSlotIndexByItemId, isSlotIndexEmpty } from '..
 import { putDownToGridInventory, putDownToSocketInventory } from './InventoryCursorElementHelper.js';
 import { DEFAULT_ITEM_UNIT_SIZE } from '../invgrid/InventoryElementMouseHelper.js';
 import { isInvInStore, getInvInStore, createSocketInvInStore, deleteInvInStore } from '../../store/InvStore.js';
+import { dropItemOnGround } from '../../satchel/GroundAlbum.js';
 
 /**
  * @typedef {import('../invgrid/InventoryGridElement.js').InventoryGridElement} InventoryGridElement
@@ -229,6 +230,24 @@ export class InventoryCursorElement extends HTMLElement {
       default:
         throw new Error('Unsupported inventory type.');
     }
+  }
+
+  /**
+   * Drop from cursor to ground.
+   */
+  dropDown() {
+    let store = getSatchelStore();
+    const heldItem = this.getHeldItem();
+    if (!heldItem) {
+      return false;
+    }
+    if (this.ignoreFirstPutDown) {
+      // First put down has been ignored. Don't ignore the next intentful one.
+      this.ignoreFirstPutDown = false;
+      return true;
+    }
+    this.clearHeldItem();
+    dropItemOnGround(heldItem);
   }
 
   hasHeldItem() {

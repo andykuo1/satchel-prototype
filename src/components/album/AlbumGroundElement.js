@@ -108,12 +108,7 @@ export class AlbumGroundElement extends HTMLElement {
   /** @private */
   onMouseUp(e) {
     const cursor = getCursor();
-    const item = cursor.getHeldItem();
-    if (!item) {
-      return;
-    }
-    cursor.clearHeldItem();
-    dropItemOnGround(item);
+    cursor.dropDown();
   }
 
   /**
