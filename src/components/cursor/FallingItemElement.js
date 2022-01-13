@@ -2,35 +2,30 @@
  * @typedef {import('../../satchel/item/Item.js').Item} Item
  */
 
+import { dropItemOnGround } from '../../satchel/GroundAlbum.js';
+import { DEFAULT_ITEM_UNIT_SIZE } from '../invgrid/InventoryElementMouseHelper.js';
+
 const INNER_HTML = /* html */`
 <div class="outer">
-  <div class="inner">
-    <img>
-  </div>
+  <img>
 </div>
 `;
 const INNER_STYLE = /* css */`
 :host {
   display: inline-block;
   pointer-events: none;
-  overflow: hidden;
 }
 .outer {
-  display: inline-block;
   position: absolute;
   left: 0;
   top: 0;
-  width: 48px;
-  height: 48px;
+  width: ${DEFAULT_ITEM_UNIT_SIZE}px;
+  height: ${DEFAULT_ITEM_UNIT_SIZE}px;
   animation-duration: 1s;
   animation-timing-function: cubic-bezier(0.6, -0.18, 0.735, 0.045);
   animation-fill-mode: forwards;
   overflow: hidden;
   transform: scale(0);
-}
-.inner {
-  width: 100%;
-  height: 100%;
 }
 img {
   width: 100%;
@@ -42,14 +37,14 @@ img {
 }
 @keyframes itemfall {
   0% {
-    transform: scale(1);
+    transform: scale(1.5);
   }
   20% {
-    transform: scale(1.5);
+    transform: scale(3);
   }
   to {
     transform: scale(0);
-    top: 50%;
+    top: 10%;
     left: 100%;
   }
 }
@@ -86,14 +81,16 @@ export class FallingItemElement extends HTMLElement {
       this.constructor[Symbol.for('styleNode')].cloneNode(true)
     );
     
+    /** @private */
     this.containerElement = shadowRoot.querySelector('.outer');
+    /** @private */
     this.imageElement = shadowRoot.querySelector('img');
   }
 
   /**
    * @param {Item} item 
    */
-  animateItem(item, clientX, clientY, unitSize) {
+  animateItem(item, clientX, clientY) {
     const img = this.imageElement;
     img.src = item.imgSrc;
     img.alt = item.displayName;
@@ -112,4 +109,9 @@ FallingItemElement.define();
  */
 export function getFalling() {
   return document.querySelector('falling-item');
+}
+
+export function dropFallingItem(item, clientX, clientY) {
+  dropItemOnGround(item);
+  getFalling().animateItem(item, clientX, clientY);
 }

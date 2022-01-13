@@ -19,6 +19,7 @@ import { forceEmptyStorage } from './Storage.js';
 import { setActiveProfileInStore } from './store/ProfileStore.js';
 import { loadSatchelFromData, loadSatchelProfilesFromData, saveSatchelToData } from './loader/SatchelLoader.js';
 import { setupActionProfile } from './toolbar/profile.js';
+import { dropFallingItem } from './components/cursor/FallingItemElement.js';
 
 function elementEventListener(selector, event, callback) {
   document.querySelector(selector).addEventListener(event, callback);
@@ -177,13 +178,14 @@ function onActionItemEdit() {
   }
 }
 
-function onActionItemDuplicate() {
+function onActionItemDuplicate(e) {
   if (!isFoundryOpen()) {
     return;
   }
   const newItem = copyFoundry();
   if (newItem) {
-    dropItemOnGround(newItem);
+    const clientRect = e.target.getBoundingClientRect();
+    dropFallingItem(newItem, clientRect.x, clientRect.y);
   }
 }
 

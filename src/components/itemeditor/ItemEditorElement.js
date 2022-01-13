@@ -3,10 +3,10 @@ import { InventoryGridElement } from '../invgrid/InventoryGridElement.js';
 import { getSatchelStore } from '../../store/SatchelStore.js';
 import { addItemToInventory, clearItemsInInventory, getItemAtSlotIndex, isInventoryEmpty } from '../../satchel/inv/InventoryTransfer.js';
 import { saveItemToFoundryAlbum, shouldSaveItemToFoundryAlbum } from '../../satchel/FoundryAlbum.js';
-import { dropItemOnGround } from '../../satchel/GroundAlbum.js';
 import { addInventoryChangeListener, dispatchInventoryChange, removeInventoryChangeListener } from '../../events/InvEvents.js';
 import { ItemBuilder } from '../../satchel/item/Item.js';
 import { dispatchItemChange } from '../../events/ItemEvents.js';
+import { dropFallingItem } from '../cursor/FallingItemElement.js';
 
 /** @typedef {import('../../satchel/item/Item.js').Item} Item */
 
@@ -411,7 +411,8 @@ export class ItemEditorElement extends HTMLElement {
     if (item && !isInventoryEmpty(store, socketInvId)) {
       const item = getItemAtSlotIndex(store, socketInvId, 0);
       clearItemsInInventory(store, socketInvId);
-      dropItemOnGround(item);
+      const clientRect = this.getBoundingClientRect();
+      dropFallingItem(item, clientRect.x + clientRect.width / 2, clientRect.y + clientRect.height / 2);
     }
     if (item) {
       removeInventoryChangeListener(store, socketInvId, this.onSocketInventoryChange);

@@ -23,7 +23,9 @@ slot[name="items"] {
 .shaking {
   animation-name: shake;
   animation-fill-mode: forwards;
-  animation-duration: 1s;
+  animation-duration: 1.3s;
+  animation-delay: 0.3s;
+  transform: translate(0, 0) scale(0);
 }
 
 @keyframes shake {

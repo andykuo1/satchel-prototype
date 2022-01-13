@@ -3,13 +3,13 @@ import { getCursorContext } from '../../satchel/inv/CursorHelper.js';
 import { openFoundry } from '../../satchel/inv/FoundryHelper.js';
 import { getSatchelStore } from '../../store/SatchelStore.js';
 import { removeItemFromInventory } from '../../satchel/inv/InventoryTransfer.js';
-import { dropItemOnGround } from '../../satchel/GroundAlbum.js';
 import { getItemByItemId } from '../../satchel/inv/InvItems.js';
 import { ActivityPlayerList } from '../../satchel/peer/ActivityPlayerList.js';
 import { cloneItem, copyItem } from '../../satchel/item/Item.js';
 import { ItemEditorElement } from './ItemEditorElement.js';
 import { dispatchItemChange } from '../../events/ItemEvents.js';
 import { getInvInStore } from '../../store/InvStore.js';
+import { dropFallingItem } from '../cursor/FallingItemElement.js';
 
 /** @typedef {import('../../satchel/item/Item.js').Item} Item */
 
@@ -147,7 +147,7 @@ export class ItemDialogElement extends HTMLElement {
   }
 
   /** @private */
-  onActionDuplicate() {
+  onActionDuplicate(e) {
     if (!this._containerElement || !this._invId || !this._itemId) {
       return;
     }
@@ -156,7 +156,8 @@ export class ItemDialogElement extends HTMLElement {
     const socketedItem = this.itemEditor.getSocketedItem();
     if (socketedItem) {
       let newItem = copyItem(socketedItem);
-      dropItemOnGround(newItem);
+      const clientRect = e.target.getBoundingClientRect();
+      dropFallingItem(newItem, clientRect.x, clientRect.y);
     }
   }
 

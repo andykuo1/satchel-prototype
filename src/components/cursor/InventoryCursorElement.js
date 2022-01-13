@@ -14,8 +14,8 @@ import { getSlotCoordsByIndex, getSlotIndexByItemId, isSlotIndexEmpty } from '..
 import { putDownToGridInventory, putDownToSocketInventory } from './InventoryCursorElementHelper.js';
 import { DEFAULT_ITEM_UNIT_SIZE } from '../invgrid/InventoryElementMouseHelper.js';
 import { isInvInStore, getInvInStore, createSocketInvInStore, deleteInvInStore } from '../../store/InvStore.js';
-import { dropItemOnGround } from '../../satchel/GroundAlbum.js';
 import { addItemToAlbum } from '../../satchel/album/AlbumItems.js';
+import { dropFallingItem } from './FallingItemElement.js';
 
 /**
  * @typedef {import('../invgrid/InventoryGridElement.js').InventoryGridElement} InventoryGridElement
@@ -236,7 +236,7 @@ export class InventoryCursorElement extends HTMLElement {
   /**
    * Put down from cursor to ground.
    */
-  putDownInGround() {
+  putDownInGround(clientX = 0, clientY = 0) {
     const heldItem = this.getHeldItem();
     if (!heldItem) {
       return false;
@@ -247,7 +247,7 @@ export class InventoryCursorElement extends HTMLElement {
       return true;
     }
     this.clearHeldItem();
-    dropItemOnGround(heldItem);
+    dropFallingItem(heldItem, clientX, clientY);
     return true;
   }
 
