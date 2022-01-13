@@ -108,7 +108,11 @@ export class AlbumGroundElement extends HTMLElement {
   /** @private */
   onMouseUp(e) {
     const cursor = getCursor();
-    cursor.dropDown();
+    if (cursor.putDownInGround()) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
   }
 
   /**

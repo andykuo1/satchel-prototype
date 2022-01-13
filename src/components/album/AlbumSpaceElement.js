@@ -96,14 +96,14 @@ export class AlbumSpaceElement extends HTMLElement {
     this.onAlbumChange = this.onAlbumChange.bind(this);
     
     /** @private */
-    this.onItemDrop = this.onItemDrop.bind(this);
+    this.onMouseUp = this.onMouseUp.bind(this);
   }
 
   /** @protected */
   connectedCallback() {
     upgradeProperty(this, 'albumId');
 
-    this.container.addEventListener('mouseup', this.onItemDrop);
+    this.container.addEventListener('mouseup', this.onMouseUp);
   }
 
   /** @protected */
@@ -130,7 +130,7 @@ export class AlbumSpaceElement extends HTMLElement {
       }
     }
 
-    this.container.removeEventListener('mouseup', this.onItemDrop);
+    this.container.removeEventListener('mouseup', this.onMouseUp);
   }
 
   /**
@@ -226,17 +226,14 @@ export class AlbumSpaceElement extends HTMLElement {
   }
 
   /** @private */
-  onItemDrop(e) {
+  onMouseUp(e) {
+    const cursor = getCursor();
     const store = getSatchelStore();
     const albumId = this.albumId;
     if (!isAlbumInStore(store, albumId)) {
       return;
     }
-    let cursor = getCursor();
-    if (cursor.hasHeldItem()) {
-      const item = cursor.getHeldItem();
-      cursor.clearHeldItem();
-      addItemToAlbum(store, albumId, item);
+    if (cursor.putDownInAlbum(albumId)) {
       e.preventDefault();
       e.stopPropagation();
       return false;
