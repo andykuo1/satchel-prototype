@@ -7,8 +7,8 @@ import { addStoreEventListener, dispatchStoreEvent, removeStoreEventListener } f
 
 /**
  * @callback OnAlbumChangeCallback
- * @param store
- * @param albumId
+ * @param {Store} store
+ * @param {AlbumId} albumId
  */
 
 /**

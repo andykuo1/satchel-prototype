@@ -1,6 +1,5 @@
 import { getSatchelStore } from '../../store/SatchelStore.js';
 import { addItemToInventory, getItemAtSlotIndex } from '../../satchel/inv/InventoryTransfer.js';
-import { createInventoryView } from '../../satchel/inv/InvView.js';
 import { cloneItem } from '../../satchel/item/Item.js';
 import { uuid } from '../../util/uuid.js';
 import { getCursor } from '../cursor/index.js';
@@ -8,9 +7,10 @@ import { getAlbumInStore } from '../../store/AlbumStore.js';
 import { addAlbumChangeListener, removeAlbumChangeListener } from '../../events/AlbumEvents.js';
 import { addInventoryChangeListener, removeInventoryChangeListener } from '../../events/InvEvents.js';
 import { getItemIdsInAlbum, getItemInAlbum, hasItemInAlbum, removeItemFromAlbum } from '../../satchel/album/AlbumItems.js';
-import { dropItemOnGround, getGroundAlbumId } from '../../satchel/GroundAlbum.js';
+import { getGroundAlbumId } from '../../satchel/GroundAlbum.js';
 import { isInvInStore, getInvInStore, deleteInvInStore, createSocketInvInStore } from '../../store/InvStore.js';
 
+/** @typedef {import('../invgrid/InventoryGridElement.js').InventoryGridElement} InventoryGridElement */
 
 const INNER_HTML = /* html */`
 <slot name="items"></slot>
@@ -19,6 +19,35 @@ const INNER_STYLE = /* css */`
 slot[name="items"] {
   display: flex;
   flex-direction: column;
+}
+.shaking {
+  animation-name: shake;
+  animation-fill-mode: forwards;
+  animation-duration: 1s;
+}
+
+@keyframes shake {
+  0% {
+    transform: translate(0, 0) scale(0);
+  }
+  20% {
+    transform: translate(10%, 0) scale(1);
+  }
+  40% {
+    transform: translate(-10%, 0);
+  }
+  50% {
+    transform: translate(10%, 0);
+  }
+  60% {
+    transform: translate(-10%, 0);
+  }
+  80% {
+    transform: translate(10%, 0);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
 }
 `;
 
@@ -108,7 +137,7 @@ export class AlbumGroundElement extends HTMLElement {
   /** @private */
   onMouseUp(e) {
     const cursor = getCursor();
-    if (cursor.putDownInGround()) {
+    if (cursor.putDownInGround(e.clientX, e.clientY)) {
       e.preventDefault();
       e.stopPropagation();
       return false;
@@ -129,7 +158,11 @@ export class AlbumGroundElement extends HTMLElement {
 
     // Preserve unchanged items in slot
     const preservedInvs = {};
-    for (const node of this.slotItems.assignedNodes()) {
+    const children = [
+      ...this.slotItems.childNodes,
+      ...this.slotItems.assignedNodes(),
+    ];
+    for (const node of children) {
       const invNode =
         /** @type {import('../invgrid/InventoryGridElement.js').InventoryGridElement} */ (node);
       const invId = invNode.invId;
@@ -152,6 +185,7 @@ export class AlbumGroundElement extends HTMLElement {
       if (itemId in preservedInvs) {
         element = preservedInvs[itemId];
         delete preservedInvs[itemId];
+        element.classList.remove('shaking');
       } else {
         let store = getSatchelStore();
         let albumItem = getItemInAlbum(store, albumId, itemId);
@@ -160,12 +194,14 @@ export class AlbumGroundElement extends HTMLElement {
         const invId = uuid();
         createSocketInvInStore(store, invId);
         addItemToInventory(store, invId, newItem, 0, 0);
-        const invElement = createInventoryView(store, invId);
+        const invElement = /** @type {InventoryGridElement} */ (document.createElement('inventory-grid'));
+        invElement.invId = invId;
         invElement.toggleAttribute('fixed', true);
         invElement.toggleAttribute('noinput', true);
         invElement.toggleAttribute('temp', true);
         addInventoryChangeListener(store, invId, this.onSocketInventoryChange);
         element = invElement;
+        element.classList.add('shaking');
       }
       socketItems[element.invId] = itemId;
       emptySlot.append(element);

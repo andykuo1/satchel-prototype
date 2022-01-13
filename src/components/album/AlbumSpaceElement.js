@@ -7,7 +7,7 @@ import { cloneItem } from '../../satchel/item/Item.js';
 import { getAlbumInStore, isAlbumInStore } from '../../store/AlbumStore.js';
 import { addAlbumChangeListener, removeAlbumChangeListener } from '../../events/AlbumEvents.js';
 import { addInventoryChangeListener, removeInventoryChangeListener } from '../../events/InvEvents.js';
-import { addItemToAlbum, getItemIdsInAlbum, getItemInAlbum, removeItemFromAlbum } from '../../satchel/album/AlbumItems.js';
+import { getItemIdsInAlbum, getItemInAlbum, removeItemFromAlbum } from '../../satchel/album/AlbumItems.js';
 import { isInvInStore, getInvInStore, deleteInvInStore, createSocketInvInStore } from '../../store/InvStore.js';
 
 /**
@@ -181,7 +181,11 @@ export class AlbumSpaceElement extends HTMLElement {
 
     // Preserve unchanged items in slot
     const preservedInvs = {};
-    for (const node of this.slotItems.assignedNodes()) {
+    const children = [
+      ...this.slotItems.childNodes,
+      ...this.slotItems.assignedNodes(),
+    ];
+    for (const node of children) {
       const invNode =
         /** @type {import('../invgrid/InventoryGridElement.js').InventoryGridElement} */ (node);
       const invId = invNode.invId;
