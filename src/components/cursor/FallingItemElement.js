@@ -3,21 +3,34 @@
  */
 
 const INNER_HTML = /* html */`
-<div>
-  <img>
+<div class="outer">
+  <div class="inner">
+    <img>
+  </div>
 </div>
 `;
 const INNER_STYLE = /* css */`
-div {
+:host {
+  display: inline-block;
+  pointer-events: none;
+  overflow: hidden;
+}
+.outer {
   display: inline-block;
   position: absolute;
-  overflow: hidden;
   left: 0;
   top: 0;
+  width: 48px;
+  height: 48px;
   animation-duration: 1s;
   animation-timing-function: cubic-bezier(0.6, -0.18, 0.735, 0.045);
   animation-fill-mode: forwards;
-  pointer-events: none;
+  overflow: hidden;
+  transform: scale(0);
+}
+.inner {
+  width: 100%;
+  height: 100%;
 }
 img {
   width: 100%;
@@ -73,7 +86,7 @@ export class FallingItemElement extends HTMLElement {
       this.constructor[Symbol.for('styleNode')].cloneNode(true)
     );
     
-    this.containerElement = shadowRoot.querySelector('div');
+    this.containerElement = shadowRoot.querySelector('.outer');
     this.imageElement = shadowRoot.querySelector('img');
   }
 
@@ -87,8 +100,6 @@ export class FallingItemElement extends HTMLElement {
     const root = this.containerElement;
     root.style.setProperty('left', `${clientX}px`);
     root.style.setProperty('top', `${clientY}px`);
-    root.style.setProperty('width', `${item.width * unitSize}px`);
-    root.style.setProperty('height', `${item.height * unitSize}px`);
     root.classList.remove('falling');
     void root.offsetWidth;
     root.classList.add('falling');
