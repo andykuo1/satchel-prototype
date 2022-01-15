@@ -11,7 +11,7 @@ import { deleteAlbumInStore, getAlbumInStore, isAlbumInStore } from '../../store
 import { addAlbumChangeListener, dispatchAlbumChange, removeAlbumChangeListener } from '../../events/AlbumEvents.js';
 import { IconButtonElement } from '../lib/IconButtonElement.js';
 import { addInventoryChangeListener, removeInventoryChangeListener } from '../../events/InvEvents.js';
-import { addItemToAlbum, clearItemsInAlbum, getItemInAlbum, getItemsInAlbum, hasItemInAlbum, removeItemFromAlbum } from '../../satchel/album/AlbumItems.js';
+import { addItemToAlbum, clearItemsInAlbum, getItemIdsInAlbum, getItemInAlbum, getItemsInAlbum, hasItemInAlbum, removeItemFromAlbum } from '../../satchel/album/AlbumItems.js';
 import { isGroundAlbum } from '../../satchel/GroundAlbum.js';
 import { isFoundryAlbum } from '../../satchel/FoundryAlbum.js';
 import { isInvInStore, getInvInStore, deleteInvInStore, createSocketInvInStore } from '../../store/InvStore.js';
@@ -33,6 +33,7 @@ const INNER_HTML = /* html */`
     <icon-button class="button" id="buttonImport" icon="res/upload.svg" alt="import" title="Import Album"></icon-button>
     <icon-button class="button" id="buttonLock" icon="res/unlock.svg" alt="lock" title="Lock Album"></icon-button>
   </span>
+  <label id="labelEmpty" class="hidden">- - - - - Empty - - - - -</label>
   <slot name="items"></slot>
 </fieldset>
 `;
@@ -76,6 +77,17 @@ legend[contenteditable] {
   width: 1.5em;
   height: 1.5em;
   margin: 0;
+}
+#labelEmpty {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  color: #666666;
+  text-align: center;
+}
+.hidden {
+  display: none;
 }
 fieldset.internal {
   opacity: 0.6;
@@ -138,6 +150,8 @@ export class AlbumPackElement extends HTMLElement {
     this.container = shadowRoot.querySelector('fieldset');
     /** @private */
     this.inputTitle = shadowRoot.querySelector('legend');
+    /** @private */
+    this.labelEmpty = shadowRoot.querySelector('#labelEmpty');
 
     /** @private */
     this.buttonDelete = shadowRoot.querySelector('#buttonDelete');
@@ -312,6 +326,11 @@ export class AlbumPackElement extends HTMLElement {
     // Update name
     this.inputTitle.textContent = name;
 
+    // Update if empty
+    let empty = getItemIdsInAlbum(store, albumId).length > 0;
+    this.labelEmpty.classList.toggle('hidden', empty);
+
+    // Update items
     const list = getItemsInAlbum(store, albumId)
       .sort((a, b) => (a.displayName||'').localeCompare(b.displayName||''))
       .map(a => a.itemId);
