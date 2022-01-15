@@ -20,6 +20,7 @@ import { getExistingAlbumInStore } from '../../store/AlbumStore.js';
  * @property {string} displayName
  * @property {boolean} locked
  * @property {boolean} hidden
+ * @property {boolean} expand
  */
 
 /**
@@ -33,6 +34,7 @@ export function createAlbum(albumId) {
     locked: false,
     displayName: 'Untitled',
     hidden: false,
+    expand: true,
   };
   return album;
 }
@@ -81,6 +83,7 @@ export function cloneAlbum(other, dst = undefined, opts = {}) {
   dst.displayName = String(other.displayName);
   dst.locked = Boolean(other.locked);
   dst.hidden = Boolean(other.hidden);
+  dst.expand = typeof other.expand === 'boolean' ? other.expand : true;
   return dst;
 }
 
@@ -128,4 +131,27 @@ export function isAlbumLocked(store, albumId) {
  export function isAlbumHidden(store, albumId) {
   let album = getExistingAlbumInStore(store, albumId);
   return album.hidden;
+}
+
+/**
+ * @param {Store} store
+ * @param {AlbumId} albumId 
+ * @param {boolean} expand 
+ */
+ export function setAlbumExpanded(store, albumId, expand) {
+  let album = getExistingAlbumInStore(store, albumId);
+  if (album.expand !== expand) {
+    album.expand = expand;
+    dispatchAlbumChange(store, albumId);
+  }
+}
+
+/**
+ * @param {Store} store
+ * @param {AlbumId} albumId 
+ * @returns {boolean}
+ */
+export function isAlbumExpanded(store, albumId) {
+  let album = getExistingAlbumInStore(store, albumId);
+  return album.expand;
 }

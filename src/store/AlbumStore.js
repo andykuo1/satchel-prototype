@@ -1,5 +1,5 @@
 import { createAlbum } from '../satchel/album/Album.js';
-import { dispatchAlbumChange } from '../events/AlbumEvents.js';
+import { dispatchAlbumChange, dispatchAlbumListChange } from '../events/AlbumEvents.js';
 
 /**
  * @typedef {import('./SatchelStore.js').SatchelStore} Store
@@ -82,6 +82,7 @@ export function addAlbumInStore(store, albumId, album) {
   }
   store.data.album[albumId] = album;
   dispatchAlbumChange(store, albumId);
+  dispatchAlbumListChange(store);
   return true;
 }
 
@@ -100,5 +101,6 @@ export function deleteAlbumInStore(store, albumId, album) {
   }
   delete store.data.album[albumId];
   dispatchAlbumChange(store, albumId);
+  dispatchAlbumListChange(store);
   return true;
 }

@@ -1,5 +1,5 @@
 import { getSatchelStore } from '../../store/SatchelStore.js';
-import { addItemToInventory, getItemAtSlotIndex } from '../../satchel/inv/InventoryTransfer.js';
+import { addItemToInventory } from '../../satchel/inv/InventoryTransfer.js';
 import { cloneItem } from '../../satchel/item/Item.js';
 import { uuid } from '../../util/uuid.js';
 import { getCursor } from '../cursor/index.js';
@@ -9,6 +9,7 @@ import { addInventoryChangeListener, removeInventoryChangeListener } from '../..
 import { getItemIdsInAlbum, getItemInAlbum, hasItemInAlbum, removeItemFromAlbum } from '../../satchel/album/AlbumItems.js';
 import { getGroundAlbumId } from '../../satchel/GroundAlbum.js';
 import { isInvInStore, getInvInStore, deleteInvInStore, createSocketInvInStore } from '../../store/InvStore.js';
+import { updateList } from '../ElementListHelper.js';
 
 /** @typedef {import('../invgrid/InventoryGridElement.js').InventoryGridElement} InventoryGridElement */
 
@@ -74,6 +75,11 @@ export class AlbumGroundElement extends HTMLElement {
     customElements.define('album-ground', this);
   }
 
+  get albumId() {
+    const store = getSatchelStore();
+    return getGroundAlbumId(store);
+  }
+
   constructor() {
     super();
     const shadowRoot = this.attachShadow({ mode: 'open' });
@@ -91,7 +97,7 @@ export class AlbumGroundElement extends HTMLElement {
     this.slotItems = this.shadowRoot.querySelector('slot[name="items"]');
 
     /** @private */
-    this.socketItems = {};
+    this.socketedIds = {};
 
     /** @private */
     this.onAlbumChange = this.onAlbumChange.bind(this);
@@ -99,11 +105,6 @@ export class AlbumGroundElement extends HTMLElement {
     this.onMouseUp = this.onMouseUp.bind(this);
     /** @private */
     this.onSocketInventoryChange = this.onSocketInventoryChange.bind(this);
-  }
-
-  get albumId() {
-    const store = getSatchelStore();
-    return getGroundAlbumId(store);
   }
 
   /** @protected */
@@ -120,18 +121,24 @@ export class AlbumGroundElement extends HTMLElement {
   disconnectedCallback() {
     const store = getSatchelStore();
     const albumId = this.albumId;
-    removeAlbumChangeListener(store, albumId, this.onAlbumChange);
+    if (albumId) {
+      removeAlbumChangeListener(
+        store,
+        albumId,
+        this.onAlbumChange
+      );
+    }
 
     document.removeEventListener('mouseup', this.onMouseUp);
+
+    // Remove all temp inv listeners
+    for(let invId of Object.keys(this.socketedIds)) {
+      removeInventoryChangeListener(store, invId, this.onSocketInventoryChange);
+    }
     
     // Destroy all items
-    const children = [
-      ...this.slotItems.childNodes,
-      ...this.slotItems.assignedNodes(),
-    ];
-    for (const node of children) {
-      const invNode =
-        /** @type {import('../invgrid/InventoryGridElement.js').InventoryGridElement} */ (node);
+    for (const node of this.slotItems.children) {
+      const invNode = /** @type {InventoryGridElement} */ (node);
       const invId = invNode.invId;
       const inv = getInvInStore(store, invId);
       if (inv) {
@@ -152,69 +159,28 @@ export class AlbumGroundElement extends HTMLElement {
       return;
     }
 
-    // Preserve unchanged items in slot
-    const preservedInvs = {};
-    const children = [
-      ...this.slotItems.childNodes,
-      ...this.slotItems.assignedNodes(),
-    ];
-    for (const node of children) {
-      const invNode =
-        /** @type {import('../invgrid/InventoryGridElement.js').InventoryGridElement} */ (node);
-      const invId = invNode.invId;
-      const item = getItemAtSlotIndex(getSatchelStore(), invId, 0);
-      if (item) {
-        preservedInvs[item.itemId] = invNode;
-      }
-    }
-
-    // Add new items into slot.
-    const emptySlot = /** @type {HTMLSlotElement} */ (
-      this.slotItems.cloneNode(false)
-    );
-    let itemIds = getItemIdsInAlbum(store, albumId)
+    const list = getItemIdsInAlbum(store, albumId)
       .sort((a, b) => (getItemInAlbum(store, albumId, a).displayName||'')
-        .localeCompare(getItemInAlbum(store, albumId, b).displayName||''));
-    let socketItems = {};
-    for (const itemId of itemIds) {
-      let element;
-      if (itemId in preservedInvs) {
-        element = preservedInvs[itemId];
-        delete preservedInvs[itemId];
-        element.classList.remove('shaking');
-      } else {
-        let store = getSatchelStore();
-        let albumItem = getItemInAlbum(store, albumId, itemId);
-        let newItem = cloneItem(albumItem);
+      .localeCompare(getItemInAlbum(store, albumId, b).displayName||''));
+    const factoryCreate = (key) => {
+      let store = getSatchelStore();
+      let albumItem = getItemInAlbum(store, albumId, key);
+      let newItem = cloneItem(albumItem);
 
-        const invId = uuid();
-        createSocketInvInStore(store, invId);
-        addItemToInventory(store, invId, newItem, 0, 0);
-        const invElement = /** @type {InventoryGridElement} */ (document.createElement('inventory-grid'));
-        invElement.invId = invId;
-        invElement.toggleAttribute('fixed', true);
-        invElement.toggleAttribute('noinput', true);
-        invElement.toggleAttribute('temp', true);
-        addInventoryChangeListener(store, invId, this.onSocketInventoryChange);
-        element = invElement;
-        element.classList.add('shaking');
-      }
-      socketItems[element.invId] = itemId;
-      emptySlot.append(element);
-    }
-
-    // Delete remaining inventories
-    for(let invElement of Object.values(preservedInvs)) {
-      const invId = invElement.invId;
-      const inv = getInvInStore(store, invId);
-      if (inv) {
-        deleteInvInStore(store, invId, inv);
-      }
-    }
-
-    this.socketItems = socketItems;
-    this.slotItems.replaceWith(emptySlot);
-    this.slotItems = emptySlot;
+      const invId = uuid();
+      createSocketInvInStore(store, invId);
+      addItemToInventory(store, invId, newItem, 0, 0);
+      const invElement = /** @type {InventoryGridElement} */ (document.createElement('inventory-grid'));
+      invElement.invId = invId;
+      invElement.toggleAttribute('fixed', true);
+      invElement.toggleAttribute('noinput', true);
+      invElement.toggleAttribute('temp', true);
+      invElement.classList.add('shaking');
+      this.socketedIds[invId] = newItem.itemId;
+      addInventoryChangeListener(store, invId, this.onSocketInventoryChange);
+      return invElement;
+    };
+    updateList(this.slotItems, list, factoryCreate);
   }
 
   /** @private */
@@ -232,7 +198,7 @@ export class AlbumGroundElement extends HTMLElement {
     if (!isInvInStore(store, invId)) {
       removeInventoryChangeListener(store, invId, this.onSocketInventoryChange);
       const albumId = this.albumId;
-      const itemId = this.socketItems[invId];
+      const itemId = this.socketedIds[invId];
       if (hasItemInAlbum(store, albumId, itemId)) {
         removeItemFromAlbum(store, albumId, itemId);
       }

@@ -154,6 +154,7 @@ export function saveSatchelProfilesToData(store, profileIds, dst = {}) {
 }
 
 export function loadSatchelAlbumsFromData(store, jsonData, overrideData) {
+  let result = [];
   let inAlbums = jsonData.albums;
   for (let albumJson of inAlbums) {
     const album = importAlbumFromJSON(albumJson);
@@ -161,6 +162,7 @@ export function loadSatchelAlbumsFromData(store, jsonData, overrideData) {
     if (!overrideData) {
       const newAlbum = copyAlbum(album);
       addAlbumInStore(store, newAlbum.albumId, newAlbum);
+      result.push(newAlbum.albumId);
     } else {
       if (isAlbumInStore(store, albumId)) {
         const oldAlbum = getAlbumInStore(store, albumId);
@@ -169,8 +171,10 @@ export function loadSatchelAlbumsFromData(store, jsonData, overrideData) {
       } else {
         addAlbumInStore(store, albumId, album);
       }
+      result.push(albumId);
     }
   }
+  return result;
 }
 
 export function saveSatchelAlbumsToData(store, albumIds, dst = {}) {

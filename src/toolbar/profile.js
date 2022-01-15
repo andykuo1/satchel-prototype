@@ -214,7 +214,7 @@ async function onActionProfileImport() {
       }
     } break;
     default:
-      window.alert('Cannot load json - this is not a profile.');
+      window.alert('Cannot load json - this is not a valid profile.');
       return;
   }
   onActionProfile();

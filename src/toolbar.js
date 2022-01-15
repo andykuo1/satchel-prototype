@@ -6,12 +6,12 @@ import { uploadFile } from './util/uploader.js';
 import { copyToClipboard, pasteFromClipboard } from './util/clipboard.js';
 import { ItemBuilder } from './satchel/item/Item.js';
 import { uuid } from './util/uuid.js';
-import { ItemAlbumElement } from './components/album/AlbumPackElement.js';
+import { AlbumPackElement } from './components/album/AlbumPackElement.js';
 import { exportItemToString, importItemFromJSON, importItemFromString } from './loader/ItemLoader.js';
 import { importAlbumFromJSON } from './loader/AlbumLoader.js';
-import { addAlbumInStore, createAlbumInStore, getAlbumIdsInStore, getAlbumInStore } from './store/AlbumStore.js';
+import { addAlbumInStore, createAlbumInStore, getAlbumIdsInStore, getAlbumInStore, getAlbumsInStore } from './store/AlbumStore.js';
 import { copyAlbum, isAlbumHidden } from './satchel/album/Album.js';
-import { dispatchAlbumChange } from './events/AlbumEvents.js';
+import { addAlbumListChangeListener, dispatchAlbumChange } from './events/AlbumEvents.js';
 import { clearFoundry, closeFoundry, copyFoundry, isFoundryOpen, openFoundry } from './satchel/inv/FoundryHelper.js';
 import { ActivityPlayerList } from './satchel/peer/ActivityPlayerList.js';
 import { dropItemOnGround, isGroundAlbum } from './satchel/GroundAlbum.js';
@@ -20,35 +20,39 @@ import { setActiveProfileInStore } from './store/ProfileStore.js';
 import { loadSatchelFromData, loadSatchelProfilesFromData, saveSatchelToData } from './loader/SatchelLoader.js';
 import { setupActionProfile } from './toolbar/profile.js';
 import { dropFallingItem } from './components/cursor/FallingItemElement.js';
+import { updateList } from './components/ElementListHelper.js';
+import { isFoundryAlbum } from './satchel/FoundryAlbum.js';
+import { isTrashAlbum } from './satchel/TrashAlbum.js';
 
-function elementEventListener(selector, event, callback) {
+function el(selector, event, callback) {
   document.querySelector(selector).addEventListener(event, callback);
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-  elementEventListener('#actionItemEdit', 'click', onActionItemEdit);
-  elementEventListener('#downloadButton', 'click', onDownloadClick);
-  elementEventListener('#uploadButton', 'click', onUploadClick);
-  elementEventListener('#cloudButton', 'click', onCloudClick);
-  elementEventListener('#actionEraseAll', 'click', onActionEraseAll);
+  el('#actionItemEdit', 'click', onActionItemEdit);
+  el('#downloadButton', 'click', onDownloadClick);
+  el('#uploadButton', 'click', onUploadClick);
+  el('#cloudButton', 'click', onCloudClick);
+  el('#actionEraseAll', 'click', onActionEraseAll);
   
-  elementEventListener('#actionAlbumOpen', 'click', onActionAlbumOpen);
-  elementEventListener('#actionAlbumImport', 'click', onActionAlbumImport);
-  elementEventListener('#actionAlbumNew', 'click', onActionAlbumNew);
+  el('#actionAlbumOpen', 'click', onActionAlbumOpen);
+  el('#actionAlbumNew', 'click', onActionAlbumNew);
 
-  elementEventListener('#actionShareItem', 'click', onActionShareItem);
-  elementEventListener('#actionSettings', 'click', onActionSettings);
+  el('#actionShareItem', 'click', onActionShareItem);
+  el('#actionSettings', 'click', onActionSettings);
 
-  elementEventListener('#actionItemCodeImport', 'click', onActionItemCodeImport);
-  elementEventListener('#actionItemCodeExport', 'click', onActionItemCodeExport);
-  elementEventListener('#actionItemDuplicate', 'click', onActionItemDuplicate);
-  elementEventListener('#actionFoundryReset', 'click', onActionFoundryReset);
-  elementEventListener('#actionFoundryNew', 'click', onActionFoundryNew);
-  elementEventListener('#giftCodeExport', 'click', onGiftCodeExport);
+  el('#actionItemCodeImport', 'click', onActionItemCodeImport);
+  el('#actionItemCodeExport', 'click', onActionItemCodeExport);
+  el('#actionItemDuplicate', 'click', onActionItemDuplicate);
+  el('#actionFoundryReset', 'click', onActionFoundryReset);
+  el('#actionFoundryNew', 'click', onActionFoundryNew);
+  el('#giftCodeExport', 'click', onGiftCodeExport);
 
-  elementEventListener('#giftSubmit', 'click', onGiftSubmit);
+  el('#giftSubmit', 'click', onGiftSubmit);
 
   setupActionProfile();
+
+  addAlbumListChangeListener(getSatchelStore(), onAlbumListUpdate);
 
   document.addEventListener('itemcontext', onItemContext);
 });
@@ -124,50 +128,30 @@ function onActionAlbumNew() {
   const store = getSatchelStore();
   const albumId = uuid();
   createAlbumInStore(store, albumId);
-  const albumContainer = document.querySelector('#albumList');
-  const albumElement = new ItemAlbumElement();
-  albumElement.albumId = albumId;
-  albumContainer.appendChild(albumElement);
+  const albumList = document.querySelector('#albumList');
+  albumList.scrollTo(0, 0);
 }
 
 function onActionAlbumOpen() {
-  const store = getSatchelStore();
-  const albumIds = getAlbumIdsInStore(store);
-  const albumElementList = document.querySelector('#albumList');
-  /** @type {NodeListOf<ItemAlbumElement>} */
-  const albumElementChildren = albumElementList.querySelectorAll('item-album');
-  for(let album of albumElementChildren) {
-    let i = albumIds.indexOf(album.albumId);
-    if (i >= 0) {
-      // Ignore this element as it is already created and in store.
-      albumIds.splice(i, 1);
-    } else {
-      // Delete this element as it no longer exists in store.
-      album.remove();
-    }
-  }
-  // Create any albums not matched with one in store
-  for(let albumId of albumIds) {
-    const album = getAlbumInStore(store, albumId);
-    if (isGroundAlbum(album)) {
-      // Ground album is always displayed in a separate sidebar
-      continue;
-    }
-    // Hidden albums are not shown, so don't create it.
-    if (isAlbumHidden(store, albumId)) {
-      continue;
-    }
-    const albumElement = new ItemAlbumElement();
-    albumElement.albumId = albumId;
-    albumElementList.appendChild(albumElement);
-  }
-  // Actually open the container
   let albumContainer = document.querySelector('.albumContainer');
   albumContainer.classList.toggle('open');
 }
 
-async function onActionAlbumImport() {
-  await onUploadClick();
+function onAlbumListUpdate() {
+  const store = getSatchelStore();
+  const list = getAlbumsInStore(store)
+    .sort((a, b) => (a.displayName||'').localeCompare(b.displayName||''))
+    .filter(a => !isGroundAlbum(a))
+    .filter(a => !isAlbumHidden(store, a.albumId))
+    .map(a => a.albumId)
+    .reverse();
+  const albumList = document.querySelector('#albumList');
+  const factoryCreate = (key) => {
+    const albumElement = new AlbumPackElement();
+    albumElement.albumId = key;
+    return albumElement;
+  };
+  updateList(albumList, list, factoryCreate);
 }
 
 function onActionItemEdit() {
@@ -250,11 +234,6 @@ async function onUploadClick() {
         const album = importAlbumFromJSON(jsonData);
         const newAlbum = copyAlbum(album);
         addAlbumInStore(store, newAlbum.albumId, newAlbum);
-        const albumList = document.querySelector('#albumList');
-        const albumElement = new ItemAlbumElement();
-        albumElement.albumId = newAlbum.albumId;
-        albumList.appendChild(albumElement);
-        dispatchAlbumChange(store, newAlbum.albumId);
 
         // Make sure to open the container
         let albumContainer = document.querySelector('.albumContainer');

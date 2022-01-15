@@ -4,7 +4,7 @@ import { createAlbum, isAlbumLocked } from './album/Album.js';
 import { dispatchAlbumChange } from '../events/AlbumEvents.js';
 import { addItemToAlbum, getItemsInAlbum } from './album/AlbumItems.js';
 import { addAlbumInStore, getAlbumsInStore, isAlbumInStore } from '../store/AlbumStore.js';
-import { ItemAlbumElement } from '../components/album/AlbumPackElement.js';
+import { AlbumPackElement } from '../components/album/AlbumPackElement.js';
 
 const FOUNDRY_ALBUM_DISPLAY_NAME = '[ Foundry ]';
 
@@ -20,12 +20,6 @@ export function saveItemToFoundryAlbum(freedItem) {
     album.displayName = FOUNDRY_ALBUM_DISPLAY_NAME;
     album.locked = true;
     addAlbumInStore(store, album.albumId, album);
-    dispatchAlbumChange(store, album.albumId);
-
-    const albumContainer = document.querySelector('#albumList');
-    const albumElement = new ItemAlbumElement();
-    albumElement.albumId = album.albumId;
-    albumContainer.prepend(albumElement);
   }
   addItemToAlbum(store, foundryAlbumId, freedItem);
 }

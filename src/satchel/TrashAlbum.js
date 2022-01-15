@@ -4,7 +4,7 @@ import { createAlbum } from './album/Album.js';
 import { dispatchAlbumChange } from '../events/AlbumEvents.js';
 import { addItemToAlbum, getItemIdsInAlbum, removeItemFromAlbum } from './album/AlbumItems.js';
 import { addAlbumInStore, getAlbumsInStore, isAlbumInStore } from '../store/AlbumStore.js';
-import { ItemAlbumElement } from '../components/album/AlbumPackElement.js';
+import { AlbumPackElement } from '../components/album/AlbumPackElement.js';
 
 const TRASH_ALBUM_DISPLAY_NAME = '[ Trash ]';
 const MAX_ITEMS_IN_TRASH = 30;
@@ -20,13 +20,8 @@ export function saveItemToTrashAlbum(freedItem) {
     let album = createAlbum(trashAlbumId);
     album.displayName = TRASH_ALBUM_DISPLAY_NAME;
     album.locked = false;
+    album.expand = false;
     addAlbumInStore(store, album.albumId, album);
-    dispatchAlbumChange(store, album.albumId);
-
-    const albumContainer = document.querySelector('#albumList');
-    const albumElement = new ItemAlbumElement();
-    albumElement.albumId = album.albumId;
-    albumContainer.prepend(albumElement);
   }
   addItemToAlbum(store, trashAlbumId, freedItem);
   let itemIds = getItemIdsInAlbum(store, trashAlbumId);
