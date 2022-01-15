@@ -591,8 +591,14 @@ export class ItemEditorElement extends HTMLElement {
       newWidth = oldHeight;
       newHeight = oldWidth;
     } else if (oldHeight === 1) {
-      // No change
-      return;
+      if (oldWidth === 1) {
+        // Flat & Tiny
+        newWidth = 2;
+        newHeight = 1;
+      } else {
+        // No change
+        return;
+      }
     } else {
       // Flatten it
       newWidth = oldWidth + 1;
@@ -618,8 +624,14 @@ export class ItemEditorElement extends HTMLElement {
       newWidth = oldHeight;
       newHeight = oldWidth;
     } else if (oldWidth === 1) {
-      // No change
-      return;
+      if (oldHeight === 1) {
+        // Flat & Tiny
+        newWidth = 1;
+        newHeight = 2;
+      } else {
+        // No change
+        return;
+      }
     } else {
       // Flatten it
       newWidth = Math.ceil(oldWidth / 2);
