@@ -1,30 +1,39 @@
 const INNER_HTML = /* html */ `
 <div class="container">
-  <slot></slot>
+  <div class="inner">
+    <slot></slot>
+  </div>
 </div>
 `;
 const INNER_STYLE = /* css */ `
-:host {
-  z-index: 10;
-}
 .container {
   position: fixed;
   top: 0;
   left: 0;
   padding: 0.5em;
-  overflow-x: hidden;
-  overflow-y: auto;
   background-color: #444444;
-  border-radius: 1em;
+  border-radius: 2em;
+  border-top-left-radius: 0;
   border-top: 0.1em solid #666666;
   border-left: 0.1em solid #666666;
   border-right: 0.3em solid #666666;
   border-bottom: 0.3em solid #666666;
   width: 10em;
-  height: 10em;
+  height: 12em;
+  z-index: 10;
+  transition: width 0.3s ease, height 0.3s ease;
+  overflow: hidden;
+}
+.inner {
+  width: 10em;
+  height: 12em;
+  overflow-x: hidden;
+  overflow-y: visible;
 }
 .container:not(.visible) {
   visibility: hidden;
+  width: 0;
+  height: 0;
 }
 `;
 
@@ -111,9 +120,9 @@ export class ContextMenuElement extends HTMLElement {
   onOutside(e) {
     const contextMenu = this.containerElement;
     if (contextMenu.classList.contains('visible')) {
-      let rect = contextMenu.getBoundingClientRect();
-      let x = e.clientX;
-      let y = e.clientY;
+      const rect = contextMenu.getBoundingClientRect();
+      const x = e.clientX;
+      const y = e.clientY;
       if (x > rect.right || x < rect.left || y > rect.bottom || y < rect.top) {
         this.close();
       }
