@@ -1,10 +1,8 @@
 import { getSatchelStore } from '../store/SatchelStore.js';
 import { uuid } from '../util/uuid.js';
 import { createAlbum, isAlbumLocked } from './album/Album.js';
-import { dispatchAlbumChange } from '../events/AlbumEvents.js';
 import { addItemToAlbum, getItemsInAlbum } from './album/AlbumItems.js';
 import { addAlbumInStore, getAlbumsInStore, isAlbumInStore } from '../store/AlbumStore.js';
-import { AlbumPackElement } from '../components/album/AlbumPackElement.js';
 
 const FOUNDRY_ALBUM_DISPLAY_NAME = '[ Foundry ]';
 

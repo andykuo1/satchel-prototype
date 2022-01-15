@@ -1,10 +1,8 @@
 import { getSatchelStore } from '../store/SatchelStore.js';
 import { uuid } from '../util/uuid.js';
 import { createAlbum } from './album/Album.js';
-import { dispatchAlbumChange } from '../events/AlbumEvents.js';
 import { addItemToAlbum, getItemIdsInAlbum, removeItemFromAlbum } from './album/AlbumItems.js';
 import { addAlbumInStore, getAlbumsInStore, isAlbumInStore } from '../store/AlbumStore.js';
-import { AlbumPackElement } from '../components/album/AlbumPackElement.js';
 
 const TRASH_ALBUM_DISPLAY_NAME = '[ Trash ]';
 const MAX_ITEMS_IN_TRASH = 30;
@@ -19,7 +17,7 @@ export function saveItemToTrashAlbum(freedItem) {
     trashAlbumId = uuid();
     let album = createAlbum(trashAlbumId);
     album.displayName = TRASH_ALBUM_DISPLAY_NAME;
-    album.locked = false;
+    album.locked = true;
     album.expand = false;
     addAlbumInStore(store, album.albumId, album);
   }
