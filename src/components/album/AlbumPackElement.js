@@ -11,7 +11,7 @@ import { deleteAlbumInStore, getAlbumInStore, isAlbumInStore } from '../../store
 import { addAlbumChangeListener, dispatchAlbumChange, removeAlbumChangeListener } from '../../events/AlbumEvents.js';
 import { IconButtonElement } from '../lib/IconButtonElement.js';
 import { addInventoryChangeListener, removeInventoryChangeListener } from '../../events/InvEvents.js';
-import { addItemToAlbum, clearItemsInAlbum, getItemIdsInAlbum, getItemInAlbum, getItemsInAlbum, hasItemInAlbum, removeItemFromAlbum } from '../../satchel/album/AlbumItems.js';
+import { addItemToAlbum, clearItemsInAlbum, getItemInAlbum, getItemsInAlbum, hasItemInAlbum, removeItemFromAlbum } from '../../satchel/album/AlbumItems.js';
 import { isGroundAlbum } from '../../satchel/GroundAlbum.js';
 import { isFoundryAlbum } from '../../satchel/FoundryAlbum.js';
 import { isInvInStore, getInvInStore, deleteInvInStore, createSocketInvInStore } from '../../store/InvStore.js';

@@ -21,6 +21,8 @@ import { loadSatchelFromData, loadSatchelProfilesFromData, saveSatchelToData } f
 import { setupActionProfile } from './toolbar/profile.js';
 import { dropFallingItem } from './components/cursor/FallingItemElement.js';
 import { updateList } from './components/ElementListHelper.js';
+import { getCursor } from './components/index.js';
+import { addItemToAlbum } from './satchel/album/AlbumItems.js';
 
 function el(selector, event, callback) {
   document.querySelector(selector).addEventListener(event, callback);
@@ -50,6 +52,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   setupActionProfile();
 
+  el('.albumContainer', 'mouseup', onAlbumItemDrop);
   addAlbumListChangeListener(getSatchelStore(), onAlbumListUpdate);
 
   document.addEventListener('itemcontext', onItemContext);
@@ -128,11 +131,35 @@ function onActionAlbumNew() {
   createAlbumInStore(store, albumId);
   const albumList = document.querySelector('#albumList');
   albumList.scrollTo(0, 0);
+  return albumId;
 }
 
 function onActionAlbumOpen() {
   let albumContainer = document.querySelector('.albumContainer');
   albumContainer.classList.toggle('open');
+}
+
+function onAlbumItemDrop(e) {
+  const store = getSatchelStore();
+  const albums = getAlbumsInStore(store)
+    .filter(a => !a.locked)
+    .filter(a => !isGroundAlbum(a))
+    .filter(a => !isAlbumHidden(store, a.albumId));
+  let cursor = getCursor();
+  if (cursor.hasHeldItem()) {
+    let item = cursor.getHeldItem();
+    let albumId;
+    if (albums.length > 0) {
+      albumId = albums[0].albumId;
+    } else {
+      albumId = onActionAlbumNew();
+    }
+    addItemToAlbum(store, albumId, item);
+    cursor.clearHeldItem();
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+  }
 }
 
 function onAlbumListUpdate() {
