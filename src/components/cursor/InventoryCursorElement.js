@@ -16,6 +16,7 @@ import { DEFAULT_ITEM_UNIT_SIZE } from '../invgrid/InventoryElementMouseHelper.j
 import { isInvInStore, getInvInStore, createSocketInvInStore, deleteInvInStore } from '../../store/InvStore.js';
 import { addItemToAlbum } from '../../satchel/album/AlbumItems.js';
 import { dropFallingItem } from './FallingItemElement.js';
+import { playSound } from '../../sounds.js';
 
 /**
  * @typedef {import('../invgrid/InventoryGridElement.js').InventoryGridElement} InventoryGridElement
@@ -214,6 +215,7 @@ export class InventoryCursorElement extends HTMLElement {
       this.ignoreFirstPutDown = false;
       return true;
     }
+    playSound('putdown');
     const toInventory = getExistingInventory(store, invId);
     const invType = toInventory.type;
     switch (invType) {
@@ -265,6 +267,7 @@ export class InventoryCursorElement extends HTMLElement {
       this.ignoreFirstPutDown = false;
       return true;
     }
+    playSound('putdownAlbum');
     this.clearHeldItem();
     addItemToAlbum(store, albumId, heldItem);
     return true;
@@ -303,6 +306,7 @@ export class InventoryCursorElement extends HTMLElement {
     this.startHeldY = this.clientY;
     this.heldOffsetX = Math.min(0, offsetX);
     this.heldOffsetY = Math.min(0, offsetY);
+    playSound('pickup');
   }
 
   clearHeldItem() {

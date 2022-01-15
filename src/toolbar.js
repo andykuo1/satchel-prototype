@@ -22,7 +22,8 @@ import { setupActionProfile } from './toolbar/profile.js';
 import { dropFallingItem } from './components/cursor/FallingItemElement.js';
 import { updateList } from './components/ElementListHelper.js';
 import { getCursor } from './components/index.js';
-import { addItemToAlbum } from './satchel/album/AlbumItems.js';
+import { playSound } from './sounds.js';
+import { saveItemToTrashAlbum } from './satchel/TrashAlbum.js';
 
 function el(selector, event, callback) {
   document.querySelector(selector).addEventListener(event, callback);
@@ -137,6 +138,12 @@ function onActionAlbumNew() {
 function onActionAlbumOpen() {
   let albumContainer = document.querySelector('.albumContainer');
   albumContainer.classList.toggle('open');
+  let isOpen = albumContainer.classList.contains('open');
+  if (isOpen) {
+    playSound('openBag');
+  } else {
+    playSound('closeBag');
+  }
 }
 
 function onAlbumItemDrop(e) {
@@ -146,19 +153,21 @@ function onAlbumItemDrop(e) {
     .filter(a => !isGroundAlbum(a))
     .filter(a => !isAlbumHidden(store, a.albumId));
   let cursor = getCursor();
-  if (cursor.hasHeldItem()) {
-    let item = cursor.getHeldItem();
+  // HACK: This is so single clicks won't create albums
+  // @ts-ignore
+  if (cursor.hasHeldItem() && !cursor.ignoreFirstPutDown) {
     let albumId;
     if (albums.length > 0) {
       albumId = albums[0].albumId;
     } else {
       albumId = onActionAlbumNew();
     }
-    addItemToAlbum(store, albumId, item);
-    cursor.clearHeldItem();
-    e.preventDefault();
-    e.stopPropagation();
-    return false;
+    let result = cursor.putDownInAlbum(albumId);
+    if (result) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
   }
 }
 
@@ -205,6 +214,7 @@ function onActionFoundryNew() {
   clearFoundry();
   const newItem = new ItemBuilder().fromDefault().width(2).height(2).build();
   openFoundry(newItem);
+  playSound('spawnItem');
 }
 
 function onDownloadClick() {
@@ -357,5 +367,7 @@ function onActionFoundryReset() {
   const prevItem = clearFoundry();
   if (!prevItem) {
     closeFoundry();
+  } else {
+    saveItemToTrashAlbum(prevItem);
   }
 }

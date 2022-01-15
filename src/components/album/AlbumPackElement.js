@@ -469,10 +469,8 @@ export class AlbumPackElement extends HTMLElement {
       return;
     }
     let cursor = getCursor();
-    if (cursor.hasHeldItem()) {
-      const item = cursor.getHeldItem();
-      cursor.clearHeldItem();
-      addItemToAlbum(store, albumId, item);
+    let result = cursor.putDownInAlbum(albumId);
+    if (result) {
       e.preventDefault();
       e.stopPropagation();
       return false;

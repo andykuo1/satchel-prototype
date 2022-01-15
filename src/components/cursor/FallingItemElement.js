@@ -3,6 +3,7 @@
  */
 
 import { dropItemOnGround } from '../../satchel/GroundAlbum.js';
+import { playSound } from '../../sounds.js';
 import { DEFAULT_ITEM_UNIT_SIZE } from '../invgrid/InventoryElementMouseHelper.js';
 
 const INNER_HTML = /* html */`
@@ -112,6 +113,7 @@ export function getFalling() {
 }
 
 export function dropFallingItem(item, clientX, clientY) {
+  playSound('putdownGround');
   dropItemOnGround(item);
   getFalling().animateItem(item, clientX, clientY);
 }

@@ -2,6 +2,7 @@ import { getItemIdsInAlbum, getItemInAlbum } from '../satchel/album/AlbumItems.j
 import { clearItemsOnGround, getGroundAlbumId } from '../satchel/GroundAlbum.js';
 import { saveItemToTrashAlbum } from '../satchel/TrashAlbum.js';
 import { getSatchelStore } from '../store/SatchelStore.js';
+import { getCursor } from './index.js';
 
 /** @typedef {import('./cursor/InventoryCursorElement.js').InventoryCursorElement} InventoryCursorElement */
 
@@ -69,8 +70,7 @@ export class TrashCanElement extends HTMLElement {
 
   /** @private */
   onActionDelete(e) {
-    /** @type {InventoryCursorElement} */
-    let cursor = document.querySelector('inventory-cursor');
+    let cursor = getCursor();
     if (cursor && cursor.hasHeldItem()) {
       let heldItem = cursor.getHeldItem();
       cursor.clearHeldItem();

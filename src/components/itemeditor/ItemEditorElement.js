@@ -7,6 +7,7 @@ import { addInventoryChangeListener, dispatchInventoryChange, removeInventoryCha
 import { ItemBuilder } from '../../satchel/item/Item.js';
 import { dispatchItemChange } from '../../events/ItemEvents.js';
 import { dropFallingItem } from '../cursor/FallingItemElement.js';
+import { playSound } from '../../sounds.js';
 
 /** @typedef {import('../../satchel/item/Item.js').Item} Item */
 
@@ -544,6 +545,7 @@ export class ItemEditorElement extends HTMLElement {
     }
     dispatchItemChange(store, item.itemId);
     dispatchInventoryChange(store, this.socket.invId);
+    playSound('sizeItem');
   }
 
   /** @private */
@@ -716,9 +718,8 @@ export class ItemEditorElement extends HTMLElement {
     if (!this.hasAttribute('editable')) {
       return;
     }
-    const containerElement = this.socket;
     let cursor = getCursor();
-    let result = cursor.putDown(containerElement.invId, 0, 0, true);
+    let result = cursor.putDown(this.socket.invId, 0, 0, true);
     if (result) {
       e.preventDefault();
       e.stopPropagation();

@@ -3,6 +3,7 @@ import { uuid } from '../util/uuid.js';
 import { createAlbum } from './album/Album.js';
 import { addItemToAlbum, getItemIdsInAlbum, removeItemFromAlbum } from './album/AlbumItems.js';
 import { addAlbumInStore, getAlbumsInStore, isAlbumInStore } from '../store/AlbumStore.js';
+import { playSound } from '../sounds.js';
 
 const TRASH_ALBUM_DISPLAY_NAME = '[ Trash ]';
 const MAX_ITEMS_IN_TRASH = 30;
@@ -27,6 +28,7 @@ export function saveItemToTrashAlbum(freedItem) {
     let firstItemId = itemIds[0];
     removeItemFromAlbum(store, trashAlbumId, firstItemId);
   }
+  playSound('clearItem');
 }
 
 /**

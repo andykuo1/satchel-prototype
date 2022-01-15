@@ -3,9 +3,7 @@ autoUnlock(AUDIO_CONTEXT);
 
 export async function createSound(buffer, opts = {}) {
   const ctx = AUDIO_CONTEXT;
-  let buf = new ArrayBuffer(buffer.byteLength);
-  new Uint8Array(buf).set(buffer);
-  let data = await ctx.decodeAudioData(buf);
+  let data = await ctx.decodeAudioData(buffer);
   return new Sound(ctx, data, Boolean(opts.loop));
 }
 

@@ -1,16 +1,25 @@
+import { playSound } from '../../sounds.js';
 import { copyItem } from '../item/Item.js';
 
 export function openFoundry(item = undefined) {
   let editorContainer = document.querySelector('.editorContainer');
+  let wasOpen = editorContainer.classList.contains('open');
   editorContainer.classList.toggle('open', true);
   /** @type {import('../../components/itemeditor/ItemEditorElement.js').ItemEditorElement} */
   let itemEditor = document.querySelector('#itemEditor');
   itemEditor.putSocketedItem(item, true);
+  if (!wasOpen) {
+    playSound('openAnvil');
+  }
 }
 
 export function closeFoundry() {
   let editorContainer = document.querySelector('.editorContainer');
+  let wasOpen = editorContainer.classList.contains('open');
   editorContainer.classList.toggle('open', false);
+  if (wasOpen) {
+    playSound('closeAnvil');
+  }
 }
 
 export function isFoundryOpen() {
