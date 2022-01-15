@@ -17,6 +17,7 @@ export function saveItemToFoundryAlbum(freedItem) {
     let album = createAlbum(foundryAlbumId);
     album.displayName = FOUNDRY_ALBUM_DISPLAY_NAME;
     album.locked = true;
+    album.expand = false;
     addAlbumInStore(store, album.albumId, album);
   }
   addItemToAlbum(store, foundryAlbumId, freedItem);

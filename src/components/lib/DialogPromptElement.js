@@ -14,7 +14,7 @@ const INNER_STYLE = /* css */ `
   position: fixed;
   top: 50%;
   left: 50%;
-  z-index: 100;
+  z-index: 10;
   --foreground-color: #ffffff;
   --background-color: #333333;
   --outline-color: #444444;

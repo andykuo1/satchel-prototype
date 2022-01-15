@@ -11,8 +11,12 @@ import { playSound } from '../../sounds.js';
 import { updateList } from '../ElementListHelper.js';
 import { getItemsInAlbum } from '../../satchel/album/AlbumItems.js';
 import { addAlbumChangeListener, removeAlbumChangeListener } from '../../events/AlbumEvents.js';
+import '../lib/ContextMenuElement.js';
 
-/** @typedef {import('../../satchel/item/Item.js').Item} Item */
+/**
+ * @typedef {import('../lib/ContextMenuElement.js').ContextMenuElement} ContextMenuElement
+ * @typedef {import('../../satchel/item/Item.js').Item} Item
+ */
 
 const MAX_ITEM_WIDTH = 8;
 const MAX_ITEM_HEIGHT = 8;
@@ -67,7 +71,7 @@ const INNER_HTML = /* html */`
   </fieldset>
 </div>
 
-<div id="imageContextMenu"></div>
+<context-menu id="imageContextMenu"></context-menu>
 `;
 const INNER_STYLE = /* css */`
 :host {
@@ -234,36 +238,22 @@ img {
 }
 
 #imageContextMenu {
+  text-align: left;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(3em, 1fr));
-  position: fixed;
-  top: 0;
-  left: 0;
-  background-color: #444444;
-  border-radius: 1em;
-  padding: 0.5em;
-  border-top: 0.1em solid #666666;
-  border-left: 0.1em solid #666666;
-  border-right: 0.3em solid #666666;
-  border-bottom: 0.3em solid #666666;
-  width: 10em;
-  height: 10em;
-  overflow-x: hidden;
-  overflow-y: auto;
-}
-#imageContextMenu:not(.visible) {
-  visibility: hidden;
 }
 #imageContextMenu img {
   width: 100%;
   height: 100%;
   max-width: 3em;
   max-height: 3em;
+  margin: 0 0.1em;
   object-fit: contain;
 }
 #imageContextMenu img:hover {
-  outline: 0.1em solid blue;
-  background-color: blue;
+  outline: 0.1em solid #666666;
+  background-color: #666666;
+  cursor: pointer;
 }
 `;
 
@@ -305,7 +295,7 @@ export class ItemEditorElement extends HTMLElement {
     /** @private */
     this.detailContainer = shadowRoot.querySelector('.detailContainer');
     /** @private */
-    this.imageContextMenu = /** @type {HTMLDivElement} */ (shadowRoot.querySelector('#imageContextMenu'));
+    this.imageContextMenu = /** @type {ContextMenuElement} */ (shadowRoot.querySelector('#imageContextMenu'));
 
     /**
      * @private
@@ -385,8 +375,6 @@ export class ItemEditorElement extends HTMLElement {
     /** @private */
     this.onActionImage = this.onActionImage.bind(this);
     /** @private */
-    this.onActionImageOutside = this.onActionImageOutside.bind(this);
-    /** @private */
     this.onFoundryAlbumChange = this.onFoundryAlbumChange.bind(this);
     /** @private */
     this.onFoundryAlbumImageClick = this.onFoundryAlbumImageClick.bind(this);
@@ -394,6 +382,8 @@ export class ItemEditorElement extends HTMLElement {
     this.onItemWidth = this.onItemWidth.bind(this);
     /** @private */
     this.onItemHeight = this.onItemHeight.bind(this);
+    /** @private */
+    this.onImageContextMenuClick = this.onImageContextMenuClick.bind(this);
 
     /** @private */
     this.onSocketInventoryChange = this.onSocketInventoryChange.bind(this);
@@ -422,8 +412,7 @@ export class ItemEditorElement extends HTMLElement {
     this.itemWidth.addEventListener('change', this.onItemWidth);
     this.itemHeight.addEventListener('change', this.onItemHeight);
     this.portraitContainer.addEventListener('mouseup', this.onItemDrop);
-
-    document.addEventListener('mousedown', this.onActionImageOutside, true);
+    this.imageContextMenu.addEventListener('click', this.onImageContextMenuClick);
 
     const store = getSatchelStore();
     addInventoryChangeListener(store, this.socket.invId, this.onSocketInventoryChange);
@@ -449,8 +438,7 @@ export class ItemEditorElement extends HTMLElement {
     this.itemWidth.removeEventListener('change', this.onItemWidth);
     this.itemHeight.removeEventListener('change', this.onItemHeight);
     this.portraitContainer.removeEventListener('mouseup', this.onItemDrop);
-
-    document.removeEventListener('mousedown', this.onActionImageOutside, true);
+    this.imageContextMenu.removeEventListener('click', this.onImageContextMenuClick);
 
     const store = getSatchelStore();
     removeInventoryChangeListener(store, this.socket.invId, this.onSocketInventoryChange);
@@ -720,25 +708,14 @@ export class ItemEditorElement extends HTMLElement {
   /** @private */
   onActionImage(e) {
     const contextMenu = this.imageContextMenu;
-    contextMenu.style.left = `${e.clientX}px`;
-    contextMenu.style.top = `${e.clientY}px`;
-    contextMenu.classList.add('visible');
+    contextMenu.open(e.clientX, e.clientY);
     this.onFoundryAlbumChange();
   }
 
   /** @private */
-  onActionImageOutside(e) {
+  onImageContextMenuClick() {
     const contextMenu = this.imageContextMenu;
-    if (contextMenu.classList.contains('visible')) {
-      let rect = contextMenu.getBoundingClientRect();
-      let x = e.clientX;
-      let y = e.clientY;
-      if (x > rect.x && x < rect.x + rect.width && y > rect.y && y < rect.y + rect.height) {
-        // INSIDE!
-      } else {
-        contextMenu.classList.remove('visible');
-      }
-    }
+    contextMenu.close();
   }
 
   /** @private */
@@ -747,7 +724,7 @@ export class ItemEditorElement extends HTMLElement {
     const src = e.target.getAttribute('data-imgsrc');
     this.itemImage.value = src;
     this.onItemImage();
-    contextMenu.classList.remove('visible');
+    contextMenu.close();
   }
 
   /** @private */
