@@ -2,12 +2,15 @@ import { getCursor } from '../cursor/index.js';
 import { InventoryGridElement } from '../invgrid/InventoryGridElement.js';
 import { getSatchelStore } from '../../store/SatchelStore.js';
 import { addItemToInventory, clearItemsInInventory, getItemAtSlotIndex, isInventoryEmpty } from '../../satchel/inv/InventoryTransfer.js';
-import { saveItemToFoundryAlbum, shouldSaveItemToFoundryAlbum } from '../../satchel/FoundryAlbum.js';
+import { getFoundryAlbumId, saveItemToFoundryAlbum, shouldSaveItemToFoundryAlbum } from '../../satchel/FoundryAlbum.js';
 import { addInventoryChangeListener, dispatchInventoryChange, removeInventoryChangeListener } from '../../events/InvEvents.js';
 import { ItemBuilder } from '../../satchel/item/Item.js';
 import { dispatchItemChange } from '../../events/ItemEvents.js';
 import { dropFallingItem } from '../cursor/FallingItemElement.js';
 import { playSound } from '../../sounds.js';
+import { updateList } from '../ElementListHelper.js';
+import { getItemsInAlbum } from '../../satchel/album/AlbumItems.js';
+import { addAlbumChangeListener, removeAlbumChangeListener } from '../../events/AlbumEvents.js';
 
 /** @typedef {import('../../satchel/item/Item.js').Item} Item */
 
@@ -19,11 +22,11 @@ const INNER_HTML = /* html */`
   <fieldset class="portraitContainer">
     <div class="foundrySocketContainer">
       <div class="foundryContainer">
-        <icon-button id="actionEnlarge" icon="res/more.svg"></icon-button>
-        <icon-button id="actionShrink" icon="res/less.svg"></icon-button>
-        <icon-button id="actionFlatten" icon="res/flatten.svg"></icon-button>
-        <icon-button id="actionFlattenRotated" icon="res/flatten.svg" style="transform: rotate(90deg);"></icon-button>
-        <icon-button id="actionFit" icon="res/aspectratio.svg"></icon-button>
+        <icon-button id="actionEnlarge" icon="res/more.svg" alt="more" title="Enlarge"></icon-button>
+        <icon-button id="actionShrink" icon="res/less.svg" alt="less" title="Shrink"></icon-button>
+        <icon-button id="actionFlatten" icon="res/flatten.svg" alt="flat" title="Flatten"></icon-button>
+        <icon-button id="actionFlattenRotated" icon="res/flatten.svg" alt="long" title="Elongate" style="transform: rotate(90deg);"></icon-button>
+        <icon-button id="actionFit" icon="res/aspectratio.svg" alt="fit" title="Fit"></icon-button>
       </div>
       <div class="socketXContainer">
         <div class="socketSpacing"></div>
@@ -44,7 +47,7 @@ const INNER_HTML = /* html */`
     </div>
     <p class="styleContainer">
       <label for="itemImage">
-        <img src="res/image.svg" alt="image" title="Change Image">
+        <icon-button id="actionImage" icon="res/image.svg" alt="image" title="Image"></icon-button>
       </label>
       <input type="url" id="itemImage">
       <input type="color" id="itemBackground">
@@ -63,6 +66,8 @@ const INNER_HTML = /* html */`
     </p>
   </fieldset>
 </div>
+
+<div id="imageContextMenu"></div>
 `;
 const INNER_STYLE = /* css */`
 :host {
@@ -125,6 +130,10 @@ img {
   display: flex;
   vertical-align: middle;
   margin-top: 0.5em;
+}
+.styleContainer icon-button {
+  width: 2em;
+  height: 2em;
 }
 
 .foundrySocketContainer {
@@ -223,6 +232,39 @@ img {
   width: 2em;
   height: 2em;
 }
+
+#imageContextMenu {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(3em, 1fr));
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #444444;
+  border-radius: 1em;
+  padding: 0.5em;
+  border-top: 0.1em solid #666666;
+  border-left: 0.1em solid #666666;
+  border-right: 0.3em solid #666666;
+  border-bottom: 0.3em solid #666666;
+  width: 10em;
+  height: 10em;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+#imageContextMenu:not(.visible) {
+  visibility: hidden;
+}
+#imageContextMenu img {
+  width: 100%;
+  height: 100%;
+  max-width: 3em;
+  max-height: 3em;
+  object-fit: contain;
+}
+#imageContextMenu img:hover {
+  outline: 0.1em solid blue;
+  background-color: blue;
+}
 `;
 
 export class ItemEditorElement extends HTMLElement {
@@ -262,6 +304,8 @@ export class ItemEditorElement extends HTMLElement {
     this.portraitContainer = shadowRoot.querySelector('.portraitContainer');
     /** @private */
     this.detailContainer = shadowRoot.querySelector('.detailContainer');
+    /** @private */
+    this.imageContextMenu = /** @type {HTMLDivElement} */ (shadowRoot.querySelector('#imageContextMenu'));
 
     /**
      * @private
@@ -313,6 +357,8 @@ export class ItemEditorElement extends HTMLElement {
     this.actionFlattenRotated = shadowRoot.querySelector('#actionFlattenRotated');
     /** @private */
     this.actionFit = shadowRoot.querySelector('#actionFit');
+    /** @private */
+    this.actionImage = shadowRoot.querySelector('#actionImage');
 
     /** @private */
     this.onItemTitle = this.onItemTitle.bind(this);
@@ -336,6 +382,14 @@ export class ItemEditorElement extends HTMLElement {
     this.onActionFlattenRotated = this.onActionFlattenRotated.bind(this);
     /** @private */
     this.onActionFit = this.onActionFit.bind(this);
+    /** @private */
+    this.onActionImage = this.onActionImage.bind(this);
+    /** @private */
+    this.onActionImageOutside = this.onActionImageOutside.bind(this);
+    /** @private */
+    this.onFoundryAlbumChange = this.onFoundryAlbumChange.bind(this);
+    /** @private */
+    this.onFoundryAlbumImageClick = this.onFoundryAlbumImageClick.bind(this);
     /** @private */
     this.onItemWidth = this.onItemWidth.bind(this);
     /** @private */
@@ -364,12 +418,16 @@ export class ItemEditorElement extends HTMLElement {
     this.actionFlatten.addEventListener('click', this.onActionFlatten);
     this.actionFlattenRotated.addEventListener('click', this.onActionFlattenRotated);
     this.actionFit.addEventListener('click', this.onActionFit);
+    this.actionImage.addEventListener('click', this.onActionImage);
     this.itemWidth.addEventListener('change', this.onItemWidth);
     this.itemHeight.addEventListener('change', this.onItemHeight);
-
     this.portraitContainer.addEventListener('mouseup', this.onItemDrop);
+
+    document.addEventListener('mousedown', this.onActionImageOutside, true);
+
     const store = getSatchelStore();
     addInventoryChangeListener(store, this.socket.invId, this.onSocketInventoryChange);
+    addAlbumChangeListener(store, getFoundryAlbumId(store), this.onFoundryAlbumChange);
 
     this.disableInputs(true);
   }
@@ -387,12 +445,16 @@ export class ItemEditorElement extends HTMLElement {
     this.actionFlatten.removeEventListener('click', this.onActionFlatten);
     this.actionFlattenRotated.removeEventListener('click', this.onActionFlattenRotated);
     this.actionFit.removeEventListener('click', this.onActionFit);
+    this.actionImage.removeEventListener('click', this.onActionImage);
     this.itemWidth.removeEventListener('change', this.onItemWidth);
     this.itemHeight.removeEventListener('change', this.onItemHeight);
-
     this.portraitContainer.removeEventListener('mouseup', this.onItemDrop);
+
+    document.removeEventListener('mousedown', this.onActionImageOutside, true);
+
     const store = getSatchelStore();
     removeInventoryChangeListener(store, this.socket.invId, this.onSocketInventoryChange);
+    removeAlbumChangeListener(store, getFoundryAlbumId(store), this.onFoundryAlbumChange);
   }
 
   grabDefaultFocus() {
@@ -653,6 +715,66 @@ export class ItemEditorElement extends HTMLElement {
     // NOTE: Finds the nearest square size that is even (min 1)
     let newSize = Math.max(1, Math.floor(Math.floor((oldWidth + oldHeight) / 2) / 2) * 2);
     this.updateItemSize(store, socketItem, newSize, newSize);
+  }
+
+  /** @private */
+  onActionImage(e) {
+    const contextMenu = this.imageContextMenu;
+    contextMenu.style.left = `${e.clientX}px`;
+    contextMenu.style.top = `${e.clientY}px`;
+    contextMenu.classList.add('visible');
+    this.onFoundryAlbumChange();
+  }
+
+  /** @private */
+  onActionImageOutside(e) {
+    const contextMenu = this.imageContextMenu;
+    if (contextMenu.classList.contains('visible')) {
+      let rect = contextMenu.getBoundingClientRect();
+      let x = e.clientX;
+      let y = e.clientY;
+      if (x > rect.x && x < rect.x + rect.width && y > rect.y && y < rect.y + rect.height) {
+        // INSIDE!
+      } else {
+        contextMenu.classList.remove('visible');
+      }
+    }
+  }
+
+  /** @private */
+  onFoundryAlbumImageClick(e) {
+    const contextMenu = this.imageContextMenu;
+    const src = e.target.getAttribute('data-imgsrc');
+    this.itemImage.value = src;
+    this.onItemImage();
+    contextMenu.classList.remove('visible');
+  }
+
+  /** @private */
+  onFoundryAlbumChange() {
+    const store = getSatchelStore();
+    const albumId = getFoundryAlbumId(store);
+    const contextMenu = this.imageContextMenu;
+    const items = getItemsInAlbum(store, albumId);
+    const list = new Set([
+      'res/images/potion.png',
+      'res/images/blade.png',
+      'res/images/scroll.png',
+      ...items.map(item => item.imgSrc).filter(Boolean)
+    ]);
+    const create = (key) => {
+      let element = document.createElement('img');
+      element.setAttribute('data-imgsrc', key);
+      element.src = key;
+      element.alt = key;
+      element.title = key;
+      element.addEventListener('click', this.onFoundryAlbumImageClick);
+      return element;
+    };
+    const destroy = (key, element) => {
+      element.removeEventListener('click', this.onFoundryAlbumImageClick);
+    };
+    updateList(contextMenu, list, create, destroy);
   }
 
   /** @private */

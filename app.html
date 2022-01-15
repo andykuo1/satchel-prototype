@@ -293,9 +293,11 @@
       <inventory-cursor id="cursor"></inventory-cursor>
       <falling-item id="falling"></falling-item>
     </div>
+
     <item-dialog id="itemDialog">
       <icon-button slot="actions" id="actionShareItem" icon="res/share.svg" alt="send" title="Send Item"></icon-button>
     </item-dialog>
+
     <dialog-prompt id="giftDialog">
       <h3>Share Item</h3>
       <fieldset id="giftCode">
@@ -312,6 +314,7 @@
         </p>
       </fieldset>
     </dialog-prompt>
+
     <dialog-prompt id="settingsDialog" style="text-align: center;">
       <h3>Settings</h3>
       <p style="display: flex; flex-direction: column;">
@@ -339,6 +342,7 @@
         </a>
       </p>
     </dialog-prompt>
+
     <dialog-prompt id="profilesDialog">
       <style>
         #profilesDialog h3 {
@@ -439,6 +443,7 @@
       <br>
       <button id="actionProfileInvSubmit">Apply</button>
     </dialog-prompt>
+
     <script type="module" src="src/main.js"></script>
   </body>
 </html>

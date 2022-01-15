@@ -1,10 +1,10 @@
 /**
  * 
  * @param {Element} parentNode
- * @param {Array<string>} list 
- * @param {Function} factoryCreate
- * @param {Function} [factoryDelete]
- * @param {Function} [callback]
+ * @param {Iterable<string>} list 
+ * @param {(key: string) => Element} factoryCreate
+ * @param {(key: string, element: Element) => void} [factoryDelete]
+ * @param {(key: string, element: Element, preserved: boolean) => void} [callback]
  */
 export function updateList(parentNode, list, factoryCreate, factoryDelete = () => {}, callback = () => {}) {
   const children = parentNode.children;
@@ -19,7 +19,8 @@ export function updateList(parentNode, list, factoryCreate, factoryDelete = () =
   /** @type {Array<Element>} */
   let reversedChildren = [];
   const preservedKeys = Object.keys(preserved);
-  for(let key of list.reverse()) {
+  let keys = [...list].reverse();
+  for(let key of keys) {
     let i = preservedKeys.indexOf(key);
     if (i >= 0) {
       preservedKeys.splice(i, 1);
@@ -42,6 +43,6 @@ export function updateList(parentNode, list, factoryCreate, factoryDelete = () =
   for(let key of preservedKeys) {
     let element = preserved[key];
     element.remove();
-    factoryDelete(key);
+    factoryDelete(key, element);
   }
 }
