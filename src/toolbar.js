@@ -6,7 +6,7 @@ import { uploadFile } from './util/uploader.js';
 import { copyToClipboard, pasteFromClipboard } from './util/clipboard.js';
 import { ItemBuilder } from './satchel/item/Item.js';
 import { uuid } from './util/uuid.js';
-import { ItemAlbumElement } from './components/album/ItemAlbumElement.js';
+import { ItemAlbumElement } from './components/album/AlbumPackElement.js';
 import { exportItemToString, importItemFromJSON, importItemFromString } from './loader/ItemLoader.js';
 import { importAlbumFromJSON } from './loader/AlbumLoader.js';
 import { addAlbumInStore, createAlbumInStore, getAlbumIdsInStore, getAlbumInStore } from './store/AlbumStore.js';

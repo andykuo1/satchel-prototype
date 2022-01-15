@@ -1,13 +1,16 @@
-export const AUDIO_CONTEXT = new AudioContext();
+const AUDIO_CONTEXT = new AudioContext();
 autoUnlock(AUDIO_CONTEXT);
 
-export const AUDIO_ASSET_TAG = 'audio';
-export async function loadAudio(buffer, opts = {}) {
+export async function createSound(buffer, opts = {}) {
   const ctx = AUDIO_CONTEXT;
   let buf = new ArrayBuffer(buffer.byteLength);
   new Uint8Array(buf).set(buffer);
   let data = await ctx.decodeAudioData(buf);
   return new Sound(ctx, data, Boolean(opts.loop));
+}
+
+export function getAudioContext() {
+  return AUDIO_CONTEXT;
 }
 
 const DEFAULT_SOURCE_PARAMS = {

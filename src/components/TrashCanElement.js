@@ -1,4 +1,7 @@
-import { clearItemsOnGround } from '../satchel/GroundAlbum.js';
+import { getItemIdsInAlbum, getItemInAlbum } from '../satchel/album/AlbumItems.js';
+import { clearItemsOnGround, getGroundAlbumId } from '../satchel/GroundAlbum.js';
+import { saveItemToTrashAlbum } from '../satchel/TrashAlbum.js';
+import { getSatchelStore } from '../store/SatchelStore.js';
 
 /** @typedef {import('./cursor/InventoryCursorElement.js').InventoryCursorElement} InventoryCursorElement */
 
@@ -69,7 +72,9 @@ export class TrashCanElement extends HTMLElement {
     /** @type {InventoryCursorElement} */
     let cursor = document.querySelector('inventory-cursor');
     if (cursor && cursor.hasHeldItem()) {
+      let heldItem = cursor.getHeldItem();
       cursor.clearHeldItem();
+      saveItemToTrashAlbum(heldItem);
       e.preventDefault();
       e.stopPropagation();
       return false;
@@ -81,6 +86,13 @@ export class TrashCanElement extends HTMLElement {
     let result = this.onActionDelete(e);
     if (result !== false) {
       if (window.confirm('Clear all items on the ground?')) {
+        let store = getSatchelStore();
+        let albumId = getGroundAlbumId(store);
+        let itemIds = getItemIdsInAlbum(store, albumId);
+        for(let itemId of itemIds) {
+          let item = getItemInAlbum(store, albumId, itemId);
+          saveItemToTrashAlbum(item);
+        }
         clearItemsOnGround();
       }
     }

@@ -16,6 +16,7 @@ import { addItemToAlbum, clearItemsInAlbum, getItemIdsInAlbum, getItemInAlbum, r
 import { isGroundAlbum } from '../../satchel/GroundAlbum.js';
 import { isFoundryAlbum } from '../../satchel/FoundryAlbum.js';
 import { isInvInStore, getInvInStore, deleteInvInStore, createSocketInvInStore } from '../../store/InvStore.js';
+import { isTrashAlbum } from '../../satchel/TrashAlbum.js';
 
 const INNER_HTML = /* html */`
 <fieldset>
@@ -35,7 +36,6 @@ const INNER_STYLE = /* css */`
 }
 fieldset {
   position: relative;
-  width: 15em;
   min-height: 2em;
   border-color: #444444;
 }
@@ -63,8 +63,11 @@ legend[contenteditable] {
   height: 1.5em;
   margin: 0;
 }
-.internal {
-  opacity: 0.3;
+fieldset.internal {
+  opacity: 0.6;
+}
+legend.internal {
+  color: #888888;
 }
 `;
 
@@ -258,7 +261,8 @@ export class ItemAlbumElement extends HTMLElement {
     this.container.classList.toggle('unlocked', !locked);
 
     // Change style for internal albums
-    let isInternalAlbum = isFoundryAlbum(album) || isGroundAlbum(album);
+    let isInternalAlbum = isFoundryAlbum(album) || isGroundAlbum(album) || isTrashAlbum(album);
+    this.container.classList.toggle('internal', isInternalAlbum);
     this.inputTitle.classList.toggle('internal', isInternalAlbum);
 
     // Update name

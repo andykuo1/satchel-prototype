@@ -125,7 +125,11 @@ export class AlbumGroundElement extends HTMLElement {
     document.removeEventListener('mouseup', this.onMouseUp);
     
     // Destroy all items
-    for (const node of this.slotItems.assignedNodes()) {
+    const children = [
+      ...this.slotItems.childNodes,
+      ...this.slotItems.assignedNodes(),
+    ];
+    for (const node of children) {
       const invNode =
         /** @type {import('../invgrid/InventoryGridElement.js').InventoryGridElement} */ (node);
       const invId = invNode.invId;
@@ -133,16 +137,6 @@ export class AlbumGroundElement extends HTMLElement {
       if (inv) {
         deleteInvInStore(store, invId, inv);
       }
-    }
-  }
-
-  /** @private */
-  onMouseUp(e) {
-    const cursor = getCursor();
-    if (cursor.putDownInGround(e.clientX, e.clientY)) {
-      e.preventDefault();
-      e.stopPropagation();
-      return false;
     }
   }
 
@@ -221,6 +215,16 @@ export class AlbumGroundElement extends HTMLElement {
     this.socketItems = socketItems;
     this.slotItems.replaceWith(emptySlot);
     this.slotItems = emptySlot;
+  }
+
+  /** @private */
+  onMouseUp(e) {
+    const cursor = getCursor();
+    if (cursor.putDownInGround(e.clientX, e.clientY)) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
   }
 
   /** @private */

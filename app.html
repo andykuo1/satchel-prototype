@@ -70,6 +70,9 @@
           <div class="spacing">
           </div>
           <div class="sidebarActions">
+            <icon-button id="actionProfile" icon="res/profile.svg" alt="profile" title="Profile" disabled></icon-button>
+          </div>
+          <div class="sidebarActions">
             <icon-button id="cloudButton" icon="res/cloud.svg" alt="connect" title="Connect" disabled></icon-button>
           </div>
           <div class="sidebarActions">
@@ -143,39 +146,6 @@
           }
         </style>
         <div slot="sidebar" class="rightSideContainer">
-          <!-- ALBUM CONTENT -->
-          <style>
-            .albumContainer {
-              display: none;
-              flex-direction: column;
-              background-color: #333333;
-              text-align: left;
-            }
-            .albumContainer.open {
-              display: flex;
-            }
-            .albumContainer > * {
-              visibility: hidden;
-            }
-            .albumContainer.open > * {
-              visibility: visible;
-            }
-            .albumActions {
-              display: flex;
-              flex-direction: column;
-            }
-            #albumList {
-              flex: 1;
-              overflow-y: auto;
-            }
-          </style>
-          <div class="albumContainer">
-            <div id="albumList"></div>
-            <div class="albumActions">
-              <button id="actionAlbumNew">New Album</button>
-              <button id="actionAlbumImport">Import Album</button>
-            </div>
-          </div>
           <!-- GROUND CONTENT -->
           <div class="groundContainer">
             <div class="sidebarActions">
@@ -187,6 +157,8 @@
             </div>
           </div>
         </div>
+
+<!--=========================================== CENTER CONTENT ==-->
         <style>
           .body {
             display: flex;
@@ -197,89 +169,117 @@
         </style>
         <div class="body">
           <style>
-            main {
-              flex: 1;
-              overflow: hidden;
+            /** Title Header */
+            header {
+              position: absolute;
+              top: 0.5em;
+              left: 1em;
             }
-            header,
-            footer {
-              z-index: 1;
+            #title {
+              background-color: #444444;
+              border-radius: 1em;
+              padding: 0.2em 1em;
+              white-space: nowrap;
+            }
+            #appTitle {
+              display: inline-block;
+              margin: 0;
+            }
+            /** Online Status */
+            #onlineStatus {
+              color: #000000;
+            }
+            #onlineStatus::after {
+              content: 'OFFLINE';
+            }
+            #onlineStatus.active {
+              color: green;
+            }
+            #onlineStatus.active::after {
+              content: 'ONLINE';
             }
           </style>
           <header>
-            <style>
-              header {
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                padding: 0 1em;
-              }
-              .spacer {
-                flex: 1;
-              }
-              .toolbar {
-                white-space: nowrap;
-                overflow-x: auto;
-              }
-              #appTitle {
-                margin: 0.5em 0;
-              }
-            </style>
-            <div>
-              <icon-button id="actionProfile" icon="res/profile.svg" alt="profile" title="Profile" disabled></icon-button>
-            </div>
-            <div class="spacer"></div>
-            <h1 id="appTitle">Satchel</h1>
-            <small id="onlineStatus"></small>
-            <div class="spacer"></div>
-            <div class="toolbar">
-              <style>
-                .toolbar button:disabled {
-                  opacity: 0.3;
-                }
-                #onlineStatus {
-                  color: red;
-                }
-                #onlineStatus::after {
-                  content: 'OFFLINE';
-                }
-                #onlineStatus.active {
-                  color: green;
-                }
-                #onlineStatus.active::after {
-                  content: 'ONLINE';
-                }
-              </style>
-            </div>
+            <span id="title">
+              <h1 id="appTitle">Satchel</h1>
+              <small id="onlineStatus"></small>
+            </span>
           </header>
           <main>
-            <style>
-              main {
-                position: relative;
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                text-align: center;
-              }
-            </style>
             <!-- WORKSPACE CONTENT -->
             <style>
-              #workspace {
-                flex: 1;
+              main {
                 width: 100%;
                 height: 100%;
+                flex: 1;
+                position: relative;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+              }
+              #workspace {
+                width: 100%;
+                height: 100%;
+                flex: 1;
+                text-align: center;
                 overflow: auto;
+              }
+              .padding {
+                min-width: 4em;
+                min-height: 4em;
+              }
+              .albumContainer {
+                width: 100%;
+                height: 100%;
+                flex: 1;
+                display: flex;
+                background-color: #333333;
+                border-top-right-radius: 2em;
+                overflow: hidden;
               }
             </style>
             <div id="workspace">
+              <div class="padding"></div>
               <div id="localWorkspace"></div>
               <div id="remoteWorkspace"></div>
+              <div class="padding"></div>
+            </div>
+            <style>
+              .albumContainer {
+                display: none;
+                flex-direction: column;
+                background-color: #333333;
+                text-align: left;
+              }
+              .albumContainer.open {
+                display: flex;
+              }
+              .albumContainer > * {
+                visibility: hidden;
+              }
+              .albumContainer.open > * {
+                visibility: visible;
+              }
+              #albumList {
+                flex: 1;
+                overflow-y: auto;
+              }
+            </style>
+            <div class="albumContainer">
+              <div id="albumList"></div>
+              <div class="albumActions">
+                <button id="actionAlbumNew">New Album</button>
+                <button id="actionAlbumImport">Import Album</button>
+                <button id="actionAlbumCollapseAll">Collapse All</button>
+                <button id="actionAlbumExpandAll">Expand All</button>
+              </div>
             </div>
           </main>
         </div>
       </sidebar-layout>
     </sidebar-layout>
-    <!-- OUTER CONTENT -->
+
+<!--=========================================== OUTER CONTENT ==-->
     <div class="foreground">
       <inventory-cursor id="cursor"></inventory-cursor>
       <falling-item id="falling"></falling-item>

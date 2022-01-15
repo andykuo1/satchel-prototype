@@ -14,4 +14,4 @@ Join a lobby then pick a profile to be the role as. Switch profiles later?
 
 Password protect a profile. This is a temporary profile and does not save for autoload.
 
-
+Gift box - right click to open and reveal contents. Should be the same size at the item within.
