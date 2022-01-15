@@ -1,11 +1,24 @@
+import { loadFromStorage, saveToStorage } from './Storage.js';
 import { createSound } from './util/audio.js';
 
 const INIT_FLAG = Symbol('init');
+const PLAY_FLAG = Symbol('play');
 const SOUNDS = {
   [INIT_FLAG]: false,
+  [PLAY_FLAG]: loadFromStorage('sound') !== 'off',
 };
 
+export function toggleSound(force = undefined) {
+  let result = typeof force === 'undefined' ? !SOUNDS[PLAY_FLAG] : Boolean(force);
+  SOUNDS[PLAY_FLAG] = result;
+  saveToStorage('sound', result ? 'on' : 'off');
+  playSound('ping');
+}
+
 export function playSound(name) {
+  if (!SOUNDS[PLAY_FLAG]) {
+    return;
+  }
   if (!SOUNDS[INIT_FLAG]) {
     SOUNDS[INIT_FLAG] = true;
     initSounds().then(() => playSound(name));
@@ -39,6 +52,7 @@ async function initSounds() {
   registerSound('spawnItem', pick, -5, 5);
   registerSound('clearItem', dunk, -5, 0);
   registerSound('sizeItem', put, -5, 0, 0.5);
+  registerSound('ping', pop, -5, 5);
 }
 
 /**

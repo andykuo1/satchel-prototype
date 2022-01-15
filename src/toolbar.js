@@ -22,7 +22,7 @@ import { setupActionProfile } from './toolbar/profile.js';
 import { dropFallingItem } from './components/cursor/FallingItemElement.js';
 import { updateList } from './components/ElementListHelper.js';
 import { getCursor } from './components/index.js';
-import { playSound } from './sounds.js';
+import { playSound, toggleSound } from './sounds.js';
 import { saveItemToTrashAlbum } from './satchel/TrashAlbum.js';
 
 function el(selector, event, callback) {
@@ -33,6 +33,7 @@ window.addEventListener('DOMContentLoaded', () => {
   el('#actionItemEdit', 'click', onActionItemEdit);
   el('#downloadButton', 'click', onDownloadClick);
   el('#uploadButton', 'click', onUploadClick);
+  el('#actionSoundToggle', 'click', onActionSoundToggle);
   el('#cloudButton', 'click', onCloudClick);
   el('#actionEraseAll', 'click', onActionEraseAll);
   
@@ -48,7 +49,6 @@ window.addEventListener('DOMContentLoaded', () => {
   el('#actionFoundryReset', 'click', onActionFoundryReset);
   el('#actionFoundryNew', 'click', onActionFoundryNew);
   el('#giftCodeExport', 'click', onGiftCodeExport);
-
   el('#giftSubmit', 'click', onGiftSubmit);
 
   setupActionProfile();
@@ -370,4 +370,8 @@ function onActionFoundryReset() {
   } else {
     saveItemToTrashAlbum(prevItem);
   }
+}
+
+function onActionSoundToggle() {
+  toggleSound();
 }
