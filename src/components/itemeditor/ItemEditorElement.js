@@ -2,7 +2,7 @@ import { getCursor } from '../cursor/index.js';
 import { InventoryGridElement } from '../invgrid/InventoryGridElement.js';
 import { getSatchelStore } from '../../store/SatchelStore.js';
 import { addItemToInventory, clearItemsInInventory, getItemAtSlotIndex, isInventoryEmpty } from '../../satchel/inv/InventoryTransfer.js';
-import { getFoundryAlbumId, saveItemToFoundryAlbum, shouldSaveItemToFoundryAlbum } from '../../satchel/FoundryAlbum.js';
+import { getFoundryAlbumId, hasFoundryAlbum, saveItemToFoundryAlbum, shouldSaveItemToFoundryAlbum } from '../../satchel/FoundryAlbum.js';
 import { addInventoryChangeListener, dispatchInventoryChange, removeInventoryChangeListener } from '../../events/InvEvents.js';
 import { ItemBuilder } from '../../satchel/item/Item.js';
 import { dispatchItemChange } from '../../events/ItemEvents.js';
@@ -735,6 +735,9 @@ export class ItemEditorElement extends HTMLElement {
   /** @private */
   onFoundryAlbumChange() {
     const store = getSatchelStore();
+    if (!hasFoundryAlbum(store)) {
+      return;
+    }
     const albumId = getFoundryAlbumId(store);
     const contextMenu = this.imageContextMenu;
     const items = getItemsInAlbum(store, albumId);

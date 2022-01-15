@@ -16,6 +16,9 @@ import {
 } from '../store/ProfileStore.js';
 import { exportDataToJSON, importDataFromJSON } from './DataLoader.js';
 import { isInvInStore, getInvInStore, addInvInStore } from '../store/InvStore.js';
+import { getFoundryAlbumId, isFoundryAlbum } from '../satchel/FoundryAlbum.js';
+import { getGroundAlbumId, isGroundAlbum } from '../satchel/GroundAlbum.js';
+import { getTrashAlbumId, isTrashAlbum } from '../satchel/TrashAlbum.js';
 
 export function loadSatchelFromData(store, jsonData, overrideData) {
   return importDataFromJSON(jsonData, 'satchel_v2', (data) => {
@@ -164,14 +167,34 @@ export function loadSatchelAlbumsFromData(store, jsonData, overrideData) {
       addAlbumInStore(store, newAlbum.albumId, newAlbum);
       result.push(newAlbum.albumId);
     } else {
-      if (isAlbumInStore(store, albumId)) {
+      // HACK: Named albums are hacky. There's gotta be a better way to manage them.
+      if (isFoundryAlbum(album)) {
+        let internalAlbumId = getFoundryAlbumId(store);
+        let internalAlbum = cloneAlbum(album, getAlbumInStore(store, internalAlbumId));
+        internalAlbum.albumId = internalAlbumId;
+        dispatchAlbumChange(store, internalAlbumId);
+        result.push(internalAlbumId);
+      } else if (isGroundAlbum(album)) {
+        let internalAlbumId = getGroundAlbumId(store);
+        let internalAlbum = cloneAlbum(album, getAlbumInStore(store, internalAlbumId));
+        internalAlbum.albumId = internalAlbumId;
+        dispatchAlbumChange(store, internalAlbumId);
+        result.push(internalAlbumId);
+      } else if (isTrashAlbum(album)) {
+        let internalAlbumId = getTrashAlbumId(store);
+        let internalAlbum = cloneAlbum(album, getAlbumInStore(store, internalAlbumId));
+        internalAlbum.albumId = internalAlbumId;
+        dispatchAlbumChange(store, internalAlbumId);
+        result.push(internalAlbumId);
+      } else if (isAlbumInStore(store, albumId)) {
         const oldAlbum = getAlbumInStore(store, albumId);
         cloneAlbum(album, oldAlbum);
         dispatchAlbumChange(store, albumId);
+        result.push(albumId);
       } else {
         addAlbumInStore(store, albumId, album);
+        result.push(albumId);
       }
-      result.push(albumId);
     }
   }
   return result;

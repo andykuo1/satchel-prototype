@@ -1,5 +1,5 @@
 import { getItemIdsInAlbum, getItemInAlbum } from '../satchel/album/AlbumItems.js';
-import { clearItemsOnGround, getGroundAlbumId } from '../satchel/GroundAlbum.js';
+import { clearItemsOnGround, getGroundAlbumId, hasGroundAlbum } from '../satchel/GroundAlbum.js';
 import { saveItemToTrashAlbum } from '../satchel/TrashAlbum.js';
 import { getSatchelStore } from '../store/SatchelStore.js';
 import { getCursor } from './index.js';
@@ -85,8 +85,11 @@ export class TrashCanElement extends HTMLElement {
   onActionDeleteUp(e) {
     let result = this.onActionDelete(e);
     if (result !== false) {
+      const store = getSatchelStore();
+      if (!hasGroundAlbum(store)) {
+        return;
+      }
       if (window.confirm('Clear all items on the ground?')) {
-        let store = getSatchelStore();
         let albumId = getGroundAlbumId(store);
         let itemIds = getItemIdsInAlbum(store, albumId);
         for(let itemId of itemIds) {

@@ -1,7 +1,6 @@
 import { getSatchelStore } from '../../store/SatchelStore.js';
 import { addItemToInventory } from '../../satchel/inv/InventoryTransfer.js';
 import { uuid } from '../../util/uuid.js';
-import { upgradeProperty } from '../../util/wc.js';
 import { isAlbumExpanded, isAlbumLocked, setAlbumExpanded, setAlbumLocked } from '../../satchel/album/Album.js';
 import { getCursor } from '../cursor/index.js';
 import { downloadText } from '../../util/downloader.js';
@@ -11,7 +10,7 @@ import { deleteAlbumInStore, getAlbumInStore, isAlbumInStore } from '../../store
 import { addAlbumChangeListener, dispatchAlbumChange, removeAlbumChangeListener } from '../../events/AlbumEvents.js';
 import { IconButtonElement } from '../lib/IconButtonElement.js';
 import { addInventoryChangeListener, removeInventoryChangeListener } from '../../events/InvEvents.js';
-import { addItemToAlbum, clearItemsInAlbum, getItemIdsInAlbum, getItemInAlbum, getItemsInAlbum, hasItemInAlbum, removeItemFromAlbum } from '../../satchel/album/AlbumItems.js';
+import { clearItemsInAlbum, getItemIdsInAlbum, getItemInAlbum, getItemsInAlbum, hasItemInAlbum, removeItemFromAlbum } from '../../satchel/album/AlbumItems.js';
 import { isGroundAlbum } from '../../satchel/GroundAlbum.js';
 import { isFoundryAlbum } from '../../satchel/FoundryAlbum.js';
 import { isInvInStore, getInvInStore, deleteInvInStore, createSocketInvInStore } from '../../store/InvStore.js';
@@ -121,20 +120,15 @@ export class AlbumPackElement extends HTMLElement {
     customElements.define('album-pack', this);
   }
 
-  static get observedAttributes() {
-    return ['albumid'];
-  }
-
   get albumId() {
     return this._albumId;
   }
 
-  set albumId(value) {
-    this.setAttribute('albumid', value);
-  }
-
-  constructor() {
+  constructor(albumId) {
     super();
+    if (!albumId) {
+      throw new Error('Missing album id for album element.');
+    }
     const shadowRoot = this.attachShadow({ mode: 'open' });
     shadowRoot.append(
       this.constructor[Symbol.for('templateNode')].content.cloneNode(true)
@@ -144,7 +138,7 @@ export class AlbumPackElement extends HTMLElement {
     );
     
     /** @private */
-    this._albumId = undefined;
+    this._albumId = albumId;
 
     /** @private */
     this.container = shadowRoot.querySelector('fieldset');
@@ -197,7 +191,10 @@ export class AlbumPackElement extends HTMLElement {
 
   /** @protected */
   connectedCallback() {
-    upgradeProperty(this, 'albumId');
+    const store = getSatchelStore();
+    const albumId = this.albumId;
+    addAlbumChangeListener(store, albumId, this.onAlbumChange);
+    this.onAlbumChange(store, albumId);
 
     this.inputTitle.addEventListener('input', this.onInputTitle);
     this.buttonLock.addEventListener('click', this.onButtonLock);
@@ -249,37 +246,6 @@ export class AlbumPackElement extends HTMLElement {
         deleteInvInStore(store, invId, inv);
         node.remove();
       }
-    }
-  }
-
-  /**
-   * @param attribute
-   * @param previous
-   * @param value
-   * @protected
-   */
-  attributeChangedCallback(attribute, previous, value) {
-    switch (attribute) {
-      case 'albumid': {
-        const store = getSatchelStore();
-        const prevAlbumId = this._albumId;
-        const nextAlbumId = value;
-        if (prevAlbumId !== nextAlbumId) {
-          this._albumId = nextAlbumId;
-          if (prevAlbumId) {
-            removeAlbumChangeListener(
-              store,
-              prevAlbumId,
-              this.onAlbumChange
-            );
-          }
-          this.cleanUp();
-          if (nextAlbumId) {
-            addAlbumChangeListener(store, nextAlbumId, this.onAlbumChange);
-            this.onAlbumChange(store, nextAlbumId);
-          }
-        }
-      } break;
     }
   }
 

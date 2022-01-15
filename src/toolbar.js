@@ -9,9 +9,9 @@ import { uuid } from './util/uuid.js';
 import { AlbumPackElement } from './components/album/AlbumPackElement.js';
 import { exportItemToString, importItemFromJSON, importItemFromString } from './loader/ItemLoader.js';
 import { importAlbumFromJSON } from './loader/AlbumLoader.js';
-import { addAlbumInStore, createAlbumInStore, getAlbumsInStore } from './store/AlbumStore.js';
-import { copyAlbum, isAlbumHidden } from './satchel/album/Album.js';
-import { addAlbumListChangeListener } from './events/AlbumEvents.js';
+import { addAlbumInStore, createAlbumInStore, getAlbumInStore, getAlbumsInStore, isAlbumInStore } from './store/AlbumStore.js';
+import { cloneAlbum, isAlbumHidden } from './satchel/album/Album.js';
+import { addAlbumListChangeListener, dispatchAlbumChange } from './events/AlbumEvents.js';
 import { clearFoundry, closeFoundry, copyFoundry, isFoundryOpen, openFoundry } from './satchel/inv/FoundryHelper.js';
 import { ActivityPlayerList } from './satchel/peer/ActivityPlayerList.js';
 import { dropItemOnGround, isGroundAlbum } from './satchel/GroundAlbum.js';
@@ -180,11 +180,7 @@ function onAlbumListUpdate() {
     .map(a => a.albumId)
     .reverse();
   const albumList = document.querySelector('#albumList');
-  const factoryCreate = (key) => {
-    const albumElement = new AlbumPackElement();
-    albumElement.albumId = key;
-    return albumElement;
-  };
+  const factoryCreate = (key) => new AlbumPackElement(key);
   updateList(albumList, list, factoryCreate);
 }
 
@@ -267,9 +263,13 @@ async function onUploadClick() {
       const store = getSatchelStore();
       try {
         const album = importAlbumFromJSON(jsonData);
-        const newAlbum = copyAlbum(album);
-        addAlbumInStore(store, newAlbum.albumId, newAlbum);
-
+        if (isAlbumInStore(store, album.albumId)) {
+          cloneAlbum(album, getAlbumInStore(store, album.albumId));
+          dispatchAlbumChange(store, album.albumId);
+        } else {
+          addAlbumInStore(store, album.albumId, album);
+        }
+        
         // Make sure to open the container
         let albumContainer = document.querySelector('.albumContainer');
         if (!albumContainer.classList.contains('open')) {

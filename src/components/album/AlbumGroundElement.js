@@ -6,7 +6,7 @@ import { getCursor } from '../cursor/index.js';
 import { getAlbumInStore } from '../../store/AlbumStore.js';
 import { addAlbumChangeListener, removeAlbumChangeListener } from '../../events/AlbumEvents.js';
 import { addInventoryChangeListener, removeInventoryChangeListener } from '../../events/InvEvents.js';
-import { getItemIdsInAlbum, getItemInAlbum, getItemsInAlbum, hasItemInAlbum, removeItemFromAlbum } from '../../satchel/album/AlbumItems.js';
+import { getItemInAlbum, getItemsInAlbum, hasItemInAlbum, removeItemFromAlbum } from '../../satchel/album/AlbumItems.js';
 import { getGroundAlbumId } from '../../satchel/GroundAlbum.js';
 import { isInvInStore, getInvInStore, deleteInvInStore, createSocketInvInStore } from '../../store/InvStore.js';
 import { updateList } from '../ElementListHelper.js';
@@ -76,8 +76,7 @@ export class AlbumGroundElement extends HTMLElement {
   }
 
   get albumId() {
-    const store = getSatchelStore();
-    return getGroundAlbumId(store);
+    return this._albumId;
   }
 
   constructor() {
@@ -89,6 +88,10 @@ export class AlbumGroundElement extends HTMLElement {
     shadowRoot.append(
       this.constructor[Symbol.for('styleNode')].cloneNode(true)
     );
+
+    const store = getSatchelStore();
+    /** @private */
+    this._albumId = getGroundAlbumId(store);
 
     /**
      * @private

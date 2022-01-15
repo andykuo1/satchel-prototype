@@ -2,7 +2,7 @@ import { getSatchelStore } from '../store/SatchelStore.js';
 import { uuid } from '../util/uuid.js';
 import { createAlbum, isAlbumLocked } from './album/Album.js';
 import { addItemToAlbum, getItemsInAlbum } from './album/AlbumItems.js';
-import { addAlbumInStore, getAlbumsInStore, isAlbumInStore } from '../store/AlbumStore.js';
+import { addAlbumInStore, getAlbumsInStore } from '../store/AlbumStore.js';
 
 const FOUNDRY_ALBUM_DISPLAY_NAME = '[ Foundry ]';
 
@@ -12,15 +12,17 @@ const FOUNDRY_ALBUM_DISPLAY_NAME = '[ Foundry ]';
 export function saveItemToFoundryAlbum(freedItem) {
   const store = getSatchelStore();
   let foundryAlbumId = getFoundryAlbumId(store);
-  if (!foundryAlbumId || !isAlbumInStore(store, foundryAlbumId)) {
-    foundryAlbumId = uuid();
-    let album = createAlbum(foundryAlbumId);
-    album.displayName = FOUNDRY_ALBUM_DISPLAY_NAME;
-    album.locked = true;
-    album.expand = false;
-    addAlbumInStore(store, album.albumId, album);
-  }
   addItemToAlbum(store, foundryAlbumId, freedItem);
+}
+
+function resolveFoundryAlbumId(store) {
+  let foundryAlbumId = uuid();
+  let album = createAlbum(foundryAlbumId);
+  album.displayName = FOUNDRY_ALBUM_DISPLAY_NAME;
+  album.locked = true;
+  album.expand = false;
+  addAlbumInStore(store, album.albumId, album);
+  return foundryAlbumId;
 }
 
 /**
@@ -29,9 +31,16 @@ export function saveItemToFoundryAlbum(freedItem) {
  */
 export function shouldSaveItemToFoundryAlbum(item) {
   const store = getSatchelStore();
-  const foundryAlbumId = getFoundryAlbumId(store);
-  if (!foundryAlbumId || !isAlbumInStore(store, foundryAlbumId)) {
-    return true;
+  const albums = getAlbumsInStore(store);
+  let foundryAlbumId = null;
+  for (let album of albums) {
+    if (isFoundryAlbum(album)) {
+      foundryAlbumId = album.albumId;
+      break;
+    }
+  }
+  if (!foundryAlbumId) {
+    return false;
   }
   if (!isAlbumLocked(store, foundryAlbumId)) {
     return false;
@@ -55,6 +64,16 @@ export function isFoundryAlbum(album) {
   return album.displayName === FOUNDRY_ALBUM_DISPLAY_NAME;
 }
 
+export function hasFoundryAlbum(store) {
+  const albums = getAlbumsInStore(store);
+  for (let album of albums) {
+    if (isFoundryAlbum(album)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export function getFoundryAlbumId(store) {
   const albums = getAlbumsInStore(store);
   for (let album of albums) {
@@ -62,5 +81,5 @@ export function getFoundryAlbumId(store) {
       return album.albumId;
     }
   }
-  return null;
+  return resolveFoundryAlbumId(store);
 }
