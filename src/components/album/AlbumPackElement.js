@@ -293,6 +293,7 @@ export class AlbumPackElement extends HTMLElement {
     this.buttonLock.alt = locked ? 'unlock' : 'lock';
     this.buttonLock.title = locked ? 'Unlock Album' : 'Lock Album';
     this.buttonDelete.toggleAttribute('disabled', locked);
+    this.buttonImport.toggleAttribute('disabled', locked);
     this.inputTitle.toggleAttribute('contenteditable', !locked);
     this.container.classList.toggle('unlocked', !locked);
 
