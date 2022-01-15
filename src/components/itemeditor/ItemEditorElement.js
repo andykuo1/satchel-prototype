@@ -413,6 +413,7 @@ export class ItemEditorElement extends HTMLElement {
     this.itemHeight.addEventListener('change', this.onItemHeight);
     this.portraitContainer.addEventListener('mouseup', this.onItemDrop);
     this.imageContextMenu.addEventListener('click', this.onImageContextMenuClick);
+    this.itemImage.addEventListener('contextmenu', this.onActionImage);
 
     const store = getSatchelStore();
     addInventoryChangeListener(store, this.socket.invId, this.onSocketInventoryChange);
@@ -439,6 +440,7 @@ export class ItemEditorElement extends HTMLElement {
     this.itemHeight.removeEventListener('change', this.onItemHeight);
     this.portraitContainer.removeEventListener('mouseup', this.onItemDrop);
     this.imageContextMenu.removeEventListener('click', this.onImageContextMenuClick);
+    this.itemImage.removeEventListener('contextmenu', this.onActionImage);
 
     const store = getSatchelStore();
     removeInventoryChangeListener(store, this.socket.invId, this.onSocketInventoryChange);
@@ -710,6 +712,9 @@ export class ItemEditorElement extends HTMLElement {
     const contextMenu = this.imageContextMenu;
     contextMenu.open(e.clientX, e.clientY);
     this.onFoundryAlbumChange();
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
   }
 
   /** @private */
