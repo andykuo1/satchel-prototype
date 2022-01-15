@@ -11,7 +11,7 @@ import { deleteAlbumInStore, getAlbumInStore, isAlbumInStore } from '../../store
 import { addAlbumChangeListener, dispatchAlbumChange, removeAlbumChangeListener } from '../../events/AlbumEvents.js';
 import { IconButtonElement } from '../lib/IconButtonElement.js';
 import { addInventoryChangeListener, removeInventoryChangeListener } from '../../events/InvEvents.js';
-import { addItemToAlbum, clearItemsInAlbum, getItemIdsInAlbum, getItemInAlbum, hasItemInAlbum, removeItemFromAlbum } from '../../satchel/album/AlbumItems.js';
+import { addItemToAlbum, clearItemsInAlbum, getItemIdsInAlbum, getItemInAlbum, getItemsInAlbum, hasItemInAlbum, removeItemFromAlbum } from '../../satchel/album/AlbumItems.js';
 import { isGroundAlbum } from '../../satchel/GroundAlbum.js';
 import { isFoundryAlbum } from '../../satchel/FoundryAlbum.js';
 import { isInvInStore, getInvInStore, deleteInvInStore, createSocketInvInStore } from '../../store/InvStore.js';
@@ -135,10 +135,9 @@ export class AlbumPackElement extends HTMLElement {
     this._albumId = undefined;
 
     /** @private */
-    this.inputTitle = shadowRoot.querySelector('legend');
-
-    /** @private */
     this.container = shadowRoot.querySelector('fieldset');
+    /** @private */
+    this.inputTitle = shadowRoot.querySelector('legend');
 
     /** @private */
     this.buttonDelete = shadowRoot.querySelector('#buttonDelete');
@@ -155,7 +154,7 @@ export class AlbumPackElement extends HTMLElement {
      * @private
      * @type {HTMLSlotElement}
      */
-    this.slotItems = this.shadowRoot.querySelector('slot[name="items"]');
+    this.slotItems = shadowRoot.querySelector('slot[name="items"]');
 
     /** @private */
     this.socketedIds = {};
@@ -312,9 +311,9 @@ export class AlbumPackElement extends HTMLElement {
     // Update name
     this.inputTitle.textContent = name;
 
-    const list = getItemIdsInAlbum(store, albumId)
-      .sort((a, b) => (getItemInAlbum(store, albumId, a).displayName||'')
-      .localeCompare(getItemInAlbum(store, albumId, b).displayName||''));
+    const list = getItemsInAlbum(store, albumId)
+      .sort((a, b) => (a.displayName||'').localeCompare(b.displayName||''))
+      .map(a => a.itemId);
     const callback = (key, element) => {
       if (locked) {
         element.toggleAttribute('copyoutput', true);

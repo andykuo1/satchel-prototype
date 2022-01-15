@@ -9,9 +9,9 @@ import { uuid } from './util/uuid.js';
 import { AlbumPackElement } from './components/album/AlbumPackElement.js';
 import { exportItemToString, importItemFromJSON, importItemFromString } from './loader/ItemLoader.js';
 import { importAlbumFromJSON } from './loader/AlbumLoader.js';
-import { addAlbumInStore, createAlbumInStore, getAlbumIdsInStore, getAlbumInStore, getAlbumsInStore } from './store/AlbumStore.js';
+import { addAlbumInStore, createAlbumInStore, getAlbumsInStore } from './store/AlbumStore.js';
 import { copyAlbum, isAlbumHidden } from './satchel/album/Album.js';
-import { addAlbumListChangeListener, dispatchAlbumChange } from './events/AlbumEvents.js';
+import { addAlbumListChangeListener } from './events/AlbumEvents.js';
 import { clearFoundry, closeFoundry, copyFoundry, isFoundryOpen, openFoundry } from './satchel/inv/FoundryHelper.js';
 import { ActivityPlayerList } from './satchel/peer/ActivityPlayerList.js';
 import { dropItemOnGround, isGroundAlbum } from './satchel/GroundAlbum.js';
@@ -21,8 +21,6 @@ import { loadSatchelFromData, loadSatchelProfilesFromData, saveSatchelToData } f
 import { setupActionProfile } from './toolbar/profile.js';
 import { dropFallingItem } from './components/cursor/FallingItemElement.js';
 import { updateList } from './components/ElementListHelper.js';
-import { isFoundryAlbum } from './satchel/FoundryAlbum.js';
-import { isTrashAlbum } from './satchel/TrashAlbum.js';
 
 function el(selector, event, callback) {
   document.querySelector(selector).addEventListener(event, callback);

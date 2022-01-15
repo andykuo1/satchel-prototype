@@ -6,7 +6,7 @@ import { getCursor } from '../cursor/index.js';
 import { getAlbumInStore } from '../../store/AlbumStore.js';
 import { addAlbumChangeListener, removeAlbumChangeListener } from '../../events/AlbumEvents.js';
 import { addInventoryChangeListener, removeInventoryChangeListener } from '../../events/InvEvents.js';
-import { getItemIdsInAlbum, getItemInAlbum, hasItemInAlbum, removeItemFromAlbum } from '../../satchel/album/AlbumItems.js';
+import { getItemIdsInAlbum, getItemInAlbum, getItemsInAlbum, hasItemInAlbum, removeItemFromAlbum } from '../../satchel/album/AlbumItems.js';
 import { getGroundAlbumId } from '../../satchel/GroundAlbum.js';
 import { isInvInStore, getInvInStore, deleteInvInStore, createSocketInvInStore } from '../../store/InvStore.js';
 import { updateList } from '../ElementListHelper.js';
@@ -159,9 +159,9 @@ export class AlbumGroundElement extends HTMLElement {
       return;
     }
 
-    const list = getItemIdsInAlbum(store, albumId)
-      .sort((a, b) => (getItemInAlbum(store, albumId, a).displayName||'')
-      .localeCompare(getItemInAlbum(store, albumId, b).displayName||''));
+    const list = getItemsInAlbum(store, albumId)
+      .sort((a, b) => (a.displayName||'').localeCompare(b.displayName||''))
+      .map(a => a.itemId);
     const factoryCreate = (key) => {
       let store = getSatchelStore();
       let albumItem = getItemInAlbum(store, albumId, key);
