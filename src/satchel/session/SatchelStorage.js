@@ -9,6 +9,7 @@ import {
   saveSatchelProfilesToData,
 } from '../../loader/SatchelLoader.js';
 import { isAlbumHidden } from '../album/Album.js';
+import { isProfileRemote } from '../RemoteProfile.js';
 
 export function loadSatchelFromStorage() {
   const store = getSatchelStore();
@@ -40,6 +41,8 @@ export function saveSatchelToStorage() {
   const store = getSatchelStore();
   try {
     let profileIds = getProfileIdsInStore(store);
+    // Do not save remote profiles
+    profileIds.filter(profileId => !isProfileRemote(store, profileId));
     let profileData = saveSatchelProfilesToData(store, profileIds);
     saveToStorage('satchel_data_v4', JSON.stringify(profileData));
   } catch (e) {

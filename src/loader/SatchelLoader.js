@@ -19,6 +19,7 @@ import { isInvInStore, getInvInStore, addInvInStore } from '../store/InvStore.js
 import { getFoundryAlbumId, isFoundryAlbum } from '../satchel/FoundryAlbum.js';
 import { getGroundAlbumId, isGroundAlbum } from '../satchel/GroundAlbum.js';
 import { getTrashAlbumId, isTrashAlbum } from '../satchel/TrashAlbum.js';
+import { isProfileRemote } from '../satchel/RemoteProfile.js';
 
 export function loadSatchelFromData(store, jsonData, overrideData) {
   return importDataFromJSON(jsonData, 'satchel_v2', (data) => {
@@ -41,6 +42,8 @@ export function loadSatchelFromData(store, jsonData, overrideData) {
 export function saveSatchelToData(store, dst = {}) {
   const profileIds = getProfileIdsInStore(store);
   const albumIds = getAlbumIdsInStore(store);
+  // Do not save remote profiles
+  profileIds.filter((profileId) => !isProfileRemote(store, profileId));
   // Do not save hidden albums
   albumIds.filter((albumId) => !isAlbumHidden(store, albumId));
   const profilesData = saveSatchelProfilesToData(store, profileIds);

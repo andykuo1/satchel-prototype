@@ -7,6 +7,7 @@ import { ActivityPlayerInventory } from '../peer/ActivityPlayerInventory.js';
 import { SatchelLocal } from '../peer/SatchelLocal.js';
 import { ActivityError } from '../peer/ActivityError.js';
 import { getPlayerName } from '../peer/PlayerState.js';
+import { ActivityProfileMap, ActivityProfileReset, ActivityProfileSelect, ActivityProfileSync } from '../peer/ActivityProfile.js';
 
 /**
  * @typedef {import('../../peerful/PeerfulConnection.js').PeerfulConnection} PeerfulConnection
@@ -16,10 +17,10 @@ import { getPlayerName } from '../peer/PlayerState.js';
 
 const ACTIVITY_REGISTRY = [
   ActivityError,
-  ActivityPlayerHandshake,
-  ActivityPlayerList,
-  ActivityPlayerInventory,
-  ActivityPlayerGift,
+  ActivityProfileMap,
+  ActivityProfileSelect,
+  ActivityProfileSync,
+  ActivityProfileReset,
 ];
 
 export class SatchelServer extends SatchelLocal {
@@ -96,6 +97,9 @@ export class SatchelServer extends SatchelLocal {
       } catch (e) {
         console.error(e);
       }
+    }
+    if (remote.handleMessage(type, data)) {
+      return;
     }
     console.error(`Found unknown message from client - ${data}`);
     ActivityError.sendError(remote, 'Unknown message.');
@@ -198,6 +202,9 @@ export class SatchelClient extends SatchelLocal {
       } catch (e) {
         console.error(e);
       }
+    }
+    if (remoteServer.handleMessage(type, data)) {
+      return;
     }
     console.error(`Found unknown message from server - ${data}`);
   }
