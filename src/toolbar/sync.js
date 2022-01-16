@@ -67,6 +67,7 @@ async function onActionImportGoogle() {
     window.alert('Import complete!');
   } catch (e) {
     console.error(e);
+    window.alert('Error! \n' + JSON.stringify(e));
   } finally {
     stopBusyWork();
   }
@@ -82,6 +83,7 @@ async function onActionExportGoogle() {
     window.alert('Save complete!');
   } catch (e) {
     console.error(e);
+    window.alert('Error! \n' + JSON.stringify(e));
   } finally {
     stopBusyWork();
   }

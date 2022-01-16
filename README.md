@@ -23,3 +23,12 @@ Each profile can be toggle online or offline.
   - The profile select screen should be continuously updated and synced from the dm-side.
 - The player view is always READ-ONLY
 
+Does not work on Firefox yet.
+
+Feedback
+- Paste Item code is confusing.
+- Limited, Limitless, Single
+- Rename to Recent
+
+- Trash one-click to open trash
+
