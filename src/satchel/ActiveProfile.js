@@ -112,5 +112,8 @@ function onProfileChange() {
   }
   /** @type {HTMLInputElement} */
   let profileTitle = document.querySelector('#appTitle');
-  profileTitle.textContent = activeProfile.displayName;
+  let windowTitle = document.querySelector('title');
+  let displayName = activeProfile.displayName;
+  profileTitle.textContent = displayName;
+  windowTitle.textContent = displayName;
 }

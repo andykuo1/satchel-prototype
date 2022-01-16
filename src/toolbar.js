@@ -347,7 +347,7 @@ function onActionItemCodeExport() {
   }
   let itemString = exportItemToString(item);
   copyToClipboard(itemString).then(() => {
-    window.alert('Copied to clipboard!\n\nShare with a friend, then paste the code in Foundry.');
+    window.alert(`Copied to clipboard! Share this with a friend, then paste the code in Foundry.\n\n${itemString}`);
   });
 }
 

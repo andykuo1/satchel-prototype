@@ -40,6 +40,29 @@ export function removeProfileChangeListener(store, profileId, callback) {
 /**
  * @param {Store} store
  */
+ export function dispatchProfileListChange(store) {
+  dispatchStoreEvent(store, 'profileList', 'all');
+}
+
+/**
+ * @param {Store} store
+ * @param {OnProfileChangeCallback} callback
+ */
+export function addProfileListChangeListener(store, callback) {
+  addStoreEventListener(store, 'profileList', 'all', callback);
+}
+
+/**
+ * @param {Store} store
+ * @param {OnProfileChangeCallback} callback
+ */
+export function removeProfileListChangeListener(store, callback) {
+  removeStoreEventListener(store, 'profileList', 'all', callback);
+}
+
+/**
+ * @param {Store} store
+ */
 export function dispatchActiveProfileChange(store) {
   dispatchStoreEvent(store, 'activeProfile', 'change');
 }

@@ -32,11 +32,6 @@ export async function connectAsClient(ctx, remoteId) {
   return true;
 }
 
-export function isServerSide() {
-  const ctx = getCursorContext();
-  return Boolean(ctx.server);
-}
-
 export async function connectAsServer(ctx, localId) {
   if (!localId) {
     throw new Error('Missing local id to start server.');
@@ -58,4 +53,28 @@ export async function connectAsServer(ctx, localId) {
   }
 
   document.querySelector('#onlineStatus').classList.toggle('active', true);
+}
+
+export function isServerSide() {
+  const ctx = getCursorContext();
+  return Boolean(ctx.server);
+}
+
+export function isClientSide() {
+  const ctx = getCursorContext();
+  return Boolean(ctx.client);
+}
+
+/**
+ * @returns {SatchelServer}
+ */
+export function getServer() {
+  return getCursorContext().server.instance;
+}
+
+/**
+ * @returns {SatchelClient}
+ */
+export function getClient() {
+  return getCursorContext().client.instance;
 }

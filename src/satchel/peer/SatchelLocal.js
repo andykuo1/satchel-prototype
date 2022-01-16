@@ -9,6 +9,7 @@ export class SatchelLocal {
    */
   constructor(peerful) {
     this.peerful = peerful;
+    /** @type {Array<SatchelRemote} */
     this.remotes = [];
     this.detail = {};
 
@@ -149,6 +150,8 @@ export class SatchelRemote {
   constructor(connection) {
     this.connection = connection;
     this.detail = {};
+    /** @private */
+    this.pending = {};
   }
 
   /**
@@ -157,5 +160,51 @@ export class SatchelRemote {
    */
   sendMessage(type, data) {
     this.connection.send(JSON.stringify({ type, data }));
+  }
+
+  /**
+   * @param {string} type 
+   * @param {number} timeout
+   */
+  async awaitMessage(type, timeout = 10_000) {
+    return new Promise((resolve, reject) => {
+      const pending = {
+        resolve,
+        reject,
+        done: false,
+      };
+      if (type in this.pending) {
+        this.pending[type].push(pending);
+      } else {
+        this.pending[type] = [pending];
+      }
+      setTimeout(() => {
+        if (!pending.done) {
+          pending.done = true;
+          pending.reject(new Error('Timeout reached for message response.'));
+        }
+      }, timeout);
+    });
+  }
+
+  /**
+   * @param {string} type 
+   * @param {object} data 
+   * @returns {boolean}
+   */
+  handleMessage(type, data) {
+    let flag = false;
+    if (type in this.pending) {
+      const pendings = this.pending[type];
+      delete this.pending[type];
+      for(let pending of pendings) {
+        if (!pending.done) {
+          pending.done = true;
+          pending.resolve(data);
+          flag = true;
+        }
+      }
+    }
+    return flag;
   }
 }

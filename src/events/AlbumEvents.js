@@ -41,7 +41,7 @@ export function removeAlbumChangeListener(store, albumId, callback) {
  * @param {Store} store
  */
  export function dispatchAlbumListChange(store) {
-  dispatchStoreEvent(store, 'albumlist', 'all');
+  dispatchStoreEvent(store, 'albumList', 'all');
 }
 
 /**
@@ -49,7 +49,7 @@ export function removeAlbumChangeListener(store, albumId, callback) {
  * @param {OnAlbumChangeCallback} callback
  */
 export function addAlbumListChangeListener(store, callback) {
-  addStoreEventListener(store, 'albumlist', 'all', callback);
+  addStoreEventListener(store, 'albumList', 'all', callback);
 }
 
 /**
@@ -57,5 +57,5 @@ export function addAlbumListChangeListener(store, callback) {
  * @param {OnAlbumChangeCallback} callback
  */
 export function removeAlbumListChangeListener(store, callback) {
-  removeStoreEventListener(store, 'albumlist', 'all', callback);
+  removeStoreEventListener(store, 'albumList', 'all', callback);
 }
