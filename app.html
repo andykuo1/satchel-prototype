@@ -460,20 +460,38 @@
     </dialog-prompt>
 
     <style>
-      #cloudDialog > div {
+      #cloudDialog h3 {
+        margin: 0;
+        text-align: center;
+      }
+      .cloudOptionList {
         display: flex;
         flex-direction: column;
+        align-items: center;
       }
-      #cloudDialog > div > * {
+      .cloudOption {
         flex: 1;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+      }
+      .cloudOption label {
+        font-size: 0.5em;
       }
     </style>
     <!-- Saves Remotely -->
     <context-menu id="cloudDialog">
-      <div>
-        <button id="actionExportGoogle" class="googleOnly">Save to Google Drive</button>
-        <button disabled>Save to Notion.so</button>
-        <button id="actionPeer" disabled>Join Session</button>
+      <h3>Sync to...</h3>
+      <div class="cloudOptionList">
+        <div class="cloudOption">
+          <icon-button id="actionExportGoogle" icon="res/googledrive.svg" title="Google Drive"></icon-button>
+        </div>
+        <div class="cloudOption">
+          <icon-button id="actionExportNotion" icon="res/notionso.svg" disabled title="Notion.so"></icon-button>
+        </div>
+        <div class="cloudOption">
+          <icon-button id="actionPeer" icon="res/group.svg" disabled title="P2P Session"></icon-button>
+        </div>
       </div>
     </context-menu>
 
