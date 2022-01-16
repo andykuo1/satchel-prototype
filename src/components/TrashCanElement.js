@@ -45,7 +45,7 @@ export class TrashCanElement extends HTMLElement {
     /** @private */
     this.onActionDelete = this.onActionDelete.bind(this);
     /** @private */
-    this.onActionDeleteUp = this.onActionDeleteUp.bind(this);
+    this.onActionClear = this.onActionClear.bind(this);
     /** @private */
     this.onActionDeleteEnter = this.onActionDeleteEnter.bind(this);
     /** @private */
@@ -54,7 +54,7 @@ export class TrashCanElement extends HTMLElement {
 
   /** @protected */
   connectedCallback() {
-    this.actionDelete.addEventListener('mouseup', this.onActionDeleteUp);
+    this.actionDelete.addEventListener('dblclick', this.onActionClear);
     this.actionDelete.addEventListener('mousedown', this.onActionDelete);
     this.actionDelete.addEventListener('mouseenter', this.onActionDeleteEnter);
     this.actionDelete.addEventListener('mouseleave', this.onActionDeleteLeave);
@@ -62,7 +62,7 @@ export class TrashCanElement extends HTMLElement {
 
   /** @protected */
   disconnectedCallback() {
-    this.actionDelete.removeEventListener('mouseup', this.onActionDeleteUp);
+    this.actionDelete.removeEventListener('dblclick', this.onActionClear);
     this.actionDelete.removeEventListener('mousedown', this.onActionDelete);
     this.actionDelete.removeEventListener('mouseenter', this.onActionDeleteEnter);
     this.actionDelete.removeEventListener('mouseleave', this.onActionDeleteLeave);
@@ -82,7 +82,7 @@ export class TrashCanElement extends HTMLElement {
   }
 
   /** @private */
-  onActionDeleteUp(e) {
+  onActionClear(e) {
     let result = this.onActionDelete(e);
     if (result !== false) {
       const store = getSatchelStore();
