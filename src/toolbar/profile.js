@@ -18,7 +18,7 @@ function el(selector, event, callback) {
   document.querySelector(selector).addEventListener(event, callback);
 }
 
-export function setupActionProfile() {
+export function setupProfile() {
   el('#actionProfile', 'click', onActionProfile);
   el('#actionProfileNew', 'click', onActionProfileNew);
   el('#actionProfileImport', 'click', onActionProfileImport);

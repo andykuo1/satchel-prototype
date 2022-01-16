@@ -2,6 +2,7 @@
 <html lang="en">
   <head>
     <title>Satchel</title>
+    <meta charset="utf-8">
     <link rel="apple-touch-icon" sizes="180x180" href="res/favicons/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="res/favicons/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="res/favicons/favicon-16x16.png">
@@ -40,6 +41,9 @@
 
       /** To prevent FOUC */
       dialog-prompt:not([open]) {
+        display: none;
+      }
+      context-menu:not([open]) {
         display: none;
       }
     </style>
@@ -330,6 +334,10 @@
         <button id="uploadButton">Import Data</button>
         <button id="downloadButton">Export Data</button>
         <br>
+        <button id="actionImportGoogle" class="googleOnly">Import Google Drive</button>
+        <button disabled>Import Notion.so</button>
+        <button id="actionSignOut">Sign Out</button>
+        <br>
         <button id="actionSoundToggle">Sound On/Off</button>
       </p>
       <small id="appVersion">v-.-.-</small>
@@ -449,6 +457,31 @@
       <input type="number" min="1" max="12" id="actionProfileInvHeight" value="1">
       <br>
       <button id="actionProfileInvSubmit">Apply</button>
+    </dialog-prompt>
+
+    <style>
+      #cloudDialog > div {
+        display: flex;
+        flex-direction: column;
+      }
+      #cloudDialog > div > * {
+        flex: 1;
+      }
+    </style>
+    <!-- Saves Remotely -->
+    <context-menu id="cloudDialog">
+      <div>
+        <button id="actionExportGoogle" class="googleOnly">Save to Google Drive</button>
+        <button disabled>Save to Notion.so</button>
+        <button id="actionPeer" disabled>Join Session</button>
+      </div>
+    </context-menu>
+
+    <dialog-prompt id="busyDialog" required>
+      <h2>
+        <span id="busyLabel">Fetching Goblins</span>
+        <span id="busyProgress">...</span>
+      </h2>
     </dialog-prompt>
 
     <script type="module" src="src/main.js"></script>

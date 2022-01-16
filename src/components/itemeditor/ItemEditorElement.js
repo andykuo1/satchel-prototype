@@ -710,7 +710,9 @@ export class ItemEditorElement extends HTMLElement {
   /** @private */
   onActionImage(e) {
     const contextMenu = this.imageContextMenu;
-    contextMenu.open(e.clientX, e.clientY);
+    contextMenu.x = e.clientX;
+    contextMenu.y = e.clientY;
+    contextMenu.toggleAttribute('open', true);
     this.onFoundryAlbumChange();
     e.preventDefault();
     e.stopPropagation();
@@ -720,7 +722,7 @@ export class ItemEditorElement extends HTMLElement {
   /** @private */
   onImageContextMenuClick() {
     const contextMenu = this.imageContextMenu;
-    contextMenu.close();
+    contextMenu.toggleAttribute('open', false);
   }
 
   /** @private */

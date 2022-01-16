@@ -55,6 +55,7 @@ export class TrashCanElement extends HTMLElement {
   /** @protected */
   connectedCallback() {
     this.actionDelete.addEventListener('dblclick', this.onActionClear);
+    this.actionDelete.addEventListener('mouseup', this.onActionDelete);
     this.actionDelete.addEventListener('mousedown', this.onActionDelete);
     this.actionDelete.addEventListener('mouseenter', this.onActionDeleteEnter);
     this.actionDelete.addEventListener('mouseleave', this.onActionDeleteLeave);
@@ -63,6 +64,7 @@ export class TrashCanElement extends HTMLElement {
   /** @protected */
   disconnectedCallback() {
     this.actionDelete.removeEventListener('dblclick', this.onActionClear);
+    this.actionDelete.removeEventListener('mouseup', this.onActionDelete);
     this.actionDelete.removeEventListener('mousedown', this.onActionDelete);
     this.actionDelete.removeEventListener('mouseenter', this.onActionDeleteEnter);
     this.actionDelete.removeEventListener('mouseleave', this.onActionDeleteLeave);

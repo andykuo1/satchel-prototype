@@ -1,6 +1,5 @@
 import { downloadText } from './util/downloader.js';
 import { getSatchelStore } from './store/SatchelStore.js';
-import { connectAsServer } from './satchel/app/PeerSatchelConnector.js';
 import { getCursorContext } from './satchel/inv/CursorHelper.js';
 import { uploadFile } from './util/uploader.js';
 import { copyToClipboard, pasteFromClipboard } from './util/clipboard.js';
@@ -18,12 +17,14 @@ import { dropItemOnGround, isGroundAlbum } from './satchel/GroundAlbum.js';
 import { forceEmptyStorage } from './Storage.js';
 import { setActiveProfileInStore } from './store/ProfileStore.js';
 import { loadSatchelFromData, loadSatchelProfilesFromData, saveSatchelToData } from './loader/SatchelLoader.js';
-import { setupActionProfile } from './toolbar/profile.js';
 import { dropFallingItem } from './components/cursor/FallingItemElement.js';
 import { updateList } from './components/ElementListHelper.js';
 import { getCursor } from './components/index.js';
 import { playSound, toggleSound } from './sounds.js';
 import { saveItemToTrashAlbum } from './satchel/TrashAlbum.js';
+
+import { setupProfile } from './toolbar/profile.js';
+import { setupSync } from './toolbar/sync.js';
 
 function el(selector, event, callback) {
   document.querySelector(selector).addEventListener(event, callback);
@@ -51,7 +52,8 @@ window.addEventListener('DOMContentLoaded', () => {
   el('#giftCodeExport', 'click', onGiftCodeExport);
   el('#giftSubmit', 'click', onGiftSubmit);
 
-  setupActionProfile();
+  setupProfile();
+  setupSync();
 
   el('.albumContainer', 'mouseup', onAlbumItemDrop);
   addAlbumListChangeListener(getSatchelStore(), onAlbumListUpdate);
@@ -294,33 +296,17 @@ async function onUploadClick() {
   }
 }
 
-async function onCloudClick() {
-  const ctx = getCursorContext();
-  let peerId;
-  if (ctx.server) {
-    peerId = ctx.server.peerful.id;
-  } else if (ctx.client) {
-    peerId = ctx.client.peerful.remoteId;
-  } else {
-    peerId = ctx.sessionId;
-    await connectAsServer(ctx, peerId);
-  }
-  const shareable = generateShareableLink(peerId);
-  await copyToClipboard(shareable);
-  window.alert(`Link copied!\n${shareable}`);
+async function onCloudClick(e) {
+  /** @type {import('./components/lib/ContextMenuElement.js').ContextMenuElement} */
+  let cloudDialog = document.querySelector('#cloudDialog');
+  cloudDialog.x = e.clientX;
+  cloudDialog.y = e.clientY;
+  cloudDialog.toggleAttribute('open', true);
 }
 
 function onActionSettings() {
   let settingsDialog = document.querySelector('#settingsDialog');
   settingsDialog.toggleAttribute('open', true);
-}
-
-/**
- * @param {string} peerId
- * @returns {string}
- */
-function generateShareableLink(peerId) {
-  return `${location.origin}${location.pathname}?id=${peerId}`;
 }
 
 function onItemContext(e) {
