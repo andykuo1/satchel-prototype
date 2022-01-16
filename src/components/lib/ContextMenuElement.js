@@ -8,8 +8,6 @@ const INNER_HTML = /* html */ `
 const INNER_STYLE = /* css */ `
 .container {
   position: fixed;
-  top: 0;
-  left: 0;
   padding: 0.5em;
   background-color: #444444;
   border-radius: 2em;
@@ -70,6 +68,8 @@ export class ContextMenuElement extends HTMLElement {
 
     /** @private */
     this.containerElement = /** @type {HTMLElement} */ (shadowRoot.querySelector('.container'));
+    /** @private */
+    this.innerElement = /** @type {HTMLElement} */ (shadowRoot.querySelector('.inner'));
 
     /** @private */
     this.onOutside = this.onOutside.bind(this);
@@ -91,8 +91,22 @@ export class ContextMenuElement extends HTMLElement {
    */
    open(clientX, clientY) {
     const contextMenu = this.containerElement;
-    contextMenu.style.left = `${clientX}px`;
-    contextMenu.style.top = `${clientY}px`;
+    const innerContent = this.innerElement;
+    const innerRect = innerContent.getBoundingClientRect();
+    const width = innerRect.width;
+    const height = innerRect.height;
+    const expectedPadding = '1.4em'; // Manually calculated from stylesheet
+    if (window.innerHeight < (clientY + height)) {
+      contextMenu.style.top = `calc(${window.innerHeight - height}px - ${expectedPadding})`;
+      contextMenu.classList.remove('topleft');
+    } else {
+      contextMenu.style.top = `${clientY}px`;
+    }
+    if (window.innerWidth < (clientX + width)) {
+      contextMenu.style.left = `calc(${window.innerWidth - width}px - ${expectedPadding})`;
+    } else {
+      contextMenu.style.left = `${clientX}px`;
+    }
     contextMenu.classList.add('visible');
     this.dispatchEvent(
       new CustomEvent('open', {
