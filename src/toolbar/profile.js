@@ -5,8 +5,22 @@ import { createAlbum } from '../satchel/album/Album.js';
 import { createGridInventory, createSocketInventory } from '../satchel/inv/Inv.js';
 import { createProfile } from '../satchel/profile/Profile.js';
 import { getAlbumInStore, isAlbumInStore, deleteAlbumInStore, addAlbumInStore } from '../store/AlbumStore.js';
-import { createGridInvInStore, getInvInStore, deleteInvInStore, isInvInStore, addInvInStore } from '../store/InvStore.js';
-import { addProfileInStore, deleteProfileInStore, getActiveProfileInStore, getProfileIdsInStore, getProfileInStore, isProfileInStore, setActiveProfileInStore } from '../store/ProfileStore.js';
+import {
+  createGridInvInStore,
+  getInvInStore,
+  deleteInvInStore,
+  isInvInStore,
+  addInvInStore,
+} from '../store/InvStore.js';
+import {
+  addProfileInStore,
+  deleteProfileInStore,
+  getActiveProfileInStore,
+  getProfileIdsInStore,
+  getProfileInStore,
+  isProfileInStore,
+  setActiveProfileInStore,
+} from '../store/ProfileStore.js';
 import { getSatchelStore } from '../store/SatchelStore.js';
 import { downloadText } from '../util/downloader.js';
 import { uploadFile } from '../util/uploader.js';
@@ -33,7 +47,7 @@ function onActionProfile() {
   const activeProfile = resolveActiveProfile(store);
   const rootContainerElement = document.querySelector('#activeProfileList');
   rootContainerElement.innerHTML = '';
-  for(let profileId of profileIds) {
+  for (let profileId of profileIds) {
     let profile = getProfileInStore(store, profileId);
     let elementId = `activeProfile-${profileId}`;
     let element = document.createElement('input');
@@ -123,7 +137,7 @@ function onActionProfileEdit(e) {
   /** @type {DialogPromptElement} */
   const profilesDialog = document.querySelector('#profilesDialog');
   profilesDialog.toggleAttribute('open', false);
-  
+
   // Prepare edit dialog
   prepareEditProfileDialog(store, profileId);
 
@@ -146,7 +160,7 @@ function prepareEditProfileDialog(store, profileId) {
   const profile = getProfileInStore(store, profileId);
   const rootContainerElement = document.querySelector('#activeInventoryList');
   rootContainerElement.innerHTML = '';
-  for(let invId of profile.invs) {
+  for (let invId of profile.invs) {
     let inv = getInvInStore(store, invId);
     let labelElement = document.createElement('label');
     labelElement.textContent = `${inv.displayName || 'Inventory'} | ${inv.width}⨯${inv.height}`;
@@ -162,7 +176,7 @@ function prepareEditProfileDialog(store, profileId) {
     containerElement.appendChild(deleteElement);
     rootContainerElement.appendChild(containerElement);
   }
-  for(let albumId of profile.albums) {
+  for (let albumId of profile.albums) {
     let album = getAlbumInStore(store, albumId);
     let labelElement = document.createElement('label');
     labelElement.textContent = `${album.displayName || 'Inventory'} | ∞`;
@@ -197,22 +211,24 @@ async function onActionProfileImport() {
     window.alert('Cannot load file with invalid json format.');
   }
 
-  switch(jsonData._type) {
-    case 'profile_v2': {
-      const store = getSatchelStore();
-      try {
-        let loadedProfileIds = loadSatchelProfilesFromData(store, jsonData, false);
-        if (loadedProfileIds) {
-          let profileId = loadedProfileIds[0];
-          if (profileId) {
-            setActiveProfileInStore(store, profileId);
+  switch (jsonData._type) {
+    case 'profile_v2':
+      {
+        const store = getSatchelStore();
+        try {
+          let loadedProfileIds = loadSatchelProfilesFromData(store, jsonData, false);
+          if (loadedProfileIds) {
+            let profileId = loadedProfileIds[0];
+            if (profileId) {
+              setActiveProfileInStore(store, profileId);
+            }
           }
+        } catch (e) {
+          console.error('Failed to load satchel from file.');
+          console.error(e);
         }
-      } catch (e) {
-        console.error('Failed to load satchel from file.');
-        console.error(e);
       }
-    } break;
+      break;
     default:
       window.alert('Cannot load json - this is not a valid profile.');
       return;
@@ -246,7 +262,7 @@ function onActionProfileDelete(e) {
     return;
   }
   let profile = getProfileInStore(store, profileId);
-  for(let invId of profile.invs) {
+  for (let invId of profile.invs) {
     let inv = getInvInStore(store, invId);
     deleteInvInStore(store, invId, inv);
   }
@@ -341,7 +357,7 @@ function onActionProfileInvSubmit() {
     activeProfile.albums.push(newAlbumId);
   } else {
     let newInv;
-    switch(type) {
+    switch (type) {
       case 'grid':
         newInv = createGridInventory(newInvId, width, height);
         break;
@@ -357,7 +373,7 @@ function onActionProfileInvSubmit() {
   }
   dispatchProfileChange(store, activeProfile.profileId);
   prepareEditProfileDialog(store, activeProfile.profileId);
-  
+
   /** @type {DialogPromptElement} */
   const profileInventoryDialog = document.querySelector('#profileInventoryDialog');
   profileInventoryDialog.toggleAttribute('open', false);

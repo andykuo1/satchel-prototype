@@ -40,7 +40,7 @@ export function removeAlbumChangeListener(store, albumId, callback) {
 /**
  * @param {Store} store
  */
- export function dispatchAlbumListChange(store) {
+export function dispatchAlbumListChange(store) {
   dispatchStoreEvent(store, 'albumList', 'all');
 }
 

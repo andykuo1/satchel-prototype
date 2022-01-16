@@ -6,7 +6,7 @@ const CLIENT_ID = '195145006634-0mp9f2fvmgfufp524aj70ckka4q6oc9t.apps.googleuser
 const API_KEY = 'AIzaSyBjE7tnNHjYPOrXUJuso4yGCZk64ZEtoJU';
 
 // Array of API discovery doc URLs for APIs used by the quickstart
-const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
+const DISCOVERY_DOCS = ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'];
 
 // Authorization scopes required by the API; multiple scopes can be
 // included, separated by spaces.
@@ -61,7 +61,7 @@ export async function writeGoogleAppFile(fileName, jsonContent) {
 
 async function initializeGoogle() {
   let script = document.querySelector('#gapiScript');
-  if(!script) {
+  if (!script) {
     LOGGER.info('Initializing Google...');
     return new Promise((resolve, reject) => {
       let script = document.createElement('script');
@@ -69,27 +69,24 @@ async function initializeGoogle() {
       script.toggleAttribute('async', true);
       script.toggleAttribute('defer', true);
       script.setAttribute('src', 'https://apis.google.com/js/api.js');
-      script.addEventListener(
-        'load',
-        () => gapi.load(
-          'client:auth2',
-          async () => {
-            try {
-              await gapi.client.init({
-                apiKey: API_KEY,
-                clientId: CLIENT_ID,
-                discoveryDocs: DISCOVERY_DOCS,
-                scope: SCOPES,
-              });
-            } catch (e) {
-              reject(e);
-              return;
-            }
-            LOGGER.info('Google complete!');
-            // Listen for sign-in state changes
-            gapi.auth2.getAuthInstance().isSignedIn.listen(onGoogleSignIn);
-            // Resolve the pending promise
-            resolve();
+      script.addEventListener('load', () =>
+        gapi.load('client:auth2', async () => {
+          try {
+            await gapi.client.init({
+              apiKey: API_KEY,
+              clientId: CLIENT_ID,
+              discoveryDocs: DISCOVERY_DOCS,
+              scope: SCOPES,
+            });
+          } catch (e) {
+            reject(e);
+            return;
+          }
+          LOGGER.info('Google complete!');
+          // Listen for sign-in state changes
+          gapi.auth2.getAuthInstance().isSignedIn.listen(onGoogleSignIn);
+          // Resolve the pending promise
+          resolve();
         })
       );
       document.body.appendChild(script);
@@ -110,7 +107,7 @@ async function createFile(name) {
   let fileMetadata = {
     name,
     mimeType: 'application/json',
-    parents: ['appDataFolder']
+    parents: ['appDataFolder'],
   };
   let response = await gapi.client.drive.files.create({
     resource: fileMetadata,
@@ -151,7 +148,7 @@ async function getFileId(name) {
   }
   let result = null;
   let files = await listFiles();
-  for(let file of files) {
+  for (let file of files) {
     if (file.name === name) {
       result = file.id;
       break;
@@ -182,14 +179,17 @@ async function uploadFile(fileId, name, jsonString) {
   LOGGER.info(`Uploading Google file '${name}'...`);
   LOGGER.debug(fileId, name, typeof jsonString);
   const accessToken = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token;
-  const response = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`, {
-    method: 'PATCH',
-    headers: new Headers({
-      'Authorization': `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-    }),
-    body: jsonString,
-  });
+  const response = await fetch(
+    `https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`,
+    {
+      method: 'PATCH',
+      headers: new Headers({
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      }),
+      body: jsonString,
+    }
+  );
   if (response.status === 200) {
     return true;
   } else {

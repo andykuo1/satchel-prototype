@@ -94,7 +94,7 @@ export class TrashCanElement extends HTMLElement {
       if (window.confirm('Clear all items on the ground?')) {
         let albumId = getGroundAlbumId(store);
         let itemIds = getItemIdsInAlbum(store, albumId);
-        for(let itemId of itemIds) {
+        for (let itemId of itemIds) {
           let item = getItemInAlbum(store, albumId, itemId);
           saveItemToTrashAlbum(item);
         }

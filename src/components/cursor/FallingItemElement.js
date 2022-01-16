@@ -83,7 +83,7 @@ export class FallingItemElement extends HTMLElement {
     );
     
     /** @private */
-    this.containerElement = shadowRoot.querySelector('.outer');
+    this.containerElement = /** @type {HTMLElement} */ (shadowRoot.querySelector('.outer'));
     /** @private */
     this.imageElement = shadowRoot.querySelector('img');
   }

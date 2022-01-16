@@ -40,7 +40,7 @@ export function removeProfileChangeListener(store, profileId, callback) {
 /**
  * @param {Store} store
  */
- export function dispatchProfileListChange(store) {
+export function dispatchProfileListChange(store) {
   dispatchStoreEvent(store, 'profileList', 'all');
 }
 

@@ -1,7 +1,7 @@
 /**
- * 
+ *
  * @param {Element} parentNode
- * @param {Iterable<string>} list 
+ * @param {Iterable<string>} list
  * @param {(key: string) => Element} factoryCreate
  * @param {(key: string, element: Element) => void} [factoryDelete]
  * @param {(key: string, element: Element, preserved: boolean) => void} [callback]
@@ -10,7 +10,7 @@ export function updateList(parentNode, list, factoryCreate, factoryDelete = () =
   const children = parentNode.children;
   /** @type {Record<string, Element>} */
   const preserved = {};
-  for(let child of children) {
+  for (let child of children) {
     if (child.hasAttribute('data-listkey')) {
       let listKey = child.getAttribute('data-listkey');
       preserved[listKey] = child;
@@ -20,7 +20,7 @@ export function updateList(parentNode, list, factoryCreate, factoryDelete = () =
   let reversedChildren = [];
   const preservedKeys = Object.keys(preserved);
   let keys = [...list].reverse();
-  for(let key of keys) {
+  for (let key of keys) {
     let i = preservedKeys.indexOf(key);
     if (i >= 0) {
       preservedKeys.splice(i, 1);
@@ -40,7 +40,7 @@ export function updateList(parentNode, list, factoryCreate, factoryDelete = () =
     }
   }
   // Delete any remaining preserved
-  for(let key of preservedKeys) {
+  for (let key of preservedKeys) {
     let element = preserved[key];
     element.remove();
     factoryDelete(key, element);

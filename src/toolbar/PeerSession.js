@@ -22,6 +22,6 @@ export async function startCloud() {
  * @param {string} peerId
  * @returns {string}
  */
- function generateShareableLink(peerId) {
+function generateShareableLink(peerId) {
   return `${location.origin}${location.pathname}?id=${peerId}`;
 }

@@ -1,4 +1,9 @@
-import { loadSatchelAlbumsFromData, loadSatchelProfilesFromData, saveSatchelAlbumsToData, saveSatchelProfilesToData } from '../loader/SatchelLoader.js';
+import {
+  loadSatchelAlbumsFromData,
+  loadSatchelProfilesFromData,
+  saveSatchelAlbumsToData,
+  saveSatchelProfilesToData,
+} from '../loader/SatchelLoader.js';
 import { isAlbumHidden } from '../satchel/album/Album.js';
 import { getCursorContext } from '../satchel/inv/CursorHelper.js';
 import { getAlbumIdsInStore } from '../store/AlbumStore.js';
@@ -26,7 +31,7 @@ export function startBusyWork() {
   let ctx = getCursorContext();
   let handle = setInterval(() => {
     let busyProgress = document.querySelector('#busyProgress');
-    switch(busyProgress.textContent) {
+    switch (busyProgress.textContent) {
       case '.':
         busyProgress.textContent = '..';
         break;
@@ -55,12 +60,12 @@ export function stopBusyWork() {
 async function onActionImportGoogle() {
   try {
     startBusyWork();
-    if (!await signInGoogle()) {
+    if (!(await signInGoogle())) {
       throw new Error('Not signed in to Google.');
     }
     await loadSatchelFromGoogle();
     window.alert('Import complete!');
-  } catch(e) {
+  } catch (e) {
     console.error(e);
   } finally {
     stopBusyWork();
@@ -70,12 +75,12 @@ async function onActionImportGoogle() {
 async function onActionExportGoogle() {
   try {
     startBusyWork();
-    if (!await signInGoogle()) {
+    if (!(await signInGoogle())) {
       throw new Error('Not signed in to Google.');
     }
     await saveSatchelToGoogle();
     window.alert('Save complete!');
-  } catch(e) {
+  } catch (e) {
     console.error(e);
   } finally {
     stopBusyWork();
@@ -127,7 +132,7 @@ async function saveSatchelToGoogle() {
   try {
     let albumIds = getAlbumIdsInStore(store);
     // Do not save hidden albums
-    albumIds.filter(albumId => !isAlbumHidden(store, albumId));
+    albumIds.filter((albumId) => !isAlbumHidden(store, albumId));
     let albumData = saveSatchelAlbumsToData(store, albumIds);
     await writeGoogleAppFile('satchel_album_v3', JSON.stringify(albumData));
   } catch (e) {
