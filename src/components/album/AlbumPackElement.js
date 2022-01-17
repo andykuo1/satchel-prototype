@@ -290,7 +290,9 @@ export class AlbumPackElement extends HTMLElement {
     this.inputTitle.classList.toggle('internal', isInternalAlbum);
 
     // Update name
-    this.inputTitle.textContent = name;
+    if (name !== this.inputTitle.textContent) {
+      this.inputTitle.textContent = name;
+    }
 
     // Update if empty
     let empty = getItemIdsInAlbum(store, albumId).length > 0;
