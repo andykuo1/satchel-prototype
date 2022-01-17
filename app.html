@@ -49,6 +49,19 @@
     </style>
   </head>
   <body>
+    <style>
+      .bigButton {
+        background-color: transparent;
+        border: 0.2em solid #666666;
+        border-radius: 1em;
+        height: 3em;
+        color: #ffffff;
+      }
+      .bigButton:hover {
+        cursor: pointer;
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+    </style>
     <sidebar-layout>
       <style>
         .leftSideContainer {
@@ -70,15 +83,15 @@
       <div slot="sidebar" class="leftSideContainer">
         <div class="sideContainer">
           <div class="sidebarActions">
-            <icon-button id="actionItemEdit" icon="res/anvil.svg" alt="foundry" title="Open Foundry"></icon-button>
+            <foundry-anvil id="actionItemEdit"></foundry-anvil>
           </div>
           <div class="spacing">
           </div>
           <div class="sidebarActions">
-            <icon-button id="actionProfile" icon="res/profile.svg" alt="profile" title="Profile" disabled></icon-button>
+            <icon-button id="actionAlbumOpen" icon="res/bookmarks.svg" alt="album" title="Albums"></icon-button>
           </div>
           <div class="sidebarActions">
-            <icon-button id="cloudButton" icon="res/cloud.svg" alt="connect" title="Connect" disabled></icon-button>
+            <icon-button id="cloudButton" icon="res/cloud.svg" alt="sync" title="Cloud Sync" disabled></icon-button>
           </div>
           <div class="sidebarActions">
             <icon-button id="actionSettings" icon="res/settings.svg" alt="settings" title="Settings"></icon-button>
@@ -119,11 +132,6 @@
           #actionFoundryNew {
             flex: 3;
             margin-right: 1.5em;
-            background-color: transparent;
-            border: 0.2em solid #666666;
-            border-radius: 1em;
-            color: #ffffff;
-            height: 100%;
           }
 
           #editorWatermark {
@@ -139,7 +147,7 @@
         </style>
         <div class="editorContainer">
           <div class="editorActions">
-            <button id="actionFoundryNew">+ Item</button>
+            <button id="actionFoundryNew" class="bigButton">+ Item</button>
             <icon-button id="actionItemCodeImport" icon="res/paste.svg" alt="paste" title="Paste Item Code"></icon-button>
             <trash-can id="actionFoundryReset"></trash-can>
           </div>
@@ -192,7 +200,7 @@
               <h3>Ground</h3>
             </div>
             <div class="sidebarActions">
-              <icon-button id="actionAlbumOpen" icon="res/bookmarks.svg" alt="album" title="Open Album"></icon-button>
+              <icon-button id="actionProfile" icon="res/profile.svg" alt="profiles" title="Profiles" disabled></icon-button>
             </div>
             <album-ground id="ground"></album-ground>
             <div class="sidebarActions">
@@ -317,13 +325,6 @@
                 scroll-behavior: smooth;
                 padding: 0 0.5em;
               }
-              #actionAlbumNew {
-                background-color: transparent;
-                border: 0.2em solid #666666;
-                border-radius: 1em;
-                height: 3em;
-                color: #ffffff;
-              }
 
               #albumWatermark {
                 position: absolute;
@@ -342,7 +343,7 @@
               </div>
               <div id="albumList"></div>
               <div class="albumActions">
-                <button id="actionAlbumNew">+ Album</button>
+                <button id="actionAlbumNew" class="bigButton">+ Album</button>
               </div>
             </div>
           </main>
@@ -452,6 +453,10 @@
           opacity: 0.6;
           font-size: 0.4em;
         }
+        #inventoriesDialog fieldset {
+          display: flex;
+          flex-direction: column;
+        }
         #activeInventoryList {
           display: flex;
           flex-direction: column;
@@ -488,7 +493,7 @@
       <fieldset>
         <legend>Inventory</legend>
         <p id="activeInventoryList"></p>
-        <button id="actionProfileInvNew">New Inventory</button>
+        <button id="actionProfileInvNew" class="bigButton">+ Inventory</button>
       </fieldset>
     </dialog-prompt>
 

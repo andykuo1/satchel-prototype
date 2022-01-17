@@ -4,7 +4,7 @@ import { createAlbum, isAlbumLocked } from './album/Album.js';
 import { addItemToAlbum, getItemsInAlbum } from './album/AlbumItems.js';
 import { addAlbumInStore, getAlbumsInStore } from '../store/AlbumStore.js';
 
-const FOUNDRY_ALBUM_DISPLAY_NAME = '[ Foundry ]';
+const FOUNDRY_ALBUM_DISPLAY_NAME = '[ Recent ]';
 
 /**
  * @param {import('./item/Item.js').Item} freedItem

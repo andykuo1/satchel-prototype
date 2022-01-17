@@ -31,7 +31,6 @@ function el(selector, event, callback) {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-  el('#actionItemEdit', 'click', onActionItemEdit);
   el('#downloadButton', 'click', onDownloadClick);
   el('#uploadButton', 'click', onUploadClick);
   el('#actionSoundToggle', 'click', onActionSoundToggle);
@@ -47,7 +46,7 @@ window.addEventListener('DOMContentLoaded', () => {
   el('#actionItemCodeImport', 'click', onActionItemCodeImport);
   el('#actionItemCodeExport', 'click', onActionItemCodeExport);
   el('#actionItemDuplicate', 'click', onActionItemDuplicate);
-  el('#actionFoundryReset', 'click', onActionFoundryReset);
+  el('#actionFoundryReset', 'mouseup', onActionFoundryReset);
   el('#actionFoundryNew', 'click', onActionFoundryNew);
   el('#giftCodeExport', 'click', onGiftCodeExport);
   el('#giftSubmit', 'click', onGiftSubmit);
@@ -184,14 +183,6 @@ function onAlbumListUpdate() {
   const albumList = document.querySelector('#albumList');
   const factoryCreate = (key) => new AlbumPackElement(key);
   updateList(albumList, list, factoryCreate);
-}
-
-function onActionItemEdit() {
-  if (isFoundryOpen()) {
-    closeFoundry();
-  } else {
-    openFoundry(null);
-  }
 }
 
 function onActionItemDuplicate(e) {
@@ -340,10 +331,14 @@ function onActionItemCodeExport() {
 async function onActionItemCodeImport() {
   /** @type {import('./components/itemeditor/ItemEditorElement.js').ItemEditorElement} */
   const itemEditor = document.querySelector('#itemEditor');
-  let itemString = await pasteFromClipboard();
-  let newItem = importItemFromString(itemString);
-  itemEditor.clearSocketedItem();
-  itemEditor.putSocketedItem(newItem, true);
+  try {
+    let itemString = await pasteFromClipboard();
+    let newItem = importItemFromString(itemString);
+    itemEditor.clearSocketedItem();
+    itemEditor.putSocketedItem(newItem, true);
+  } catch (e) {
+    window.alert('Sorry! No valid item code to paste. Try copy the item code text then click this button again.\n\n' + e);
+  }
 }
 
 function onActionFoundryReset() {

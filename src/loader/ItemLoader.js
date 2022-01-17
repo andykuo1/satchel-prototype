@@ -18,9 +18,13 @@ export function exportItemToString(item) {
 }
 
 export function importItemFromString(itemString, dst = undefined) {
-  if (!itemString.startsWith('item:')) {
-    throw new Error('Invalid item string - missing required prefix.');
+  let i = itemString.indexOf('item:');
+  if (i < 0) {
+    throw new Error(`Invalid item string - missing required prefix 'item'`);
   }
-  let result = importItemFromBase64(itemString.substring('item:'.length), dst);
+  let j = itemString.indexOf(/\s+/, i);
+  let k = i + 'item:'.length;
+  let base64String = j < 0 ? itemString.substring(k) : itemString.substring(k, j);
+  let result = importItemFromBase64(base64String, dst);
   return result;
 }

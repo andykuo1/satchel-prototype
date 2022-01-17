@@ -26,11 +26,14 @@ const INNER_HTML = /* html */`
   <fieldset class="portraitContainer">
     <div class="foundrySocketContainer">
       <div class="foundryContainer">
-        <icon-button id="actionEnlarge" icon="res/more.svg" alt="more" title="Enlarge"></icon-button>
-        <icon-button id="actionShrink" icon="res/less.svg" alt="less" title="Shrink"></icon-button>
-        <icon-button id="actionFlatten" icon="res/flatten.svg" alt="flat" title="Flatten"></icon-button>
-        <icon-button id="actionFlattenRotated" icon="res/flatten.svg" alt="long" title="Elongate" style="transform: rotate(90deg);"></icon-button>
-        <icon-button id="actionFit" icon="res/aspectratio.svg" alt="fit" title="Fit"></icon-button>
+        <icon-button id="actionExpand" icon="res/expandmore.svg" alt="expand" title="Expand"></icon-button>
+        <span id="foundryActions" class="hidden">
+          <icon-button id="actionEnlarge" icon="res/enlarge.svg" alt="more" title="Enlarge"></icon-button>
+          <icon-button id="actionShrink" icon="res/shrink.svg" alt="less" title="Shrink"></icon-button>
+          <icon-button id="actionFlatten" icon="res/flatten.svg" alt="flat" title="Flatten"></icon-button>
+          <icon-button id="actionFlattenRotated" icon="res/flatten.svg" alt="long" title="Elongate" style="transform: rotate(90deg);"></icon-button>
+          <icon-button id="actionFit" icon="res/aspectratio.svg" alt="fit" title="Fit"></icon-button>
+        </span>
       </div>
       <div class="socketXContainer">
         <div class="socketSpacing"></div>
@@ -159,6 +162,13 @@ img {
   margin: 0.2em 0;
 }
 .foundryContainer icon-button[disabled] {
+  visibility: hidden;
+}
+#foundryActions {
+  display: flex;
+  flex-direction: column;
+}
+.hidden {
   visibility: hidden;
 }
 
@@ -296,6 +306,8 @@ export class ItemEditorElement extends HTMLElement {
     this.detailContainer = shadowRoot.querySelector('.detailContainer');
     /** @private */
     this.imageContextMenu = /** @type {ContextMenuElement} */ (shadowRoot.querySelector('#imageContextMenu'));
+    /** @private */
+    this.foundryActions = shadowRoot.querySelector('#foundryActions');
 
     /**
      * @private
@@ -349,6 +361,8 @@ export class ItemEditorElement extends HTMLElement {
     this.actionFit = shadowRoot.querySelector('#actionFit');
     /** @private */
     this.actionImage = shadowRoot.querySelector('#actionImage');
+    /** @private */
+    this.actionExpand = shadowRoot.querySelector('#actionExpand');
 
     /** @private */
     this.onItemTitle = this.onItemTitle.bind(this);
@@ -384,6 +398,8 @@ export class ItemEditorElement extends HTMLElement {
     this.onItemHeight = this.onItemHeight.bind(this);
     /** @private */
     this.onImageContextMenuClick = this.onImageContextMenuClick.bind(this);
+    /** @private */
+    this.onActionExpand = this.onActionExpand.bind(this);
 
     /** @private */
     this.onSocketInventoryChange = this.onSocketInventoryChange.bind(this);
@@ -414,6 +430,7 @@ export class ItemEditorElement extends HTMLElement {
     this.portraitContainer.addEventListener('mouseup', this.onItemDrop);
     this.imageContextMenu.addEventListener('click', this.onImageContextMenuClick);
     this.itemImage.addEventListener('contextmenu', this.onActionImage);
+    this.actionExpand.addEventListener('click', this.onActionExpand);
 
     const store = getSatchelStore();
     addInventoryChangeListener(store, this.socket.invId, this.onSocketInventoryChange);
@@ -441,6 +458,7 @@ export class ItemEditorElement extends HTMLElement {
     this.portraitContainer.removeEventListener('mouseup', this.onItemDrop);
     this.imageContextMenu.removeEventListener('click', this.onImageContextMenuClick);
     this.itemImage.removeEventListener('contextmenu', this.onActionImage);
+    this.actionExpand.removeEventListener('click', this.onActionExpand);
 
     const store = getSatchelStore();
     removeInventoryChangeListener(store, this.socket.invId, this.onSocketInventoryChange);
@@ -526,6 +544,7 @@ export class ItemEditorElement extends HTMLElement {
     this.actionFlattenRotated.toggleAttribute('disabled', force);
     this.actionFit.toggleAttribute('disabled', force);
     this.detailContainer.toggleAttribute('disabled', force);
+    this.actionExpand.toggleAttribute('disabled', force);
   }
 
   /** @private */
@@ -573,6 +592,7 @@ export class ItemEditorElement extends HTMLElement {
     this.actionFlatten.toggleAttribute('disabled', !resizable);
     this.actionFlattenRotated.toggleAttribute('disabled', !resizable);
     this.actionFit.toggleAttribute('disabled', !resizable);
+    this.actionExpand.toggleAttribute('disabled', !resizable);
   }
 
   /**
@@ -731,7 +751,7 @@ export class ItemEditorElement extends HTMLElement {
     const src = e.target.getAttribute('data-imgsrc');
     this.itemImage.value = src;
     this.onItemImage();
-    contextMenu.close();
+    contextMenu.toggleAttribute('open', false);
   }
 
   /** @private */
@@ -845,6 +865,18 @@ export class ItemEditorElement extends HTMLElement {
       e.preventDefault();
       e.stopPropagation();
       return false;
+    }
+  }
+
+  /** @private */
+  onActionExpand() {
+    let isMore = this.actionExpand.getAttribute('icon') === 'res/expandmore.svg';
+    if (isMore) {
+      this.actionExpand.setAttribute('icon', 'res/expandless.svg');
+      this.foundryActions.classList.toggle('hidden', false);
+    } else {
+      this.actionExpand.setAttribute('icon', 'res/expandmore.svg');
+      this.foundryActions.classList.toggle('hidden', true);
     }
   }
 

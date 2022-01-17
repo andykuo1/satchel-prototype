@@ -49,6 +49,11 @@ const INNER_STYLE = /* css */`
   opacity: 0.8;
   filter: brightness(70%) drop-shadow(0 0 0.5em red);
 }
+/* This is only used externally and for style. */
+:host([important]) {
+  opacity: 0.8;
+  filter: brightness(70%) drop-shadow(0 0 0.5em white);
+}
 `;
 
 export class InventoryCursorElement extends HTMLElement {

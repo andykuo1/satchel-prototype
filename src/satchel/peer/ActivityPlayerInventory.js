@@ -129,7 +129,7 @@ export class ActivityPlayerInventory extends ActivityBase {
         const clientData = messageData;
         let store = getSatchelStore();
         try {
-          let profileIds = loadSatchelProfilesFromData(store, clientData, true);
+          let profileIds = loadSatchelProfilesFromData(store, clientData, true, false);
           if (profileIds[0] !== clientDataName) {
             console.error('Server and client disagree on player data name!');
           }

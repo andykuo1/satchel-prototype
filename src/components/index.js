@@ -4,3 +4,4 @@ export * from './invgrid/index.js';
 export * from './itemeditor/index.js';
 export * from './lib/index.js';
 export { TrashCanElement } from './TrashCanElement.js';
+export { FoundryAnvilElement } from './FoundryAnvilElement.js';

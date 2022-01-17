@@ -13,6 +13,7 @@ import {
   getProfileIdsInStore,
   getProfileInStore,
   isProfileInStore,
+  setActiveProfileInStore,
 } from '../store/ProfileStore.js';
 import { exportDataToJSON, importDataFromJSON } from './DataLoader.js';
 import { isInvInStore, getInvInStore, addInvInStore } from '../store/InvStore.js';
@@ -52,7 +53,7 @@ export function saveSatchelToData(store, dst = {}) {
   return exportDataToJSON('satchel_v2', data, {}, dst);
 }
 
-export function loadSatchelProfilesFromData(store, jsonData, overrideData) {
+export function loadSatchelProfilesFromData(store, jsonData, overrideData, changeActive = true) {
   return importDataFromJSON(jsonData, 'profile_v2', (data) => {
     let result = [];
     let inProfiles = data.profdata;
@@ -123,6 +124,10 @@ export function loadSatchelProfilesFromData(store, jsonData, overrideData) {
         }
         result.push(profileId);
       }
+    }
+    // Change profile to the newly loaded one.
+    if (result.length > 0 && changeActive) {
+      setActiveProfileInStore(store, result[0]);
     }
     return result;
   });
