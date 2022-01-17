@@ -75,7 +75,8 @@ export function describeJSONFormat(formatType, create, exportToJSON, importFromJ
 export function describeCurrentJSONFormat(create, exportToJSON, sourceExportMap) {
   it('should be unchanged as default export', () => {
     assert.hasAnyKeys(sourceExportMap, ['default'], 'missing default key for current json format.');
-    const [/* unused */, exportedPath] = sourceExportMap.default;
+    // Get the second value in the array
+    const [, exportedPath] = sourceExportMap.default;
     assert.exists(exportedPath, 'missing exported fixture path.');
     cy.fixture(exportedPath).then((defaultExported) => {
       let created = create('test');
