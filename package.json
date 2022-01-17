@@ -6,8 +6,9 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "lint": "eslint src/**/*.js",
-    "format": "prettier --write src/**/*.js",
+    "start": "web-dev-server --node-resolve --open",
+    "lint": "eslint src/**/*.js cypress/**/*.js",
+    "format": "prettier --write src/**/*.js cypress/**/*.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -17,8 +18,11 @@
     "@types/gapi.auth2": "^0.0.55",
     "@types/gapi.client": "^1.0.5",
     "@types/gapi.client.drive": "^3.0.13",
+    "@web/dev-server": "^0.1.29",
+    "cypress": "^9.2.1",
     "eslint": "^8.2.0",
     "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-cypress": "^2.12.1",
     "prettier": "^2.4.1"
   }
 }

@@ -1,6 +1,4 @@
-import { hasFoundryAlbum } from '../satchel/FoundryAlbum.js';
 import { closeFoundry, isFoundryOpen, openFoundry } from '../satchel/inv/FoundryHelper.js';
-import { getSatchelStore } from '../store/SatchelStore.js';
 import { getCursor } from './index.js';
 
 /** @typedef {import('./cursor/InventoryCursorElement.js').InventoryCursorElement} InventoryCursorElement */

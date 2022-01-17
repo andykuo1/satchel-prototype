@@ -1,12 +1,15 @@
 import { exportDataToJSON, importDataFromJSON } from './DataLoader.js';
 import { cloneAlbum } from '../satchel/album/Album.js';
 
-/** @typedef {import('../satchel/album/Album.js').Album} Album */
+/**
+ * @typedef {import('../satchel/album/Album.js').Album} Album
+ * @typedef {import('./DataLoader.js').ImportDataFormat} ImportDataFormat
+ */
 
 /**
  * @param {Album} album
  * @param {object} [dst]
- * @returns {object}
+ * @returns {ImportDataFormat}
  */
 export function exportAlbumToJSON(album, dst = undefined) {
   return exportDataToJSON('album_v1', cloneAlbum(album), {}, dst);

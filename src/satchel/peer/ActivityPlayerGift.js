@@ -5,6 +5,7 @@ import { SatchelLocal, SatchelRemote } from './SatchelLocal.js';
 
 import { ActivityPlayerHandshake } from './ActivityPlayerHandshake.js';
 import { dropItemOnGround } from '../GroundAlbum.js';
+import { copyItem } from '../item/Item.js';
 
 /** @typedef {import('../item/Item.js').Item} Item */
 
@@ -24,8 +25,8 @@ export class ActivityPlayerGift extends ActivityBase {
     const { from, target, item } = messageData;
     switch (messageType) {
       case 'gift':
-        let newItem = importItemFromJSON(item);
-        dropItemOnGround(newItem);
+        let freeItem = copyItem(importItemFromJSON(item));
+        dropItemOnGround(freeItem);
         window.alert(
           `You received a gift from ${
             from || 'the server'

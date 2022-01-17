@@ -3,7 +3,7 @@ import { getSatchelStore } from './store/SatchelStore.js';
 import { getCursorContext } from './satchel/inv/CursorHelper.js';
 import { uploadFile } from './util/uploader.js';
 import { copyToClipboard, pasteFromClipboard } from './util/clipboard.js';
-import { ItemBuilder } from './satchel/item/Item.js';
+import { copyItem, ItemBuilder } from './satchel/item/Item.js';
 import { uuid } from './util/uuid.js';
 import { AlbumPackElement } from './components/album/AlbumPackElement.js';
 import { exportItemToString, importItemFromJSON, importItemFromString } from './loader/ItemLoader.js';
@@ -275,8 +275,8 @@ async function onUploadClick() {
     } break;
     case 'item_v1': {
       try {
-        let item = importItemFromJSON(jsonData);
-        dropItemOnGround(item);
+        let freeItem = copyItem(importItemFromJSON(jsonData));
+        dropItemOnGround(freeItem);
       } catch (e) {
         console.error('Failed to load item from file.');
         console.error(e);

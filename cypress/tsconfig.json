@@ -7,11 +7,7 @@
     "checkJs": true,
     "types": ["cypress"]
   },
-  "exclude": [
-    "node_modules"
-  ],
   "include": [
-    "src/**/*.js",
-    "res/**/*.js"
+    "**/*.js"
   ]
 }

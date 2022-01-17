@@ -1,3 +1,4 @@
+/* global gapi */
 import { Logger } from '../util/Logger.js';
 
 // TODO: To test this, you need to use localhost (not 127.0.0.1)

@@ -37,7 +37,7 @@ export function createInventory(invId, invType, slotCount, maxCoordX, maxCoordY)
     invId,
     type: invType,
     items: {},
-    slots: new Array(slotCount),
+    slots: new Array(slotCount).fill(null),
     width: maxCoordX,
     height: maxCoordY,
     length: slotCount,
