@@ -2,6 +2,7 @@ import { uuid } from '../util/uuid.js';
 import { Eventable } from '../util/Eventable.js';
 import { PeerJsSignaling } from './PeerJsSignaling.js';
 import { PeerfulLocalConnection, PeerfulRemoteConnection } from './PeerfulConnection.js';
+import { Logger } from '../util/Logger.js';
 
 /**
  * @typedef {import('./PeerfulConnection.js').PeerfulConnection} PeerfulConnection
@@ -9,6 +10,8 @@ import { PeerfulLocalConnection, PeerfulRemoteConnection } from './PeerfulConnec
  * @property {(connection: PeerfulConnection) => void} connect
  * @property {(error: Error) => void} error
  */
+
+const LOGGER = new Logger('Peerful');
 
 /**
  * @augments Eventable<PeerfulEvents>
@@ -70,7 +73,7 @@ export class Peerful extends Eventable {
     try {
       await conn.connect(remoteId);
     } catch (e) {
-      console.error('Failed to connect to peer.', e);
+      LOGGER.error('Failed to connect to peer', e);
       delete this.connections[remoteId];
     }
 
@@ -145,7 +148,7 @@ export class Peerful extends Eventable {
             {
               const conn = this.connections[src];
               if (!conn) {
-                console.warn('Received signaling attempt when not listening.');
+                LOGGER.warn('Received signaling attempt when not listening.');
                 return;
               }
               const description = new RTCSessionDescription(init);
@@ -153,7 +156,7 @@ export class Peerful extends Eventable {
             }
             break;
           default:
-            console.warn('Received unknown signal:', init);
+            LOGGER.warn('Received unknown signal:', init);
             break;
         }
       } else if ('candidate' in sdp) {
@@ -162,7 +165,7 @@ export class Peerful extends Eventable {
         const candidate = new RTCIceCandidate(init);
         conn.onSignalingResponse('candidate', candidate, src, dst);
       } else {
-        console.warn('Received unknown signal:', sdp);
+        LOGGER.warn('Received unknown signal:', sdp);
       }
     }
   }

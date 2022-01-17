@@ -9,10 +9,13 @@ import { getCursorContext } from '../satchel/inv/CursorHelper.js';
 import { getAlbumIdsInStore } from '../store/AlbumStore.js';
 import { getProfileIdsInStore } from '../store/ProfileStore.js';
 import { getSatchelStore } from '../store/SatchelStore.js';
+import { Logger } from '../util/Logger.js';
 import { readGoogleAppFile, signInGoogle, signOutGoogle, writeGoogleAppFile } from './GoogleDrive.js';
 import { startCloud } from './PeerSession.js';
 
 /** @typedef {import('../components/lib/DialogPromptElement.js').DialogPromptElement} DialogPromptElement */
+
+const LOGGER = new Logger('toolbar.sync');
 
 function el(selector, event, callback) {
   document.querySelector(selector).addEventListener(event, callback);
@@ -66,7 +69,7 @@ async function onActionImportGoogle() {
     await loadSatchelFromGoogle();
     window.alert('Import complete!');
   } catch (e) {
-    console.error(e);
+    LOGGER.error('Failed to import from Google', e);
     window.alert('Error! \n' + JSON.stringify(e));
   } finally {
     stopBusyWork();
@@ -82,7 +85,7 @@ async function onActionExportGoogle() {
     await saveSatchelToGoogle();
     window.alert('Save complete!');
   } catch (e) {
-    console.error(e);
+    LOGGER.error('Failed to export to Google', e);
     window.alert('Error! \n' + JSON.stringify(e));
   } finally {
     stopBusyWork();
@@ -106,8 +109,7 @@ async function loadSatchelFromGoogle() {
       let jsonData = JSON.parse(satchelData);
       loadSatchelProfilesFromData(store, jsonData, true);
     } catch (e) {
-      console.error('Failed to load satchel from storage.');
-      console.error(e);
+      LOGGER.error('Failed to load satchel from storage', e);
     }
   }
   let albumData = await readGoogleAppFile('satchel_album_v3');
@@ -116,8 +118,7 @@ async function loadSatchelFromGoogle() {
       let jsonData = JSON.parse(albumData);
       loadSatchelAlbumsFromData(store, jsonData, true);
     } catch (e) {
-      console.error('Failed to load album from storage.');
-      console.error(e);
+      LOGGER.error('Failed to load album from storage.', e);
     }
   }
 }
@@ -129,7 +130,7 @@ async function saveSatchelToGoogle() {
     let profileData = saveSatchelProfilesToData(store, profileIds);
     await writeGoogleAppFile('satchel_data_v4', JSON.stringify(profileData));
   } catch (e) {
-    console.error(e);
+    LOGGER.error('Failed to save profiles to Google', e);
   }
   try {
     let albumIds = getAlbumIdsInStore(store);
@@ -138,7 +139,7 @@ async function saveSatchelToGoogle() {
     let albumData = saveSatchelAlbumsToData(store, albumIds);
     await writeGoogleAppFile('satchel_album_v3', JSON.stringify(albumData));
   } catch (e) {
-    console.error(e);
+    LOGGER.error('Failed to save albums to Google', e);
   }
 }
 

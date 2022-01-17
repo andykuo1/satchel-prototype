@@ -20,6 +20,9 @@ import { isInvInStore, getInvInStore, addInvInStore } from '../store/InvStore.js
 import { getFoundryAlbumId, isFoundryAlbum } from '../satchel/FoundryAlbum.js';
 import { getGroundAlbumId, isGroundAlbum } from '../satchel/GroundAlbum.js';
 import { getTrashAlbumId, isTrashAlbum } from '../satchel/TrashAlbum.js';
+import { Logger } from '../util/Logger.js';
+
+const LOGGER = new Logger('SatchelLoader');
 
 export function loadSatchelFromData(store, jsonData, overrideData) {
   return importDataFromJSON(jsonData, 'satchel_v2', (data) => {
@@ -27,14 +30,12 @@ export function loadSatchelFromData(store, jsonData, overrideData) {
     try {
       loadSatchelProfilesFromData(store, profiles, overrideData);
     } catch (e) {
-      console.error('Failed to load satchel from data.');
-      console.error(e);
+      LOGGER.error('Failed to load satchel from data', e);
     }
     try {
       loadSatchelAlbumsFromData(store, albums, overrideData);
     } catch (e) {
-      console.error('Failed to load album from data.');
-      console.error(e);
+      LOGGER.error('Failed to load album from data', e);
     }
   });
 }
@@ -150,7 +151,7 @@ export function saveSatchelProfilesToData(store, profileIds, dst = {}) {
       }
       outProfiles.push(exportProfileToJSON(profile));
     } catch (e) {
-      console.error(e);
+      LOGGER.error('Failed to save satchel profiles to data', e);
     }
   }
   let result = {
@@ -212,7 +213,7 @@ export function saveSatchelAlbumsToData(store, albumIds, dst = {}) {
     try {
       outAlbums.push(exportAlbumToJSON(album));
     } catch (e) {
-      console.error(e);
+      LOGGER.error('Failed to save satchel albums to data', e);
     }
   }
   dst.albums = outAlbums;

@@ -23,10 +23,13 @@ import {
 } from '../store/ProfileStore.js';
 import { getSatchelStore } from '../store/SatchelStore.js';
 import { downloadText } from '../util/downloader.js';
+import { Logger } from '../util/Logger.js';
 import { uploadFile } from '../util/uploader.js';
 import { uuid } from '../util/uuid.js';
 
 /** @typedef {import('../components/lib/DialogPromptElement.js').DialogPromptElement} DialogPromptElement */
+
+const LOGGER = new Logger('toolbar.profile');
 
 function el(selector, event, callback) {
   document.querySelector(selector).addEventListener(event, callback);
@@ -224,8 +227,7 @@ async function onActionProfileImport() {
             }
           }
         } catch (e) {
-          console.error('Failed to load satchel from file.');
-          console.error(e);
+          LOGGER.error('Failed to load satchel from file', e);
         }
       }
       break;

@@ -194,7 +194,7 @@ async function uploadFile(fileId, name, jsonString) {
   if (response.status === 200) {
     return true;
   } else {
-    console.error('Failed to upload file -', response, await response.text());
+    LOGGER.error('Failed to upload file -', response, await response.text());
     return false;
   }
 }

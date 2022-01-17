@@ -1,5 +1,7 @@
-const SHOW_DEBUG = true;
+import { Logger } from '../util/Logger.js';
 
+const SHOW_DEBUG = true;
+const LOGGER = new Logger('PeerfulUtil');
 /**
  * @param  {...any} messages
  */
@@ -7,7 +9,7 @@ export function debug(...messages) {
   if (!SHOW_DEBUG) {
     return;
   }
-  console.log(...messages);
+  LOGGER.debug(...messages);
 }
 
 export const FILTER_TRICKLE_SDP_PATTERN = /a=ice-options:trickle\s\n/g;

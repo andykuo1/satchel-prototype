@@ -5,7 +5,12 @@
     "allowJs": true,
     "noEmit": true,
     "checkJs": true,
-    "types": ["cypress"]
+    "types": [
+      "gapi",
+      "gapi.auth2",
+      "gapi.client",
+      "gapi.client.drive"
+    ]
   },
   "exclude": [
     "node_modules"
