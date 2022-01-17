@@ -290,8 +290,11 @@ async function onUploadClick() {
 async function onCloudClick(e) {
   /** @type {import('./components/lib/ContextMenuElement.js').ContextMenuElement} */
   let cloudDialog = document.querySelector('#cloudDialog');
-  cloudDialog.x = e.clientX;
-  cloudDialog.y = e.clientY;
+  let rect = e.target.getBoundingClientRect();
+  let x = rect.x + rect.width / 2;
+  let y = rect.y + rect.height / 2;
+  cloudDialog.x = x;
+  cloudDialog.y = y;
   cloudDialog.toggleAttribute('open', true);
 }
 

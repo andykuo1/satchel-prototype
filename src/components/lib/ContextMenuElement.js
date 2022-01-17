@@ -48,6 +48,8 @@ const INNER_STYLE = /* css */ `
 }
 `;
 
+const EXPECTED_MENU_PADDING = '1.4em'; // Manually calculated from stylesheet
+
 /**
  * @fires open
  * @fires close
@@ -147,33 +149,41 @@ export class ContextMenuElement extends HTMLElement {
         break;
     }
   }
-  
-  /** @private */
-  applyPosition(clientX, clientY) {
+
+  /**
+   * @private
+   * @param {number} clientX 
+   * @param {number} clientY 
+   * @returns {ContextMenuElement}
+   */
+  setPosition(clientX, clientY) {
     const contextMenu = this.containerElement;
     const innerContent = this.innerElement;
     const innerRect = innerContent.getBoundingClientRect();
     const width = innerRect.width;
     const height = innerRect.height;
-    const expectedPadding = '1.4em'; // Manually calculated from stylesheet
+    const root = document.documentElement;
+    const rootWidth = root.clientWidth;
+    const rootHeight = root.clientHeight;
     let bottom = false;
-    let left = false;
-    if (window.innerHeight < (clientY + height)) {
-      contextMenu.style.top = `calc(${clientY - height}px - ${expectedPadding})`;
+    let right = false;
+    if (rootHeight < (clientY + height)) {
+      contextMenu.style.top = `calc(${clientY - height}px - ${EXPECTED_MENU_PADDING})`;
       bottom = true;
     } else {
       contextMenu.style.top = `${clientY}px`;
     }
-    if (window.innerWidth < (clientX + width)) {
-      contextMenu.style.left = `calc(${clientX - width}px - ${expectedPadding})`;
+    if (rootWidth < (clientX + width)) {
+      contextMenu.style.left = `calc(${clientX - width}px - ${EXPECTED_MENU_PADDING})`;
+      right = true;
     } else {
       contextMenu.style.left = `${clientX}px`;
-      left = true;
     }
-    contextMenu.classList.toggle('bottomleft', bottom && left);
-    contextMenu.classList.toggle('bottomright', bottom && !left);
-    contextMenu.classList.toggle('topleft', !bottom && left);
-    contextMenu.classList.toggle('topright', !bottom && !left);
+    contextMenu.classList.toggle('bottomleft', bottom && !right);
+    contextMenu.classList.toggle('bottomright', bottom && right);
+    contextMenu.classList.toggle('topleft', !bottom && !right);
+    contextMenu.classList.toggle('topright', !bottom && right);
+    return this;
   }
 
   /** @private */
@@ -182,7 +192,7 @@ export class ContextMenuElement extends HTMLElement {
     if (contextMenu.classList.contains('visible')) {
       return;
     }
-    this.applyPosition(this.x, this.y);
+    this.setPosition(this.x, this.y);
     contextMenu.classList.add('visible');
     this.dispatchEvent(
       new CustomEvent('open', {
