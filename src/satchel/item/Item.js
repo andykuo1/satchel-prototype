@@ -19,6 +19,7 @@ import { uuid } from '../../util/uuid.js';
  * @param {ItemId} itemId
  */
 export function createItem(itemId) {
+  // NOTE: Order matters! New properties should always be added at the end.
   let item = {
     itemId,
     width: 1,

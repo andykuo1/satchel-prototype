@@ -186,12 +186,12 @@ export class ItemDialogElement extends HTMLElement {
         let giftTarget = document.querySelector('#giftTarget');
         let ctx = getCursorContext();
         if (ctx.server && ctx.server.instance) {
-          const localServer = /** @type {import('../../satchel/app/PeerSatchel.js').SatchelServer} */ (ctx.server.instance);
+          const localServer = /** @type {import('../../satchel/peer/PeerSatchel.js').SatchelServer} */ (ctx.server.instance);
           const playerNames = ActivityPlayerList.getPlayerNameListOnServer(localServer);
           let content = playerNames.map(clientName => `<option>${clientName.toLowerCase()}</option>`).join('\n');
           giftTarget.innerHTML = content;
         } else if (ctx.client && ctx.client.instance) {
-          const localClient = /** @type {import('../../satchel/app/PeerSatchel.js').SatchelClient} */ (ctx.client.instance);
+          const localClient = /** @type {import('../../satchel/peer/PeerSatchel.js').SatchelClient} */ (ctx.client.instance);
           const playerNames = ActivityPlayerList.getPlayerNameListOnClient(localClient);
           let content = playerNames.map(clientName => `<option>${clientName.toLowerCase()}</option>`).join('\n');
           giftTarget.innerHTML = content;
