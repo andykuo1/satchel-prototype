@@ -18,11 +18,17 @@ import {
   addProfileInStore,
 } from '../store/ProfileStore.js';
 import { createGridInvInStore } from '../store/InvStore.js';
+import { loadFromStorage, saveToStorage } from '../Storage.js';
 
 export function setupActiveProfile() {
   const store = getSatchelStore();
   const ctx = getCursorContext();
-  const activeProfile = resolveActiveProfile(store);
+  let activeProfile = resolveActiveProfile(store);
+  let storedProfileId = loadFromStorage('activeProfileId');
+  if (storedProfileId) {
+    changeActiveProfile(store, storedProfileId);
+    activeProfile = resolveActiveProfile(store);
+  }
   ctx.lastActiveProfileId = activeProfile.profileId;
   addActiveProfileChangeListener(store, onActiveProfileChange);
   addProfileChangeListener(store, activeProfile.profileId, onProfileChange);
@@ -38,6 +44,7 @@ export function teardownActiveProfile() {
   let lastActiveProfileId = ctx.lastActiveProfileId;
   removeActiveProfileChangeListener(store, onActiveProfileChange);
   removeProfileChangeListener(store, lastActiveProfileId, onProfileChange);
+  saveToStorage('activeProfileId', lastActiveProfileId);
 }
 
 export function changeActiveProfile(store, profileId) {
@@ -81,6 +88,7 @@ function onActiveProfileChange() {
   addProfileChangeListener(store, nextActiveProfile.profileId, onProfileChange);
   ctx.lastActiveProfileId = nextActiveProfile.profileId;
   onProfileChange();
+  saveToStorage('activeProfileId', nextActiveProfile);
 }
 
 function onProfileChange() {
