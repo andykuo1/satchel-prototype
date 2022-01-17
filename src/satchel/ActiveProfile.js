@@ -84,11 +84,12 @@ function onActiveProfileChange() {
   if (lastActiveProfileId) {
     removeProfileChangeListener(store, lastActiveProfileId, onProfileChange);
   }
-  let nextActiveProfile = resolveActiveProfile(store);
-  addProfileChangeListener(store, nextActiveProfile.profileId, onProfileChange);
-  ctx.lastActiveProfileId = nextActiveProfile.profileId;
+  const nextActiveProfile = resolveActiveProfile(store);
+  const nextActiveProfileId = nextActiveProfile.profileId;
+  addProfileChangeListener(store, nextActiveProfileId, onProfileChange);
+  ctx.lastActiveProfileId = nextActiveProfileId;
   onProfileChange();
-  saveToStorage('activeProfileId', nextActiveProfile);
+  saveToStorage('activeProfileId', nextActiveProfileId);
 }
 
 function onProfileChange() {

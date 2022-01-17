@@ -49,20 +49,61 @@ export function describeJSONFormat(formatType, create, exportToJSON, importFromJ
     let jsonString = JSON.stringify(exported);
     assert.exists(jsonString);
     assert.notEqual(jsonString, '[Object object]');
-    let parsed = JSON.parse(jsonString);
+    let parsed;
+    assert.doesNotThrow(() => parsed = JSON.parse(jsonString));
     assert.isNotEmpty(parsed);
     assert.deepStrictEqual(parsed, exported);
   });
-  it('should be consistent', () => {
+  it('should be idempotent to create', () => {
     let created = create('test');
+    let created2 = create('test');
+    assert.deepStrictEqual(created2, created);
+  });
+  it('should be idempotent to export', () => {
+    let created = create('test');
+    let created2 = create('test');
     let exported = exportToJSON(created);
     let exported2 = exportToJSON(created);
     // Ignore metadata since it is time-sensitive
     exported2._meta = exported._meta;
-    assert.deepStrictEqual(exported2, exported, 'exports on the same data should be the same.');
+    assert.deepStrictEqual(created2, created, 'exports should not change source data.');
+    assert.deepStrictEqual(exported2, exported, 'exports on the same data should have same results.');
+  });
+  it('should be idempotent to import', () => {
+    let created = create('test');
+    let created2 = create('test');
+    let exported = exportToJSON(created);
+    let exported2 = exportToJSON(created);
+    // Ignore metadata since it is time-sensitive
+    exported2._meta = exported._meta;
     let imported = importFromJSON(exported);
     let imported2 = importFromJSON(exported);
-    assert.deepStrictEqual(imported2, imported, 'imports on the same data should be the same.');
+    assert.deepStrictEqual(created2, created, 'imports should not change source data.');
+    assert.deepStrictEqual(exported2, exported, 'imports should not change export data.');
+    assert.deepStrictEqual(imported2, imported, 'imports on the same data should have same results.');
+  });
+  it('should be isolated and deeply created', () => {
+    let created = create('test');
+    let created2 = create('test');
+    deeplyMangleObject(created2);
+    assert.isTrue(isObjectMangledDeeply(created2));
+    assert.isFalse(isObjectMangledDeeply(created));
+  });
+  it('should be isolated deeply exported from source', () => {
+    let created = create('test');
+    let exported = exportToJSON(created);
+    deeplyMangleObject(exported);
+    assert.isTrue(isObjectMangledDeeply(exported));
+    assert.isFalse(isObjectMangledDeeply(created));
+  });
+  it('should be isolated deeply imported from source', () => {
+    let created = create('test');
+    let exported = exportToJSON(created);
+    let imported = importFromJSON(exported);
+    deeplyMangleObject(imported);
+    assert.isTrue(isObjectMangledDeeply(imported));
+    assert.isFalse(isObjectMangledDeeply(exported));
+    assert.isFalse(isObjectMangledDeeply(created));
   });
   it('should be persistent', () => {
     let created = create('test');
@@ -119,4 +160,28 @@ export function describeBackwardsCompatibleJSONFormat(
       });
     });
   }
+}
+
+function deeplyMangleObject(obj) {
+  obj.__FOO__ = '__BAR__';
+  for(let key of Object.keys(obj)) {
+    let value = obj[key];
+    if (typeof value === 'object' && value !== null) {
+      deeplyMangleObject(value);
+    }
+  }
+}
+
+function isObjectMangledDeeply(obj) {
+  let keys = Object.keys(obj);
+  for(let key of keys) {
+    let value = obj[key];
+    if (key === '__FOO__') {
+      return value === '__BAR__';
+    }
+    if (typeof value === 'object' && value !== null && isObjectMangledDeeply(value)) {
+      return true;
+    }
+  }
+  return false;
 }
