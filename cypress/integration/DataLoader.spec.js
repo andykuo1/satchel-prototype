@@ -9,14 +9,16 @@ describe('The data loader', () => {
   });
   it('should be persistent', () => {
     let formatType = 'exampleV1';
-    let data = { data: 'data', random: Math.random() };
-    let metadata = { meta: 'meta', random: Math.random() };
+    let data = { data: 'data', random: Math.floor(Math.random() * 100) };
+    let metadata = { meta: 'meta', random: Math.floor(Math.random() * 100) };
     let exported = exportDataToJSON(formatType, data, metadata);
     let [imported, importedMeta] = importDataFromJSON(exported, formatType, (data, metadata) => [
       data,
       metadata,
     ]);
     assert.deepStrictEqual(imported, data);
+    // Ignore time metadata
+    delete importedMeta.time;
     assert.deepStrictEqual(importedMeta, metadata);
   });
 });
