@@ -1,5 +1,4 @@
 import { getSatchelStore } from '../../store/SatchelStore.js';
-import { getExistingInventory } from '../../satchel/inv/InventoryTransfer.js';
 import { getItemByItemId } from '../../satchel/inv/InvItems.js';
 import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../../satchel/inv/InvSlots.js';
 import { copyItem } from '../../satchel/item/Item.js';
@@ -110,6 +109,7 @@ export function containerMouseUpCallback(
   }
   const swappable = !containerElement.hasAttribute('nooutput');
   const mergable = !containerElement.hasAttribute('noinput');
+  const shiftKey = mouseEvent.shiftKey;
   const boundingRect = containerElement._container.getBoundingClientRect();
   const clientCoordX = getClientCoordX(
     boundingRect,
@@ -122,7 +122,7 @@ export function containerMouseUpCallback(
     unitSize
   );
   let cursor = getCursor();
-  let result = cursor.putDown(containerElement.invId, clientCoordX, clientCoordY, swappable, mergable);
+  let result = cursor.putDown(containerElement.invId, clientCoordX, clientCoordY, swappable, mergable, shiftKey);
   if (result) {
     // HACK: This should really grab focus to the item.
     let activeElement = document.activeElement;

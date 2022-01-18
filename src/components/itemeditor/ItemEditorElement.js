@@ -862,8 +862,9 @@ export class ItemEditorElement extends HTMLElement {
     if (!this.hasAttribute('editable')) {
       return;
     }
+    // TODO: Shift key needed here. But where to poll?
     let cursor = getCursor();
-    let result = cursor.putDown(this.socket.invId, 0, 0, true, true);
+    let result = cursor.putDown(this.socket.invId, 0, 0, true, true, false);
     if (result) {
       e.preventDefault();
       e.stopPropagation();

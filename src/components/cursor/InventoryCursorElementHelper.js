@@ -11,6 +11,7 @@ import { getItemByItemId } from '../../satchel/inv/InvItems.js';
 import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../../satchel/inv/InvSlots.js';
 import { getInvInStore } from '../../store/InvStore.js';
 import { dispatchItemChange } from '../../events/ItemEvents.js';
+import { copyItem } from '../../satchel/item/Item.js';
 
 /**
  * @typedef {import('../../satchel/inv/Inv.js').Inventory} Inventory
@@ -31,6 +32,7 @@ import { dispatchItemChange } from '../../events/ItemEvents.js';
  * @param {number} coordY
  * @param {boolean} swappable
  * @param {boolean} mergable
+ * @param {boolean} shiftKey
  */
 export function putDownToSocketInventory(
   cursor,
@@ -39,7 +41,8 @@ export function putDownToSocketInventory(
   coordX,
   coordY,
   swappable,
-  mergable
+  mergable,
+  shiftKey
 ) {
   let heldItem = cursor.getHeldItem();
   let prevItem = getItemAtSlotIndex(store, toInvId, 0);
@@ -56,15 +59,10 @@ export function putDownToSocketInventory(
       prevItemY = y;
       prevItem = getItemByItemId(inv, prevItemId);
       // If we can merge, do it now.
-      if (mergable && isMergableItems(prevItem, heldItem)) {
-        mergeItems(prevItem, heldItem);
-        dispatchItemChange(store, prevItemId);
-        // Merged successfully! Discard the held item.
-        cursor.clearHeldItem();
+      if (tryMergeItems(store, cursor, prevItem, heldItem, mergable, shiftKey)) {
         return true;
-      } else {
-        removeItemFromInventory(store, toInvId, prevItemId);
       }
+      // ...otherwise we continue with the swap.
       removeItemFromInventory(store, toInvId, prevItemId);
     } else {
       // Cannot swap. Exit early.
@@ -93,6 +91,7 @@ export function putDownToSocketInventory(
  * @param {number} itemY The root slot coordinates to place item (includes holding offset)
  * @param {boolean} swappable
  * @param {boolean} mergable
+ * @param {boolean} shiftKey
  */
 export function putDownToGridInventory(
   cursor,
@@ -101,7 +100,8 @@ export function putDownToGridInventory(
   itemX,
   itemY,
   swappable,
-  mergable
+  mergable,
+  shiftKey,
 ) {
   const toInventory = getInvInStore(store, toInvId);
   const heldItem = cursor.getHeldItem();
@@ -153,15 +153,21 @@ export function putDownToGridInventory(
       prevItemY = y;
       prevItem = getItemByItemId(inv, prevItemId);
       // If we can merge, do it now.
-      if (mergable && isMergableItems(prevItem, heldItem)) {
-        mergeItems(prevItem, heldItem);
-        dispatchItemChange(store, prevItemId);
-        // Merged successfully! Discard the held item.
-        cursor.clearHeldItem();
+      if (tryMergeItems(store, cursor, prevItem, heldItem, mergable, shiftKey)) {
         return true;
-      } else {
-        removeItemFromInventory(store, toInvId, prevItemId);
       }
+      // ...otherwise we continue with the swap.
+      removeItemFromInventory(store, toInvId, prevItemId);
+    } else if (shiftKey && heldItem.stackSize > 1) {
+      // No item in the way and we want to partially drop stack.
+      let newStackSize = Math.floor(heldItem.stackSize / 2);
+      let remaining = heldItem.stackSize - newStackSize;
+      let newItem = copyItem(heldItem);
+      newItem.stackSize = newStackSize;
+      heldItem.stackSize = remaining;
+      dispatchItemChange(store, heldItem.itemId);
+      addItemToInventory(store, toInvId, newItem, targetCoordX, targetCoordY);
+      return true;
     }
     // Now there are no items in the way. Place it down!
     cursor.clearHeldItem();
@@ -192,6 +198,33 @@ export function putDownToGridInventory(
     // No can do :(
     return false;
   }
+}
+
+function tryMergeItems(store, cursor, prevItem, heldItem, mergable, shiftKey) {
+  // If we can merge, do it now.
+  if (!mergable || !isMergableItems(prevItem, heldItem)) {
+    return false;
+  }
+  // Full merge!
+  if (!shiftKey) {
+    mergeItems(prevItem, heldItem);
+    dispatchItemChange(store, prevItem.itemId);
+    // Merged successfully! Discard the held item.
+    cursor.clearHeldItem();
+    return true;
+  }
+  // If not enough items, stop here.
+  if (heldItem.stackSize <= 1) {
+    return true;
+  }
+  // Partial merge!
+  let amount = Math.floor(heldItem.stackSize / 2);
+  let remaining = heldItem.stackSize - amount;
+  prevItem.stackSize += amount;
+  heldItem.stackSize = remaining;
+  dispatchItemChange(store, prevItem.itemId);
+  dispatchItemChange(store, heldItem.itemId);
+  return true;
 }
 
 /**
