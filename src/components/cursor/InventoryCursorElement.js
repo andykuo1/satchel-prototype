@@ -208,8 +208,9 @@ export class InventoryCursorElement extends HTMLElement {
    * @param {number} coordX
    * @param {number} coordY
    * @param {boolean} swappable
+   * @param {boolean} mergable
    */
-  putDown(invId, coordX, coordY, swappable) {
+  putDown(invId, coordX, coordY, swappable, mergable) {
     const store = getSatchelStore();
     const heldItem = this.getHeldItem();
     if (!heldItem) {
@@ -225,7 +226,7 @@ export class InventoryCursorElement extends HTMLElement {
     const invType = toInventory.type;
     switch (invType) {
       case 'socket':
-        return putDownToSocketInventory(this, store, invId, coordX, coordY, swappable);
+        return putDownToSocketInventory(this, store, invId, coordX, coordY, swappable, mergable);
       case 'grid':
         return putDownToGridInventory(
           this,
@@ -233,7 +234,8 @@ export class InventoryCursorElement extends HTMLElement {
           invId,
           coordX + this.heldOffsetX,
           coordY + this.heldOffsetY,
-          swappable
+          swappable,
+          mergable
         );
       default:
         throw new Error('Unsupported inventory type.');

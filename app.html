@@ -612,10 +612,26 @@
       </div>
     </context-menu>
 
+    <style>
+      #itemCodeDialog[open] {
+        display: flex;
+      }
+      #itemCodeDialog > div {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+      #itemCodeInput {
+        resize: none;
+      }
+    </style>
     <context-menu id="itemCodeDialog">
-      <h3 style="margin: 0;">Item Code</h3>
-      <input id="itemCodeInput" type="text" placeholder="Paste item code here...">
-      <button id="itemCodeSubmit">Submit</button>
+      <div>
+        <h3 style="margin: 0;">Item Code</h3>
+        <textarea id="itemCodeInput" type="text" style="flex: 1;" placeholder="Paste here..."></textarea>
+        <button id="itemCodeSubmit" class="bigButton">Submit</button>
+      </div>
     </context-menu>
 
     <banner-prompt id="busyDialog" required>

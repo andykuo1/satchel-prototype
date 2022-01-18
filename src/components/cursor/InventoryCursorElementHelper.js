@@ -10,6 +10,7 @@ import {
 import { getItemByItemId } from '../../satchel/inv/InvItems.js';
 import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../../satchel/inv/InvSlots.js';
 import { getInvInStore } from '../../store/InvStore.js';
+import { dispatchItemChange } from '../../events/ItemEvents.js';
 
 /**
  * @typedef {import('../../satchel/inv/Inv.js').Inventory} Inventory
@@ -29,6 +30,7 @@ import { getInvInStore } from '../../store/InvStore.js';
  * @param {number} coordX
  * @param {number} coordY
  * @param {boolean} swappable
+ * @param {boolean} mergable
  */
 export function putDownToSocketInventory(
   cursor,
@@ -36,7 +38,8 @@ export function putDownToSocketInventory(
   toInvId,
   coordX,
   coordY,
-  swappable
+  swappable,
+  mergable
 ) {
   let heldItem = cursor.getHeldItem();
   let prevItem = getItemAtSlotIndex(store, toInvId, 0);
@@ -52,6 +55,16 @@ export function putDownToSocketInventory(
       prevItemX = x;
       prevItemY = y;
       prevItem = getItemByItemId(inv, prevItemId);
+      // If we can merge, do it now.
+      if (mergable && isMergableItems(prevItem, heldItem)) {
+        mergeItems(prevItem, heldItem);
+        dispatchItemChange(store, prevItemId);
+        // Merged successfully! Discard the held item.
+        cursor.clearHeldItem();
+        return true;
+      } else {
+        removeItemFromInventory(store, toInvId, prevItemId);
+      }
       removeItemFromInventory(store, toInvId, prevItemId);
     } else {
       // Cannot swap. Exit early.
@@ -79,6 +92,7 @@ export function putDownToSocketInventory(
  * @param {number} itemX The root slot coordinates to place item (includes holding offset)
  * @param {number} itemY The root slot coordinates to place item (includes holding offset)
  * @param {boolean} swappable
+ * @param {boolean} mergable
  */
 export function putDownToGridInventory(
   cursor,
@@ -86,7 +100,8 @@ export function putDownToGridInventory(
   toInvId,
   itemX,
   itemY,
-  swappable
+  swappable,
+  mergable
 ) {
   const toInventory = getInvInStore(store, toInvId);
   const heldItem = cursor.getHeldItem();
@@ -130,14 +145,23 @@ export function putDownToGridInventory(
     let prevItemX = -1;
     let prevItemY = -1;
     if (prevItemId) {
-      // Has an item to swap. So pick up this one for later.
+      // Has an item to swap or merge. So pick up this one for later.
       let inv = getExistingInventory(store, toInvId);
       let slotIndex = getSlotIndexByItemId(inv, prevItemId);
       let [x, y] = getSlotCoordsByIndex(inv, slotIndex);
       prevItemX = x;
       prevItemY = y;
       prevItem = getItemByItemId(inv, prevItemId);
-      removeItemFromInventory(store, toInvId, prevItemId);
+      // If we can merge, do it now.
+      if (mergable && isMergableItems(prevItem, heldItem)) {
+        mergeItems(prevItem, heldItem);
+        dispatchItemChange(store, prevItemId);
+        // Merged successfully! Discard the held item.
+        cursor.clearHeldItem();
+        return true;
+      } else {
+        removeItemFromInventory(store, toInvId, prevItemId);
+      }
     }
     // Now there are no items in the way. Place it down!
     cursor.clearHeldItem();
@@ -168,6 +192,55 @@ export function putDownToGridInventory(
     // No can do :(
     return false;
   }
+}
+
+/**
+ * @param {Item} item 
+ * @param {Item} other 
+ */
+function mergeItems(item, other) {
+  item.stackSize += other.stackSize;
+  if (other.description) {
+    if (item.description) {
+      item.description += '\n\n';
+    }
+    item.description += other.description;
+  }
+  if (other.metadata) {
+    item.metadata = {
+      ...item.metadata,
+      ...other.metadata,
+    };
+  }
+  return item;
+}
+
+/**
+ * @param {Item} item 
+ * @param {Item} other 
+ */
+function isMergableItems(item, other) {
+  if (item.stackSize < 0 || other.stackSize < 0) {
+    // Only merge if already stackable.
+    return false;
+  }
+  if (item.imgSrc !== other.imgSrc) {
+    return false;
+  }
+  if (item.displayName !== other.displayName) {
+    return false;
+  }
+  if (item.width !== other.width || item.height !== other.height) {
+    return false;
+  }
+  if (item.background !== other.background) {
+    return false;
+  }
+  if (item.itemId === other.itemId) {
+    // Cannot self merge.
+    return false;
+  }
+  return true;
 }
 
 /**

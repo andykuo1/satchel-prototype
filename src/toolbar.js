@@ -215,6 +215,7 @@ async function onActionItemCodeSubmit() {
   /** @type {HTMLInputElement} */
   let itemCodeInput = document.querySelector('#itemCodeInput');
   let itemString = itemCodeInput.value;
+  console.log(itemString);
   itemCodeInput.value = '';
   let newItem;
   try {

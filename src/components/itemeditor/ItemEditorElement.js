@@ -863,7 +863,7 @@ export class ItemEditorElement extends HTMLElement {
       return;
     }
     let cursor = getCursor();
-    let result = cursor.putDown(this.socket.invId, 0, 0, true);
+    let result = cursor.putDown(this.socket.invId, 0, 0, true, true);
     if (result) {
       e.preventDefault();
       e.stopPropagation();
