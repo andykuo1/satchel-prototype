@@ -200,7 +200,7 @@ export function putDownToGridInventory(
  */
 function mergeItems(item, other) {
   item.stackSize += other.stackSize;
-  if (other.description) {
+  if (item.description !== other.description && other.description) {
     if (item.description) {
       item.description += '\n\n';
     }

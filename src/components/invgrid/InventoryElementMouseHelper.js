@@ -5,6 +5,8 @@ import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../../satchel/inv/In
 import { copyItem } from '../../satchel/item/Item.js';
 
 import { getCursor } from '../cursor/index.js';
+import { getInvInStore } from '../../store/InvStore.js';
+import { dispatchItemChange } from '../../events/ItemEvents.js';
 
 /**
  * @typedef {import('./InventoryItemElement.js').InventoryItemElement} InventoryItemElement
@@ -37,11 +39,14 @@ export function itemMouseDownCallback(mouseEvent, itemElement, unitSize) {
     mouseEvent.clientY,
     unitSize
   );
+  const store = getSatchelStore();
+  const itemId = itemElement.itemId;
+  const invId = containerElement.invId;
+  const inv = getInvInStore(store, invId);
+  const item = getItemByItemId(inv, itemId);
   let cursor = getCursor();
   let result;
   if (containerElement.hasAttribute('copyoutput')) {
-    const itemId = itemElement.itemId;
-    const invId = containerElement.invId;
     if (!itemId) {
       return;
     }
@@ -49,16 +54,31 @@ export function itemMouseDownCallback(mouseEvent, itemElement, unitSize) {
       // NOTE: Swapping is performed on putDown(), so ignore for pick up.
       return;
     }
-    let store = getSatchelStore();
-    let inv = getExistingInventory(store, invId);
+    let newItem = copyItem(item);
+    // Try splitting the stack.
+    if (mouseEvent.shiftKey && item.stackSize > 1) {
+      newItem.stackSize = Math.floor(item.stackSize / 2);
+    }
     const slotIndex = getSlotIndexByItemId(inv, itemId);
     const [fromItemX, fromItemY] = getSlotCoordsByIndex(inv, slotIndex);
-    const item = getItemByItemId(inv, itemId);
-    let newItem = copyItem(item);
     cursor.setHeldItem(newItem, fromItemX - clientCoordX, fromItemY - clientCoordY);
     result = true;
   } else {
-    result = cursor.pickUp(containerElement.invId, itemElement.itemId, clientCoordX, clientCoordY);
+    // Try splitting the stack.
+    if (mouseEvent.shiftKey && !cursor.hasHeldItem() && item.stackSize > 1) {
+      let newStackSize = Math.floor(item.stackSize / 2);
+      let remaining = item.stackSize - newStackSize;
+      let newItem = copyItem(item);
+      newItem.stackSize = newStackSize;
+      item.stackSize = remaining;
+      dispatchItemChange(store, itemId);
+      const slotIndex = getSlotIndexByItemId(inv, itemId);
+      const [fromItemX, fromItemY] = getSlotCoordsByIndex(inv, slotIndex);
+      cursor.setHeldItem(newItem, fromItemX - clientCoordX, fromItemY - clientCoordY);
+      result = true;
+    } else {
+      result = cursor.pickUp(containerElement.invId, itemId, clientCoordX, clientCoordY);
+    }
   }
   if (result) {
     // HACK: This should really grab focus to the item.
