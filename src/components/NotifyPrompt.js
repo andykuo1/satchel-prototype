@@ -1,27 +1,34 @@
+/** @typedef {import('./lib/BannerPromptElement.js').BannerPromptElement} BannerPromptElement */
+
 export async function notify(message, confirm = false) {
   return new Promise((resolve, reject) => {
-    /** @type {HTMLTemplateElement} */
-    let notifyTemplate = document.querySelector('#notifyTemplate');
-    let element = /** @type {HTMLElement} */ (notifyTemplate.content.cloneNode(true));
-    let dialog = element.querySelector('#notifyDialog');
-    let label = element.querySelector('#notifyLabel');
-    /** @type {HTMLButtonElement} */
-    let button = element.querySelector('#notifyConfirm');
-    processRichText(label, message);
-    button.addEventListener('click', () => {
-      dialog.toggleAttribute('open', false);
-      resolve();
-    });
-    dialog.addEventListener('close', () => {
-      element.remove();
-    });
-    if (confirm) {
-      dialog.toggleAttribute('required', true);
-    } else {
-      button.style.display = 'none';
-      resolve();
+    try {
+      /** @type {HTMLTemplateElement} */
+      let notifyTemplate = document.querySelector('#notifyTemplate');
+      let element = /** @type {BannerPromptElement} */ (notifyTemplate.content.firstElementChild.cloneNode(true));
+      let label = element.querySelector('label');
+      /** @type {HTMLButtonElement} */
+      let button = element.querySelector('button');
+      processRichText(label, message);
+      if (confirm) {
+        element.toggleAttribute('required', true);
+      } else {
+        button.style.display = 'none';
+      }
+      document.body.appendChild(element);
+      button.addEventListener('click', () => {
+        element.toggleAttribute('open', false);
+        resolve();
+      }, { once: true });
+      element.addEventListener('close', () => {
+        element.remove();
+      }, { once: true });
+      if (!confirm) {
+        resolve();
+      }
+    } catch (e) {
+      reject(e);
     }
-    document.body.appendChild(element);
   });
 }
 

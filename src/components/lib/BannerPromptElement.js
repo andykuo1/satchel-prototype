@@ -74,7 +74,7 @@ dialog[open]:not(.shake) {
   bottom: 0;
   width: 100%;
   height: 15em;
-  max-height: 70vh;
+  max-height: 50vh;
   border-width: 1em 0;
   overflow: hidden;
 }

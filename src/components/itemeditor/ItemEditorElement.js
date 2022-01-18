@@ -203,6 +203,9 @@ img {
 #itemWidth:disabled, #itemHeight:disabled {
   opacity: 0.3;
 }
+#itemWidth:disabled:empty, #itemHeight:disabled:empty {
+  visibility: hidden;
+}
 #itemWidth {
   z-index: 1;
   transform: translateX(30%);
