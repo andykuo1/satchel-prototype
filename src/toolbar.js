@@ -52,6 +52,8 @@ window.addEventListener('DOMContentLoaded', () => {
   el('#giftCodeExport', 'click', onGiftCodeExport);
   el('#giftSubmit', 'click', onGiftSubmit);
 
+  el('#itemCodeSubmit', 'click', onActionItemCodeSubmit);
+
   setupProfile();
   setupSync();
 
@@ -334,16 +336,48 @@ function onActionItemCodeExport() {
   });
 }
 
-async function onActionItemCodeImport() {
-  /** @type {import('./components/itemeditor/ItemEditorElement.js').ItemEditorElement} */
-  const itemEditor = document.querySelector('#itemEditor');
+async function onActionItemCodeImport(e) {
+  let newItem;
   try {
     let itemString = await pasteFromClipboard();
-    let newItem = importItemFromString(itemString);
+    newItem = importItemFromString(itemString);
+  } catch (e) {
+    // Do nothing.
+  }
+  if (newItem) {
+    /** @type {import('./components/itemeditor/ItemEditorElement.js').ItemEditorElement} */
+    const itemEditor = document.querySelector('#itemEditor');
     itemEditor.clearSocketedItem();
     itemEditor.putSocketedItem(newItem, true);
+  } else {
+    /** @type {import('./components/lib/ContextMenuElement.js').ContextMenuElement} */
+    const itemCodeDialog = document.querySelector('#itemCodeDialog');
+    let rect = e.target.getBoundingClientRect();
+    itemCodeDialog.x = rect.x + rect.width / 2;
+    itemCodeDialog.y = rect.y + rect.height / 2;
+    itemCodeDialog.toggleAttribute('open', true);
+  }
+}
+
+async function onActionItemCodeSubmit() {
+  /** @type {HTMLInputElement} */
+  let itemCodeInput = document.querySelector('#itemCodeInput');
+  let itemString = itemCodeInput.value;
+  itemCodeInput.value = '';
+  let newItem;
+  try {
+    newItem = importItemFromString(itemString);
   } catch (e) {
-    notify('Sorry! No valid item code to paste. Try copy the item code text then click this button again.\n\n' + e);
+    notify('Sorry! That is not a valid item code. Try copy a valid item code text then click this button again.\n\n' + e);
+  }
+  if (newItem) {
+    /** @type {import('./components/itemeditor/ItemEditorElement.js').ItemEditorElement} */
+    const itemEditor = document.querySelector('#itemEditor');
+    itemEditor.clearSocketedItem();
+    itemEditor.putSocketedItem(newItem, true);
+  } else {
+    const itemCodeDialog = document.querySelector('#itemCodeDialog');
+    itemCodeDialog.toggleAttribute('open', true);
   }
 }
 
