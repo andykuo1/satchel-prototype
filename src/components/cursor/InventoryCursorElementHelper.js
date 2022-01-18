@@ -68,6 +68,9 @@ export function putDownToSocketInventory(
       // Cannot swap. Exit early.
       return false;
     }
+  } else if (tryDropPartialItem(store, toInvId, heldItem, mergable, shiftKey, 0, 0)) {
+    // No item in the way and we want to partially drop singles.
+    return true;
   }
   // Now there are no items in the way. Place it down!
   cursor.clearHeldItem();
@@ -158,15 +161,8 @@ export function putDownToGridInventory(
       }
       // ...otherwise we continue with the swap.
       removeItemFromInventory(store, toInvId, prevItemId);
-    } else if (shiftKey && heldItem.stackSize > 1) {
-      // No item in the way and we want to partially drop stack.
-      let newStackSize = Math.floor(heldItem.stackSize / 2);
-      let remaining = heldItem.stackSize - newStackSize;
-      let newItem = copyItem(heldItem);
-      newItem.stackSize = newStackSize;
-      heldItem.stackSize = remaining;
-      dispatchItemChange(store, heldItem.itemId);
-      addItemToInventory(store, toInvId, newItem, targetCoordX, targetCoordY);
+    } else if (tryDropPartialItem(store, toInvId, heldItem, mergable, shiftKey, targetCoordX, targetCoordY)) {
+      // No item in the way and we want to partially drop singles.
       return true;
     }
     // Now there are no items in the way. Place it down!
@@ -200,6 +196,21 @@ export function putDownToGridInventory(
   }
 }
 
+function tryDropPartialItem(store, toInvId, heldItem, mergable, shiftKey, targetCoordX, targetCoordY) {
+  if (mergable && shiftKey && heldItem.stackSize > 1) {
+    // No item in the way and we want to partially drop singles.
+    let amount = 1;
+    let remaining = heldItem.stackSize - amount;
+    let newItem = copyItem(heldItem);
+    newItem.stackSize = amount;
+    heldItem.stackSize = remaining;
+    dispatchItemChange(store, heldItem.itemId);
+    addItemToInventory(store, toInvId, newItem, targetCoordX, targetCoordY);
+    return true;
+  }
+  return false;
+}
+
 function tryMergeItems(store, cursor, prevItem, heldItem, mergable, shiftKey) {
   // If we can merge, do it now.
   if (!mergable || !isMergableItems(prevItem, heldItem)) {
@@ -217,8 +228,8 @@ function tryMergeItems(store, cursor, prevItem, heldItem, mergable, shiftKey) {
   if (heldItem.stackSize <= 1) {
     return true;
   }
-  // Partial merge!
-  let amount = Math.floor(heldItem.stackSize / 2);
+  // Single merge!
+  let amount = 1;
   let remaining = heldItem.stackSize - amount;
   prevItem.stackSize += amount;
   heldItem.stackSize = remaining;
