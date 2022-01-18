@@ -21,10 +21,11 @@ const INNER_HTML = /* html */`
 `;
 const INNER_STYLE = /* css */`
 :host {
-  --background-color: #7f6b50;
-  --outline-color: #352e25;
-  --title-color: #662200;
-  --grid-color: rgba(0, 0, 0, 0.2);
+  --background-color: var(--satchel-background-color);
+  --outline-color: var(--satchel-outline-color);
+  --title-color: var(--satchel-title-color);
+  --grid-color: var(--satchel-grid-color);
+
   --container-width: 1;
   --container-height: 1;
   --item-unit-size: ${DEFAULT_ITEM_UNIT_SIZE}px;

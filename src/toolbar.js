@@ -25,6 +25,7 @@ import { saveItemToTrashAlbum } from './satchel/TrashAlbum.js';
 
 import { setupProfile } from './toolbar/profile.js';
 import { setupSync } from './toolbar/sync.js';
+import { notify } from './components/NotifyPrompt.js';
 
 function el(selector, event, callback) {
   document.querySelector(selector).addEventListener(event, callback);
@@ -340,7 +341,7 @@ async function onActionItemCodeImport() {
     itemEditor.clearSocketedItem();
     itemEditor.putSocketedItem(newItem, true);
   } catch (e) {
-    window.alert('Sorry! No valid item code to paste. Try copy the item code text then click this button again.\n\n' + e);
+    notify('Sorry! No valid item code to paste. Try copy the item code text then click this button again.\n\n' + e);
   }
 }
 

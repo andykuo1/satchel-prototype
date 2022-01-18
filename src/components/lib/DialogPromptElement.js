@@ -15,10 +15,6 @@ const INNER_STYLE = /* css */ `
   top: 50%;
   left: 50%;
   z-index: 10;
-  --foreground-color: #ffffff;
-  --background-color: #333333;
-  --outline-color: #444444;
-  --shadow-color: #222222;
 }
 dialog {
   position: relative;

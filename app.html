@@ -26,6 +26,19 @@
         overflow: hidden;
         font-family: Georgia, 'Times New Roman', Times, serif;
         box-shadow: inset 0 0 16rem #000000;
+
+        --foreground-color: #ffffff;
+        --background-color: #333333;
+        --outline-color: #444444;
+        --shadow-color: #111111;
+
+        --satchel-background-color: #7f6b50;
+        --satchel-outline-color: #352e25;
+        --satchel-title-color: #662200;
+        --satchel-grid-color: rgba(0, 0, 0, 0.2);
+
+        --item-background-color: rgba(0, 0, 0, 0.1);
+        --item-hover-color: rgba(0, 0, 0, 0.2);
       }
 
       .foreground {
@@ -46,20 +59,44 @@
       context-menu:not([open]) {
         display: none;
       }
+      banner-prompt:not([open]) {
+        display: none;
+      }
     </style>
   </head>
   <body>
     <style>
       .bigButton {
-        background-color: transparent;
         border: 0.2em solid #666666;
         border-radius: 1em;
         height: 3em;
-        color: #ffffff;
+        padding: 0 3em;
+        color: var(--foreground-color);
+        background-color: var(--background-color);
       }
       .bigButton:hover {
         cursor: pointer;
         background-color: rgba(255, 255, 255, 0.1);
+      }
+    </style>
+    <style>
+      .flexColumn {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+      .flexRow {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+      }
+      .flexPadding {
+        flex: 1;
+      }
+      .flexList {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
       }
     </style>
     <sidebar-layout>
@@ -119,6 +156,7 @@
           #itemEditor {
             flex: 1;
             overflow-y: auto;
+            z-index: 0;
           }
 
           .editorActions {
@@ -275,16 +313,16 @@
                 text-align: center;
                 overflow: auto;
               }
-              .padding {
+              .workspacePadding {
                 min-width: 4em;
                 min-height: 4em;
               }
             </style>
             <div id="workspace">
-              <div class="padding"></div>
+              <div class="workspacePadding"></div>
               <div id="localWorkspace"></div>
               <div id="remoteWorkspace"></div>
-              <div class="padding"></div>
+              <div class="workspacePadding"></div>
             </div>
             <style>
               .albumContainer {
@@ -357,11 +395,7 @@
       <falling-item id="falling"></falling-item>
     </div>
 
-    <item-dialog id="itemDialog">
-      <icon-button slot="actions" id="actionShareItem" icon="res/share.svg" alt="send" title="Send Item"></icon-button>
-    </item-dialog>
-
-    <dialog-prompt id="giftDialog">
+    <banner-prompt id="giftDialog">
       <h3>Share Item</h3>
       <fieldset id="giftCode">
         <legend>Item Code</legend>
@@ -376,41 +410,47 @@
           <button id="giftSubmit">Send</button>
         </p>
       </fieldset>
-    </dialog-prompt>
+    </banner-prompt>
 
-    <dialog-prompt id="settingsDialog" style="text-align: center;">
-      <h3>Settings</h3>
-      <p style="display: flex; flex-direction: column;">
-        <button id="actionEraseAll">Erase All Content</button>
-        <br>
-        <button id="uploadButton">Import Data</button>
-        <button id="downloadButton">Export Data</button>
-        <br>
-        <button id="actionImportGoogle" class="googleOnly">Import Google Drive</button>
-        <button disabled>Import Notion.so</button>
-        <button id="actionSignOut">Sign Out</button>
-        <br>
-        <button id="actionSoundToggle">Sound On/Off</button>
-      </p>
-      <small id="appVersion">v-.-.-</small>
-      <p>
-        <style>
-          #author {
-            font-family: monospace;
-            opacity: 0.3;
-            color: #ffffff;
-          }
-          #author:hover {
-            opacity: 0.6;
-          }
-        </style>
-        <a id="author" href="https://github.com/andykuo1/satchel" target="_blank">
-          <small>Made with ❤ by Andrew Kuo</small>
-        </a>
-      </p>
-    </dialog-prompt>
+    <banner-prompt id="settingsDialog" style="text-align: center;">
+      <div class="flexColumn">
+        <div class="flexPadding"></div>
+        <div>
+          <h3>Settings</h3>
+          <p style="display: flex; flex-direction: column;">
+            <button id="actionEraseAll">Erase All Content</button>
+            <br>
+            <button id="uploadButton">Import Data</button>
+            <button id="downloadButton">Export Data</button>
+            <br>
+            <button id="actionImportGoogle" class="googleOnly">Import Google Drive</button>
+            <button disabled>Import Notion.so</button>
+            <button id="actionSignOut">Sign Out</button>
+            <br>
+            <button id="actionSoundToggle">Sound On/Off</button>
+          </p>
+          <small id="appVersion">v-.-.-</small>
+          <p>
+            <style>
+              #author {
+                font-family: monospace;
+                opacity: 0.3;
+                color: #ffffff;
+              }
+              #author:hover {
+                opacity: 0.6;
+              }
+            </style>
+            <a id="author" href="https://github.com/andykuo1/satchel" target="_blank">
+              <small>Made with ❤ by Andrew Kuo</small>
+            </a>
+          </p>
+        </div>
+        <div class="flexPadding"></div>
+      </div>
+    </banner-prompt>
 
-    <dialog-prompt id="profilesDialog">
+    <banner-prompt id="profilesDialog">
       <style>
         #profilesDialog h3 {
           margin: 0;
@@ -437,13 +477,19 @@
           height: 2em;
         }
       </style>
-      <h3>Profiles</h3>
-      <p id="activeProfileList"></p>
-      <button id="actionProfileNew">New Profile</button>
-      <button id="actionProfileImport">Import Profile</button>
-    </dialog-prompt>
+      <div class="flexColumn">
+        <div class="flexPadding"></div>
+        <div>
+          <h3>Profiles</h3>
+          <p id="activeProfileList"></p>
+          <button id="actionProfileNew">New Profile</button>
+          <button id="actionProfileImport">Import Profile</button>
+        </div>
+        <div class="flexPadding"></div>
+      </div>
+    </banner-prompt>
 
-    <dialog-prompt id="inventoriesDialog">
+    <banner-prompt id="inventoriesDialog">
       <style>
         #inventoriesDialog h3 {
           margin: 0;
@@ -495,25 +541,42 @@
         <p id="activeInventoryList"></p>
         <button id="actionProfileInvNew" class="bigButton">+ Inventory</button>
       </fieldset>
-    </dialog-prompt>
+    </banner-prompt>
 
-    <dialog-prompt id="profileInventoryDialog">
-      <h3>New Inventory</h3>
-      <label for="actionProfileInvType">Type</label>
-      <select id="actionProfileInvType">
-        <option value="socket">Single</option>
-        <option value="grid" selected>Grid</option>
-        <option value="space">Borderless</option>
-      </select>
-      <label for="actionProfileInvTitle">Title</label>
-      <input id="actionProfileInvTitle" placeholder="Default">
-      <label for="actionProfileInvWidth">Width</label>
-      <input type="number" min="1" max="12" id="actionProfileInvWidth" value="1">
-      <label for="actionProfileInvHeight">Height</label>
-      <input type="number" min="1" max="12" id="actionProfileInvHeight" value="1">
-      <br>
-      <button id="actionProfileInvSubmit">Apply</button>
-    </dialog-prompt>
+    <banner-prompt id="profileInventoryDialog">
+      <style>
+        #profileInventoryDialog > div {
+          display: flex;
+          flex-direction: column;
+        }
+      </style>
+      <div>
+        <h3>New Inventory</h3>
+        <label for="actionProfileInvType">Type</label>
+        <select id="actionProfileInvType">
+          <option value="socket">Single</option>
+          <option value="grid" selected>Grid</option>
+          <option value="space">Borderless</option>
+        </select>
+        <label for="actionProfileInvTitle">Title</label>
+        <input id="actionProfileInvTitle" placeholder="Default">
+        <label for="actionProfileInvWidth">Width</label>
+        <input type="number" min="1" max="12" id="actionProfileInvWidth" value="1">
+        <label for="actionProfileInvHeight">Height</label>
+        <input type="number" min="1" max="12" id="actionProfileInvHeight" value="1">
+        <br>
+        <button id="actionProfileInvSubmit">Apply</button>
+      </div>
+    </banner-prompt>
+
+    <style>
+      #itemDialog {
+        z-index: 1;
+      }
+    </style>
+    <item-dialog id="itemDialog">
+      <icon-button slot="actions" id="actionShareItem" icon="res/share.svg" alt="send" title="Send Item"></icon-button>
+    </item-dialog>
 
     <style>
       #cloudDialog h3 {
@@ -535,7 +598,6 @@
         font-size: 0.5em;
       }
     </style>
-    <!-- Saves Remotely -->
     <context-menu id="cloudDialog">
       <h3>Sync to...</h3>
       <div class="cloudOptionList">
@@ -551,12 +613,27 @@
       </div>
     </context-menu>
 
-    <dialog-prompt id="busyDialog" required>
+    <banner-prompt id="busyDialog" required>
       <h2>
         <span id="busyLabel">Fetching Goblins</span>
         <span id="busyProgress">...</span>
       </h2>
-    </dialog-prompt>
+    </banner-prompt>
+
+    <template id="notifyTemplate">
+      <banner-prompt id="notifyDialog" horizontal open>
+        <div class="flexColumn">
+          <div class="flexPadding"></div>
+          <div class="flexList">
+            <h3 style="width: 60%; font-family: fantasy;">
+              <span id="notifyLabel">You hear footsteps is approaching...</span>
+            </h3>
+            <button id="notifyConfirm" class="bigButton" style="margin-bottom: 2em;">Accept</button>
+          </div>
+          <div class="flexPadding"></div>
+        </div>
+      </banner-prompt>
+    </template>
 
     <script type="module" src="src/main.js"></script>
   </body>

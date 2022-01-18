@@ -195,7 +195,7 @@ img {
 }
 
 #itemWidth, #itemHeight {
-  color: #ffffff;
+  color: var(--foreground-color);
   width: 2.5em;
   background: none;
   border: none;
@@ -216,7 +216,7 @@ img {
   flex: 1;
   background: none;
   border: none;
-  color: #ffffff;
+  color: var(--foreground-color);
   margin-left: 0.5em;
 }
 .rootContainer[disabled] label[for="itemImage"] {

@@ -14,13 +14,13 @@ import { dropFallingItem } from '../cursor/FallingItemElement.js';
 /** @typedef {import('../../satchel/item/Item.js').Item} Item */
 
 const INNER_HTML = /* html */`
-<dialog-prompt>
+<banner-prompt>
   <item-editor>
-  <icon-button slot="actions" id="actionFoundry" icon="res/anvil.svg" alt="foundry" title="Edit in Foundry"></icon-button>
+    <icon-button slot="actions" id="actionFoundry" icon="res/anvil.svg" alt="foundry" title="Edit in Foundry"></icon-button>
     <icon-button slot="actions" id="actionFoundryShare" icon="res/share.svg" alt="share" title="Share Item"></icon-button>
     <icon-button slot="actions" id="actionDuplicate" icon="res/duplicate.svg" alt="duplicate" title="Duplicate Item"></icon-button>
   </item-editor>
-</dialog-prompt>
+</banner-prompt>
 `;
 const INNER_STYLE = /* css */`
 `;
@@ -67,7 +67,7 @@ export class ItemDialogElement extends HTMLElement {
      * @private
      * @type {DialogPromptElement}
      */
-     this.dialog = shadowRoot.querySelector('dialog-prompt');
+     this.dialog = shadowRoot.querySelector('banner-prompt');
     /**
      * @private
      * @type {ItemEditorElement}

@@ -18,8 +18,9 @@ const INNER_HTML = /* html */`
 `;
 const INNER_STYLE = /* css */`
 :host {
-  --background-color: rgba(0, 0, 0, 0.1);
-  --hover-color: rgba(0, 0, 0, 0.2);
+  --background-color: var(--item-background-color);
+  --hover-color: var(--item-hover-color);
+  
   --itemX: 0;
   --itemY: 0;
   --itemWidth: 1;
@@ -42,7 +43,7 @@ const INNER_STYLE = /* css */`
   background: var(--itemBackground, var(--background-color));
 }
 .container:hover {
-  z-index: 1;
+  z-index: 5;
 }
 .container:hover .innerContainer {
   background-color: var(--hover-color);
