@@ -5,7 +5,7 @@ import { isAlbumExpanded, isAlbumLocked, setAlbumExpanded, setAlbumLocked } from
 import { getCursor } from '../cursor/index.js';
 import { downloadText } from '../../util/downloader.js';
 import { cloneItem } from '../../satchel/item/Item.js';
-import { exportAlbumToJSON, importAlbumFromJSON } from '../../loader/AlbumLoader.js';
+import { exportAlbumToJSON } from '../../loader/AlbumLoader.js';
 import { deleteAlbumInStore, getAlbumInStore, isAlbumInStore } from '../../store/AlbumStore.js';
 import { addAlbumChangeListener, dispatchAlbumChange, removeAlbumChangeListener } from '../../events/AlbumEvents.js';
 import { IconButtonElement } from '../lib/IconButtonElement.js';
@@ -15,7 +15,6 @@ import { isGroundAlbum } from '../../satchel/GroundAlbum.js';
 import { isFoundryAlbum } from '../../satchel/FoundryAlbum.js';
 import { isInvInStore, getInvInStore, deleteInvInStore, createSocketInvInStore } from '../../store/InvStore.js';
 import { isTrashAlbum } from '../../satchel/TrashAlbum.js';
-import { uploadFile } from '../../util/uploader.js';
 import { updateList } from '../ElementListHelper.js';
 
 /** @typedef {import('../invgrid/InventoryGridElement.js').InventoryGridElement} InventoryGridElement */
@@ -29,7 +28,6 @@ const INNER_HTML = /* html */`
   <span class="actionbar">
     <icon-button class="button" id="buttonDelete" icon="res/delete.svg" alt="clear" title="Clear Album"></icon-button>
     <icon-button class="button" id="buttonExport" icon="res/download.svg" alt="export" title="Export Album"></icon-button>
-    <icon-button class="button" id="buttonImport" icon="res/upload.svg" alt="import" title="Import Album"></icon-button>
     <icon-button class="button" id="buttonLock" icon="res/unlock.svg" alt="lock" title="Lock Album"></icon-button>
   </span>
   <label id="labelEmpty" class="hidden">- - - - - Empty - - - - -</label>
@@ -154,8 +152,6 @@ export class AlbumPackElement extends HTMLElement {
     /** @private */
     this.buttonLock = /** @type {IconButtonElement} */ (shadowRoot.querySelector('#buttonLock'));
     /** @private */
-    this.buttonImport = shadowRoot.querySelector('#buttonImport');
-    /** @private */
     this.buttonExpand = /** @type {IconButtonElement} */ (shadowRoot.querySelector('#buttonExpand'));
 
     /**
@@ -179,8 +175,6 @@ export class AlbumPackElement extends HTMLElement {
     /** @private */
     this.onButtonDelete = this.onButtonDelete.bind(this);
     /** @private */
-    this.onButtonImport = this.onButtonImport.bind(this);
-    /** @private */
     this.onButtonExpand = this.onButtonExpand.bind(this);
     
     /** @private */
@@ -200,7 +194,6 @@ export class AlbumPackElement extends HTMLElement {
     this.buttonLock.addEventListener('click', this.onButtonLock);
     this.buttonExport.addEventListener('click', this.onButtonExport);
     this.buttonDelete.addEventListener('click', this.onButtonDelete);
-    this.buttonImport.addEventListener('click', this.onButtonImport);
     this.buttonExpand.addEventListener('click', this.onButtonExpand);
     this.container.addEventListener('mouseup', this.onItemDrop);
   }
@@ -220,7 +213,6 @@ export class AlbumPackElement extends HTMLElement {
     this.buttonLock.removeEventListener('click', this.onButtonLock);
     this.buttonExport.removeEventListener('click', this.onButtonExport);
     this.buttonDelete.removeEventListener('click', this.onButtonDelete);
-    this.buttonImport.removeEventListener('click', this.onButtonImport);
     this.buttonExpand.removeEventListener('click', this.onButtonExpand);
     this.container.removeEventListener('mouseup', this.onItemDrop);
     
@@ -273,7 +265,6 @@ export class AlbumPackElement extends HTMLElement {
     this.buttonLock.alt = locked ? 'unlock' : 'lock';
     this.buttonLock.title = locked ? 'Unlock Album' : 'Lock Album';
     this.buttonDelete.toggleAttribute('disabled', locked);
-    this.buttonImport.toggleAttribute('disabled', locked);
     this.inputTitle.toggleAttribute('contenteditable', !locked);
     this.container.classList.toggle('unlocked', !locked);
 
@@ -375,43 +366,6 @@ export class AlbumPackElement extends HTMLElement {
     const album = getAlbumInStore(store, albumId);
     deleteAlbumInStore(store, albumId, album);
     this.remove();
-  }
-
-  /** @private */
-  async onButtonImport() {
-    let files = await uploadFile('.json');
-    let file = files[0];
-
-    let jsonData;
-    try {
-      jsonData = JSON.parse(await file.text());
-    } catch {
-      window.alert('Cannot load file with invalid json format.');
-    }
-
-    switch(jsonData._type) {
-      case 'album_v2':
-      case 'album_v1': {
-        const store = getSatchelStore();
-        try {
-          // Replace this album with the new one.
-          const albumId = this.albumId;
-          const album = getAlbumInStore(store, albumId);
-          clearItemsInAlbum(store, albumId);
-          importAlbumFromJSON(jsonData, album);
-          // Preserve original album id and always expand
-          album.albumId = albumId;
-          album.expand = true;
-          dispatchAlbumChange(store, albumId);
-        } catch (e) {
-          console.error('Failed to load satchel from file.');
-          console.error(e);
-        }
-      } break;
-      default:
-        window.alert('Cannot load json - this is not a valid album.');
-        return;
-    }
   }
 
   /** @private */

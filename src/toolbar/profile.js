@@ -1,5 +1,5 @@
 import { dispatchProfileChange } from '../events/ProfileEvents.js';
-import { loadSatchelProfilesFromData, saveSatchelProfilesToData } from '../loader/SatchelLoader.js';
+import { saveSatchelProfilesToData } from '../loader/SatchelLoader.js';
 import { resolveActiveProfile } from '../satchel/ActiveProfile.js';
 import { createAlbum } from '../satchel/album/Album.js';
 import { createGridInventory, createSocketInventory } from '../satchel/inv/Inv.js';
@@ -24,8 +24,8 @@ import {
 import { getSatchelStore } from '../store/SatchelStore.js';
 import { downloadText } from '../util/downloader.js';
 import { Logger } from '../util/Logger.js';
-import { uploadFile } from '../util/uploader.js';
 import { uuid } from '../util/uuid.js';
+import { uploadSatchelFile } from './upload.js';
 
 /** @typedef {import('../components/lib/BannerPromptElement.js').BannerPromptElement} BannerPromptElement */
 
@@ -201,37 +201,7 @@ function prepareEditProfileDialog(store, profileId) {
 }
 
 async function onActionProfileImport() {
-  let files = await uploadFile('.json');
-  let file = files[0];
-
-  let jsonData;
-  try {
-    jsonData = JSON.parse(await file.text());
-  } catch {
-    window.alert('Cannot load file with invalid json format.');
-  }
-
-  switch (jsonData._type) {
-    case 'profile_v2':
-      {
-        const store = getSatchelStore();
-        try {
-          let loadedProfileIds = loadSatchelProfilesFromData(store, jsonData, false);
-          if (loadedProfileIds) {
-            let profileId = loadedProfileIds[0];
-            if (profileId) {
-              setActiveProfileInStore(store, profileId);
-            }
-          }
-        } catch (e) {
-          LOGGER.error('Failed to load satchel from file', e);
-        }
-      }
-      break;
-    default:
-      window.alert('Cannot load json - this is not a valid profile.');
-      return;
-  }
+  await uploadSatchelFile(false);
   onActionProfile();
 }
 

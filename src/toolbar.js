@@ -1,31 +1,22 @@
 import { downloadText } from './util/downloader.js';
 import { getSatchelStore } from './store/SatchelStore.js';
 import { getCursorContext } from './satchel/inv/CursorHelper.js';
-import { uploadFile } from './util/uploader.js';
 import { copyToClipboard, pasteFromClipboard } from './util/clipboard.js';
-import { copyItem, ItemBuilder } from './satchel/item/Item.js';
-import { uuid } from './util/uuid.js';
-import { AlbumPackElement } from './components/album/AlbumPackElement.js';
-import { exportItemToString, importItemFromJSON, importItemFromString } from './loader/ItemLoader.js';
-import { importAlbumFromJSON } from './loader/AlbumLoader.js';
-import { addAlbumInStore, createAlbumInStore, getAlbumInStore, getAlbumsInStore, isAlbumInStore } from './store/AlbumStore.js';
-import { cloneAlbum, copyAlbum, isAlbumHidden } from './satchel/album/Album.js';
-import { addAlbumListChangeListener, dispatchAlbumChange } from './events/AlbumEvents.js';
+import { ItemBuilder } from './satchel/item/Item.js';
+import { exportItemToString, importItemFromString } from './loader/ItemLoader.js';
 import { clearFoundry, closeFoundry, copyFoundry, isFoundryOpen, openFoundry } from './satchel/inv/FoundryHelper.js';
 import { ActivityPlayerList } from './satchel/peer/ActivityPlayerList.js';
-import { dropItemOnGround, isGroundAlbum } from './satchel/GroundAlbum.js';
 import { forceEmptyStorage } from './Storage.js';
-import { setActiveProfileInStore } from './store/ProfileStore.js';
-import { loadSatchelFromData, loadSatchelProfilesFromData, saveSatchelToData } from './loader/SatchelLoader.js';
+import { saveSatchelToData } from './loader/SatchelLoader.js';
 import { dropFallingItem } from './components/cursor/FallingItemElement.js';
-import { updateList } from './components/ElementListHelper.js';
-import { getCursor } from './components/index.js';
 import { playSound, toggleSound } from './sounds.js';
 import { saveItemToTrashAlbum } from './satchel/TrashAlbum.js';
 
 import { setupProfile } from './toolbar/profile.js';
 import { setupSync } from './toolbar/sync.js';
 import { notify } from './components/NotifyPrompt.js';
+import { setupAlbum } from './toolbar/album.js';
+import { uploadSatchelFile } from './toolbar/upload.js';
 
 function el(selector, event, callback) {
   document.querySelector(selector).addEventListener(event, callback);
@@ -33,13 +24,10 @@ function el(selector, event, callback) {
 
 window.addEventListener('DOMContentLoaded', () => {
   el('#downloadButton', 'click', onDownloadClick);
-  el('#uploadButton', 'click', onUploadClick);
+  el('#uploadButton', 'click', uploadSatchelFile);
   el('#actionSoundToggle', 'click', onActionSoundToggle);
   el('#cloudButton', 'click', onCloudClick);
   el('#actionEraseAll', 'click', onActionEraseAll);
-  
-  el('#actionAlbumOpen', 'click', onActionAlbumOpen);
-  el('#actionAlbumNew', 'click', onActionAlbumNew);
 
   el('#actionShareItem', 'click', onActionShareItem);
   el('#actionSettings', 'click', onActionSettings);
@@ -53,13 +41,10 @@ window.addEventListener('DOMContentLoaded', () => {
   el('#giftSubmit', 'click', onGiftSubmit);
 
   el('#itemCodeSubmit', 'click', onActionItemCodeSubmit);
-  el('#actionAlbumImport', 'click', onActionAlbumImport);
 
   setupProfile();
   setupSync();
-
-  el('.albumContainer', 'mouseup', onAlbumItemDrop);
-  addAlbumListChangeListener(getSatchelStore(), onAlbumListUpdate);
+  setupAlbum();
 
   document.addEventListener('itemcontext', onItemContext);
 });
@@ -131,64 +116,6 @@ function onActionEraseAll() {
   window.location.reload();
 }
 
-function onActionAlbumNew() {
-  const store = getSatchelStore();
-  const albumId = uuid();
-  createAlbumInStore(store, albumId);
-  const albumList = document.querySelector('#albumList');
-  albumList.scrollTo(0, 0);
-  return albumId;
-}
-
-function onActionAlbumOpen() {
-  let albumContainer = document.querySelector('.albumContainer');
-  albumContainer.classList.toggle('open');
-  let isOpen = albumContainer.classList.contains('open');
-  if (isOpen) {
-    playSound('openBag');
-  } else {
-    playSound('closeBag');
-  }
-}
-
-function onAlbumItemDrop(e) {
-  const store = getSatchelStore();
-  const albums = getAlbumsInStore(store)
-    .filter(a => !a.locked)
-    .filter(a => !isGroundAlbum(a))
-    .filter(a => !isAlbumHidden(store, a.albumId));
-  let cursor = getCursor();
-  // HACK: This is so single clicks won't create albums
-  // @ts-ignore
-  if (cursor.hasHeldItem() && !cursor.ignoreFirstPutDown) {
-    let albumId;
-    if (albums.length > 0) {
-      albumId = albums[0].albumId;
-    } else {
-      albumId = onActionAlbumNew();
-    }
-    let result = cursor.putDownInAlbum(albumId);
-    if (result) {
-      e.preventDefault();
-      e.stopPropagation();
-      return false;
-    }
-  }
-}
-
-function onAlbumListUpdate() {
-  const store = getSatchelStore();
-  const list = getAlbumsInStore(store)
-    .sort((a, b) => (a.displayName||'').localeCompare(b.displayName||''))
-    .filter(a => !isGroundAlbum(a))
-    .filter(a => !isAlbumHidden(store, a.albumId))
-    .map(a => a.albumId)
-    .reverse();
-  const albumList = document.querySelector('#albumList');
-  const factoryCreate = (key) => new AlbumPackElement(key);
-  updateList(albumList, list, factoryCreate);
-}
-
 function onActionItemDuplicate(e) {
   if (!isFoundryOpen()) {
     return;
@@ -215,82 +142,6 @@ function onDownloadClick() {
   const store = getSatchelStore();
   const json = saveSatchelToData(store);
   downloadText(`satchel-data-${timestamp}.json`, JSON.stringify(json, null, 4));
-}
-
-async function onUploadClick() {
-  let files = await uploadFile('.json');
-  let file = files[0];
-
-  let jsonData;
-  try {
-    jsonData = JSON.parse(await file.text());
-  } catch {
-    window.alert('Cannot load file with invalid json format.');
-  }
-
-  switch(jsonData._type) {
-    case 'satchel_v2': {
-      if (!window.confirm('This may overwrite data. Do you want to continue?')) {
-        return;
-      }
-      const store = getSatchelStore();
-      try {
-        loadSatchelFromData(store, jsonData, true);
-      } catch (e) {
-        console.error('Failed to load satchel from file.');
-        console.error(e);
-      }
-    } break;
-    case 'profile_v2': {
-      const store = getSatchelStore();
-      try {
-        let loadedProfileIds = loadSatchelProfilesFromData(store, jsonData, false);
-        if (loadedProfileIds) {
-          let profileId = loadedProfileIds[0];
-          if (profileId) {
-            setActiveProfileInStore(store, profileId);
-          }
-        }
-      } catch (e) {
-        console.error('Failed to load satchel from file.');
-        console.error(e);
-      }
-    } break;
-    case 'album_v2':
-    case 'album_v1': {
-      const store = getSatchelStore();
-      try {
-        const album = importAlbumFromJSON(jsonData);
-        if (isAlbumInStore(store, album.albumId)) {
-          cloneAlbum(album, getAlbumInStore(store, album.albumId));
-          dispatchAlbumChange(store, album.albumId);
-        } else {
-          addAlbumInStore(store, album.albumId, album);
-        }
-        
-        // Make sure to open the container
-        let albumContainer = document.querySelector('.albumContainer');
-        if (!albumContainer.classList.contains('open')) {
-          onActionAlbumOpen();
-        }
-      } catch (e) {
-        console.error('Failed to load album from file.');
-        console.error(e);
-      }
-    } break;
-    case 'item_v2':
-    case 'item_v1': {
-      try {
-        let freeItem = copyItem(importItemFromJSON(jsonData));
-        dropItemOnGround(freeItem);
-      } catch (e) {
-        console.error('Failed to load item from file.');
-        console.error(e);
-      }
-    } break;
-    default:
-      notify(`Error! Could not upload file.\nUnknown data format: ${jsonData._type}`);
-  }
 }
 
 async function onCloudClick(e) {
@@ -396,43 +247,4 @@ function onActionFoundryReset() {
 
 function onActionSoundToggle() {
   toggleSound();
-}
-
-async function onActionAlbumImport() {
-  let files = await uploadFile('.json');
-  let file = files[0];
-
-  let jsonData;
-  try {
-    jsonData = JSON.parse(await file.text());
-  } catch {
-    window.alert('Cannot load file with invalid json format.');
-  }
-
-  switch (jsonData._type) {
-    case 'album_v2':
-    case 'album_v1': {
-      const store = getSatchelStore();
-      try {
-        let album = importAlbumFromJSON(jsonData);
-        if (isAlbumInStore(store, album.albumId)) {
-          album = copyAlbum(album);
-        }
-        console.log(album);
-        addAlbumInStore(store, album.albumId, album);
-        
-        // Make sure to open the container
-        let albumContainer = document.querySelector('.albumContainer');
-        if (!albumContainer.classList.contains('open')) {
-          onActionAlbumOpen();
-        }
-      } catch (e) {
-        console.error('Failed to load album from file.');
-        console.error(e);
-      }
-    } break;
-    default:
-      window.alert('Cannot load json - this is not a valid profile.');
-      return;
-  }
 }
