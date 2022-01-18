@@ -253,6 +253,7 @@ async function onUploadClick() {
         console.error(e);
       }
     } break;
+    case 'album_v2':
     case 'album_v1': {
       const store = getSatchelStore();
       try {
@@ -274,6 +275,7 @@ async function onUploadClick() {
         console.error(e);
       }
     } break;
+    case 'item_v2':
     case 'item_v1': {
       try {
         let freeItem = copyItem(importItemFromJSON(jsonData));
@@ -284,7 +286,7 @@ async function onUploadClick() {
       }
     } break;
     default:
-      window.alert('Cannot load json - this is not a known format.');
+      notify(`Error! Could not upload file.\nUnknown data format: ${jsonData._type}`);
   }
 }
 

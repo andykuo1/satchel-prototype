@@ -1,6 +1,6 @@
 import { exportDataToJSON, importDataFromJSON } from './DataLoader.js';
-import { cloneAlbum } from '../satchel/album/Album.js';
 import { exportItemToJSON, importItemFromJSON } from './ItemLoader.js';
+import { cloneAlbum } from '../satchel/album/Album.js';
 
 /**
  * @typedef {import('../satchel/album/Album.js').Album} Album
