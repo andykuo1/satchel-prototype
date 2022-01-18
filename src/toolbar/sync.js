@@ -1,3 +1,4 @@
+import { busy } from '../components/BusyPrompt.js';
 import {
   loadSatchelAlbumsFromData,
   loadSatchelProfilesFromData,
@@ -26,71 +27,16 @@ export function setupSync() {
   el('#actionPeer', 'click', onActionPeer);
 }
 
-const BUSY_ADJ = [
-  'Fetching',
-  'Feeding',
-  'Wrangling',
-  'Spooling',
-  'Bubbling',
-  'Raising',
-  'Finding',
-  'Investigating',
-  'Pushing',
-  'Pulling',
-  'Committing',
-  'Branching',
-];
-const BUSY_NOUN = [
-  'Goblins',
-  'Hobgoblins',
-  'Beholders',
-  'Ankhegs',
-  'Dragons',
-  'Minds',
-  'Cubes',
-  'Mimics',
-  'Humans',
-  'Gnomes',
-  'Elves',
-];
-function randomBusyLabel() {
-  let i = Math.floor(Math.random() * BUSY_ADJ.length);
-  let j = Math.floor(Math.random() * BUSY_NOUN.length);
-  return `${BUSY_ADJ[i]} ${BUSY_NOUN[j]}`;
-}
-
 export function startBusyWork() {
-  let busyDialog = document.querySelector('#busyDialog');
-  busyDialog.toggleAttribute('open', true);
-  let busyLabel = document.querySelector('#busyLabel');
-  busyLabel.innerHTML = randomBusyLabel();
+  let callback = busy();
   let ctx = getCursorContext();
-  let handle = setInterval(() => {
-    let busyProgress = document.querySelector('#busyProgress');
-    switch (busyProgress.textContent) {
-      case '.':
-        busyProgress.textContent = '..';
-        break;
-      case '..':
-        busyProgress.textContent = '...';
-        break;
-      case '...':
-        busyProgress.textContent = '.';
-        break;
-      default:
-        busyProgress.textContent = '.';
-        break;
-    }
-  }, 300);
-  ctx.busyWork = handle;
+  ctx.busyCallback = callback;
 }
 
 export function stopBusyWork() {
-  let busyDialog = document.querySelector('#busyDialog');
-  busyDialog.toggleAttribute('open', false);
   let ctx = getCursorContext();
-  let handle = ctx.busyWork;
-  clearInterval(handle);
+  let callback = ctx.busyCallback;
+  callback();
 }
 
 async function onActionImportGoogle() {

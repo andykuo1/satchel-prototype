@@ -631,22 +631,19 @@
         <button id="itemCodeSubmit" class="bigButton">Submit</button>
       </div>
     </context-menu>
-
-    <style>
-      #busyDialog {
-        text-align: center;
-      }
-    </style>
-    <banner-prompt id="busyDialog" horizontal required>
-      <div class="flexColumn">
-        <div class="flexPadding"></div>
-        <h2>
-          <span id="busyLabel">Fetching Goblins</span>
-          <span id="busyProgress">...</span>
-        </h2>
-        <div class="flexPadding"></div>
-      </div>
-    </banner-prompt>
+    
+    <template id="busyTemplate">
+      <banner-prompt id="busyDialog" horizontal required style="text-align: center;">
+        <div class="flexColumn">
+          <div class="flexPadding"></div>
+          <h2>
+            <label id="busyLabel">Fetching Goblins</label>
+            <span id="busyProgress">...</span>
+          </h2>
+          <div class="flexPadding"></div>
+        </div>
+      </banner-prompt>
+    </template>
 
     <template id="notifyTemplate">
       <banner-prompt id="notifyDialog" horizontal open>

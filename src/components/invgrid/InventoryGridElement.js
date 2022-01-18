@@ -59,6 +59,9 @@ h2 {
   transform: translateY(-100%);
   box-shadow: 0.4rem 0.4rem 0 0 var(--outline-color);
 }
+.hidden {
+  visibility: hidden;
+}
 .container {
   position: relative;
   width: 100%;
@@ -297,9 +300,15 @@ export class InventoryGridElement extends HTMLElement {
 
     // Set display name
     const displayName = inv.displayName;
-    this.slotHeader.textContent = displayName;
-    this.root.classList.toggle('topmargin', Boolean(displayName));
-    this._container.classList.toggle('flattop', Boolean(displayName));
+    let isDisplayName = Boolean(displayName);
+    let prevDisplayName = this.slotHeader.textContent;
+    if (displayName !== prevDisplayName) {
+      this.slotHeader.textContent = displayName || '';
+    }
+    // NOTE: Slotted headers WILL NOT be visible if there is no display name.
+    this.slotHeader.parentElement.classList.toggle('hidden', !isDisplayName);
+    this.root.classList.toggle('topmargin', isDisplayName);
+    this._container.classList.toggle('flattop', isDisplayName);
 
     // Preserve unchanged items in slot
     const preservedItems = {};

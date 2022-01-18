@@ -72,9 +72,6 @@ figcaption {
   text-shadow: 0.1em 0.1em 0.05em #000000;
   white-space: nowrap;
   overflow: hidden;
-  /*
-  opacity: 0;
-  */
 }
 figcaption.vertical {
   top: 0;
@@ -83,11 +80,6 @@ figcaption.vertical {
   right: unset;
   writing-mode: vertical-rl;
 }
-/*
-.container:hover figcaption {
-  opacity: 1;
-}
-*/
 
 #stackSize {
   position: absolute;
