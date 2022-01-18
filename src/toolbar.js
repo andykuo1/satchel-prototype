@@ -9,7 +9,7 @@ import { AlbumPackElement } from './components/album/AlbumPackElement.js';
 import { exportItemToString, importItemFromJSON, importItemFromString } from './loader/ItemLoader.js';
 import { importAlbumFromJSON } from './loader/AlbumLoader.js';
 import { addAlbumInStore, createAlbumInStore, getAlbumInStore, getAlbumsInStore, isAlbumInStore } from './store/AlbumStore.js';
-import { cloneAlbum, isAlbumHidden } from './satchel/album/Album.js';
+import { cloneAlbum, copyAlbum, isAlbumHidden } from './satchel/album/Album.js';
 import { addAlbumListChangeListener, dispatchAlbumChange } from './events/AlbumEvents.js';
 import { clearFoundry, closeFoundry, copyFoundry, isFoundryOpen, openFoundry } from './satchel/inv/FoundryHelper.js';
 import { ActivityPlayerList } from './satchel/peer/ActivityPlayerList.js';
@@ -53,6 +53,7 @@ window.addEventListener('DOMContentLoaded', () => {
   el('#giftSubmit', 'click', onGiftSubmit);
 
   el('#itemCodeSubmit', 'click', onActionItemCodeSubmit);
+  el('#actionAlbumImport', 'click', onActionAlbumImport);
 
   setupProfile();
   setupSync();
@@ -395,4 +396,43 @@ function onActionFoundryReset() {
 
 function onActionSoundToggle() {
   toggleSound();
+}
+
+async function onActionAlbumImport() {
+  let files = await uploadFile('.json');
+  let file = files[0];
+
+  let jsonData;
+  try {
+    jsonData = JSON.parse(await file.text());
+  } catch {
+    window.alert('Cannot load file with invalid json format.');
+  }
+
+  switch (jsonData._type) {
+    case 'album_v2':
+    case 'album_v1': {
+      const store = getSatchelStore();
+      try {
+        let album = importAlbumFromJSON(jsonData);
+        if (isAlbumInStore(store, album.albumId)) {
+          album = copyAlbum(album);
+        }
+        console.log(album);
+        addAlbumInStore(store, album.albumId, album);
+        
+        // Make sure to open the container
+        let albumContainer = document.querySelector('.albumContainer');
+        if (!albumContainer.classList.contains('open')) {
+          onActionAlbumOpen();
+        }
+      } catch (e) {
+        console.error('Failed to load album from file.');
+        console.error(e);
+      }
+    } break;
+    default:
+      window.alert('Cannot load json - this is not a valid profile.');
+      return;
+  }
 }

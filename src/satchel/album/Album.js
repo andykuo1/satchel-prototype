@@ -71,12 +71,12 @@ export function cloneAlbum(other, dst = undefined, opts = {}) {
     if (preserveItemId) {
       for (let item of Object.values(other.items)) {
         let newItem = cloneItem(item);
-        dst.items[newItem.itemId] = item;
+        dst.items[newItem.itemId] = newItem;
       }
     } else {
       for (let item of Object.values(other.items)) {
         let newItem = copyItem(item);
-        dst.items[newItem.itemId] = item;
+        dst.items[newItem.itemId] = newItem;
       }
     }
   }

@@ -390,6 +390,7 @@ export class AlbumPackElement extends HTMLElement {
     }
 
     switch(jsonData._type) {
+      case 'album_v2':
       case 'album_v1': {
         const store = getSatchelStore();
         try {
