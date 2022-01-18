@@ -32,3 +32,4 @@ Feedback
 
 - Trash one-click to open trash
 
+- Cloud icon should show the time since last save.

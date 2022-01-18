@@ -37,6 +37,7 @@ async function tryLoadJSONFile(store, jsonData) {
     case 'satchel_v2':
     case 'satchel_v1': {
       if (!window.confirm('This will ERASE and OVERWRITE all data. Do you want to continue?')) {
+        notify('Upload cancelled.');
         return;
       }
       try {
