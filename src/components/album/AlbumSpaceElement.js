@@ -26,6 +26,7 @@ const INNER_STYLE = /* css */`
   display: inline-block;
   margin: 0.5em;
   text-align: left;
+  vertical-align: top;
 }
 fieldset {
   position: relative;
@@ -33,6 +34,7 @@ fieldset {
   min-height: 2em;
   max-width: 20em;
   border: 0.5em dashed #333333;
+  padding: 2em;
 }
 `;
 
