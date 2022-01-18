@@ -27,7 +27,7 @@ import { Logger } from '../util/Logger.js';
 import { uploadFile } from '../util/uploader.js';
 import { uuid } from '../util/uuid.js';
 
-/** @typedef {import('../components/lib/DialogPromptElement.js').DialogPromptElement} DialogPromptElement */
+/** @typedef {import('../components/lib/BannerPromptElement.js').BannerPromptElement} BannerPromptElement */
 
 const LOGGER = new Logger('toolbar.profile');
 
@@ -93,7 +93,7 @@ function onActionProfile() {
     containerElement.appendChild(deleteElement);
     rootContainerElement.appendChild(containerElement);
   }
-  /** @type {DialogPromptElement} */
+  /** @type {BannerPromptElement} */
   const profilesDialog = document.querySelector('#profilesDialog');
   profilesDialog.toggleAttribute('open', true);
 }
@@ -137,14 +137,11 @@ function onActionProfileEdit(e) {
   if (activeProfile.profileId !== profileId) {
     setActiveProfileInStore(store, profileId);
   }
-  /** @type {DialogPromptElement} */
-  const profilesDialog = document.querySelector('#profilesDialog');
-  profilesDialog.toggleAttribute('open', false);
 
   // Prepare edit dialog
   prepareEditProfileDialog(store, profileId);
 
-  /** @type {DialogPromptElement} */
+  /** @type {BannerPromptElement} */
   const inventoriesDialog = document.querySelector('#inventoriesDialog');
   inventoriesDialog.toggleAttribute('open', true);
 }
@@ -326,7 +323,7 @@ function onActionProfileInvNew() {
   if (!activeProfile) {
     return;
   }
-  /** @type {DialogPromptElement} */
+  /** @type {BannerPromptElement} */
   const profileInventoryDialog = document.querySelector('#profileInventoryDialog');
   profileInventoryDialog.toggleAttribute('open', true);
 }
@@ -376,7 +373,7 @@ function onActionProfileInvSubmit() {
   dispatchProfileChange(store, activeProfile.profileId);
   prepareEditProfileDialog(store, activeProfile.profileId);
 
-  /** @type {DialogPromptElement} */
+  /** @type {BannerPromptElement} */
   const profileInventoryDialog = document.querySelector('#profileInventoryDialog');
   profileInventoryDialog.toggleAttribute('open', false);
 }

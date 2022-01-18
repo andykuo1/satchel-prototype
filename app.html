@@ -53,13 +53,10 @@
       }
 
       /** To prevent FOUC */
-      dialog-prompt:not([open]) {
+      banner-prompt:not([open]) {
         display: none;
       }
       context-menu:not([open]) {
-        display: none;
-      }
-      banner-prompt:not([open]) {
         display: none;
       }
     </style>
@@ -450,7 +447,7 @@
       </div>
     </banner-prompt>
 
-    <banner-prompt id="profilesDialog">
+    <banner-prompt id="profilesDialog" horizontal>
       <style>
         #profilesDialog h3 {
           margin: 0;
@@ -477,13 +474,15 @@
           height: 2em;
         }
       </style>
-      <div class="flexColumn">
+      <div class="flexRow">
         <div class="flexPadding"></div>
-        <div>
+        <div style="flex: 3;">
           <h3>Profiles</h3>
           <p id="activeProfileList"></p>
-          <button id="actionProfileNew">New Profile</button>
-          <button id="actionProfileImport">Import Profile</button>
+          <div style="margin-bottom: 2em; display: flex; flex-direction: row;">
+            <button id="actionProfileNew" class="bigButton" style="flex: 1; margin-right: 1em;">+ Profile</button>
+            <button id="actionProfileImport" class="bigButton">Import Profile</button>
+          </div>
         </div>
         <div class="flexPadding"></div>
       </div>

@@ -13,8 +13,6 @@ import { Logger } from '../util/Logger.js';
 import { readGoogleAppFile, signInGoogle, signOutGoogle, writeGoogleAppFile } from './GoogleDrive.js';
 import { startCloud } from './PeerSession.js';
 
-/** @typedef {import('../components/lib/DialogPromptElement.js').DialogPromptElement} DialogPromptElement */
-
 const LOGGER = new Logger('toolbar.sync');
 
 function el(selector, event, callback) {

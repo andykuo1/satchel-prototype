@@ -1,4 +1,3 @@
-import { DialogPromptElement } from '../lib/DialogPromptElement.js';
 import { getCursorContext } from '../../satchel/inv/CursorHelper.js';
 import { openFoundry } from '../../satchel/inv/FoundryHelper.js';
 import { getSatchelStore } from '../../store/SatchelStore.js';
@@ -11,7 +10,10 @@ import { dispatchItemChange } from '../../events/ItemEvents.js';
 import { getInvInStore } from '../../store/InvStore.js';
 import { dropFallingItem } from '../cursor/FallingItemElement.js';
 
-/** @typedef {import('../../satchel/item/Item.js').Item} Item */
+/**
+ * @typedef {import('../../satchel/item/Item.js').Item} Item
+ * @typedef {import('../lib/BannerPromptElement.js').BannerPromptElement} BannerPromptElement
+ */
 
 const INNER_HTML = /* html */`
 <banner-prompt>
@@ -65,7 +67,7 @@ export class ItemDialogElement extends HTMLElement {
 
     /**
      * @private
-     * @type {DialogPromptElement}
+     * @type {BannerPromptElement}
      */
      this.dialog = shadowRoot.querySelector('banner-prompt');
     /**

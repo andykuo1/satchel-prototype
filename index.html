@@ -14,11 +14,17 @@
         color: #ffffff;
         text-align: center;
       }
+      body {
+        --foreground-color: #ffffff;
+        --background-color: #333333;
+        --outline-color: #444444;
+        --shadow-color: #111111;
+      }
       h1 {
         font-size: 3em;
       }
       /** To prevent FOUC */
-      dialog-prompt:not([open]) {
+      banner-prompt:not([open]) {
         display: none;
       }
     </style>
@@ -61,6 +67,12 @@
       #buttonIntro:hover {
         color: #aaaaaa;
       }
+
+      #sessionForm {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
     </style>
     <h1>Satchel</h1>
     <img id="logo" src="res/images/potion.png">
@@ -74,7 +86,7 @@
       </nav>
       <div class="spacing"></div>
     </div>
-    <banner-prompt id="sessionDialog">
+    <banner-prompt id="sessionDialog" horizontal>
       <form id="sessionForm" autocomplete="off">
         <p>Your Invitation?</p>
         <p style="display: flex;">
