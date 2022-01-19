@@ -53,18 +53,15 @@ const INNER_HTML = /* html */`
       <div class="foundrySocketMargin"></div>
     </div>
     <p class="styleContainer">
-      <label for="itemImage">
-        <icon-button id="actionImage" icon="res/image.svg" alt="image" title="Image"></icon-button>
-      </label>
-      <input type="url" id="itemImage">
-      <input type="color" id="itemBackground">
+    <icon-button id="actionBackground" icon="res/palette.svg" alt="color" title="Background"></icon-button>
+      <icon-button id="actionImage" icon="res/image.svg" alt="image" title="Image"></icon-button>
     </p>
   </fieldset>
   <fieldset class="detailContainer">
     <p class="titleContainer">
       <input type="text" id="itemTitle" placeholder="Item">
       <span id="itemStackSizeContainer">
-        <span>⨯</span><input type="number" id="itemStackSize" placeholder="--">
+        <span id="preStackSize">⨯</span><input type="number" id="itemStackSize" placeholder="--">
       </span>
     </p>
     <p class="textContainer">
@@ -74,7 +71,31 @@ const INNER_HTML = /* html */`
   </fieldset>
 </div>
 
-<context-menu id="imageContextMenu"></context-menu>
+<context-menu id="galleryContextMenu">
+  <div class="galleryContainer">
+    <div id="galleryImages"></div>
+    <textarea id="itemImage"></textarea>
+  </div>
+</context-menu>
+
+<context-menu id="paletteContextMenu">
+  <div class="paletteContainer">
+    <div id="paletteColors">
+      <button style="background-color: #ff0000;" data-color="#ff0000"></button>
+      <button style="background-color: #00ff00;" data-color="#00ff00"></button>
+      <button style="background-color: #0000ff;" data-color="#0000ff"></button>
+      
+      <button style="background-color: #ff00ff;" data-color="#ff00ff"></button>
+      <button style="background-color: #ffff00;" data-color="#ffff00"></button>
+      <button style="background-color: #00ffff;" data-color="#00ffff"></button>
+
+      <button style="background-color: #9900ff;" data-color="#6600ff"></button>
+      <button style="background-color: #ffffff;" data-color="#ffffff"></button>
+      <button style="background-color: #000000; color: #ffffff;" data-color="#000000">⊘</button>
+    </div>
+    <input type="color" id="itemBackground">
+  </div>
+</context-menu>
 `;
 const INNER_STYLE = /* css */`
 :host {
@@ -107,7 +128,7 @@ img {
 }
 
 .portraitContainer {
-  flex: 3;
+  flex: 2;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -134,9 +155,11 @@ img {
   flex-direction: row;
 }
 .styleContainer {
+  position: absolute;
+  right: 0.7em;
+  bottom: 0;
   display: flex;
-  vertical-align: middle;
-  margin-top: 0.5em;
+  flex-direction: column;
 }
 .styleContainer icon-button {
   width: 2em;
@@ -201,9 +224,6 @@ img {
   border: none;
 }
 #itemWidth:disabled, #itemHeight:disabled {
-  opacity: 0.3;
-}
-#itemWidth:disabled:empty, #itemHeight:disabled:empty {
   visibility: hidden;
 }
 #itemWidth {
@@ -215,29 +235,37 @@ img {
   transform: translateY(-80%);
 }
 
-#itemImage {
-  flex: 1;
-  background: none;
+.rootContainer[disabled] #actionImage,
+.rootContainer[disabled] #actionBackground {
+  visibility: hidden;
+}
+
+#preStackSize {
+  display: inline-block;
+  font-size: 1.2em;
   border: none;
-  color: var(--foreground-color);
-  margin-left: 0.5em;
+  border-bottom: 0.2em solid var(--foreground-color);
 }
-.rootContainer[disabled] label[for="itemImage"] {
-  opacity: 0.6;
-  visibility: hidden;
-}
-
-#itemBackground:disabled {
-  visibility: hidden;
-}
-
 #itemStackSize {
+  font-family: serif;
+  font-size: 1.2em;
+  flex: 1;
   width: 2.5em;
+  border: none;
+  border-bottom: 0.2em solid var(--foreground-color);
+  background-color: transparent;
+  color: var(--foreground-color);
 }
 
 #itemTitle {
+  font-family: serif;
+  font-size: 1.2em;
   flex: 1;
   margin-bottom: 0.5em;
+  border: none;
+  border-bottom: 0.2em solid var(--foreground-color);
+  background-color: transparent;
+  color: var(--foreground-color);
 }
 
 .actionContainer {
@@ -250,12 +278,20 @@ img {
   height: 2em;
 }
 
-#imageContextMenu {
+.galleryContainer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+#galleryImages {
+  flex: 3;
   text-align: left;
+  overflow-y: auto;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(3em, 1fr));
 }
-#imageContextMenu img {
+#galleryImages img {
   width: 100%;
   height: 100%;
   max-width: 3em;
@@ -263,10 +299,47 @@ img {
   margin: 0 0.1em;
   object-fit: contain;
 }
-#imageContextMenu img:hover {
+#galleryImages img:hover {
   outline: 0.1em solid #666666;
   background-color: #666666;
   cursor: pointer;
+}
+#itemImage {
+  flex: 1;
+  min-height: 1em;
+  border: none;
+  border-top: 0.2em solid var(--foreground-color);
+  resize: none;
+}
+
+.paletteContainer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+#paletteColors {
+  flex: 3;
+  text-align: left;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(3em, 1fr));
+}
+#paletteColors button {
+  width: 2.5em;
+  height: 2.5em;
+  margin: 0.25em;
+  border-radius: 0.5em;
+}
+#paletteColors button:hover {
+  cursor: pointer;
+}
+#itemBackground {
+  flex: 1;
+  width: 100%;
+}
+#itemBackground:disabled {
+  visibility: hidden;
 }
 `;
 
@@ -308,9 +381,15 @@ export class ItemEditorElement extends HTMLElement {
     /** @private */
     this.detailContainer = shadowRoot.querySelector('.detailContainer');
     /** @private */
-    this.imageContextMenu = /** @type {ContextMenuElement} */ (shadowRoot.querySelector('#imageContextMenu'));
+    this.galleryContextMenu = /** @type {ContextMenuElement} */ (shadowRoot.querySelector('#galleryContextMenu'));
+    /** @private */
+    this.galleryImages = shadowRoot.querySelector('#galleryImages');
     /** @private */
     this.foundryActions = shadowRoot.querySelector('#foundryActions');
+    /** @private */
+    this.paletteContextMenu = /** @type {ContextMenuElement} */ (shadowRoot.querySelector('#paletteContextMenu'));
+    /** @private */
+    this.paletteColors = shadowRoot.querySelectorAll('#paletteColors > button');
 
     /**
      * @private
@@ -366,6 +445,8 @@ export class ItemEditorElement extends HTMLElement {
     this.actionImage = shadowRoot.querySelector('#actionImage');
     /** @private */
     this.actionExpand = shadowRoot.querySelector('#actionExpand');
+    /** @private */
+    this.actionBackground = shadowRoot.querySelector('#actionBackground');
 
     /** @private */
     this.onItemTitle = this.onItemTitle.bind(this);
@@ -400,9 +481,11 @@ export class ItemEditorElement extends HTMLElement {
     /** @private */
     this.onItemHeight = this.onItemHeight.bind(this);
     /** @private */
-    this.onImageContextMenuClick = this.onImageContextMenuClick.bind(this);
-    /** @private */
     this.onActionExpand = this.onActionExpand.bind(this);
+    /** @private */
+    this.onActionBackground = this.onActionBackground.bind(this);
+    /** @private */
+    this.onActionColor = this.onActionColor.bind(this);
 
     /** @private */
     this.onSocketInventoryChange = this.onSocketInventoryChange.bind(this);
@@ -431,9 +514,11 @@ export class ItemEditorElement extends HTMLElement {
     this.itemWidth.addEventListener('change', this.onItemWidth);
     this.itemHeight.addEventListener('change', this.onItemHeight);
     this.portraitContainer.addEventListener('mouseup', this.onItemDrop);
-    this.imageContextMenu.addEventListener('click', this.onImageContextMenuClick);
-    this.itemImage.addEventListener('contextmenu', this.onActionImage);
     this.actionExpand.addEventListener('click', this.onActionExpand);
+    this.actionBackground.addEventListener('click', this.onActionBackground);
+    this.paletteColors.forEach(e => {
+      e.addEventListener('click', this.onActionColor);
+    });
 
     const store = getSatchelStore();
     addInventoryChangeListener(store, this.socket.invId, this.onSocketInventoryChange);
@@ -459,9 +544,11 @@ export class ItemEditorElement extends HTMLElement {
     this.itemWidth.removeEventListener('change', this.onItemWidth);
     this.itemHeight.removeEventListener('change', this.onItemHeight);
     this.portraitContainer.removeEventListener('mouseup', this.onItemDrop);
-    this.imageContextMenu.removeEventListener('click', this.onImageContextMenuClick);
-    this.itemImage.removeEventListener('contextmenu', this.onActionImage);
     this.actionExpand.removeEventListener('click', this.onActionExpand);
+    this.actionBackground.removeEventListener('click', this.onActionBackground);
+    this.paletteColors.forEach(e => {
+      e.removeEventListener('click', this.onActionColor);
+    });
 
     const store = getSatchelStore();
     removeInventoryChangeListener(store, this.socket.invId, this.onSocketInventoryChange);
@@ -548,6 +635,8 @@ export class ItemEditorElement extends HTMLElement {
     this.actionFit.toggleAttribute('disabled', force);
     this.detailContainer.toggleAttribute('disabled', force);
     this.actionExpand.toggleAttribute('disabled', force);
+    this.actionBackground.toggleAttribute('disabled', force);
+    this.actionImage.toggleAttribute('disabled', force);
   }
 
   /** @private */
@@ -583,7 +672,7 @@ export class ItemEditorElement extends HTMLElement {
     } else {
       this.itemImage.value = '';
     }
-    this.itemImage.placeholder = getDefaultImageSourceByDimensions(item.width, item.height, item.stackSize);
+    this.itemImage.placeholder = 'Paste image url here...';
   }
 
   /** @private */
@@ -614,7 +703,6 @@ export class ItemEditorElement extends HTMLElement {
     item.height = height;
     // Change image based on size
     const defaultImgSrc = getDefaultImageSourceByDimensions(item.width, item.height, item.stackSize);
-    this.itemImage.placeholder = defaultImgSrc;
     if (!this.itemImage.value) {
       item.imgSrc = defaultImgSrc;
     }
@@ -732,7 +820,7 @@ export class ItemEditorElement extends HTMLElement {
 
   /** @private */
   onActionImage(e) {
-    const contextMenu = this.imageContextMenu;
+    const contextMenu = this.galleryContextMenu;
     let rect = e.target.getBoundingClientRect();
     let x = rect.x + rect.width / 2;
     let y = rect.y + rect.height / 2;
@@ -746,18 +834,10 @@ export class ItemEditorElement extends HTMLElement {
   }
 
   /** @private */
-  onImageContextMenuClick() {
-    const contextMenu = this.imageContextMenu;
-    contextMenu.toggleAttribute('open', false);
-  }
-
-  /** @private */
   onFoundryAlbumImageClick(e) {
-    const contextMenu = this.imageContextMenu;
     const src = e.target.getAttribute('data-imgsrc');
     this.itemImage.value = src;
     this.onItemImage();
-    contextMenu.toggleAttribute('open', false);
   }
 
   /** @private */
@@ -767,7 +847,6 @@ export class ItemEditorElement extends HTMLElement {
       return;
     }
     const albumId = getFoundryAlbumId(store);
-    const contextMenu = this.imageContextMenu;
     const items = getItemsInAlbum(store, albumId);
     const list = new Set([
       'res/images/potion.png',
@@ -787,7 +866,7 @@ export class ItemEditorElement extends HTMLElement {
     const destroy = (key, element) => {
       element.removeEventListener('click', this.onFoundryAlbumImageClick);
     };
-    updateList(contextMenu, list, create, destroy);
+    updateList(this.galleryImages, list, create, destroy);
   }
 
   /** @private */
@@ -885,6 +964,27 @@ export class ItemEditorElement extends HTMLElement {
       this.actionExpand.setAttribute('icon', 'res/expandmore.svg');
       this.foundryActions.classList.toggle('hidden', true);
     }
+  }
+
+  /** @private */
+  onActionBackground(e) {
+    const contextMenu = this.paletteContextMenu;
+    let rect = e.target.getBoundingClientRect();
+    let x = rect.x + rect.width / 2;
+    let y = rect.y + rect.height / 2;
+    contextMenu.x = x;
+    contextMenu.y = y;
+    contextMenu.toggleAttribute('open', true);
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+  }
+
+  /** @private */
+  onActionColor(e) {
+    let colorValue = e.target.getAttribute('data-color');
+    this.itemBackground.value = colorValue;
+    this.onItemBackground();
   }
 
   /** @private */

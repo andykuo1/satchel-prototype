@@ -236,7 +236,7 @@
             </div>
             <album-ground id="ground"></album-ground>
             <div class="sidebarActions">
-              <trash-can id="delete"></trash-can>
+              <trash-can id="actionGroundDelete"></trash-can>
             </div>
           </div>
         </div>
@@ -576,27 +576,27 @@
       <icon-button slot="actions" id="actionShareItem" icon="res/share.svg" alt="send" title="Send Item"></icon-button>
     </item-dialog>
 
-    <style>
-      #cloudDialog h3 {
-        margin: 0;
-        text-align: center;
-      }
-      .cloudOptionList {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-      }
-      .cloudOption {
-        flex: 1;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-      }
-      .cloudOption label {
-        font-size: 0.5em;
-      }
-    </style>
     <context-menu id="cloudDialog">
+      <style>
+        #cloudDialog h3 {
+          margin: 0;
+          text-align: center;
+        }
+        .cloudOptionList {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+        .cloudOption {
+          flex: 1;
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+        }
+        .cloudOption label {
+          font-size: 0.5em;
+        }
+      </style>
       <h3>Save to...</h3>
       <div class="cloudOptionList">
         <div class="cloudOption">
@@ -611,21 +611,21 @@
       </div>
     </context-menu>
 
-    <style>
-      #itemCodeDialog[open] {
-        display: flex;
-      }
-      #itemCodeDialog > div {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-      }
-      #itemCodeInput {
-        resize: none;
-      }
-    </style>
     <context-menu id="itemCodeDialog">
+      <style>
+        #itemCodeDialog[open] {
+          display: flex;
+        }
+        #itemCodeDialog > div {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+        }
+        #itemCodeInput {
+          resize: none;
+        }
+      </style>
       <div>
         <h3 style="margin: 0;">Item Code</h3>
         <textarea id="itemCodeInput" type="text" style="flex: 1;" placeholder="Paste here..."></textarea>

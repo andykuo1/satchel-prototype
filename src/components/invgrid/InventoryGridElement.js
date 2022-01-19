@@ -191,8 +191,8 @@ export class InventoryGridElement extends HTMLElement {
     upgradeProperty(this, 'init');
     // Only start init once.
     if (this.init) {
-      const initType = this.init;
       const store = getSatchelStore();
+      let initType = this.init;
       let invId = this.invId;
       if (!invId) {
         invId = uuid();
