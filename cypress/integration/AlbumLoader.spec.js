@@ -15,7 +15,7 @@ function createFullAlbum(albumId) {
   created.expand = true;
   created.hidden = true;
   created.items = {
-    test: createItem('test')
+    test: createItem('test'),
   };
   created.locked = true;
   return created;
@@ -45,7 +45,6 @@ describe('The default album data format', () => {
   });
 });
 
-
 const ALBUM_V2_FIXTURES = {
   default: ['album_v2_default.json', 'album_v2_default_export.json'],
   full: ['album_v2_full.json', 'album_v2_full_export.json'],
@@ -59,7 +58,6 @@ describe('The "album_v2" data format', () => {
   );
   describeCurrentJSONFormat(createAlbum, exportAlbumToJSON, ALBUM_V2_FIXTURES);
 });
-
 
 const ALBUM_V1_FIXTURES = {
   default: ['album_v1_default.json', 'album_v1_default_export.json'],

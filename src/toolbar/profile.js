@@ -201,7 +201,7 @@ function prepareEditProfileDialog(store, profileId) {
 }
 
 async function onActionProfileImport() {
-  await uploadSatchelFile(false);
+  await uploadSatchelFile();
   onActionProfile();
 }
 

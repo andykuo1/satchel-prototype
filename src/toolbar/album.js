@@ -43,9 +43,9 @@ function onActionAlbumOpen() {
 function onAlbumItemDrop(e) {
   const store = getSatchelStore();
   const albums = getAlbumsInStore(store)
-    .filter(a => !a.locked)
-    .filter(a => !isGroundAlbum(a))
-    .filter(a => !isAlbumHidden(store, a.albumId));
+    .filter((a) => !a.locked)
+    .filter((a) => !isGroundAlbum(a))
+    .filter((a) => !isAlbumHidden(store, a.albumId));
   let cursor = getCursor();
   // HACK: This is so single clicks won't create albums
   // @ts-ignore
@@ -68,10 +68,10 @@ function onAlbumItemDrop(e) {
 function onAlbumListUpdate() {
   const store = getSatchelStore();
   const list = getAlbumsInStore(store)
-    .sort((a, b) => (a.displayName||'').localeCompare(b.displayName||''))
-    .filter(a => !isGroundAlbum(a))
-    .filter(a => !isAlbumHidden(store, a.albumId))
-    .map(a => a.albumId)
+    .sort((a, b) => (a.displayName || '').localeCompare(b.displayName || ''))
+    .filter((a) => !isGroundAlbum(a))
+    .filter((a) => !isAlbumHidden(store, a.albumId))
+    .map((a) => a.albumId)
     .reverse();
   const albumList = document.querySelector('#albumList');
   const factoryCreate = (key) => new AlbumPackElement(key);

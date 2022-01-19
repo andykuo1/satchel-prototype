@@ -10,7 +10,9 @@ export function importInventoryFromJSON(jsonData, dst = undefined) {
     case 'inv_v1':
       return importDataFromJSON(jsonData, 'inv_v1', (data) => cloneInventory(data, dst));
     case 'inv_v2':
-      return importDataFromJSON(jsonData, 'inv_v2', (data) => cloneInventory(decompressInventoryJson(data), dst));
+      return importDataFromJSON(jsonData, 'inv_v2', (data) =>
+        cloneInventory(decompressInventoryJson(data), dst)
+      );
     default:
       throw new Error(`Unsupported inventory version '${jsonData._type}'.`);
   }

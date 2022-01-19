@@ -22,7 +22,7 @@ export function exportAlbumToJSON(album, dst = undefined) {
  * @returns {Album}
  */
 export function importAlbumFromJSON(jsonData, dst = undefined) {
-  switch(jsonData._type) {
+  switch (jsonData._type) {
     case 'album_v1':
       return importDataFromJSON(jsonData, 'album_v1', (data) => cloneAlbum(data, dst));
     case 'album_v2':
@@ -44,12 +44,12 @@ export function compressAlbumJson(uncompressedJson) {
       items: {
         t: '!',
         d: [],
-      }
+      },
     };
   }
   let newItemDatas = [];
   let newItemType;
-  for(let item of items) {
+  for (let item of items) {
     let newItem = exportItemToJSON(item);
     if (typeof newItemType === 'undefined') {
       newItemType = newItem._type;
@@ -66,7 +66,7 @@ export function compressAlbumJson(uncompressedJson) {
     items: {
       t: newItemType,
       d: newItemDatas,
-    }
+    },
   };
 }
 
@@ -79,11 +79,11 @@ export function decompressAlbumJson(compressedJson) {
   if (!newItems || newItems.length <= 0) {
     return {
       ...compressedJson,
-      items: {}
+      items: {},
     };
   }
   let oldItems = {};
-  for(let newItemData of newItems) {
+  for (let newItemData of newItems) {
     let newItem = {
       _type: newItemType,
       _data: newItemData,

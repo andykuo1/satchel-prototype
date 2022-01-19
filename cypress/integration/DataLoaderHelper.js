@@ -50,7 +50,7 @@ export function describeJSONFormat(formatType, create, exportToJSON, importFromJ
     assert.exists(jsonString);
     assert.notEqual(jsonString, '[Object object]');
     let parsed;
-    assert.doesNotThrow(() => parsed = JSON.parse(jsonString));
+    assert.doesNotThrow(() => (parsed = JSON.parse(jsonString)));
     assert.isNotEmpty(parsed);
     assert.deepStrictEqual(parsed, exported);
   });
@@ -164,7 +164,7 @@ export function describeBackwardsCompatibleJSONFormat(
 
 function deeplyMangleObject(obj) {
   obj.__FOO__ = '__BAR__';
-  for(let key of Object.keys(obj)) {
+  for (let key of Object.keys(obj)) {
     let value = obj[key];
     if (typeof value === 'object' && value !== null) {
       deeplyMangleObject(value);
@@ -174,7 +174,7 @@ function deeplyMangleObject(obj) {
 
 function isObjectMangledDeeply(obj) {
   let keys = Object.keys(obj);
-  for(let key of keys) {
+  for (let key of keys) {
     let value = obj[key];
     if (key === '__FOO__') {
       return value === '__BAR__';

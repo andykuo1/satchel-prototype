@@ -33,63 +33,71 @@ async function tryUploadJSONFile() {
 }
 
 async function tryLoadJSONFile(store, jsonData) {
-  switch(jsonData._type) {
+  switch (jsonData._type) {
     case 'satchel_v2':
-    case 'satchel_v1': {
-      if (!window.confirm('This will ERASE and OVERWRITE all data. Do you want to continue?')) {
-        notify('Upload cancelled.');
-        return;
+    case 'satchel_v1':
+      {
+        if (!window.confirm('This will ERASE and OVERWRITE all data. Do you want to continue?')) {
+          notify('Upload cancelled.');
+          return;
+        }
+        try {
+          forceEmptyStorage(true);
+          loadSatchelFromData(store, jsonData, true);
+          // Make sure to open the album
+          openAlbumPane();
+        } catch (e) {
+          notify(`Error! Failed to load album file.\n${e}`);
+        } finally {
+          forceEmptyStorage(false);
+        }
       }
-      try {
-        forceEmptyStorage(true);
-        loadSatchelFromData(store, jsonData, true);
-        // Make sure to open the album
-        openAlbumPane();
-      } catch (e) {
-        notify(`Error! Failed to load album file.\n${e}`);
-      } finally {
-        forceEmptyStorage(false);
-      }
-    } break;
+      break;
     case 'profile_v2':
-    case 'profile_v1': {
-      try {
-        let loadedProfileIds = loadSatchelProfilesFromData(store, jsonData, false);
-        if (loadedProfileIds) {
-          let profileId = loadedProfileIds[0];
-          if (profileId) {
-            setActiveProfileInStore(store, profileId);
+    case 'profile_v1':
+      {
+        try {
+          let loadedProfileIds = loadSatchelProfilesFromData(store, jsonData, false);
+          if (loadedProfileIds) {
+            let profileId = loadedProfileIds[0];
+            if (profileId) {
+              setActiveProfileInStore(store, profileId);
+            }
           }
+        } catch (e) {
+          notify(`Error! Failed to load satchel file.\n${e}`);
         }
-      } catch (e) {
-        notify(`Error! Failed to load satchel file.\n${e}`);
       }
-    } break;
+      break;
     case 'album_v2':
-    case 'album_v1': {
-      try {
-        const album = importAlbumFromJSON(jsonData);
-        if (isAlbumInStore(store, album.albumId)) {
-          const newAlbum = copyAlbum(album);
-          addAlbumInStore(store, newAlbum.albumId, newAlbum);
-        } else {
-          addAlbumInStore(store, album.albumId, album);
+    case 'album_v1':
+      {
+        try {
+          const album = importAlbumFromJSON(jsonData);
+          if (isAlbumInStore(store, album.albumId)) {
+            const newAlbum = copyAlbum(album);
+            addAlbumInStore(store, newAlbum.albumId, newAlbum);
+          } else {
+            addAlbumInStore(store, album.albumId, album);
+          }
+          // Make sure to open the container
+          openAlbumPane();
+        } catch (e) {
+          notify(`Error! Failed to load album file.\n${e}`);
         }
-        // Make sure to open the container
-        openAlbumPane();
-      } catch (e) {
-        notify(`Error! Failed to load album file.\n${e}`);
       }
-    } break;
+      break;
     case 'item_v2':
-    case 'item_v1': {
-      try {
-        let freeItem = copyItem(importItemFromJSON(jsonData));
-        dropItemOnGround(freeItem);
-      } catch (e) {
-        notify(`Error! Failed to load item file.\n${e}`);
+    case 'item_v1':
+      {
+        try {
+          let freeItem = copyItem(importItemFromJSON(jsonData));
+          dropItemOnGround(freeItem);
+        } catch (e) {
+          notify(`Error! Failed to load item file.\n${e}`);
+        }
       }
-    } break;
+      break;
     default:
       notify(`Error! Could not upload file.\nUnknown data format: ${jsonData._type}`);
       break;
