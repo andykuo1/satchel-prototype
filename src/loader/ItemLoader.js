@@ -47,7 +47,7 @@ export function exportItemV1ToJSON(item, dst = undefined) {
 
 export function exportItemToString(item) {
   let cloned = cloneItem(item);
-  cloned.itemId = '';
+  cloned.itemId = '_';
   let dataString = exportItemToBase64(cloned);
   return `item:${dataString}`;
 }
