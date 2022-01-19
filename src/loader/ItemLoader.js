@@ -1,6 +1,7 @@
 import { exportDataToJSON, importDataFromJSON } from './DataLoader.js';
 import { cloneItem, createItem } from '../satchel/item/Item.js';
 import { exportItemToBase64, importItemFromBase64 } from '../satchel/item/ItemBase64.js';
+import { uuid } from '../util/uuid.js';
 
 /**
  * @typedef {import('../satchel/item/Item.js').Item} Item
@@ -45,7 +46,9 @@ export function exportItemV1ToJSON(item, dst = undefined) {
 }
 
 export function exportItemToString(item) {
-  let dataString = exportItemToBase64(item);
+  let cloned = cloneItem(item);
+  cloned.itemId = '';
+  let dataString = exportItemToBase64(cloned);
   return `item:${dataString}`;
 }
 
@@ -58,6 +61,7 @@ export function importItemFromString(itemString, dst = undefined) {
   let k = i + 'item:'.length;
   let base64String = j < 0 ? itemString.substring(k) : itemString.substring(k, j);
   let result = importItemFromBase64(base64String, dst);
+  result.itemId = uuid();
   return result;
 }
 
