@@ -14,10 +14,14 @@ window.addEventListener('DOMContentLoaded', () => {
 
   document.querySelector('#buttonStart').addEventListener('click', () => {
     // Start a server.
+    /*
     const newSessionId = uuid();
     const selfRemoteId = newSessionId;
     prepareSessionStatus(newSessionId, selfRemoteId);
     window.open(`./app.html?id=${selfRemoteId}`, '_parent');
+    */
+    // Just start.
+    window.open('./app.html', '_parent');
   });
   document.querySelector('#sessionForm').addEventListener('submit', (e) => {
     e.preventDefault();

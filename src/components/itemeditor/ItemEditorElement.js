@@ -110,6 +110,7 @@ textarea {
   background: none;
   min-height: 10em;
   color: var(--foreground-color);
+  resize: none;
 }
 
 p {
