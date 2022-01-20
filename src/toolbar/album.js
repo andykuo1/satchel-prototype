@@ -1,3 +1,4 @@
+import { el } from '../ToolbarHelper.js';
 import { updateList } from '../components/ElementListHelper.js';
 import { AlbumPackElement, getCursor } from '../components/index.js';
 import { addAlbumListChangeListener } from '../events/AlbumEvents.js';
@@ -9,10 +10,6 @@ import { createAlbumInStore, getAlbumsInStore } from '../store/AlbumStore.js';
 import { getSatchelStore } from '../store/SatchelStore.js';
 import { uuid } from '../util/uuid.js';
 import { uploadSatchelFile } from './upload.js';
-
-function el(selector, event, callback) {
-  document.querySelector(selector).addEventListener(event, callback);
-}
 
 export function setupAlbum() {
   el('#actionAlbumOpen', 'click', onActionAlbumOpen);

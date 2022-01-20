@@ -26,7 +26,7 @@ const INNER_HTML = /* html */`
   <fieldset class="portraitContainer">
     <div class="foundrySocketContainer">
       <div class="foundryContainer">
-        <icon-button id="actionExpand" icon="res/expandmore.svg" alt="expand" title="Expand"></icon-button>
+        <icon-button id="actionExpand" icon="res/expandmore.svg" alt="expand" title="Morph Tools"></icon-button>
         <span id="foundryActions" class="hidden">
           <icon-button id="actionEnlarge" icon="res/enlarge.svg" alt="more" title="Enlarge"></icon-button>
           <icon-button id="actionShrink" icon="res/shrink.svg" alt="less" title="Shrink"></icon-button>

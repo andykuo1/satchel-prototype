@@ -1,3 +1,4 @@
+import { el } from '../ToolbarHelper.js';
 import { busy } from '../components/BusyPrompt.js';
 import {
   loadSatchelAlbumsFromData,
@@ -15,10 +16,6 @@ import { readGoogleAppFile, signInGoogle, signOutGoogle, writeGoogleAppFile } fr
 import { startCloud } from './PeerSession.js';
 
 const LOGGER = new Logger('toolbar.sync');
-
-function el(selector, event, callback) {
-  document.querySelector(selector).addEventListener(event, callback);
-}
 
 export function setupSync() {
   el('#actionImportGoogle', 'click', onActionImportGoogle);

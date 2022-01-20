@@ -1,3 +1,4 @@
+import { el } from './ToolbarHelper.js';
 import { downloadText } from './util/downloader.js';
 import { getSatchelStore } from './store/SatchelStore.js';
 import { getCursorContext } from './satchel/inv/CursorHelper.js';
@@ -19,10 +20,7 @@ import { setupAlbum } from './toolbar/album.js';
 import { uploadSatchelFile } from './toolbar/upload.js';
 import { clearItemsInAlbum, getItemIdsInAlbum, getItemInAlbum } from './satchel/album/AlbumItems.js';
 import { clearItemsOnGround, getGroundAlbumId, hasGroundAlbum } from './satchel/GroundAlbum.js';
-
-function el(selector, event, callback) {
-  document.querySelector(selector).addEventListener(event, callback);
-}
+import { setupTutorial } from './toolbar/tutorial.js';
 
 window.addEventListener('DOMContentLoaded', () => {
   el('#downloadButton', 'click', onDownloadClick);
@@ -48,23 +46,45 @@ window.addEventListener('DOMContentLoaded', () => {
   el('#actionGroundDelete', 'dblclick', onActionGroundClear);
   el('#actionTrashClear', 'click', onActionTrashClear);
 
+  el('#actionGroundDelete', 'click', onTooltipGroundDelete);
+
   setupProfile();
   setupSync();
   setupAlbum();
+  setupTutorial();
 
   document.addEventListener('itemcontext', onItemContext);
 });
 
+function onTooltipGroundDelete(e) {
+  if (e.button === 2) {
+    return;
+  }
+  /** @type {import('./components/lib/ContextMenuElement.js').ContextMenuElement} */
+  const tooltip = document.querySelector('#tooltipGroundDelete');
+  let x = e.clientX;
+  let y = e.clientY;
+  tooltip.x = x;
+  tooltip.y = y;
+  tooltip.toggleAttribute('open', true);
+}
+
 function onActionGroundClear(e) {
+  /** @type {import('./components/lib/ContextMenuElement.js').ContextMenuElement} */
+  const tooltip = document.querySelector('#tooltipGroundDelete');
+  tooltip.toggleAttribute('open', false);
   const store = getSatchelStore();
   if (!hasGroundAlbum(store)) {
+    return;
+  }
+  let albumId = getGroundAlbumId(store);
+  let itemIds = getItemIdsInAlbum(store, albumId);
+  if (itemIds.length <= 0) {
     return;
   }
   if (!window.confirm('Clear all items on the ground?')) {
     return;
   }
-  let albumId = getGroundAlbumId(store);
-  let itemIds = getItemIdsInAlbum(store, albumId);
   for (let itemId of itemIds) {
     let item = getItemInAlbum(store, albumId, itemId);
     saveItemToTrashAlbum(item);

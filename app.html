@@ -668,6 +668,48 @@
         <button id="actionTrashClear" class="bigButton">Clear All</button>
       </div>
     </context-menu>
+
+    <style>
+      .tooltip {
+        text-align: center;
+      }
+    </style>
+    <context-menu style="--height: 4.5em;" class="tooltip" id="tooltipTutorial01" required>
+      <p>
+        Click the Anvil to forge your first item.
+      </p>
+    </context-menu>
+    <context-menu style="--height: 4.5em;" class="tooltip" id="tooltipTutorial02" required>
+      <p>
+        Click <b>+</b> to spawn a new item.
+      </p>
+    </context-menu>
+    <context-menu style="--height: 8em;" class="tooltip" id="tooltipTutorial03" required>
+      <p>
+        Try editing your item!
+      </p>
+      <p>
+        When done, drag the item to your inventory &rightarrow;
+      </p>
+    </context-menu>
+    <style>
+      .finalTutorial {
+        --width: 12em;
+        --height: 1em;
+      }
+    </style>
+    <context-menu class="tooltip finalTutorial" id="tooltipDelete">
+      Drag here to delete.
+    </context-menu>
+    <context-menu class="tooltip finalTutorial" id="tooltipFoundry">
+      Drag here to edit.
+    </context-menu>
+    <context-menu class="tooltip finalTutorial" id="tooltipAlbums">
+      Click here for Albums.
+    </context-menu>
+    <context-menu class="tooltip finalTutorial" id="tooltipSettings">
+      Click here for Settings.
+    </context-menu>
     
     <template id="busyTemplate">
       <banner-prompt id="busyDialog" horizontal required style="text-align: center;">

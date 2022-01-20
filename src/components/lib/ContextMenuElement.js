@@ -97,6 +97,14 @@ export class ContextMenuElement extends HTMLElement {
     this.toggleAttribute('open', value);
   }
 
+  get required() {
+    return this.hasAttribute('required');
+  }
+
+  set required(value) {
+    this.toggleAttribute('required', value);
+  }
+
   constructor() {
     super();
     const shadowRoot = this.attachShadow({ mode: 'open' });
@@ -113,6 +121,7 @@ export class ContextMenuElement extends HTMLElement {
   /** @protected */
   connectedCallback() {
     upgradeProperty(this, 'open');
+    upgradeProperty(this, 'required');
 
     document.addEventListener('click', this.onOutside, true);
     document.addEventListener('contextmenu', this.onOutside, true);
@@ -213,13 +222,17 @@ export class ContextMenuElement extends HTMLElement {
   /** @private */
   onOutside(e) {
     const contextMenu = this.containerElement;
-    if (contextMenu.classList.contains('visible')) {
-      const rect = contextMenu.getBoundingClientRect();
-      const x = e.clientX;
-      const y = e.clientY;
-      if (x > rect.right || x < rect.left || y > rect.bottom || y < rect.top) {
-        this.open = false;
-      }
+    if (!contextMenu.classList.contains('visible')) {
+      return;
+    }
+    if (this.required) {
+      return;
+    }
+    const rect = contextMenu.getBoundingClientRect();
+    const x = e.clientX;
+    const y = e.clientY;
+    if (x > rect.right || x < rect.left || y > rect.bottom || y < rect.top) {
+      this.open = false;
     }
   }
 }

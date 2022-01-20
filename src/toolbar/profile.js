@@ -1,3 +1,4 @@
+import { el } from '../ToolbarHelper.js';
 import { dispatchProfileChange } from '../events/ProfileEvents.js';
 import { saveSatchelProfilesToData } from '../loader/SatchelLoader.js';
 import { resolveActiveProfile } from '../satchel/ActiveProfile.js';
@@ -28,12 +29,6 @@ import { uuid } from '../util/uuid.js';
 import { uploadSatchelFile } from './upload.js';
 
 /** @typedef {import('../components/lib/BannerPromptElement.js').BannerPromptElement} BannerPromptElement */
-
-const LOGGER = new Logger('toolbar.profile');
-
-function el(selector, event, callback) {
-  document.querySelector(selector).addEventListener(event, callback);
-}
 
 export function setupProfile() {
   el('#actionProfile', 'click', onActionProfile);
