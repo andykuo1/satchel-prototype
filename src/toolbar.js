@@ -45,8 +45,6 @@ window.addEventListener('DOMContentLoaded', () => {
   el('#actionFoundryReset', 'contextmenu', onTrashClick);
   el('#actionGroundDelete', 'dblclick', onActionGroundClear);
   el('#actionTrashClear', 'click', onActionTrashClear);
-
-  el('#actionGroundDelete', 'click', onTooltipGroundDelete);
   el('#actionTutorialReset', 'click', onActionTutorialReset);
 
   setupProfile();
@@ -57,23 +55,7 @@ window.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('itemcontext', onItemContext);
 });
 
-function onTooltipGroundDelete(e) {
-  if (e.button === 2) {
-    return;
-  }
-  /** @type {import('./components/lib/ContextMenuElement.js').ContextMenuElement} */
-  const tooltip = document.querySelector('#tooltipGroundDelete');
-  let x = e.clientX;
-  let y = e.clientY;
-  tooltip.x = x;
-  tooltip.y = y;
-  tooltip.toggleAttribute('open', true);
-}
-
-function onActionGroundClear(e) {
-  /** @type {import('./components/lib/ContextMenuElement.js').ContextMenuElement} */
-  const tooltip = document.querySelector('#tooltipGroundDelete');
-  tooltip.toggleAttribute('open', false);
+function onActionGroundClear() {
   const store = getSatchelStore();
   if (!hasGroundAlbum(store)) {
     return;
