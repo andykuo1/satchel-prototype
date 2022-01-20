@@ -35,9 +35,6 @@ const INNER_HTML = /* html */`
 </fieldset>
 `;
 const INNER_STYLE = /* css */`
-:host {
-  margin: 0.5em;
-}
 fieldset {
   position: relative;
   min-height: 2em;
@@ -54,6 +51,9 @@ legend {
 }
 legend[contenteditable] {
   border-color: #ffffff;
+}
+:host([noaction]) legend, :host([noaction]) .preactionbar, :host([noaction]) .actionbar {
+  display: none;
 }
 .preactionbar {
   position: absolute;
@@ -254,7 +254,7 @@ export class AlbumPackElement extends HTMLElement {
     }
     const name = album.displayName;
 
-    if (isGroundAlbum(album)) {
+    if (isGroundAlbum(album) || isTrashAlbum(album)) {
       // Cannot change lock state for a ground album
       this.buttonLock.toggleAttribute('disabled', true);
     }

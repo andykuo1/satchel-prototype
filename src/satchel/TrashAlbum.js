@@ -27,7 +27,7 @@ function resolveTrashAlbumId(store) {
   let trashAlbumId = uuid();
   let album = createAlbum(trashAlbumId);
   album.displayName = TRASH_ALBUM_DISPLAY_NAME;
-  album.locked = true;
+  album.locked = false;
   album.expand = false;
   addAlbumInStore(store, album.albumId, album);
   return trashAlbumId;

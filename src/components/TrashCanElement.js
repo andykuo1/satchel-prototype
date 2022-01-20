@@ -1,7 +1,4 @@
-import { getItemIdsInAlbum, getItemInAlbum } from '../satchel/album/AlbumItems.js';
-import { clearItemsOnGround, getGroundAlbumId, hasGroundAlbum } from '../satchel/GroundAlbum.js';
 import { saveItemToTrashAlbum } from '../satchel/TrashAlbum.js';
-import { getSatchelStore } from '../store/SatchelStore.js';
 import { getCursor } from './index.js';
 
 /** @typedef {import('./cursor/InventoryCursorElement.js').InventoryCursorElement} InventoryCursorElement */
@@ -45,8 +42,6 @@ export class TrashCanElement extends HTMLElement {
     /** @private */
     this.onActionDelete = this.onActionDelete.bind(this);
     /** @private */
-    this.onActionClear = this.onActionClear.bind(this);
-    /** @private */
     this.onActionDeleteEnter = this.onActionDeleteEnter.bind(this);
     /** @private */
     this.onActionDeleteLeave = this.onActionDeleteLeave.bind(this);
@@ -54,7 +49,6 @@ export class TrashCanElement extends HTMLElement {
 
   /** @protected */
   connectedCallback() {
-    this.actionDelete.addEventListener('dblclick', this.onActionClear);
     this.actionDelete.addEventListener('mouseup', this.onActionDelete);
     this.actionDelete.addEventListener('mouseenter', this.onActionDeleteEnter);
     this.actionDelete.addEventListener('mouseleave', this.onActionDeleteLeave);
@@ -62,7 +56,6 @@ export class TrashCanElement extends HTMLElement {
 
   /** @protected */
   disconnectedCallback() {
-    this.actionDelete.removeEventListener('dblclick', this.onActionClear);
     this.actionDelete.removeEventListener('mouseup', this.onActionDelete);
     this.actionDelete.removeEventListener('mouseenter', this.onActionDeleteEnter);
     this.actionDelete.removeEventListener('mouseleave', this.onActionDeleteLeave);
@@ -78,26 +71,6 @@ export class TrashCanElement extends HTMLElement {
       e.preventDefault();
       e.stopPropagation();
       return false;
-    }
-  }
-
-  /** @private */
-  onActionClear(e) {
-    let result = this.onActionDelete(e);
-    if (result !== false) {
-      const store = getSatchelStore();
-      if (!hasGroundAlbum(store)) {
-        return;
-      }
-      if (window.confirm('Clear all items on the ground?')) {
-        let albumId = getGroundAlbumId(store);
-        let itemIds = getItemIdsInAlbum(store, albumId);
-        for (let itemId of itemIds) {
-          let item = getItemInAlbum(store, albumId, itemId);
-          saveItemToTrashAlbum(item);
-        }
-        clearItemsOnGround();
-      }
     }
   }
 

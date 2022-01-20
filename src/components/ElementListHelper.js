@@ -10,7 +10,8 @@ export function updateList(parentNode, list, factoryCreate, factoryDelete = () =
   const children = parentNode.children;
   /** @type {Record<string, Element>} */
   const preserved = {};
-  for (let child of children) {
+  for(let i = 0; i < children.length; ++i) {
+    let child = children.item(i);
     if (child.hasAttribute('data-listkey')) {
       let listKey = child.getAttribute('data-listkey');
       preserved[listKey] = child;

@@ -357,6 +357,9 @@
                 scroll-behavior: smooth;
                 padding: 0 0.5em;
               }
+              #albumList > * {
+                margin: 0.5em;
+              }
 
               #albumWatermark {
                 position: absolute;
@@ -578,11 +581,19 @@
 
     <context-menu id="cloudDialog">
       <style>
+        #cloudDialog {
+          --width: 5em;
+        }
+        #cloudDialog[open] {
+          display: flex;
+        }
         #cloudDialog h3 {
-          margin: 0;
+          font-size: 1em;
+          margin: 0.2em;
           text-align: center;
         }
         .cloudOptionList {
+          flex: 1;
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -597,16 +608,18 @@
           font-size: 0.5em;
         }
       </style>
-      <h3>Save to...</h3>
-      <div class="cloudOptionList">
-        <div class="cloudOption">
-          <icon-button id="actionExportGoogle" icon="res/googledrive.svg" title="Google Drive"></icon-button>
-        </div>
-        <div class="cloudOption">
-          <icon-button id="actionExportNotion" icon="res/notionso.svg" disabled title="Notion.so"></icon-button>
-        </div>
-        <div class="cloudOption">
-          <icon-button id="actionPeer" icon="res/group.svg" disabled title="P2P Session"></icon-button>
+      <div>
+        <h3>Save to</h3>
+        <div class="cloudOptionList">
+          <div class="cloudOption">
+            <icon-button id="actionExportGoogle" icon="res/googledrive.svg" title="Google Drive"></icon-button>
+          </div>
+          <div class="cloudOption">
+            <icon-button id="actionExportNotion" icon="res/notionso.svg" disabled title="Notion.so"></icon-button>
+          </div>
+          <div class="cloudOption">
+            <icon-button id="actionPeer" icon="res/group.svg" disabled title="P2P Session"></icon-button>
+          </div>
         </div>
       </div>
     </context-menu>
@@ -630,6 +643,29 @@
         <h3 style="margin: 0;">Item Code</h3>
         <textarea id="itemCodeInput" type="text" style="flex: 1;" placeholder="Paste here..."></textarea>
         <button id="itemCodeSubmit" class="bigButton">Submit</button>
+      </div>
+    </context-menu>
+
+    <context-menu id="trashDialog">
+      <style>
+        #trashDialog[open] {
+          display: flex;
+        }
+        #trashDialog > div {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          text-align: center;
+          height: 100%;
+        }
+        #trashAlbum {
+          flex: 1;
+        }
+      </style>
+      <div>
+        <h3 style="margin: 0;">Trash</h3>
+        <album-space id="trashAlbum" init="trash" fixed mini></album-space>
+        <button id="actionTrashClear" class="bigButton">Clear All</button>
       </div>
     </context-menu>
     

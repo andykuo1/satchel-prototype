@@ -3,6 +3,7 @@ import { AlbumPackElement, getCursor } from '../components/index.js';
 import { addAlbumListChangeListener } from '../events/AlbumEvents.js';
 import { isAlbumHidden } from '../satchel/album/Album.js';
 import { isGroundAlbum } from '../satchel/GroundAlbum.js';
+import { isTrashAlbum } from '../satchel/TrashAlbum.js';
 import { playSound } from '../sounds.js';
 import { createAlbumInStore, getAlbumsInStore } from '../store/AlbumStore.js';
 import { getSatchelStore } from '../store/SatchelStore.js';
@@ -70,6 +71,7 @@ function onAlbumListUpdate() {
   const list = getAlbumsInStore(store)
     .sort((a, b) => (a.displayName || '').localeCompare(b.displayName || ''))
     .filter((a) => !isGroundAlbum(a))
+    .filter((a) => !isTrashAlbum(a))
     .filter((a) => !isAlbumHidden(store, a.albumId))
     .map((a) => a.albumId)
     .reverse();

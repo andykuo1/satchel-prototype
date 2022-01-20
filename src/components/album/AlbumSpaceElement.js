@@ -1,15 +1,16 @@
 import { getSatchelStore } from '../../store/SatchelStore.js';
-import { addItemToInventory, getItemAtSlotIndex } from '../../satchel/inv/InventoryTransfer.js';
+import { addItemToInventory } from '../../satchel/inv/InventoryTransfer.js';
 import { uuid } from '../../util/uuid.js';
 import { upgradeProperty } from '../../util/wc.js';
 import { getCursor } from '../cursor/index.js';
 import { cloneItem } from '../../satchel/item/Item.js';
-import { getAlbumInStore, isAlbumInStore } from '../../store/AlbumStore.js';
+import { createAlbumInStore, deleteAlbumInStore, getAlbumInStore, isAlbumInStore } from '../../store/AlbumStore.js';
 import { addAlbumChangeListener, removeAlbumChangeListener } from '../../events/AlbumEvents.js';
 import { addInventoryChangeListener, removeInventoryChangeListener } from '../../events/InvEvents.js';
-import { getItemIdsInAlbum, getItemInAlbum, getItemsInAlbum, hasItemInAlbum, removeItemFromAlbum } from '../../satchel/album/AlbumItems.js';
+import { getItemInAlbum, getItemsInAlbum, hasItemInAlbum, removeItemFromAlbum } from '../../satchel/album/AlbumItems.js';
 import { isInvInStore, getInvInStore, deleteInvInStore, createSocketInvInStore } from '../../store/InvStore.js';
 import { updateList } from '../ElementListHelper.js';
+import { getTrashAlbumId, isTrashAlbum } from '../../satchel/TrashAlbum.js';
 
 /**
  * @typedef {import('../invgrid/InventoryGridElement.js').InventoryGridElement} InventoryGridElement
@@ -24,17 +25,26 @@ const INNER_HTML = /* html */`
 const INNER_STYLE = /* css */`
 :host {
   display: inline-block;
-  margin: 0.5em;
+  min-width: 2em;
+  min-height: 6em;
   text-align: left;
   vertical-align: top;
 }
 fieldset {
   position: relative;
-  min-width: 2em;
-  min-height: 2em;
+  width: calc(100% - 1em);
+  height: calc(100% - 1em);
   max-width: 20em;
+  overflow-y: auto;
   border: 0.5em dashed #333333;
-  padding: 2em;
+  padding: 2em 1em;
+  scroll-behavior: smooth;
+}
+:host([mini]) fieldset {
+  padding: 0;
+}
+:host([mini]) legend {
+  display: none;
 }
 `;
 
@@ -69,6 +79,14 @@ export class AlbumSpaceElement extends HTMLElement {
 
   set albumId(value) {
     this.setAttribute('albumid', value);
+  }
+
+  get init() {
+    return this.getAttribute('init');
+  }
+
+  set init(value) {
+    this.setAttribute('init', value);
   }
 
   constructor() {
@@ -109,8 +127,28 @@ export class AlbumSpaceElement extends HTMLElement {
   /** @protected */
   connectedCallback() {
     upgradeProperty(this, 'albumId');
+    upgradeProperty(this, 'init');
 
     this.container.addEventListener('mouseup', this.onMouseUp);
+
+    // Only start init once.
+    if (this.init) {
+      const store = getSatchelStore();
+      let initType = this.init;
+      let albumId = this.albumId;
+      if (initType === 'trash') {
+        albumId = getTrashAlbumId(store);
+        this.albumId = albumId;
+      } else if (initType === 'album') {
+        if (!albumId) {
+          albumId = uuid();
+          this.albumId = albumId;
+        }
+        createAlbumInStore(store, albumId);
+      } else {
+        throw new Error(`Unknown init type '${initType}' for album-space.`);
+      }
+    }
   }
 
   /** @protected */
@@ -141,13 +179,24 @@ export class AlbumSpaceElement extends HTMLElement {
     this.socketedIds = {};
 
     // Destroy all items
-    for (const node of this.slotItems.children) {
-      const invNode = /** @type {InventoryGridElement} */ (node);
+    let children = this.slotItems.children;
+    for(let i = 0; i < children.length; ++i) {
+      let child = children.item(i);
+      const invNode = /** @type {InventoryGridElement} */ (child);
       const invId = invNode.invId;
       const inv = getInvInStore(store, invId);
       if (inv) {
         deleteInvInStore(store, invId, inv);
-        node.remove();
+        child.remove();
+      }
+    }
+
+    // Only stop init once.
+    if (this.init) {
+      const albumId = this.albumId;
+      const album = getAlbumInStore(store, albumId);
+      if (!isTrashAlbum(album)) {
+        deleteAlbumInStore(getSatchelStore(), albumId, album);
       }
     }
   }
@@ -199,6 +248,7 @@ export class AlbumSpaceElement extends HTMLElement {
     // Update name
     this.containerTitle.textContent = name;
 
+    let flag = false;
     const list = getItemsInAlbum(store, albumId)
       .sort((a, b) => (a.displayName||'').localeCompare(b.displayName||''))
       .map(a => a.itemId);
@@ -214,11 +264,18 @@ export class AlbumSpaceElement extends HTMLElement {
       invElement.invId = invId;
       invElement.toggleAttribute('noinput', true);
       invElement.toggleAttribute('temp', true);
+      invElement.toggleAttribute('fixed', this.hasAttribute('fixed'));
       this.socketedIds[invId] = newItem.itemId;
       addInventoryChangeListener(store, invId, this.onSocketInventoryChange);
+      flag = true;
       return invElement;
     };
     updateList(this.slotItems, list, factoryCreate);
+
+    // Only scroll for new items.
+    if (flag) {
+      this.container.scrollTo(0, this.container.scrollHeight);
+    }
   }
 
   /** @private */

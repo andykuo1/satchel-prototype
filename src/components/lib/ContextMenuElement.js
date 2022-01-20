@@ -2,12 +2,14 @@ import { upgradeProperty } from '../../util/wc.js';
 
 const INNER_HTML = /* html */ `
 <div class="container">
-  <div class="inner">
-    <slot></slot>
-  </div>
+  <slot></slot>
 </div>
 `;
 const INNER_STYLE = /* css */ `
+:host {
+  --width: 10em;
+  --height: 12em;
+}
 .container {
   position: fixed;
   padding: 0.5em;
@@ -17,22 +19,16 @@ const INNER_STYLE = /* css */ `
   border-left: 0.1em solid #666666;
   border-right: 0.3em solid #666666;
   border-bottom: 0.3em solid #666666;
-  width: 10em;
-  height: 12em;
-  z-index: 10;
-  transition: width 0.3s ease, height 0.3s ease;
-  overflow: hidden;
-}
-.inner {
-  width: 10em;
-  height: 12em;
-  overflow-x: hidden;
-  overflow-y: visible;
+  width: var(--width);
+  height: var(--height);
+  z-index: 1;
+  opacity: 1;
+  transition: opacity 0.2s ease;
+  overflow-y: auto;
 }
 .container:not(.visible) {
   visibility: hidden;
-  width: 0;
-  height: 0;
+  opacity: 0;
 }
 .topleft {
   border-top-left-radius: 0;
@@ -47,8 +43,6 @@ const INNER_STYLE = /* css */ `
   border-bottom-right-radius: 0;
 }
 `;
-
-const EXPECTED_MENU_PADDING = '1.4em'; // Manually calculated from stylesheet
 
 /**
  * @fires open
@@ -111,8 +105,6 @@ export class ContextMenuElement extends HTMLElement {
 
     /** @private */
     this.containerElement = /** @type {HTMLElement} */ (shadowRoot.querySelector('.container'));
-    /** @private */
-    this.innerElement = /** @type {HTMLElement} */ (shadowRoot.querySelector('.inner'));
 
     /** @private */
     this.onOutside = this.onOutside.bind(this);
@@ -122,12 +114,14 @@ export class ContextMenuElement extends HTMLElement {
   connectedCallback() {
     upgradeProperty(this, 'open');
 
-    document.addEventListener('mousedown', this.onOutside, true);
+    document.addEventListener('click', this.onOutside, true);
+    document.addEventListener('contextmenu', this.onOutside, true);
   }
 
   /** @protected */
   disconnectedCallback() {
-    document.removeEventListener('mousedown', this.onOutside, true);
+    document.removeEventListener('click', this.onOutside, true);
+    document.removeEventListener('contextmenu', this.onOutside, true);
   }
   
   /**
@@ -158,8 +152,7 @@ export class ContextMenuElement extends HTMLElement {
    */
   setPosition(clientX, clientY) {
     const contextMenu = this.containerElement;
-    const innerContent = this.innerElement;
-    const innerRect = innerContent.getBoundingClientRect();
+    const innerRect = contextMenu.getBoundingClientRect();
     const width = innerRect.width;
     const height = innerRect.height;
     const root = document.documentElement;
@@ -168,13 +161,13 @@ export class ContextMenuElement extends HTMLElement {
     let bottom = false;
     let right = false;
     if (rootHeight < (clientY + height)) {
-      contextMenu.style.top = `calc(${clientY - height}px - ${EXPECTED_MENU_PADDING})`;
+      contextMenu.style.top = `${clientY - height}px`;
       bottom = true;
     } else {
       contextMenu.style.top = `${clientY}px`;
     }
     if (rootWidth < (clientX + width)) {
-      contextMenu.style.left = `calc(${clientX - width}px - ${EXPECTED_MENU_PADDING})`;
+      contextMenu.style.left = `${clientX - width}px`;
       right = true;
     } else {
       contextMenu.style.left = `${clientX}px`;

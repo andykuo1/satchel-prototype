@@ -10,13 +10,15 @@ import { forceEmptyStorage } from './Storage.js';
 import { saveSatchelToData } from './loader/SatchelLoader.js';
 import { dropFallingItem } from './components/cursor/FallingItemElement.js';
 import { playSound, toggleSound } from './sounds.js';
-import { saveItemToTrashAlbum } from './satchel/TrashAlbum.js';
+import { getTrashAlbumId, saveItemToTrashAlbum } from './satchel/TrashAlbum.js';
 
 import { setupProfile } from './toolbar/profile.js';
 import { setupSync } from './toolbar/sync.js';
 import { notify } from './components/NotifyPrompt.js';
 import { setupAlbum } from './toolbar/album.js';
 import { uploadSatchelFile } from './toolbar/upload.js';
+import { clearItemsInAlbum, getItemIdsInAlbum, getItemInAlbum } from './satchel/album/AlbumItems.js';
+import { clearItemsOnGround, getGroundAlbumId, hasGroundAlbum } from './satchel/GroundAlbum.js';
 
 function el(selector, event, callback) {
   document.querySelector(selector).addEventListener(event, callback);
@@ -41,6 +43,10 @@ window.addEventListener('DOMContentLoaded', () => {
   el('#giftSubmit', 'click', onGiftSubmit);
 
   el('#itemCodeSubmit', 'click', onActionItemCodeSubmit);
+  el('#actionGroundDelete', 'contextmenu', onTrashClick);
+  el('#actionFoundryReset', 'contextmenu', onTrashClick);
+  el('#actionGroundDelete', 'dblclick', onActionGroundClear);
+  el('#actionTrashClear', 'click', onActionTrashClear);
 
   setupProfile();
   setupSync();
@@ -48,6 +54,48 @@ window.addEventListener('DOMContentLoaded', () => {
 
   document.addEventListener('itemcontext', onItemContext);
 });
+
+function onActionGroundClear(e) {
+  const store = getSatchelStore();
+  if (!hasGroundAlbum(store)) {
+    return;
+  }
+  if (!window.confirm('Clear all items on the ground?')) {
+    return;
+  }
+  let albumId = getGroundAlbumId(store);
+  let itemIds = getItemIdsInAlbum(store, albumId);
+  for (let itemId of itemIds) {
+    let item = getItemInAlbum(store, albumId, itemId);
+    saveItemToTrashAlbum(item);
+  }
+  clearItemsOnGround();
+}
+
+function onTrashClick(e) {
+  /** @type {import('./components/lib/ContextMenuElement.js').ContextMenuElement} */
+  const trashDialog = document.querySelector('#trashDialog');
+  let rect = e.target.getBoundingClientRect();
+  trashDialog.x = rect.x + rect.width / 2;
+  trashDialog.y = rect.y + rect.height / 2;
+  trashDialog.toggleAttribute('open', true);
+  e.preventDefault();
+  e.stopPropagation();
+  return false;
+}
+
+function onActionTrashClear() {
+  const store = getSatchelStore();
+  const trashAlbumId = getTrashAlbumId(store);
+  let itemIds = getItemIdsInAlbum(store, trashAlbumId);
+  if (itemIds.length <= 0) {
+    return;
+  }
+  if (!window.confirm('This will destroy all items in the trash. Are you sure?')) {
+    return;
+  }
+  clearItemsInAlbum(store, trashAlbumId);
+}
 
 function onActionShareItem() {
   /** @type {import('./components/itemeditor/ItemDialogElement.js').ItemDialogElement} */
@@ -233,8 +281,11 @@ async function onActionItemCodeSubmit() {
   }
 }
 
-function onActionFoundryReset() {
+function onActionFoundryReset(e) {
   if (!isFoundryOpen()) {
+    return;
+  }
+  if (e.button === 2) {
     return;
   }
   const prevItem = clearFoundry();
