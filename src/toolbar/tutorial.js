@@ -1,14 +1,23 @@
-import { loadFromStorage } from '../Storage.js';
+import { loadFromStorage, saveToStorage } from '../Storage.js';
 import { addInventoryChangeListener, removeInventoryChangeListener } from '../events/InvEvents.js';
 import { getSatchelStore } from '../store/SatchelStore.js';
 import { isInventoryEmpty } from '../satchel/inv/InventoryTransfer.js';
+import { closeFoundry } from '../satchel/inv/FoundryHelper.js';
 
 export async function setupTutorial() {
-  let skipTutorial = Boolean(loadFromStorage('skipTutorial'));
+  let skipTutorial = loadFromStorage('skipTutorial') === 'true';
   if (skipTutorial) {
     return;
   }
   setupTutorial01();
+}
+
+export function resetTutorial() {
+  saveToStorage('skipTutorial', 'false');
+  closeFoundry();
+  teardownTutorial01();
+  teardownTutorial02();
+  teardownTutorial03();
 }
 
 function openTutorial(target, tooltip) {
@@ -106,11 +115,20 @@ function teardownTutorial03() {
   removeInventoryChangeListener(store, invId, onTutorial03);
 }
 
+// NOTE: Since creating a new item calls clear then put. This can be called twice by "+ Item" button.
+let tutorial03DebounceHandle = null;
 function onTutorial03(store, invId) {
-  if (isInventoryEmpty(store, invId)) {
-    teardownTutorial03();
-    setupTutorial04();
+  if (tutorial03DebounceHandle) {
+    return;
   }
+  tutorial03DebounceHandle = setTimeout(() => {
+    if (isInventoryEmpty(store, invId)) {
+      teardownTutorial03();
+      saveToStorage('skipTutorial', 'true');
+      setupTutorial04();
+    }
+    tutorial03DebounceHandle = null;
+  });
 }
 
 function setupTutorial04() {

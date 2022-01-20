@@ -20,7 +20,7 @@ import { setupAlbum } from './toolbar/album.js';
 import { uploadSatchelFile } from './toolbar/upload.js';
 import { clearItemsInAlbum, getItemIdsInAlbum, getItemInAlbum } from './satchel/album/AlbumItems.js';
 import { clearItemsOnGround, getGroundAlbumId, hasGroundAlbum } from './satchel/GroundAlbum.js';
-import { setupTutorial } from './toolbar/tutorial.js';
+import { resetTutorial, setupTutorial } from './toolbar/tutorial.js';
 
 window.addEventListener('DOMContentLoaded', () => {
   el('#downloadButton', 'click', onDownloadClick);
@@ -47,6 +47,7 @@ window.addEventListener('DOMContentLoaded', () => {
   el('#actionTrashClear', 'click', onActionTrashClear);
 
   el('#actionGroundDelete', 'click', onTooltipGroundDelete);
+  el('#actionTutorialReset', 'click', onActionTutorialReset);
 
   setupProfile();
   setupSync();
@@ -318,4 +319,9 @@ function onActionFoundryReset(e) {
 
 function onActionSoundToggle() {
   toggleSound();
+}
+
+function onActionTutorialReset() {
+  resetTutorial();
+  setupTutorial();
 }
