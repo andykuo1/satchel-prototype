@@ -59,7 +59,9 @@ const INNER_HTML = /* html */`
   </fieldset>
   <fieldset class="detailContainer">
     <p class="titleContainer">
-      <input type="text" id="itemTitle" placeholder="Item">
+      <span id="itemTitleContainer">
+        <input type="text" id="itemTitle" placeholder="Item">
+      </span>
       <span id="itemStackSizeContainer">
         <span id="preStackSize">⨯</span><input type="number" id="itemStackSize" placeholder="--">
       </span>
@@ -108,7 +110,6 @@ textarea {
   outline: none;
   border: none;
   background: none;
-  min-height: 10em;
   color: var(--foreground-color);
   resize: none;
 }
@@ -149,6 +150,10 @@ img {
 
 .titleContainer {
   display: flex;
+  flex-direction: row;
+  align-items: center;
+  border-bottom: 0.2em solid var(--foreground-color);
+  margin-bottom: 0.5em;
 }
 .textContainer {
   flex: 1;
@@ -218,6 +223,10 @@ img {
   align-items: center;
 }
 
+#itemDesc {
+  min-height: 10em;
+}
+
 #itemWidth, #itemHeight {
   color: var(--foreground-color);
   width: 2.5em;
@@ -243,28 +252,37 @@ img {
 
 #preStackSize {
   display: inline-block;
-  font-size: 1.2em;
   border: none;
-  border-bottom: 0.2em solid var(--foreground-color);
+  margin-left: 0.5em;
+  font-size: 1.2em;
 }
 #itemStackSize {
   font-family: serif;
   font-size: 1.2em;
-  flex: 1;
   width: 2.5em;
+  height: 100%;
   border: none;
-  border-bottom: 0.2em solid var(--foreground-color);
   background-color: transparent;
   color: var(--foreground-color);
+  margin: 0;
+}
+#itemTitleContainer {
+  flex: 1;
+  height: 100%;
+}
+#itemStackSizeContainer {
+  flex: 0;
+  white-space: nowrap;
+  height: 100%;
 }
 
 #itemTitle {
+  width: 100%;
+  height: 100%;
+  display: inline-block;
   font-family: serif;
   font-size: 1.2em;
-  flex: 1;
-  margin-bottom: 0.5em;
   border: none;
-  border-bottom: 0.2em solid var(--foreground-color);
   background-color: transparent;
   color: var(--foreground-color);
 }

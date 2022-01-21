@@ -30,7 +30,6 @@ const INNER_STYLE = /* css */`
   /* var(--item-unit-size) is inherited from parent container. */
 }
 .container {
-  font-family: var(--title-font);
   display: inline-block;
   position: absolute;
   left: calc(var(--itemX) * var(--item-unit-size));
@@ -74,6 +73,7 @@ img {
   object-fit: contain;
 }
 figcaption {
+  font-family: var(--title-font);
   position: absolute;
   left: 0;
   right: 0;
