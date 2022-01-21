@@ -198,10 +198,6 @@
           .rightSideContainer {
             flex-direction: row;
           }
-          .groundContainer {
-            display: flex;
-            flex-direction: column;
-          }
           #ground {
             flex: 1;
             overflow-y: auto;
@@ -227,7 +223,7 @@
             }
           </style>
           <!-- GROUND CONTENT -->
-          <div class="groundContainer">
+          <div class="groundContainer flexColumn">
             <div id="groundWatermark">
               <h3>Ground</h3>
             </div>
@@ -307,6 +303,15 @@
                 text-align: center;
                 overflow: auto;
               }
+              #overlayWorkspace {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                box-shadow: inset 0 0 0.5em #000000;
+                pointer-events: none;
+              }
               .workspacePadding {
                 min-width: 4em;
                 min-height: 4em;
@@ -317,6 +322,7 @@
               <div id="localWorkspace"></div>
               <div id="remoteWorkspace"></div>
               <div class="workspacePadding"></div>
+              <div id="overlayWorkspace"></div>
             </div>
             <style>
               .albumContainer {
