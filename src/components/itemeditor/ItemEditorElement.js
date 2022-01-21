@@ -53,7 +53,7 @@ const INNER_HTML = /* html */`
       <div class="foundrySocketMargin"></div>
     </div>
     <p class="styleContainer">
-    <icon-button id="actionBackground" icon="res/palette.svg" alt="color" title="Background"></icon-button>
+      <icon-button id="actionBackground" icon="res/palette.svg" alt="color" title="Background"></icon-button>
       <icon-button id="actionImage" icon="res/image.svg" alt="image" title="Image"></icon-button>
     </p>
   </fieldset>
@@ -87,8 +87,8 @@ const INNER_HTML = /* html */`
 
       <button style="background-color: #ff8000;" data-color="#ff8000"></button>
       <button style="background-color: #ff00ff;" data-color="#ff00ff"></button>
-
       <button style="background-color: #9900ff;" data-color="#9900ff"></button>
+      
       <button style="background-color: #ff0000;" data-color="#ff0000"></button>
       <button style="background-color: #ffffff;" data-color="#ffffff"></button>
       <button style="background-color: #000000; color: #ffffff;" data-color="#000000">⊘</button>
