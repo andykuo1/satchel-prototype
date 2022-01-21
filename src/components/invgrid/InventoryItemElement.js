@@ -48,7 +48,7 @@ const INNER_STYLE = /* css */`
   width: calc(var(--itemWidth) * var(--item-unit-size) - 0.2em);
   height: calc(var(--itemHeight) * var(--item-unit-size) - 0.2em);
   background: linear-gradient(to bottom right,
-    transparent, var(--itemBackground, var(--background-color)));
+    var(--background-color), var(--itemBackground, var(--background-color)));
   border: 0.1em solid var(--itemBackground, var(--background-color));
 }
 .container.background, .container.background .innerContainer {
