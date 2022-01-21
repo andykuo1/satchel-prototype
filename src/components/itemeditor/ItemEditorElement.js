@@ -81,14 +81,15 @@ const INNER_HTML = /* html */`
 <context-menu id="paletteContextMenu">
   <div class="paletteContainer">
     <div id="paletteColors">
-      <button style="background-color: #ff0080;" data-color="#ff0080"></button>
+      <button style="background-color: #ffff00;" data-color="#ffff00"></button>
       <button style="background-color: #80ff00;" data-color="#80ff00"></button>
       <button style="background-color: #00ffff;" data-color="#00ffff"></button>
-      
+
       <button style="background-color: #ff8000;" data-color="#ff8000"></button>
-      <button style="background-color: #ffff00;" data-color="#ffff00"></button>
+      <button style="background-color: #ff00ff;" data-color="#ff00ff"></button>
+
       <button style="background-color: #9900ff;" data-color="#9900ff"></button>
-      
+      <button style="background-color: #ff0000;" data-color="#ff0000"></button>
       <button style="background-color: #ffffff;" data-color="#ffffff"></button>
       <button style="background-color: #000000; color: #ffffff;" data-color="#000000">⊘</button>
     </div>
