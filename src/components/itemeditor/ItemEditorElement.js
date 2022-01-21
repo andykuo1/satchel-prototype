@@ -649,6 +649,8 @@ export class ItemEditorElement extends HTMLElement {
     this.itemStackSize.value = '';
     this.itemImage.value = '';
     this.itemImage.placeholder = '';
+    this.galleryContextMenu.toggleAttribute('open', false);
+    this.paletteContextMenu.toggleAttribute('open', false);
   }
 
   /**
@@ -673,6 +675,8 @@ export class ItemEditorElement extends HTMLElement {
       this.itemImage.value = '';
     }
     this.itemImage.placeholder = 'Paste image url here...';
+    this.galleryContextMenu.toggleAttribute('open', false);
+    this.paletteContextMenu.toggleAttribute('open', false);
   }
 
   /** @private */
