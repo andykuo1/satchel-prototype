@@ -35,3 +35,6 @@ Feedback
 - Cloud icon should show the time since last save.
 
 Gift box or loot boxes. Right click opens a menu so that you can open it? Or right click always opens it?
+
+
+- ZOOM

@@ -98,6 +98,7 @@ function onActionTrashClear() {
     return;
   }
   clearItemsInAlbum(store, trashAlbumId);
+  playSound('clearItem');
 }
 
 function onActionShareItem() {
