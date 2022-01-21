@@ -40,7 +40,19 @@ const INNER_STYLE = /* css */`
   user-select: none;
   box-shadow: 0 0 0 rgba(0, 0, 0, 0);
   transition: box-shadow 0.1s ease;
-  background: var(--itemBackground, var(--background-color));
+  background: var(--background-color);
+}
+.container.background {
+  left: calc(var(--itemX) * var(--item-unit-size));
+  top: calc(var(--itemY) * var(--item-unit-size));
+  width: calc(var(--itemWidth) * var(--item-unit-size) - 0.2em);
+  height: calc(var(--itemHeight) * var(--item-unit-size) - 0.2em);
+  background: linear-gradient(to bottom right,
+    transparent, var(--itemBackground, var(--background-color)));
+  border: 0.1em solid var(--itemBackground, var(--background-color));
+}
+.container.background, .container.background .innerContainer {
+  border-radius: 1em;
 }
 .container:hover {
   z-index: 5;
@@ -166,6 +178,8 @@ export class InventoryItemElement extends HTMLElement {
     this._itemId = itemId;
 
     /** @private */
+    this._container = shadowRoot.querySelector('.container');
+    /** @private */
     this._image = this.shadowRoot.querySelector('img');
     /** @private */
     this._caption = this.shadowRoot.querySelector('figcaption');
@@ -231,11 +245,14 @@ export class InventoryItemElement extends HTMLElement {
         let a = hex === 0 ? 0.1 : 0.3;
         let background = `rgba(${r}, ${g}, ${b}, ${a})`;
         this.style.setProperty('--itemBackground', background);
+        this._container.classList.toggle('background', true);
       } catch (e) {
         this.style.removeProperty('--itemBackground');
+        this._container.classList.toggle('background', false);
       }
     } else {
       this.style.removeProperty('--itemBackground');
+      this._container.classList.toggle('background', false);
     }
     const title = item.displayName || 'Item';
     this.title = title;
