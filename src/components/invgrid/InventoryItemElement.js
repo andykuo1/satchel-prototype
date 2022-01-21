@@ -20,6 +20,7 @@ const INNER_STYLE = /* css */`
 :host {
   --background-color: var(--item-background-color);
   --hover-color: var(--item-hover-color);
+  --title-font: var(--item-title-font);
   
   --itemX: 0;
   --itemY: 0;
@@ -29,6 +30,7 @@ const INNER_STYLE = /* css */`
   /* var(--item-unit-size) is inherited from parent container. */
 }
 .container {
+  font-family: var(--title-font);
   display: inline-block;
   position: absolute;
   left: calc(var(--itemX) * var(--item-unit-size));
