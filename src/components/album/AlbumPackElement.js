@@ -38,6 +38,7 @@ const INNER_STYLE = /* css */`
 fieldset {
   position: relative;
   min-height: 2em;
+  padding-right: 2.5em;
   border-color: #444444;
 }
 fieldset.unlocked {
