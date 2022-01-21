@@ -10,8 +10,6 @@ export function dropItemOnGround(freedItem) {
   const store = getSatchelStore();
   const groundAlbumId = getGroundAlbumId(store);
   addItemToAlbum(store, groundAlbumId, freedItem);
-  const groundElement = document.querySelector('#ground');
-  groundElement.scrollTo(0, groundElement.scrollHeight);
 }
 
 function resolveGroundAlbumId(store) {

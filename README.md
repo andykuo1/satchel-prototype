@@ -38,3 +38,9 @@ Gift box or loot boxes. Right click opens a menu so that you can open it? Or rig
 
 
 - ZOOM
+
+a chunked, boundless inventory like space but it expands per chunk as you place things down (and deletes if nothing is there)
+
+As a chunked map editor.
+As a collage editor.
+

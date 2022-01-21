@@ -1,23 +1,21 @@
 import { getSatchelStore } from '../../store/SatchelStore.js';
-import { addItemToInventory } from '../../satchel/inv/InventoryTransfer.js';
-import { uuid } from '../../util/uuid.js';
 import { isAlbumExpanded, isAlbumLocked, setAlbumExpanded, setAlbumLocked } from '../../satchel/album/Album.js';
 import { getCursor } from '../cursor/index.js';
 import { downloadText } from '../../util/downloader.js';
-import { cloneItem } from '../../satchel/item/Item.js';
 import { exportAlbumToJSON } from '../../loader/AlbumLoader.js';
 import { deleteAlbumInStore, getAlbumInStore, isAlbumInStore } from '../../store/AlbumStore.js';
-import { addAlbumChangeListener, dispatchAlbumChange, removeAlbumChangeListener } from '../../events/AlbumEvents.js';
+import { dispatchAlbumChange } from '../../events/AlbumEvents.js';
 import { IconButtonElement } from '../lib/IconButtonElement.js';
-import { addInventoryChangeListener, removeInventoryChangeListener } from '../../events/InvEvents.js';
-import { clearItemsInAlbum, getItemIdsInAlbum, getItemInAlbum, getItemsInAlbum, hasItemInAlbum, removeItemFromAlbum } from '../../satchel/album/AlbumItems.js';
+import { clearItemsInAlbum, getItemIdsInAlbum } from '../../satchel/album/AlbumItems.js';
 import { isGroundAlbum } from '../../satchel/GroundAlbum.js';
 import { isFoundryAlbum } from '../../satchel/FoundryAlbum.js';
-import { isInvInStore, getInvInStore, deleteInvInStore, createSocketInvInStore } from '../../store/InvStore.js';
 import { isTrashAlbum } from '../../satchel/TrashAlbum.js';
-import { updateList } from '../ElementListHelper.js';
+import './AlbumListElement.js';
 
-/** @typedef {import('../invgrid/InventoryGridElement.js').InventoryGridElement} InventoryGridElement */
+/**
+ * @typedef {import('../invgrid/InventoryGridElement.js').InventoryGridElement} InventoryGridElement
+ * @typedef {import('../../satchel/item/Item.js').ItemId} ItemId
+ */
 
 const INNER_HTML = /* html */`
 <fieldset>
@@ -31,7 +29,7 @@ const INNER_HTML = /* html */`
     <icon-button class="button" id="buttonLock" icon="res/unlock.svg" alt="lock" title="Lock Album"></icon-button>
   </span>
   <label id="labelEmpty" class="hidden">- - - - - Empty - - - - -</label>
-  <slot name="items"></slot>
+  <album-list fixed></album-list>
 </fieldset>
 `;
 const INNER_STYLE = /* css */`
@@ -52,9 +50,6 @@ legend {
 }
 legend[contenteditable] {
   border-color: #ffffff;
-}
-:host([noaction]) legend, :host([noaction]) .preactionbar, :host([noaction]) .actionbar {
-  display: none;
 }
 .preactionbar {
   position: absolute;
@@ -93,7 +88,7 @@ fieldset.internal {
 legend.internal {
   color: #888888;
 }
-slot:not(.expanded) {
+album-list:not(.expanded) {
   display: none;
 }
 `;
@@ -138,6 +133,8 @@ export class AlbumPackElement extends HTMLElement {
     
     /** @private */
     this._albumId = albumId;
+    /** @private */
+    this._locked = false;
 
     /** @private */
     this.container = shadowRoot.querySelector('fieldset');
@@ -155,17 +152,11 @@ export class AlbumPackElement extends HTMLElement {
     /** @private */
     this.buttonExpand = /** @type {IconButtonElement} */ (shadowRoot.querySelector('#buttonExpand'));
 
-    /**
-     * @private
-     * @type {HTMLSlotElement}
-     */
-    this.slotItems = shadowRoot.querySelector('slot[name="items"]');
-
     /** @private */
-    this.socketedIds = {};
-
+    this.albumList = shadowRoot.querySelector('album-list');
+    this.albumList.setAttribute('albumid', albumId);
     /** @private */
-    this.onAlbumChange = this.onAlbumChange.bind(this);
+    this.onAlbumListChange = this.onAlbumListChange.bind(this);
 
     /** @private */
     this.onInputTitle = this.onInputTitle.bind(this);
@@ -180,17 +171,11 @@ export class AlbumPackElement extends HTMLElement {
     
     /** @private */
     this.onItemDrop = this.onItemDrop.bind(this);
-    /** @private */
-    this.onSocketInventoryChange = this.onSocketInventoryChange.bind(this);
   }
 
   /** @protected */
   connectedCallback() {
-    const store = getSatchelStore();
-    const albumId = this.albumId;
-    addAlbumChangeListener(store, albumId, this.onAlbumChange);
-    this.onAlbumChange(store, albumId);
-
+    this.albumList.addEventListener('change', this.onAlbumListChange);
     this.inputTitle.addEventListener('input', this.onInputTitle);
     this.buttonLock.addEventListener('click', this.onButtonLock);
     this.buttonExport.addEventListener('click', this.onButtonExport);
@@ -201,59 +186,20 @@ export class AlbumPackElement extends HTMLElement {
 
   /** @protected */
   disconnectedCallback() {
-    const store = getSatchelStore();
-    const albumId = this.albumId;
-    if (albumId) {
-      removeAlbumChangeListener(
-        store,
-        albumId,
-        this.onAlbumChange
-      );
-    }
+    this.albumList.removeEventListener('change', this.onAlbumListChange);
     this.inputTitle.removeEventListener('input', this.onInputTitle);
     this.buttonLock.removeEventListener('click', this.onButtonLock);
     this.buttonExport.removeEventListener('click', this.onButtonExport);
     this.buttonDelete.removeEventListener('click', this.onButtonDelete);
     this.buttonExpand.removeEventListener('click', this.onButtonExpand);
     this.container.removeEventListener('mouseup', this.onItemDrop);
-    
-    this.cleanUp();
   }
 
   /** @private */
-  cleanUp() {
+  onAlbumListChange(e) {
+    const albumId = e.detail.albumId;
     const store = getSatchelStore();
-
-    // Remove all temp inv listeners
-    for(let invId of Object.keys(this.socketedIds)) {
-      removeInventoryChangeListener(store, invId, this.onSocketInventoryChange);
-    }
-    this.socketedIds = {};
-
-    // Destroy all items
-    for (const node of this.slotItems.children) {
-      const invNode = /** @type {InventoryGridElement} */ (node);
-      const invId = invNode.invId;
-      const inv = getInvInStore(store, invId);
-      if (inv) {
-        deleteInvInStore(store, invId, inv);
-        node.remove();
-      }
-    }
-  }
-
-  /**
-   * @param store
-   * @param albumId
-   * @protected
-   */
-  onAlbumChange(store, albumId) {
     const album = getAlbumInStore(store, albumId);
-    if (!album) {
-      // The album has been deleted.
-      return;
-    }
-    const name = album.displayName;
 
     if (isGroundAlbum(album) || isTrashAlbum(album)) {
       // Cannot change lock state for a ground album
@@ -268,13 +214,14 @@ export class AlbumPackElement extends HTMLElement {
     this.buttonDelete.toggleAttribute('disabled', locked);
     this.inputTitle.toggleAttribute('contenteditable', !locked);
     this.container.classList.toggle('unlocked', !locked);
+    this.albumList.toggleAttribute('locked', locked);
 
     // Update expand status
     const expanded = isAlbumExpanded(store, albumId);
     this.buttonExpand.icon = expanded ? 'res/expandless.svg' : 'res/expandmore.svg';
     this.buttonExpand.alt = expanded ? 'less' : 'more';
     this.buttonExpand.title = expanded ? 'Hide Album' : 'Show Album';
-    this.slotItems.classList.toggle('expanded', expanded);
+    this.albumList.classList.toggle('expanded', expanded);
 
     // Change style for internal albums
     let isInternalAlbum = isFoundryAlbum(album) || isGroundAlbum(album) || isTrashAlbum(album);
@@ -282,6 +229,7 @@ export class AlbumPackElement extends HTMLElement {
     this.inputTitle.classList.toggle('internal', isInternalAlbum);
 
     // Update name
+    const name = album.displayName;
     if (name !== this.inputTitle.textContent) {
       this.inputTitle.textContent = name;
     }
@@ -289,37 +237,6 @@ export class AlbumPackElement extends HTMLElement {
     // Update if empty
     let empty = getItemIdsInAlbum(store, albumId).length > 0;
     this.labelEmpty.classList.toggle('hidden', empty);
-
-    // Update items
-    const list = getItemsInAlbum(store, albumId)
-      .sort((a, b) => (a.displayName||'').localeCompare(b.displayName||''))
-      .map(a => a.itemId);
-    const callback = (key, element) => {
-      if (locked) {
-        element.toggleAttribute('copyoutput', true);
-        element.toggleAttribute('temp', false);
-      } else {
-        element.toggleAttribute('copyoutput', false);
-        element.toggleAttribute('temp', true);
-      }
-    };
-    const factoryCreate = (key) => {
-      let store = getSatchelStore();
-      let albumItem = getItemInAlbum(store, albumId, key);
-      let newItem = cloneItem(albumItem);
-
-      const invId = uuid();
-      createSocketInvInStore(store, invId);
-      addItemToInventory(store, invId, newItem, 0, 0);
-      const invElement = /** @type {InventoryGridElement} */ (document.createElement('inventory-grid'));
-      invElement.invId = invId;
-      invElement.toggleAttribute('fixed', true);
-      invElement.toggleAttribute('noinput', true);
-      this.socketedIds[invId] = newItem.itemId;
-      addInventoryChangeListener(store, invId, this.onSocketInventoryChange);
-      return invElement;
-    };
-    updateList(this.slotItems, list, factoryCreate, undefined, callback);
   }
 
   /** @private */
@@ -398,18 +315,6 @@ export class AlbumPackElement extends HTMLElement {
       e.preventDefault();
       e.stopPropagation();
       return false;
-    }
-  }
-
-  /** @private */
-  onSocketInventoryChange(store, invId) {
-    if (!isInvInStore(store, invId)) {
-      removeInventoryChangeListener(store, invId, this.onSocketInventoryChange);
-      const albumId = this.albumId;
-      const itemId = this.socketedIds[invId];
-      if (hasItemInAlbum(store, albumId, itemId)) {
-        removeItemFromAlbum(store, albumId, itemId);
-      }
     }
   }
 }

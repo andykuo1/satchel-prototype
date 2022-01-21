@@ -1,25 +1,18 @@
 import { getSatchelStore } from '../../store/SatchelStore.js';
-import { addItemToInventory } from '../../satchel/inv/InventoryTransfer.js';
-import { uuid } from '../../util/uuid.js';
 import { upgradeProperty } from '../../util/wc.js';
 import { getCursor } from '../cursor/index.js';
-import { cloneItem } from '../../satchel/item/Item.js';
-import { createAlbumInStore, deleteAlbumInStore, getAlbumInStore, isAlbumInStore } from '../../store/AlbumStore.js';
-import { addAlbumChangeListener, removeAlbumChangeListener } from '../../events/AlbumEvents.js';
-import { addInventoryChangeListener, removeInventoryChangeListener } from '../../events/InvEvents.js';
-import { getItemInAlbum, getItemsInAlbum, hasItemInAlbum, removeItemFromAlbum } from '../../satchel/album/AlbumItems.js';
-import { isInvInStore, getInvInStore, deleteInvInStore, createSocketInvInStore } from '../../store/InvStore.js';
-import { updateList } from '../ElementListHelper.js';
-import { getTrashAlbumId, isTrashAlbum } from '../../satchel/TrashAlbum.js';
+import { getAlbumInStore, isAlbumInStore } from '../../store/AlbumStore.js';
+import './AlbumListElement.js';
 
 /**
  * @typedef {import('../invgrid/InventoryGridElement.js').InventoryGridElement} InventoryGridElement
+ * @typedef {import('../../satchel/item/Item.js').ItemId} ItemId
  */
 
 const INNER_HTML = /* html */`
 <fieldset>
   <legend></legend>
-  <slot name="items"></slot>
+  <album-list></album-list>
 </fieldset>
 `;
 const INNER_STYLE = /* css */`
@@ -39,12 +32,16 @@ fieldset {
   border: 0.5em dashed #333333;
   padding: 2em 1em;
   scroll-behavior: smooth;
+  text-align: center;
 }
 :host([mini]) fieldset {
   padding: 0;
 }
 :host([mini]) legend {
   display: none;
+}
+album-list {
+  text-align: center;
 }
 `;
 
@@ -74,7 +71,7 @@ export class AlbumSpaceElement extends HTMLElement {
   }
 
   get albumId() {
-    return this._albumId;
+    return this.getAttribute('albumid');
   }
 
   set albumId(value) {
@@ -98,30 +95,19 @@ export class AlbumSpaceElement extends HTMLElement {
     shadowRoot.append(
       this.constructor[Symbol.for('styleNode')].cloneNode(true)
     );
-    
-    /** @private */
-    this._albumId = undefined;
 
     /** @private */
     this.container = shadowRoot.querySelector('fieldset');
     /** @private */
     this.containerTitle = shadowRoot.querySelector('legend');
 
-    /**
-     * @private
-     * @type {HTMLSlotElement}
-     */
-    this.slotItems = shadowRoot.querySelector('slot[name="items"]');
-
     /** @private */
-    this.socketedIds = {};
+    this.albumList = shadowRoot.querySelector('album-list');
 
-    /** @private */
-    this.onAlbumChange = this.onAlbumChange.bind(this);
     /** @private */
     this.onMouseUp = this.onMouseUp.bind(this);
     /** @private */
-    this.onSocketInventoryChange = this.onSocketInventoryChange.bind(this);
+    this.onAlbumListChange = this.onAlbumListChange.bind(this);
   }
 
   /** @protected */
@@ -130,152 +116,42 @@ export class AlbumSpaceElement extends HTMLElement {
     upgradeProperty(this, 'init');
 
     this.container.addEventListener('mouseup', this.onMouseUp);
-
-    // Only start init once.
+    this.albumList.addEventListener('change', this.onAlbumListChange);
+    if (this.albumId) {
+      this.albumList.setAttribute('albumid', this.albumId);
+    }
     if (this.init) {
-      const store = getSatchelStore();
-      let initType = this.init;
-      let albumId = this.albumId;
-      if (initType === 'trash') {
-        albumId = getTrashAlbumId(store);
-        this.albumId = albumId;
-      } else if (initType === 'album') {
-        if (!albumId) {
-          albumId = uuid();
-          this.albumId = albumId;
-        }
-        createAlbumInStore(store, albumId);
-      } else {
-        throw new Error(`Unknown init type '${initType}' for album-space.`);
-      }
+      this.albumList.setAttribute('init', this.init);
     }
   }
 
   /** @protected */
   disconnectedCallback() {
-    const store = getSatchelStore();
-    const albumId = this.albumId;
-    if (albumId) {
-      removeAlbumChangeListener(
-        store,
-        albumId,
-        this.onAlbumChange
-      );
-    }
-
+    this.albumList.removeEventListener('change', this.onAlbumListChange);
     this.container.removeEventListener('mouseup', this.onMouseUp);
-    
-    this.cleanUp();
-  }
-
-  /** @private */
-  cleanUp() {
-    const store = getSatchelStore();
-
-    // Remove all temp inv listeners
-    for(let invId of Object.keys(this.socketedIds)) {
-      removeInventoryChangeListener(store, invId, this.onSocketInventoryChange);
-    }
-    this.socketedIds = {};
-
-    // Destroy all items
-    let children = this.slotItems.children;
-    for(let i = 0; i < children.length; ++i) {
-      let child = children.item(i);
-      const invNode = /** @type {InventoryGridElement} */ (child);
-      const invId = invNode.invId;
-      const inv = getInvInStore(store, invId);
-      if (inv) {
-        deleteInvInStore(store, invId, inv);
-        child.remove();
-      }
-    }
-
-    // Only stop init once.
-    if (this.init) {
-      const albumId = this.albumId;
-      const album = getAlbumInStore(store, albumId);
-      if (!isTrashAlbum(album)) {
-        deleteAlbumInStore(getSatchelStore(), albumId, album);
-      }
-    }
   }
 
   /**
+   * @protected
    * @param attribute
    * @param previous
    * @param value
-   * @protected
    */
   attributeChangedCallback(attribute, previous, value) {
     switch (attribute) {
       case 'albumid': {
-        const store = getSatchelStore();
-        const prevAlbumId = this._albumId;
-        const nextAlbumId = value;
-        if (prevAlbumId !== nextAlbumId) {
-          this._albumId = nextAlbumId;
-          if (prevAlbumId) {
-            removeAlbumChangeListener(
-              store,
-              prevAlbumId,
-              this.onAlbumChange
-            );
-          }
-          this.cleanUp();
-          if (nextAlbumId) {
-            addAlbumChangeListener(store, nextAlbumId, this.onAlbumChange);
-            this.onAlbumChange(store, nextAlbumId);
-          }
-        }
+        this.albumList.setAttribute('albumid', value);
       } break;
     }
   }
 
-  /**
-   * @param store
-   * @param albumId
-   * @protected
-   */
-  onAlbumChange(store, albumId) {
-    const album = getAlbumInStore(store, albumId);
-    if (!album) {
-      // The album has been deleted.
-      return;
-    }
-    const name = album.displayName;
-
+  /** @private */
+  onAlbumListChange(e) {
+    const store = getSatchelStore();
+    const album = getAlbumInStore(store, e.detail.albumId);
     // Update name
+    const name = album.displayName;
     this.containerTitle.textContent = name;
-
-    let flag = false;
-    const list = getItemsInAlbum(store, albumId)
-      .sort((a, b) => (a.displayName||'').localeCompare(b.displayName||''))
-      .map(a => a.itemId);
-    const factoryCreate = (key) => {
-      let store = getSatchelStore();
-      let albumItem = getItemInAlbum(store, albumId, key);
-      let newItem = cloneItem(albumItem);
-
-      const invId = uuid();
-      createSocketInvInStore(store, invId);
-      addItemToInventory(store, invId, newItem, 0, 0);
-      const invElement = /** @type {InventoryGridElement} */ (document.createElement('inventory-grid'));
-      invElement.invId = invId;
-      invElement.toggleAttribute('noinput', true);
-      invElement.toggleAttribute('temp', true);
-      invElement.toggleAttribute('fixed', this.hasAttribute('fixed'));
-      this.socketedIds[invId] = newItem.itemId;
-      addInventoryChangeListener(store, invId, this.onSocketInventoryChange);
-      flag = true;
-      return invElement;
-    };
-    updateList(this.slotItems, list, factoryCreate);
-
-    // Only scroll for new items.
-    if (flag) {
-      this.container.scrollTo(0, this.container.scrollHeight);
-    }
   }
 
   /** @private */
@@ -290,18 +166,6 @@ export class AlbumSpaceElement extends HTMLElement {
       e.preventDefault();
       e.stopPropagation();
       return false;
-    }
-  }
-
-  /** @private */
-  onSocketInventoryChange(store, invId) {
-    if (!isInvInStore(store, invId)) {
-      removeInventoryChangeListener(store, invId, this.onSocketInventoryChange);
-      const albumId = this.albumId;
-      const itemId = this.socketedIds[invId];
-      if (hasItemInAlbum(store, albumId, itemId)) {
-        removeItemFromAlbum(store, albumId, itemId);
-      }
     }
   }
 }

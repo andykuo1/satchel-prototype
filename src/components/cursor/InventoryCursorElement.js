@@ -265,8 +265,7 @@ export class InventoryCursorElement extends HTMLElement {
   /**
    * Put down from cursor to album.
    */
-  putDownInAlbum(albumId) {
-    const store = getSatchelStore();
+  putDownInAlbum(albumId, clientX = 0, clientY = 0, destX = 0, destY = 0) {
     const heldItem = this.getHeldItem();
     if (!heldItem) {
       return false;
@@ -276,9 +275,11 @@ export class InventoryCursorElement extends HTMLElement {
       this.ignoreFirstPutDown = false;
       return true;
     }
-    playSound('putdownAlbum');
     this.clearHeldItem();
+    const store = getSatchelStore();
     addItemToAlbum(store, albumId, heldItem);
+    // TODO: drop as falling item?
+    playSound('putdownAlbum');
     return true;
   }
 
