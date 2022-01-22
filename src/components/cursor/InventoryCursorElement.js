@@ -18,10 +18,10 @@ import { addItemToAlbum } from '../../satchel/album/AlbumItems.js';
 import { dropFallingItem } from './FallingItemElement.js';
 import { playSound } from '../../sounds.js';
 
-import '../invgrid/InventorySocketElement.js';
+import '../invgrid/InvSocketElement.js';
 
 /**
- * @typedef {import('../invgrid/InventorySocketElement.js').InventorySocketElement} InventorySocketElement
+ * @typedef {import('../invgrid/InvSocketElement.js').InvSocketElement} InvSocketElement
  * 
  * @typedef {import('../../satchel/inv/Inv.js').Inventory} Inventory
  * @typedef {import('../../satchel/inv/Inv.js').InvId} InvId
@@ -37,7 +37,7 @@ const PLACE_BUFFER_RANGE_SQUARED = PLACE_BUFFER_RANGE * PLACE_BUFFER_RANGE;
 const CURSOR_INV_ID = 'cursor';
 
 const INNER_HTML = /* html */`
-<inventory-socket invid="${CURSOR_INV_ID}"></inventory-socket>
+<inv-socket invid="${CURSOR_INV_ID}"></inv-socket>
 `;
 const INNER_STYLE = /* css */`
 :host {
@@ -113,7 +113,7 @@ export class InventoryCursorElement extends HTMLElement {
     this.ignoreFirstPutDown = false;
 
     /** @private */
-    this.inventoryElement = /** @type {InventorySocketElement} */ (shadowRoot.querySelector('inventory-socket'));
+    this.inventoryElement = /** @type {InvSocketElement} */ (shadowRoot.querySelector('inv-socket'));
 
     /** @private */
     this.onAnimationFrame = this.onAnimationFrame.bind(this);

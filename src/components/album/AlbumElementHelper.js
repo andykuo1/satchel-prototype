@@ -3,7 +3,7 @@ import { addItemToInventory } from '../../satchel/inv/InventoryTransfer.js';
 import { cloneItem } from '../../satchel/item/Item.js';
 import { createSocketInvInStore, deleteInvInStore, getInvInStore, isInvInStore } from '../../store/InvStore.js';
 import { uuid } from '../../util/uuid.js';
-import { InventorySocketElement } from '../invgrid/InventorySocketElement.js';
+import { InvSocketElement } from '../invgrid/InvSocketElement.js';
 
 /**
  * @typedef {import('../invgrid/InventoryGridElement.js').InventoryGridElement} InventoryGridElement
@@ -27,14 +27,14 @@ export function itemAlphabeticalComparator(a, b) {
  * @param {Item} readOnlyItem 
  * @param {Record<InvId, ItemId>} itemInvMap 
  * @param {() => void} invChangeCallback 
- * @returns {InventorySocketElement}
+ * @returns {InvSocketElement}
  */
 export function setUpItemInvElement(store, readOnlyItem, itemInvMap, invChangeCallback) {
   let invId = uuid();
   createSocketInvInStore(store, invId);
   let newItem = cloneItem(readOnlyItem);
   addItemToInventory(store, invId, newItem, 0, 0);
-  let invElement = /** @type {InventorySocketElement} */ (document.createElement('inventory-socket'));
+  let invElement = /** @type {InvSocketElement} */ (document.createElement('inv-socket'));
   invElement.invId = invId;
   invElement.toggleAttribute('noinput', true);
   invElement.toggleAttribute('temp', true);
@@ -74,7 +74,7 @@ export function cleanUpItemInvElements(store, itemElements, itemInvMap, invChang
   let elements = [];
   const length = itemElements.length;
   for (let i = 0; i < length; ++i) {
-    let element = /** @type {InventorySocketElement} */ (itemElements.item(i));
+    let element = /** @type {InvSocketElement} */ (itemElements.item(i));
     let invId = element.invId;
     if (isInvInStore(store, invId)) {
       let inv = getInvInStore(store, invId);

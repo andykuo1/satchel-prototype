@@ -14,19 +14,19 @@ import { getItemInInv } from '../../satchel/inv/InventoryItems.js';
 import { updateList } from '../ElementListHelper.js';
 
 /**
- * @typedef {import('../invgrid/InventoryGridElement.js').InventoryGridElement} InventoryGridElement
+ * @typedef {import('./InventoryGridElement.js').InventoryGridElement} InventoryGridElement
  * @typedef {import('../../satchel/item/Item.js').ItemId} ItemId
  * @typedef {import('../../satchel/inv/Inv.js').InvId} InvId
  * @typedef {import('../../store/SatchelStore.js').SatchelStore} Store
  */
 
 const INNER_HTML = /* html */`
-<article>
+<section class="root">
   <h2></h2>
-  <section class="container grid flattop">
+  <p class="container grid flattop">
     <div class="itemList"></div>
-  </section>
-</article>
+  </p>
+</section>
 `;
 const INNER_STYLE = /* css */`
 :host {
@@ -41,7 +41,7 @@ const INNER_STYLE = /* css */`
   --container-height: 1;
   --item-unit-size: ${DEFAULT_ITEM_UNIT_SIZE}px;
 }
-article {
+.root {
   position: relative;
   display: inline-block;
   width: calc(var(--container-width) * var(--item-unit-size));
@@ -49,7 +49,7 @@ article {
   margin-right: 0.5em;
   margin-bottom: 0.5em;
 }
-article.topmargin {
+.root.topmargin {
   margin-top: 2em;
 }
 h2 {
@@ -68,6 +68,10 @@ h2 {
   background-color: var(--title-color);
   transform: translateY(-100%);
   box-shadow: 0.4rem 0.4rem 0 0 var(--outline-color);
+}
+p {
+  margin: 0;
+  padding: 0;
 }
 .hidden {
   visibility: hidden;
@@ -102,7 +106,7 @@ h2 {
  * - nooutput - no removing items
  * - copyoutput - only copy items on remove (does not actually remove)
  */
-export class InventorySocketElement extends HTMLElement {
+export class InvSocketElement extends HTMLElement {
   /** @private */
   static get [Symbol.for('templateNode')]() {
     const t = document.createElement('template');
@@ -120,7 +124,7 @@ export class InventorySocketElement extends HTMLElement {
   }
 
   static define(customElements = window.customElements) {
-    customElements.define('inventory-socket', this);
+    customElements.define('inv-socket', this);
   }
 
   static get observedAttributes() {
@@ -157,7 +161,7 @@ export class InventorySocketElement extends HTMLElement {
     this._invId = null;
 
     /** @private */
-    this.rootContainer = shadowRoot.querySelector('article');
+    this.rootContainer = shadowRoot.querySelector('.root');
     /** @private */
     this.innerContainer = shadowRoot.querySelector('.container');
     /** @private */
@@ -289,7 +293,7 @@ export class InventorySocketElement extends HTMLElement {
     const inv = getInvInStore(store, invId);
     const invType = inv.type;
     if (invType !== 'socket') {
-      throw new Error('Trying to display non-socket inventory with inventory-socket.');
+      throw new Error('Trying to display non-socket inventory with inv-socket.');
     }
     if (temp && isInventoryEmpty(store, invId)) {
       this.internallyChangeInvId(store, null);
@@ -369,4 +373,4 @@ export class InventorySocketElement extends HTMLElement {
     return false;
   }
 }
-InventorySocketElement.define();
+InvSocketElement.define();
