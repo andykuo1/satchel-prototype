@@ -309,7 +309,7 @@ export class AlbumPackElement extends HTMLElement {
       return;
     }
     let cursor = getCursor();
-    let result = cursor.putDownInAlbum(albumId);
+    let result = cursor.putDownInAlbum(albumId, e.shiftKey);
     if (result) {
       e.preventDefault();
       e.stopPropagation();

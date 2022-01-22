@@ -106,10 +106,12 @@ export function containerMouseUpCallback(
   if (containerElement.hasAttribute('noinput')) {
     return;
   }
+  const invId = containerElement.invId;
+  const rootElement = containerElement._container;
   const swappable = !containerElement.hasAttribute('nooutput');
   const mergable = !containerElement.hasAttribute('noinput');
   const shiftKey = mouseEvent.shiftKey;
-  const boundingRect = containerElement._container.getBoundingClientRect();
+  const boundingRect = rootElement.getBoundingClientRect();
   const clientCoordX = getClientCoordX(
     boundingRect,
     mouseEvent.clientX,
@@ -121,7 +123,7 @@ export function containerMouseUpCallback(
     unitSize
   );
   let cursor = getCursor();
-  let result = cursor.putDown(containerElement.invId, clientCoordX, clientCoordY, swappable, mergable, shiftKey);
+  let result = cursor.putDown(invId, clientCoordX, clientCoordY, swappable, mergable, shiftKey);
   if (result) {
     // HACK: This should really grab focus to the item.
     let activeElement = document.activeElement;

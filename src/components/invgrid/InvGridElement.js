@@ -22,9 +22,9 @@ import { uuid } from '../../util/uuid.js';
 const INNER_HTML = /* html */`
 <section class="root">
   <h2></h2>
-  <p class="container grid flattop">
-    <div class="itemList"></div>
-  </p>
+  <div class="container grid flattop">
+    <p class="itemList"></p>
+  </div>
 </section>
 `;
 const INNER_STYLE = /* css */`

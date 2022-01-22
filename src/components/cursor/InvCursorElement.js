@@ -11,7 +11,7 @@ import {
 } from '../../satchel/inv/InventoryTransfer.js';
 import { getItemByItemId } from '../../satchel/inv/InvItems.js';
 import { getSlotCoordsByIndex, getSlotIndexByItemId, isSlotIndexEmpty } from '../../satchel/inv/InvSlots.js';
-import { putDownToGridInventory, putDownToSocketInventory } from './InvCursorElementHelper.js';
+import { putDownToGridInventory, putDownToSocketInventory, tryTakeOneItem } from './InvCursorElementHelper.js';
 import { DEFAULT_ITEM_UNIT_SIZE } from '../invgrid/InventoryElementMouseHelper.js';
 import { isInvInStore, getInvInStore, createSocketInvInStore, deleteInvInStore } from '../../store/InvStore.js';
 import { addItemToAlbum } from '../../satchel/album/AlbumItems.js';
@@ -156,7 +156,7 @@ export class InvCursorElement extends HTMLElement {
     const posX = clientX + this.heldOffsetX * DEFAULT_ITEM_UNIT_SIZE;
     const posY = clientY + this.heldOffsetY * DEFAULT_ITEM_UNIT_SIZE;
     this.style.setProperty('left', `${posX - CURSOR_OFFSET_PIXELS}px`);
-    // TODO: Maybe add 2rem from inv-grid's title margin?
+    // TODO: Maybe add 2rem from inv element's title margin?
     this.style.setProperty('top', `calc(${posY - CURSOR_OFFSET_PIXELS}px)`);
     if (
       this.ignoreFirstPutDown &&
@@ -267,7 +267,7 @@ export class InvCursorElement extends HTMLElement {
   /**
    * Put down from cursor to album.
    */
-  putDownInAlbum(albumId, clientX = 0, clientY = 0, destX = 0, destY = 0) {
+  putDownInAlbum(albumId, shiftKey, clientX = 0, clientY = 0, destX = 0, destY = 0) {
     const heldItem = this.getHeldItem();
     if (!heldItem) {
       return false;
@@ -277,8 +277,20 @@ export class InvCursorElement extends HTMLElement {
       this.ignoreFirstPutDown = false;
       return true;
     }
-    this.clearHeldItem();
+    if (shiftKey) {
+      // Try dropping as one?
+      const store = getSatchelStore();
+      let newItem = tryTakeOneItem(store, heldItem);
+      if (newItem) {
+        addItemToAlbum(store, albumId, newItem);
+        playSound('putdownAlbum');
+        return true;
+      }
+      // Cannot drop as one. Stop here.
+      return true;
+    }
     const store = getSatchelStore();
+    this.clearHeldItem();
     addItemToAlbum(store, albumId, heldItem);
     // TODO: drop as falling item?
     playSound('putdownAlbum');

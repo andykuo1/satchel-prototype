@@ -149,7 +149,7 @@ export function putDownToGridInventory(
     let prevItemY = -1;
     if (prevItemId) {
       // Has an item to swap or merge. So pick up this one for later.
-      let inv = getExistingInventory(store, toInvId);
+      let inv = getInvInStore(store, toInvId);
       let slotIndex = getSlotIndexByItemId(inv, prevItemId);
       let [x, y] = getSlotCoordsByIndex(inv, slotIndex);
       prevItemX = x;
@@ -193,6 +193,20 @@ export function putDownToGridInventory(
     }
     // No can do :(
     return false;
+  }
+}
+
+export function tryTakeOneItem(store, item) {
+  if (item.stackSize > 1) {
+    let amount = 1;
+    let remaining = item.stackSize - amount;
+    let newItem = copyItem(item);
+    newItem.stackSize = amount;
+    item.stackSize = remaining;
+    dispatchItemChange(store, item.itemId);
+    return newItem;
+  } else {
+    return null;
   }
 }
 
