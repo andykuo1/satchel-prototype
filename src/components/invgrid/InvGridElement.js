@@ -11,6 +11,7 @@ import { addInventoryChangeListener, removeInventoryChangeListener } from '../..
 import { createGridInvInStore, deleteInvInStore, getInvInStore, isInvInStore } from '../../store/InvStore.js';
 import { getItemInInv } from '../../satchel/inv/InventoryItems.js';
 import { updateList } from '../ElementListHelper.js';
+import { uuid } from '../../util/uuid.js';
 
 /**
  * @typedef {import('../../satchel/item/Item.js').ItemId} ItemId
@@ -192,6 +193,7 @@ export class InvGridElement extends HTMLElement {
       let i = init.indexOf('x');
       let w = Number(init.substring(4, i)) || 1;
       let h = Number(init.substring(i + 1)) || 1;
+      invId = uuid();
       createGridInvInStore(store, invId, w, h);
     } else if (init && init !== 'null') {
       throw new Error(`Unknown init type '${init}' for album-list.`);
