@@ -11,7 +11,7 @@ import {
 } from '../../satchel/inv/InventoryTransfer.js';
 import { getItemByItemId } from '../../satchel/inv/InvItems.js';
 import { getSlotCoordsByIndex, getSlotIndexByItemId, isSlotIndexEmpty } from '../../satchel/inv/InvSlots.js';
-import { putDownToGridInventory, putDownToSocketInventory } from './InventoryCursorElementHelper.js';
+import { putDownToGridInventory, putDownToSocketInventory } from './InvCursorElementHelper.js';
 import { DEFAULT_ITEM_UNIT_SIZE } from '../invgrid/InventoryElementMouseHelper.js';
 import { isInvInStore, getInvInStore, createSocketInvInStore, deleteInvInStore } from '../../store/InvStore.js';
 import { addItemToAlbum } from '../../satchel/album/AlbumItems.js';
@@ -58,7 +58,7 @@ const INNER_STYLE = /* css */`
 }
 `;
 
-export class InventoryCursorElement extends HTMLElement {
+export class InvCursorElement extends HTMLElement {
   /** @private */
   static get [Symbol.for('templateNode')]() {
     const t = document.createElement('template');
@@ -76,7 +76,7 @@ export class InventoryCursorElement extends HTMLElement {
   }
 
   static define(customElements = window.customElements) {
-    customElements.define('inventory-cursor', this);
+    customElements.define('inv-cursor', this);
   }
 
   constructor() {
@@ -156,7 +156,7 @@ export class InventoryCursorElement extends HTMLElement {
     const posX = clientX + this.heldOffsetX * DEFAULT_ITEM_UNIT_SIZE;
     const posY = clientY + this.heldOffsetY * DEFAULT_ITEM_UNIT_SIZE;
     this.style.setProperty('left', `${posX - CURSOR_OFFSET_PIXELS}px`);
-    // TODO: Maybe add 2rem from InventoryGridElement's title margin?
+    // TODO: Maybe add 2rem from inv-grid's title margin?
     this.style.setProperty('top', `calc(${posY - CURSOR_OFFSET_PIXELS}px)`);
     if (
       this.ignoreFirstPutDown &&
@@ -328,11 +328,11 @@ export class InventoryCursorElement extends HTMLElement {
     this.ignoreFirstPutDown = false;
   }
 }
-InventoryCursorElement.define();
+InvCursorElement.define();
 
 /**
- * @returns {InventoryCursorElement}
+ * @returns {InvCursorElement}
  */
 export function getCursor() {
-  return document.querySelector('inventory-cursor');
+  return document.querySelector('inv-cursor');
 }

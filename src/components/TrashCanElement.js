@@ -1,7 +1,7 @@
 import { saveItemToTrashAlbum } from '../satchel/TrashAlbum.js';
 import { getCursor } from './index.js';
 
-/** @typedef {import('./cursor/InventoryCursorElement.js').InventoryCursorElement} InventoryCursorElement */
+/** @typedef {import('./cursor/InvCursorElement.js').InvCursorElement} InvCursorElement */
 
 const INNER_HTML = /* html */ `
 <icon-button id="actionDelete" icon="res/delete.svg" alt="delete" title="Delete Item"></icon-button>
@@ -76,8 +76,8 @@ export class TrashCanElement extends HTMLElement {
 
   /** @private */
   onActionDeleteEnter() {
-    /** @type {InventoryCursorElement} */
-    let cursor = document.querySelector('inventory-cursor');
+    /** @type {InvCursorElement} */
+    let cursor = document.querySelector('inv-cursor');
     if (cursor) {
       cursor.toggleAttribute('danger', true);
     }
@@ -85,8 +85,8 @@ export class TrashCanElement extends HTMLElement {
 
   /** @private */
   onActionDeleteLeave() {
-    /** @type {InventoryCursorElement} */
-    let cursor = document.querySelector('inventory-cursor');
+    /** @type {InvCursorElement} */
+    let cursor = document.querySelector('inv-cursor');
     if (cursor) {
       cursor.toggleAttribute('danger', false);
     }

@@ -21,11 +21,11 @@ import { copyItem } from '../../satchel/item/Item.js';
  * @typedef {import('../../satchel/item/Item.js').Item} Item
  * @typedef {import('../../satchel/item/Item.js').ItemId} ItemId
  *
- * @typedef {import('./InventoryCursorElement.js').InventoryCursorElement} InventoryCursorElement
+ * @typedef {import('./InvCursorElement.js').InvCursorElement} InvCursorElement
  */
 
 /**
- * @param {InventoryCursorElement} cursor
+ * @param {InvCursorElement} cursor
  * @param {SatchelStore} store
  * @param {InvId} toInvId
  * @param {number} coordX
@@ -87,7 +87,7 @@ export function putDownToSocketInventory(
 }
 
 /**
- * @param {InventoryCursorElement} cursor
+ * @param {InvCursorElement} cursor
  * @param {SatchelStore} store
  * @param {InvId} toInvId
  * @param {number} itemX The root slot coordinates to place item (includes holding offset)

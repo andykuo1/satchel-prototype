@@ -1,7 +1,7 @@
 import { closeFoundry, isFoundryOpen, openFoundry } from '../satchel/inv/FoundryHelper.js';
 import { getCursor } from './index.js';
 
-/** @typedef {import('./cursor/InventoryCursorElement.js').InventoryCursorElement} InventoryCursorElement */
+/** @typedef {import('./cursor/InvCursorElement.js').InvCursorElement} InvCursorElement */
 
 const INNER_HTML = /* html */ `
 <icon-button id="actionEdit" icon="res/anvil.svg" alt="edit" title="Edit Item"></icon-button>
@@ -80,8 +80,8 @@ export class FoundryAnvilElement extends HTMLElement {
 
   /** @private */
   onActionEditEnter() {
-    /** @type {InventoryCursorElement} */
-    let cursor = document.querySelector('inventory-cursor');
+    /** @type {InvCursorElement} */
+    let cursor = document.querySelector('inv-cursor');
     if (cursor) {
       cursor.toggleAttribute('important', true);
     }
@@ -89,8 +89,8 @@ export class FoundryAnvilElement extends HTMLElement {
 
   /** @private */
   onActionEditLeave() {
-    /** @type {InventoryCursorElement} */
-    let cursor = document.querySelector('inventory-cursor');
+    /** @type {InvCursorElement} */
+    let cursor = document.querySelector('inv-cursor');
     if (cursor) {
       cursor.toggleAttribute('important', false);
     }
