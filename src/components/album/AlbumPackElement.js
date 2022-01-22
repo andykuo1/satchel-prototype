@@ -6,13 +6,14 @@ import { exportAlbumToJSON } from '../../loader/AlbumLoader.js';
 import { deleteAlbumInStore, getAlbumInStore, isAlbumInStore } from '../../store/AlbumStore.js';
 import { dispatchAlbumChange } from '../../events/AlbumEvents.js';
 import { IconButtonElement } from '../lib/IconButtonElement.js';
-import { clearItemsInAlbum, getItemIdsInAlbum } from '../../satchel/album/AlbumItems.js';
+import { clearItemsInAlbum, getItemIdsInAlbum, getItemsInAlbum } from '../../satchel/album/AlbumItems.js';
 import { isGroundAlbum } from '../../satchel/GroundAlbum.js';
 import { isFoundryAlbum } from '../../satchel/FoundryAlbum.js';
-import { isTrashAlbum } from '../../satchel/TrashAlbum.js';
+import { isTrashAlbum, saveItemToTrashAlbum } from '../../satchel/TrashAlbum.js';
 import './AlbumListElement.js';
 
 /**
+ * @typedef {import('../../satchel/item/Item.js').Item} Item
  * @typedef {import('../../satchel/item/Item.js').ItemId} ItemId
  */
 
@@ -169,7 +170,7 @@ export class AlbumPackElement extends HTMLElement {
     this.onButtonExpand = this.onButtonExpand.bind(this);
     
     /** @private */
-    this.onItemDrop = this.onItemDrop.bind(this);
+    this.onAlbumDrop = this.onAlbumDrop.bind(this);
   }
 
   /** @protected */
@@ -180,7 +181,7 @@ export class AlbumPackElement extends HTMLElement {
     this.buttonExport.addEventListener('click', this.onButtonExport);
     this.buttonDelete.addEventListener('click', this.onButtonDelete);
     this.buttonExpand.addEventListener('click', this.onButtonExpand);
-    this.container.addEventListener('mouseup', this.onItemDrop);
+    this.container.addEventListener('mouseup', this.onAlbumDrop);
   }
 
   /** @protected */
@@ -191,7 +192,7 @@ export class AlbumPackElement extends HTMLElement {
     this.buttonExport.removeEventListener('click', this.onButtonExport);
     this.buttonDelete.removeEventListener('click', this.onButtonDelete);
     this.buttonExpand.removeEventListener('click', this.onButtonExpand);
-    this.container.removeEventListener('mouseup', this.onItemDrop);
+    this.container.removeEventListener('mouseup', this.onAlbumDrop);
   }
 
   /** @private */
@@ -296,19 +297,39 @@ export class AlbumPackElement extends HTMLElement {
   }
 
   /** @private */
-  onItemDrop(e) {
+  onAlbumDrop(e) {
     const store = getSatchelStore();
     const albumId = this.albumId;
     if (!isAlbumInStore(store, albumId)) {
-      return;
-    }
-    if (isAlbumLocked(store, albumId)) {
       return;
     }
     if (!isAlbumExpanded(store, albumId)) {
       return;
     }
     let cursor = getCursor();
+    // HACK: This is so single clicks won't create albums
+      // @ts-ignore
+    if (isAlbumLocked(store, albumId) && cursor.hasHeldItem() && !cursor.ignoreFirstPutDown) {
+      let heldItem = cursor.getHeldItem();
+      let items = getItemsInAlbum(store, albumId);
+      for(let item of items) {
+        // Dragging similar items to the album will delete it.
+        if (isItemSimilarEnoughToBeDestroyed(item, heldItem)) {
+          cursor.clearHeldItem();
+          saveItemToTrashAlbum(heldItem);
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
+        }
+      }
+      // Or reject this attempt and dump to ground.
+      if (cursor.putDownInGround(e.clientX, e.clientY)) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }
+    }
+    // Otherwise, try to add it to the album normally.
     let result = cursor.putDownInAlbum(albumId, e.shiftKey);
     if (result) {
       e.preventDefault();
@@ -318,3 +339,29 @@ export class AlbumPackElement extends HTMLElement {
   }
 }
 AlbumPackElement.define();
+
+/**
+ * @param {Item} item 
+ * @param {Item} other 
+ */
+export function isItemSimilarEnoughToBeDestroyed(item, other) {
+  if (item.displayName !== other.displayName) {
+    return false;
+  }
+  if (item.background !== other.background) {
+    return false;
+  }
+  if (item.imgSrc !== other.imgSrc) {
+    return false;
+  }
+  if (item.width !== other.width) {
+    return false;
+  }
+  if (item.height !== other.height) {
+    return false;
+  }
+  if (item.description !== other.description) {
+    return false;
+  }
+  return true;
+}

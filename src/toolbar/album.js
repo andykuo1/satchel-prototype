@@ -43,6 +43,7 @@ function onAlbumItemDrop(e) {
   const albums = getAlbumsInStore(store)
     .filter((a) => !a.locked)
     .filter((a) => !isGroundAlbum(a))
+    .filter((a) => !isTrashAlbum(a))
     .filter((a) => !isAlbumHidden(store, a.albumId));
   let cursor = getCursor();
   // HACK: This is so single clicks won't create albums

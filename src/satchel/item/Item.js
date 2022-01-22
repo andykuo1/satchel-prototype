@@ -43,6 +43,38 @@ export function copyItem(other, dst = undefined) {
 }
 
 /**
+ * @param {Item} item 
+ * @param {Item} other 
+ */
+export function compareItem(item, other) {
+  if (item.displayName !== other.displayName) {
+    return item.displayName.localeCompare(other.displayName);
+  }
+  if (item.background !== other.background) {
+    return item.background.localeCompare(other.background);
+  }
+  if (item.imgSrc !== other.imgSrc) {
+    return item.background.localeCompare(other.background);
+  }
+  if (item.width !== other.width) {
+    return item.width - other.width;
+  }
+  if (item.height !== other.height) {
+    return item.height - other.height;
+  }
+  if (item.description !== other.description) {
+    return item.description.localeCompare(other.description);
+  }
+  if (item.stackSize !== other.stackSize) {
+    return item.stackSize - other.stackSize;
+  }
+  if (item.itemId !== other.itemId) {
+    return item.itemId.localeCompare(other.itemId);
+  }
+  return 0;
+}
+
+/**
  * @param {Item} other
  * @param {Item} [dst]
  * @returns {Item}
