@@ -18,8 +18,10 @@ import { addItemToAlbum } from '../../satchel/album/AlbumItems.js';
 import { dropFallingItem } from './FallingItemElement.js';
 import { playSound } from '../../sounds.js';
 
+import '../invgrid/InventorySocketElement.js';
+
 /**
- * @typedef {import('../invgrid/InventoryGridElement.js').InventoryGridElement} InventoryGridElement
+ * @typedef {import('../invgrid/InventorySocketElement.js').InventorySocketElement} InventorySocketElement
  * 
  * @typedef {import('../../satchel/inv/Inv.js').Inventory} Inventory
  * @typedef {import('../../satchel/inv/Inv.js').InvId} InvId
@@ -35,7 +37,7 @@ const PLACE_BUFFER_RANGE_SQUARED = PLACE_BUFFER_RANGE * PLACE_BUFFER_RANGE;
 const CURSOR_INV_ID = 'cursor';
 
 const INNER_HTML = /* html */`
-<inventory-grid invid="${CURSOR_INV_ID}"></inventory-grid>
+<inventory-socket invid="${CURSOR_INV_ID}"></inventory-socket>
 `;
 const INNER_STYLE = /* css */`
 :host {
@@ -79,11 +81,11 @@ export class InventoryCursorElement extends HTMLElement {
 
   constructor() {
     super();
-    this.attachShadow({ mode: 'open' });
-    this.shadowRoot.append(
+    const shadowRoot = this.attachShadow({ mode: 'open' });
+    shadowRoot.append(
       this.constructor[Symbol.for('templateNode')].content.cloneNode(true)
     );
-    this.shadowRoot.append(
+    shadowRoot.append(
       this.constructor[Symbol.for('styleNode')].cloneNode(true)
     );
 
@@ -111,7 +113,7 @@ export class InventoryCursorElement extends HTMLElement {
     this.ignoreFirstPutDown = false;
 
     /** @private */
-    this.inventoryElement = /** @type {InventoryGridElement} */ (this.shadowRoot.querySelector('inventory-grid'));
+    this.inventoryElement = /** @type {InventorySocketElement} */ (shadowRoot.querySelector('inventory-socket'));
 
     /** @private */
     this.onAnimationFrame = this.onAnimationFrame.bind(this);
