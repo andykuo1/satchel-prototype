@@ -10,8 +10,6 @@ import { uuid } from '../../util/uuid.js';
 import { loadSatchelProfilesFromData, saveSatchelProfilesToData } from '../../loader/SatchelLoader.js';
 import { createGridInvInStore } from '../../store/InvStore.js';
 
-/** @typedef {import('../../components/invgrid/InventoryGridElement.js').InventoryGridElement} InventoryGridElement */
-
 function onAutoSave(localServer) {
   const serverData = ActivityPlayerInventory.getLocalServerData(localServer);
   saveToStorage('server_data', JSON.stringify(serverData));

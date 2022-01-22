@@ -5,7 +5,6 @@ import { getAlbumInStore, isAlbumInStore } from '../../store/AlbumStore.js';
 import './AlbumListElement.js';
 
 /**
- * @typedef {import('../invgrid/InventoryGridElement.js').InventoryGridElement} InventoryGridElement
  * @typedef {import('../../satchel/item/Item.js').ItemId} ItemId
  */
 

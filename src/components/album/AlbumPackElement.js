@@ -13,7 +13,6 @@ import { isTrashAlbum } from '../../satchel/TrashAlbum.js';
 import './AlbumListElement.js';
 
 /**
- * @typedef {import('../invgrid/InventoryGridElement.js').InventoryGridElement} InventoryGridElement
  * @typedef {import('../../satchel/item/Item.js').ItemId} ItemId
  */
 

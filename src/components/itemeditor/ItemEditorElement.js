@@ -1,5 +1,4 @@
 import { getCursor } from '../cursor/index.js';
-import { InventoryGridElement } from '../invgrid/InventoryGridElement.js';
 import { getSatchelStore } from '../../store/SatchelStore.js';
 import { addItemToInventory, clearItemsInInventory, getItemAtSlotIndex, isInventoryEmpty } from '../../satchel/inv/InventoryTransfer.js';
 import { getFoundryAlbumId, hasFoundryAlbum, saveItemToFoundryAlbum, shouldSaveItemToFoundryAlbum } from '../../satchel/FoundryAlbum.js';
@@ -15,6 +14,7 @@ import '../invgrid/InvSocketElement.js';
 import '../lib/ContextMenuElement.js';
 
 /**
+ * @typedef {import('../invgrid/InvSocketElement.js').InvSocketElement} InvSocketElement
  * @typedef {import('../lib/ContextMenuElement.js').ContextMenuElement} ContextMenuElement
  * @typedef {import('../../satchel/item/Item.js').Item} Item
  */
@@ -413,7 +413,7 @@ export class ItemEditorElement extends HTMLElement {
 
     /**
      * @private
-     * @type {InventoryGridElement}
+     * @type {InvSocketElement}
      */
     this.socket = shadowRoot.querySelector('inv-socket');
     /**

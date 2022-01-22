@@ -3,10 +3,9 @@ import { addItemToInventory } from '../../satchel/inv/InventoryTransfer.js';
 import { cloneItem } from '../../satchel/item/Item.js';
 import { createSocketInvInStore, deleteInvInStore, getInvInStore, isInvInStore } from '../../store/InvStore.js';
 import { uuid } from '../../util/uuid.js';
-import { InvSocketElement } from '../invgrid/InvSocketElement.js';
 
 /**
- * @typedef {import('../invgrid/InventoryGridElement.js').InventoryGridElement} InventoryGridElement
+ * @typedef {import('../invgrid/InvSocketElement.js').InvSocketElement} InvSocketElement
  * @typedef {import('../../satchel/item/Item.js').Item} Item
  * @typedef {import('../../satchel/item/Item.js').ItemId} ItemId
  * @typedef {import('../../satchel/inv/Inv.js').InvId} InvId

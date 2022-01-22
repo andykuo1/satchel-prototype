@@ -5,8 +5,6 @@ import { hasItem, getItemByItemId } from '../../satchel/inv/InvItems.js';
 import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../../satchel/inv/InvSlots.js';
 import { addItemChangeListener, removeItemChangeListener } from '../../events/ItemEvents.js';
 
-/** @typedef {import('./InventoryGridElement.js').InventoryGridElement} InventoryGridElement */
-
 const INNER_HTML = /* html */`
 <figure class="container">
   <div class="innerContainer">
@@ -139,7 +137,7 @@ export class InventoryItemElement extends HTMLElement {
   }
 
   /**
-   * @param {HTMLElement & { invId: string }} containerElement
+   * @param {HTMLElement & { _container: Element, invId: string }} containerElement
    * @param {string} invId
    * @param {string} itemId
    */

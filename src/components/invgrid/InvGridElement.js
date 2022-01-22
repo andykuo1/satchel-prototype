@@ -5,11 +5,10 @@ import {
 } from '../../store/SatchelStore.js';
 import { InventoryItemElement } from './InventoryItemElement.js';
 import {
-  getItemAtSlotIndex, getItemIdsInSlots, isInventoryEmpty,
+ getItemIdsInSlots, isInventoryEmpty,
 } from '../../satchel/inv/InventoryTransfer.js';
-import { uuid } from '../../util/uuid.js';
 import { addInventoryChangeListener, removeInventoryChangeListener } from '../../events/InvEvents.js';
-import { createSocketInvInStore, deleteInvInStore, getInvInStore, isInvInStore } from '../../store/InvStore.js';
+import { createGridInvInStore, deleteInvInStore, getInvInStore, isInvInStore } from '../../store/InvStore.js';
 import { getItemInInv } from '../../satchel/inv/InventoryItems.js';
 import { updateList } from '../ElementListHelper.js';
 
@@ -105,7 +104,7 @@ p {
  * - nooutput - no removing items
  * - copyoutput - only copy items on remove (does not actually remove)
  */
-export class InvSocketElement extends HTMLElement {
+export class InvGridElement extends HTMLElement {
   /** @private */
   static get [Symbol.for('templateNode')]() {
     const t = document.createElement('template');
@@ -123,11 +122,11 @@ export class InvSocketElement extends HTMLElement {
   }
 
   static define(customElements = window.customElements) {
-    customElements.define('inv-socket', this);
+    customElements.define('inv-grid', this);
   }
 
   static get observedAttributes() {
-    return ['invid', 'fixed'];
+    return ['invid'];
   }
 
   get invId() {
@@ -189,19 +188,16 @@ export class InvSocketElement extends HTMLElement {
 
     // Only start init once.
     let invId;
-    switch (init) {
-      case 'inv':
-        invId = uuid();
-        createSocketInvInStore(store, invId);
-        break;
-      default:
-        if (init && init !== 'null') {
-          throw new Error(`Unknown init type '${init}' for album-list.`);
-        } else {
-          // Only if not init, use invId attribute
-          invId = this.invId;
-        }
-        break;
+    if (init && init.startsWith('grid')) {
+      let i = init.indexOf('x');
+      let w = Number(init.substring(4, i)) || 1;
+      let h = Number(init.substring(i + 1)) || 1;
+      createGridInvInStore(store, invId, w, h);
+    } else if (init && init !== 'null') {
+      throw new Error(`Unknown init type '${init}' for album-list.`);
+    } else {
+      // Only if not init, use invId attribute
+      invId = this.invId;
     }
     this.internallyChangeInvId(store, invId);
 
@@ -243,10 +239,6 @@ export class InvSocketElement extends HTMLElement {
         const store = getSatchelStore();
         this.internallyChangeInvId(store, value);
       } break;
-      case 'fixed': {
-        const store = getSatchelStore();
-        this.onInventoryChange(store, this._invId);
-      } break;
     }
   }
 
@@ -287,12 +279,11 @@ export class InvSocketElement extends HTMLElement {
     }
 
     const temp = this.hasAttribute('temp');
-    const fixed = this.hasAttribute('fixed');
 
     const inv = getInvInStore(store, invId);
     const invType = inv.type;
-    if (invType !== 'socket') {
-      throw new Error('Trying to display non-socket inventory with inv-socket.');
+    if (invType !== 'grid') {
+      throw new Error('Trying to display non-grid inventory with inv-grid.');
     }
     if (temp && isInventoryEmpty(store, invId)) {
       this.internallyChangeInvId(store, null);
@@ -301,18 +292,9 @@ export class InvSocketElement extends HTMLElement {
       return;
     }
 
-    const item = getItemAtSlotIndex(store, invId, 0);
-
     // Set inv dimensions
     let invWidth = inv.width;
     let invHeight = inv.height;
-    if (!fixed && item) {
-      invWidth = item.width;
-      invHeight = item.height;
-    } else {
-      invWidth = 1;
-      invHeight = 1;
-    }
     this.style.setProperty('--container-width', `${invWidth}`);
     this.style.setProperty('--container-height', `${invHeight}`);
 
@@ -372,4 +354,4 @@ export class InvSocketElement extends HTMLElement {
     return false;
   }
 }
-InvSocketElement.define();
+InvGridElement.define();

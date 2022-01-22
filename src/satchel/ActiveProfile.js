@@ -103,8 +103,8 @@ function onProfileChange() {
   for (let invId of activeProfile.invs) {
     let elementId = `profile_inv-${invId}`;
     let invElement =
-      /** @type {import('../components/invgrid/InventoryGridElement.js').InventoryGridElement} */ (
-        document.createElement('inventory-grid')
+      /** @type {import('../components/invgrid/InvGridElement.js').InvGridElement} */ (
+        document.createElement('inv-grid')
       );
     invElement.id = elementId;
     invElement.invId = invId;

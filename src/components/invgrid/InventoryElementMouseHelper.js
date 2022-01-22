@@ -9,7 +9,6 @@ import { dispatchItemChange } from '../../events/ItemEvents.js';
 
 /**
  * @typedef {import('./InventoryItemElement.js').InventoryItemElement} InventoryItemElement
- * @typedef {import('./InventoryGridElement.js').InventoryGridElement} InventoryGridElement
  */
 
 export const DEFAULT_ITEM_UNIT_SIZE = 48;
