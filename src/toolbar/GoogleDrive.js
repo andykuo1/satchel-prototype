@@ -4,7 +4,7 @@ import { Logger } from '../util/Logger.js';
 // TODO: To test this, you need to use localhost (not 127.0.0.1)
 // Client ID and API key from the Developer Console
 const CLIENT_ID = '195145006634-0mp9f2fvmgfufp524aj70ckka4q6oc9t.apps.googleusercontent.com';
-const API_KEY = 'AIzaSyBjE7tnNHjYPOrXUJuso4yGCZk64ZEtoJU';
+const ENCRYPTED_API_KEY = 'QUl6YVN5QmpFN3RuTkhqWVBPclhVSnVzbzR5R0NaazY0WkV0b0pV';
 
 // Array of API discovery doc URLs for APIs used by the quickstart
 const DISCOVERY_DOCS = ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'];
@@ -73,8 +73,9 @@ async function initializeGoogle() {
       script.addEventListener('load', () =>
         gapi.load('client:auth2', async () => {
           try {
+            let apiKey = window.atob(ENCRYPTED_API_KEY);
             await gapi.client.init({
-              apiKey: API_KEY,
+              apiKey: apiKey,
               clientId: CLIENT_ID,
               discoveryDocs: DISCOVERY_DOCS,
               scope: SCOPES,
