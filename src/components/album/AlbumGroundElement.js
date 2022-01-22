@@ -17,6 +17,8 @@ album-list {
   flex-direction: column;
   overflow-x: hidden;
   overflow-y: auto;
+
+  --animation-delay: 0.3s;
 }
 `;
 

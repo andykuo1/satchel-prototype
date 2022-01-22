@@ -8,7 +8,7 @@ import { cleanUpItemInvElements, itemAlphabeticalComparator, setUpItemInvElement
 import { upgradeProperty } from '../../util/wc.js';
 import { getTrashAlbumId, isTrashAlbum } from '../../satchel/TrashAlbum.js';
 import { uuid } from '../../util/uuid.js';
-import { getGroundAlbumId } from '../../satchel/GroundAlbum.js';
+import { getGroundAlbumId, isGroundAlbum } from '../../satchel/GroundAlbum.js';
 
 /**
  * @typedef {import('../invgrid/InventorySocketElement.js').InventorySocketElement} InventorySocketElement
@@ -28,7 +28,7 @@ const INNER_STYLE = /* css */`
   animation-name: shake;
   animation-fill-mode: forwards;
   animation-duration: 1.3s;
-  animation-delay: 0.3s;
+  animation-delay: var(--animation-delay, 0);
   transform: translate(0, 0) scale(0);
 }
 
@@ -172,7 +172,7 @@ export class AlbumListElement extends HTMLElement {
     // Only stop init if initialized.
     if (init) {
       const album = getAlbumInStore(store, albumId);
-      if (!isTrashAlbum(album)) {
+      if (!isTrashAlbum(album) && !isGroundAlbum(album)) {
         deleteAlbumInStore(store, albumId, album);
       }
     }

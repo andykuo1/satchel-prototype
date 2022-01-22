@@ -71,6 +71,7 @@ export function cleanUpItemInvElements(store, itemElements, itemInvMap, invChang
   }
 
   // Destroy all items
+  let elements = [];
   const length = itemElements.length;
   for (let i = 0; i < length; ++i) {
     let element = /** @type {InventorySocketElement} */ (itemElements.item(i));
@@ -79,6 +80,9 @@ export function cleanUpItemInvElements(store, itemElements, itemInvMap, invChang
       let inv = getInvInStore(store, invId);
       deleteInvInStore(store, invId, inv);
     }
+    elements.push(element);
+  }
+  for(let element of elements) {
     element.remove();
   }
 }
