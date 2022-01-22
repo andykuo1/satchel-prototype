@@ -674,6 +674,7 @@
       <style>
         #trashDialog[open] {
           display: flex;
+          --width: 11em;
         }
         #trashDialog > div {
           flex: 1;
@@ -684,11 +685,13 @@
         }
         #trashAlbum {
           flex: 1;
+          overflow-y: auto;
+          text-align: left;
         }
       </style>
       <div>
         <h3 style="margin: 0;">Trash</h3>
-        <album-space id="trashAlbum" init="trash" fixed mini></album-space>
+        <album-list id="trashAlbum" init="trash" fixed></album-list>
         <button id="actionTrashClear" class="bigButton">Clear All</button>
       </div>
     </context-menu>

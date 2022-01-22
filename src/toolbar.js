@@ -21,6 +21,8 @@ import { uploadSatchelFile } from './toolbar/upload.js';
 import { clearItemsInAlbum, getItemIdsInAlbum, getItemInAlbum } from './satchel/album/AlbumItems.js';
 import { clearItemsOnGround, getGroundAlbumId, hasGroundAlbum } from './satchel/GroundAlbum.js';
 import { resetTutorial, setupTutorial } from './toolbar/tutorial.js';
+import { getCursor } from './components/index.js';
+import { isAlbumInStore } from './store/AlbumStore.js';
 
 window.addEventListener('DOMContentLoaded', () => {
   el('#downloadButton', 'click', onDownloadClick);
@@ -45,6 +47,7 @@ window.addEventListener('DOMContentLoaded', () => {
   el('#actionFoundryReset', 'contextmenu', onTrashClick);
   el('#actionGroundDelete', 'dblclick', onActionGroundClear);
   el('#actionTrashClear', 'click', onActionTrashClear);
+  el('#trashAlbum', 'mouseup', onActionTrashDrop);
   el('#actionTutorialReset', 'click', onActionTutorialReset);
 
   setupProfile();
@@ -85,6 +88,20 @@ function onTrashClick(e) {
   e.preventDefault();
   e.stopPropagation();
   return false;
+}
+
+function onActionTrashDrop(e) {
+  const cursor = getCursor();
+  const store = getSatchelStore();
+  const albumId = getTrashAlbumId(store);
+  if (!isAlbumInStore(store, albumId)) {
+    return;
+  }
+  if (cursor.putDownInAlbum(albumId)) {
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+  }
 }
 
 function onActionTrashClear() {

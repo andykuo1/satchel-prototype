@@ -19,6 +19,7 @@ album-list {
   overflow-y: auto;
 
   --animation-delay: 0.3s;
+  --animation-duration: 1.3s;
 }
 `;
 

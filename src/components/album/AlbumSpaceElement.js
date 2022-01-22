@@ -66,24 +66,20 @@ export class AlbumSpaceElement extends HTMLElement {
     customElements.define('album-space', this);
   }
 
-  static get observedAttributes() {
-    return ['albumid'];
-  }
-
   get albumId() {
-    return this.getAttribute('albumid');
+    return this.albumList.getAttribute('albumid');
   }
 
   set albumId(value) {
-    this.setAttribute('albumid', value);
+    this.albumList.setAttribute('albumid', value);
   }
 
   get init() {
-    return this.getAttribute('init');
+    return this.albumList.getAttribute('init');
   }
 
   set init(value) {
-    this.setAttribute('init', value);
+    this.albumList.setAttribute('init', value);
   }
 
   constructor() {
@@ -117,32 +113,12 @@ export class AlbumSpaceElement extends HTMLElement {
 
     this.container.addEventListener('mouseup', this.onMouseUp);
     this.albumList.addEventListener('change', this.onAlbumListChange);
-    if (this.albumId) {
-      this.albumList.setAttribute('albumid', this.albumId);
-    }
-    if (this.init) {
-      this.albumList.setAttribute('init', this.init);
-    }
   }
 
   /** @protected */
   disconnectedCallback() {
     this.albumList.removeEventListener('change', this.onAlbumListChange);
     this.container.removeEventListener('mouseup', this.onMouseUp);
-  }
-
-  /**
-   * @protected
-   * @param attribute
-   * @param previous
-   * @param value
-   */
-  attributeChangedCallback(attribute, previous, value) {
-    switch (attribute) {
-      case 'albumid': {
-        this.albumList.setAttribute('albumid', value);
-      } break;
-    }
   }
 
   /** @private */

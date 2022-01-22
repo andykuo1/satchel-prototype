@@ -27,7 +27,7 @@ const INNER_STYLE = /* css */`
 .shaking {
   animation-name: shake;
   animation-fill-mode: forwards;
-  animation-duration: 1.3s;
+  animation-duration: var(--animation-duration, 0);
   animation-delay: var(--animation-delay, 0);
   transform: translate(0, 0) scale(0);
 }
