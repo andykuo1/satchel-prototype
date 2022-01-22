@@ -18,6 +18,7 @@ const INNER_HTML = /* html */`
 `;
 const INNER_STYLE = /* css */`
 :host {
+  --foreground-color: var(--item-foreground-color);
   --background-color: var(--item-background-color);
   --hover-color: var(--item-hover-color);
   --title-font: var(--item-title-font);
@@ -79,7 +80,7 @@ figcaption {
   right: 0;
   bottom: 0;
   top: unset;
-  color: #ffffff;
+  color: var(--foreground-color);
   background-color: rgba(0, 0, 0, 0.1);
   text-align: center;
   text-overflow: clip;
@@ -100,7 +101,7 @@ figcaption.vertical {
   right: 0.2em;
   top: 0;
   text-align: right;
-  text-shadow: 1px 1px 3px black;
+  text-shadow: 0.1em 0.1em 0.05em #000000;
 }
 `;
 
@@ -218,9 +219,9 @@ export class InventoryItemElement extends HTMLElement {
   }
 
   /**
+   * @private
    * @param store
    * @param itemId
-   * @protected
    */
   onItemChange(store, itemId) {
     const fixed = this._containerElement.hasAttribute('fixed');
@@ -271,8 +272,8 @@ export class InventoryItemElement extends HTMLElement {
   }
 
   /**
-   * @param e
-   * @protected
+   * @private
+   * @param {MouseEvent} e
    */
   onMouseDown(e) {
     if (e.button === 0) {
@@ -281,8 +282,8 @@ export class InventoryItemElement extends HTMLElement {
   }
 
   /**
+   * @private
    * @param {MouseEvent} e
-   * @protected
    */
   onContextMenu(e) {
     if (this._containerElement.hasAttribute('noedit')) {
