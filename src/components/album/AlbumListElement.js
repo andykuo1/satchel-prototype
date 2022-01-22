@@ -82,7 +82,7 @@ export class AlbumListElement extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ['albumid'];
+    return ['albumid', 'locked'];
   }
 
   get albumId() {
@@ -192,6 +192,10 @@ export class AlbumListElement extends HTMLElement {
         }
         const store = getSatchelStore();
         this.internallyChangeAlbumId(store, value);
+      } break;
+      case 'locked': {
+        const store = getSatchelStore();
+        this.onAlbumChange(store, this._albumId);
       } break;
     }
   }
