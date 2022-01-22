@@ -11,6 +11,7 @@ import { playSound } from '../../sounds.js';
 import { updateList } from '../ElementListHelper.js';
 import { getItemsInAlbum } from '../../satchel/album/AlbumItems.js';
 import { addAlbumChangeListener, removeAlbumChangeListener } from '../../events/AlbumEvents.js';
+import '../invgrid/InventorySocketElement.js';
 import '../lib/ContextMenuElement.js';
 
 /**
@@ -40,7 +41,7 @@ const INNER_HTML = /* html */`
         <div class="socketYContainer">
           <div class="socketSpacing"></div>
           <div class="socketContainer">
-            <inventory-grid init="socket" id="socketInventory" noedit></inventory-grid>
+            <inventory-socket id="socketInventory" init="inv" noedit></inventory-socket>
           </div>
           <div class="socketSpacing">
             <input type="number" min="1" max="${MAX_ITEM_WIDTH}" id="itemWidth">
@@ -414,7 +415,7 @@ export class ItemEditorElement extends HTMLElement {
      * @private
      * @type {InventoryGridElement}
      */
-    this.socket = shadowRoot.querySelector('inventory-grid');
+    this.socket = shadowRoot.querySelector('inventory-socket');
     /**
      * @private
      * @type {HTMLInputElement}

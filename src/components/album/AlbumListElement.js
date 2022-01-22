@@ -11,7 +11,7 @@ import { uuid } from '../../util/uuid.js';
 import { getGroundAlbumId } from '../../satchel/GroundAlbum.js';
 
 /**
- * @typedef {import('../invgrid/InventoryGridElement.js').InventoryGridElement} InventoryGridElement
+ * @typedef {import('../invgrid/InventorySocketElement.js').InventorySocketElement} InventorySocketElement
  * @typedef {import('../../satchel/item/Item.js').ItemId} ItemId
  * @typedef {import('../../satchel/album/Album.js').AlbumId} AlbumId
  * @typedef {import('../../store/SatchelStore.js').SatchelStore} Store
@@ -248,7 +248,7 @@ export class AlbumListElement extends HTMLElement {
   /**
    * @private
    * @param {ItemId} key 
-   * @returns {InventoryGridElement}
+   * @returns {InventorySocketElement}
    */
   onItemListEntryCreate(key) {
     const albumId = this.albumId;
@@ -264,7 +264,7 @@ export class AlbumListElement extends HTMLElement {
   /**
    * @private
    * @param {ItemId} key 
-   * @param {InventoryGridElement} element 
+   * @param {InventorySocketElement} element 
    */
   onItemListEntryUpdate(key, element) {
     if (this.hasAttribute('locked')) {

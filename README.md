@@ -25,6 +25,7 @@ Each profile can be toggle online or offline.
 
 Does not work on Firefox yet.
 
+
 Feedback
 - Paste Item code is confusing.
 - Limited, Limitless, Single
@@ -43,4 +44,10 @@ a chunked, boundless inventory like space but it expands per chunk as you place 
 
 As a chunked map editor.
 As a collage editor.
+
+Decor items - cannot be edited
+
+What if for a Boundless board, it becomes inset and scrollable inside???
+
+- What do we need? A scrollable inside. A view-resizable board (doesn't resize internal inventory, just the viewport)
 

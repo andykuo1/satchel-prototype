@@ -138,7 +138,7 @@ export class InventoryItemElement extends HTMLElement {
   }
 
   /**
-   * @param {InventoryGridElement} containerElement
+   * @param {HTMLElement & { invId: string }} containerElement
    * @param {string} invId
    * @param {string} itemId
    */
@@ -223,7 +223,7 @@ export class InventoryItemElement extends HTMLElement {
    * @protected
    */
   onItemChange(store, itemId) {
-    const fixed = this._containerElement.fixed;
+    const fixed = this._containerElement.hasAttribute('fixed');
     const invId = this._containerElement.invId;
     const inv = getExistingInventory(store, invId);
     const slotIndex = getSlotIndexByItemId(inv, itemId);

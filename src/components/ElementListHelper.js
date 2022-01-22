@@ -1,6 +1,6 @@
 /**
  *
- * @param {Element} parentNode
+ * @param {DocumentFragment|Element} parentNode
  * @param {Iterable<string>} list
  * @param {(key: string) => Element} factoryCreate
  * @param {(key: string, element: Element) => void} [factoryDelete]

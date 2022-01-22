@@ -95,7 +95,7 @@ export function itemMouseDownCallback(mouseEvent, itemElement, unitSize) {
  * Perform pickup logic for container elements.
  *
  * @param {MouseEvent} mouseEvent The triggering mouse event.
- * @param {InventoryGridElement} containerElement The target container element.
+ * @param {HTMLElement & { _container: HTMLElement, invId: string }} containerElement The target container element.
  * @param {number} unitSize The item unit size.
  * @returns {boolean} Whether to allow the event to propagate.
  */
