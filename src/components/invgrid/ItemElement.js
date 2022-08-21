@@ -1,9 +1,12 @@
-import { DEFAULT_ITEM_UNIT_SIZE, itemMouseDownCallback } from './InventoryElementMouseHelper.js';
+import { DEFAULT_ITEM_UNIT_SIZE, itemMouseDownCallback } from './InvMouseHelper.js';
 import { getSatchelStore } from '../../store/SatchelStore.js';
 import { getExistingInventory } from '../../satchel/inv/InventoryTransfer.js';
 import { hasItem, getItemByItemId } from '../../satchel/inv/InvItems.js';
 import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../../satchel/inv/InvSlots.js';
 import { addItemChangeListener, removeItemChangeListener } from '../../events/ItemEvents.js';
+import { isInventoryViewEditable, isInventoryViewUnitSized } from '../inventory/InventoryView.js';
+
+/** @typedef {import('../inventory/InventoryView.js').InventoryView} InventoryView */
 
 const INNER_HTML = /* html */`
 <figure class="container">
@@ -103,7 +106,7 @@ figcaption.vertical {
 }
 `;
 
-export class InventoryItemElement extends HTMLElement {
+export class ItemElement extends HTMLElement {
   /** @private */
   static get [Symbol.for('templateNode')]() {
     const t = document.createElement('template');
@@ -133,29 +136,24 @@ export class InventoryItemElement extends HTMLElement {
   }
 
   get container() {
-    return this._containerElement;
+    return this._invView.containerElement;
   }
 
   /**
-   * @param {HTMLElement & { _container: Element, invId: string }} containerElement
+   * @param {InventoryView} invView
    * @param {string} invId
    * @param {string} itemId
    */
-  constructor(containerElement, invId, itemId) {
+  constructor(invView, invId, itemId) {
     super();
-    if (!containerElement) {
-      throw new Error('Missing container for item element.');
+    if (!invView) {
+      throw new Error('Missing view for item container.');
     }
     if (!invId) {
       throw new Error('Missing inventory id for item element.');
     }
     if (!itemId) {
       throw new Error('Missing item id for item element.');
-    }
-    if (containerElement.invId !== invId) {
-      throw new Error(
-        'Cannot create item element with mismatched container and inventory id.'
-      );
     }
     const inv = getExistingInventory(getSatchelStore(), invId);
     if (!hasItem(inv, itemId)) {
@@ -172,7 +170,7 @@ export class InventoryItemElement extends HTMLElement {
     );
 
     /** @private */
-    this._containerElement = containerElement;
+    this._invView = invView;
     /** @private */
     this._invId = invId;
     /** @private */
@@ -181,11 +179,11 @@ export class InventoryItemElement extends HTMLElement {
     /** @private */
     this._container = shadowRoot.querySelector('.container');
     /** @private */
-    this._image = this.shadowRoot.querySelector('img');
+    this._image = shadowRoot.querySelector('img');
     /** @private */
-    this._caption = this.shadowRoot.querySelector('figcaption');
+    this._caption = shadowRoot.querySelector('figcaption');
     /** @private */
-    this._stackSize = this.shadowRoot.querySelector('#stackSize');
+    this._stackSize = shadowRoot.querySelector('#stackSize');
 
     /** @protected */
     this.onItemChange = this.onItemChange.bind(this);
@@ -222,15 +220,15 @@ export class InventoryItemElement extends HTMLElement {
    * @param itemId
    */
   onItemChange(store, itemId) {
-    const fixed = this._containerElement.hasAttribute('fixed');
-    const invId = this._containerElement.invId;
+    const unitSized = isInventoryViewUnitSized(this._invView);
+    const invId = this._invId;
     const inv = getExistingInventory(store, invId);
     const slotIndex = getSlotIndexByItemId(inv, itemId);
     const [x, y] = getSlotCoordsByIndex(inv, slotIndex);
     const item = getItemByItemId(inv, itemId);
     this.style.setProperty('--itemX', `${x}`);
     this.style.setProperty('--itemY', `${y}`);
-    if (fixed) {
+    if (unitSized) {
       this.style.setProperty('--itemWidth', '1');
       this.style.setProperty('--itemHeight', '1');
     } else {
@@ -284,7 +282,7 @@ export class InventoryItemElement extends HTMLElement {
    * @param {MouseEvent} e
    */
   onContextMenu(e) {
-    if (this._containerElement.hasAttribute('noedit')) {
+    if (isInventoryViewEditable(this._invView)) {
       e.preventDefault();
       e.stopPropagation();
       return false;
@@ -307,4 +305,4 @@ export class InventoryItemElement extends HTMLElement {
     return false;
   }
 }
-InventoryItemElement.define();
+ItemElement.define();

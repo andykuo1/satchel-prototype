@@ -4,7 +4,7 @@
 
 import { dropItemOnGround } from '../../satchel/GroundAlbum.js';
 import { playSound } from '../../sounds.js';
-import { DEFAULT_ITEM_UNIT_SIZE } from '../invgrid/InventoryElementMouseHelper.js';
+import { DEFAULT_ITEM_UNIT_SIZE } from '../invgrid/InvMouseHelper.js';
 
 const INNER_HTML = /* html */`
 <div class="outer">

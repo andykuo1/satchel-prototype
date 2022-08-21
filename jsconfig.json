@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "lib": ["es6", "dom"],
+    "target": "ESNext",
+    "lib": ["ESNext", "dom"],
     "allowJs": true,
     "noEmit": true,
     "checkJs": true,

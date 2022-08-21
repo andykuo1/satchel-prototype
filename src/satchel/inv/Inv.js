@@ -18,6 +18,8 @@ import { cloneItem, copyItem } from '../item/Item.js';
  * @property {number} width
  * @property {number} height
  * @property {number} length
+ * @property {number} groundX
+ * @property {number} groundY
  * @property {string} displayName
  * @property {object} metadata
  */
@@ -41,6 +43,8 @@ export function createInventory(invId, invType, slotCount, maxCoordX, maxCoordY)
     width: maxCoordX,
     height: maxCoordY,
     length: slotCount,
+    groundX: 0,
+    groundY: 0,
     displayName: '',
     metadata: {}, // TODO: Not used yet.
   };

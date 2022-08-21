@@ -12,7 +12,7 @@ import {
 import { getItemByItemId } from '../../satchel/inv/InvItems.js';
 import { getSlotCoordsByIndex, getSlotIndexByItemId, isSlotIndexEmpty } from '../../satchel/inv/InvSlots.js';
 import { putDownToGridInventory, putDownToSocketInventory, tryTakeOneItem } from './InvCursorElementHelper.js';
-import { DEFAULT_ITEM_UNIT_SIZE } from '../invgrid/InventoryElementMouseHelper.js';
+import { DEFAULT_ITEM_UNIT_SIZE } from '../invgrid/InvMouseHelper.js';
 import { isInvInStore, getInvInStore, createSocketInvInStore, deleteInvInStore } from '../../store/InvStore.js';
 import { addItemToAlbum } from '../../satchel/album/AlbumItems.js';
 import { dropFallingItem } from './FallingItemElement.js';

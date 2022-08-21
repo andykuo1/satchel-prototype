@@ -8,7 +8,7 @@ import { getInvInStore } from '../../store/InvStore.js';
 import { dispatchItemChange } from '../../events/ItemEvents.js';
 
 /**
- * @typedef {import('./InventoryItemElement.js').InventoryItemElement} InventoryItemElement
+ * @typedef {import('./ItemElement.js').ItemElement} ItemElement
  */
 
 export const DEFAULT_ITEM_UNIT_SIZE = 48;
@@ -17,7 +17,7 @@ export const DEFAULT_ITEM_UNIT_SIZE = 48;
  * Perform pickup logic for item elements.
  *
  * @param {MouseEvent} mouseEvent The triggering mouse event.
- * @param {InventoryItemElement} itemElement The target element.
+ * @param {ItemElement} itemElement The target element.
  * @param {number} unitSize The item unit size.
  * @returns {boolean} Whether to allow the event to propagate.
  */

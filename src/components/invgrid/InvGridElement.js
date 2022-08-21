@@ -1,17 +1,12 @@
 import { upgradeProperty } from '../../util/wc.js';
-import { containerMouseUpCallback, DEFAULT_ITEM_UNIT_SIZE } from './InventoryElementMouseHelper.js';
-import {
-  getSatchelStore,
-} from '../../store/SatchelStore.js';
-import { InventoryItemElement } from './InventoryItemElement.js';
-import {
- getItemIdsInSlots, isInventoryEmpty,
-} from '../../satchel/inv/InventoryTransfer.js';
+import { containerMouseUpCallback, DEFAULT_ITEM_UNIT_SIZE } from './InvMouseHelper.js';
+import { getSatchelStore } from '../../store/SatchelStore.js';
+import { isInventoryEmpty } from '../../satchel/inv/InventoryTransfer.js';
 import { addInventoryChangeListener, removeInventoryChangeListener } from '../../events/InvEvents.js';
 import { createGridInvInStore, deleteInvInStore, getInvInStore, isInvInStore } from '../../store/InvStore.js';
-import { getItemInInv } from '../../satchel/inv/InventoryItems.js';
-import { updateList } from '../ElementListHelper.js';
 import { uuid } from '../../util/uuid.js';
+import { InventoryItemList } from '../inventory/InventoryItemList.js';
+import { createInventoryView } from '../inventory/InventoryView.js';
 
 /**
  * @typedef {import('../../satchel/item/Item.js').ItemId} ItemId
@@ -67,10 +62,6 @@ h2 {
   background-color: var(--title-color);
   transform: translateY(-100%);
   box-shadow: 0.4rem 0.4rem 0 0 var(--outline-color);
-}
-p {
-  margin: 0;
-  padding: 0;
 }
 .hidden {
   visibility: hidden;
@@ -158,6 +149,8 @@ export class InvGridElement extends HTMLElement {
     
     /** @private */
     this._invId = null;
+    /** @private */
+    this._invView = createInventoryView(this);
 
     /** @private */
     this.rootContainer = shadowRoot.querySelector('.root');
@@ -167,12 +160,10 @@ export class InvGridElement extends HTMLElement {
     this.invHeader = shadowRoot.querySelector('h2');
 
     /** @private */
-    this.itemList = shadowRoot.querySelector('.itemList');
+    this.itemList = new InventoryItemList(shadowRoot.querySelector('.itemList'));
 
     /** @private */
     this.onInventoryChange = this.onInventoryChange.bind(this);
-    /** @private */
-    this.onItemListEntryCreate = this.onItemListEntryCreate.bind(this);
     /** @private */
     this.onMouseUp = this.onMouseUp.bind(this);
     /** @private */
@@ -309,8 +300,7 @@ export class InvGridElement extends HTMLElement {
     this.innerContainer.classList.toggle('flattop', isDisplayName);
     
     // Update items
-    const list = getItemIdsInSlots(store, invId);
-    const [created, deleted] = updateList(this.itemList, list, this.onItemListEntryCreate);
+    const [created, deleted] = this.itemList.update(store, this._invView);
     this.dispatchEvent(new CustomEvent('change', {
       composed: true,
       bubbles: false,
@@ -320,20 +310,6 @@ export class InvGridElement extends HTMLElement {
         deleted,
       }
     }));
-  }
-
-  /**
-   * @private
-   * @param {ItemId} key 
-   * @returns {InventoryItemElement}
-   */
-  onItemListEntryCreate(key) {
-    const invId = this.invId;
-    const store = getSatchelStore();
-
-    let invItem = getItemInInv(store, invId, key);
-    let element = new InventoryItemElement(this, invId, invItem.itemId);
-    return element;
   }
 
   /**
