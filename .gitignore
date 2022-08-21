@@ -6,3 +6,8 @@ node_modules/
 
 # OS X temporary files
 .DS_Store
+
+# Cypress artifacts
+cypress/downloads/
+cypress/screenshots/
+cypress/videos/

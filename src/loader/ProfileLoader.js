@@ -5,13 +5,15 @@ import { cloneProfile } from '../satchel/profile/Profile.js';
  * @typedef {import('../satchel/profile/Profile.js').Profile} Profile
  */
 
+export const CURRENT_PROFILE_VERSION = 'profile_links_v1';
+
 /**
  * @param {Profile} profile
  * @param {object} dst
  * @returns {object}
  */
 export function exportProfileToJSON(profile, dst = undefined) {
-  return exportDataToJSON('profile_links_v1', cloneProfile(profile), {}, dst);
+  return exportDataToJSON(CURRENT_PROFILE_VERSION, cloneProfile(profile), {}, dst);
 }
 
 /**

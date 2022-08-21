@@ -3,13 +3,14 @@ import { exportItemToJSON, importItemFromJSON } from './ItemLoader.js';
 import { compressInventoryJson, decompressInventoryJson } from './InvLoader.js';
 import { cloneInventory } from '../satchel/inv/Inv.js';
 import { uuid } from '../util/uuid.js';
-import { createAlbum } from '../satchel/album/Album.js';
-import { cloneItem, copyItem } from '../satchel/item/Item.js';
+import { ALBUM_FLAG_EXPAND_BIT, ALBUM_FLAG_HIDDEN_BIT, ALBUM_FLAG_LOCKED_BIT, createAlbum } from '../satchel/album/Album.js';
 
 /**
  * @typedef {import('../satchel/album/Album.js').Album} Album
  * @typedef {import('./DataLoader.js').ImportDataFormat} ImportDataFormat
  */
+
+export const CURRENT_ALBUM_VERSION = 'album_v3';
 
 /**
  * @param {Album} album
@@ -17,7 +18,7 @@ import { cloneItem, copyItem } from '../satchel/item/Item.js';
  * @returns {ImportDataFormat}
  */
 export function exportAlbumToJSON(album, dst = undefined) {
-  return exportDataToJSON('album_v3', compressInventoryJson(cloneInventory(album)), {}, dst);
+  return exportDataToJSON(CURRENT_ALBUM_VERSION, compressInventoryJson(cloneInventory(album)), {}, dst);
 }
 
 /**
@@ -28,46 +29,34 @@ export function exportAlbumToJSON(album, dst = undefined) {
 export function importAlbumFromJSON(jsonData, dst = undefined) {
   switch (jsonData._type) {
     case 'album_v1':
-      return importDataFromJSON(jsonData, 'album_v1', (data) => cloneAlbum(data, dst));
+      return importDataFromJSON(jsonData, 'album_v1', (data) => cloneInventory(albumV1ToV3(data, dst)));
     case 'album_v2':
-      return importDataFromJSON(jsonData, 'album_v2', (data) => cloneAlbum(decompressAlbumJson(data), dst));
+      return importDataFromJSON(jsonData, 'album_v2', (data) => cloneInventory(albumV1ToV3(decompressAlbumJsonV2(data), dst)));
     case 'album_v3':
       return importDataFromJSON(jsonData, 'album_v3', (data) => cloneInventory(decompressInventoryJson(data), dst));
     default:
       throw new Error(`Unsupported album version '${jsonData._type}'.`);
   }
 }
-function toAlbumV3(data, dst = undefined) {
-  if (data._type === 'album_v1') {
-    cloneAlbum(data, dst);
-  }
-}
 
-function cloneAlbum(other, dst, opts) {
-  const { preserveItemId = true } = opts;
+function albumV1ToV3(other, dst) {
   const albumId = other.albumId || uuid();
   if (!dst) {
     dst = createAlbum(albumId);
   } else {
-    dst.albumId = albumId;
+    dst.invId = albumId;
   }
-  if (typeof other.items === 'object') {
-    if (preserveItemId) {
-      for (let item of Object.values(other.items)) {
-        let newItem = cloneItem(item);
-        dst.items[newItem.itemId] = newItem;
-      }
-    } else {
-      for (let item of Object.values(other.items)) {
-        let newItem = copyItem(item);
-        dst.items[newItem.itemId] = newItem;
-      }
-    }
+  dst.items = other.items;
+  dst.displayName = other.displayName;
+  if (other.locked) {
+    dst.flags |= ALBUM_FLAG_LOCKED_BIT;
   }
-  dst.displayName = String(other.displayName);
-  dst.locked = Boolean(other.locked);
-  dst.hidden = Boolean(other.hidden);
-  dst.expand = typeof other.expand === 'boolean' ? other.expand : true;
+  if (other.hidden) {
+    dst.flags |= ALBUM_FLAG_HIDDEN_BIT;
+  }
+  if (other.expand) {
+    dst.flags |= ALBUM_FLAG_EXPAND_BIT;
+  }
   return dst;
 }
 
@@ -113,7 +102,7 @@ export function compressAlbumJson(uncompressedJson) {
  * @param {object} compressedJson
  * @returns {object}
  */
-export function decompressAlbumJson(compressedJson) {
+export function decompressAlbumJsonV2(compressedJson) {
   let { t: newItemType, d: newItems } = compressedJson.items;
   if (!newItems || newItems.length <= 0) {
     return {

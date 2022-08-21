@@ -1,16 +1,22 @@
 import {
   describeBackwardsCompatibleJSONFormat,
-  describeCurrentJSONFormat,
   describeJSONFormat,
 } from './DataLoaderHelper.js';
 
 import { exportProfileToJSON, importProfileFromJSON } from '../../src/loader/ProfileLoader.js';
 import { createProfile } from '../../src/satchel/profile/Profile.js';
 
-function createFullProfile(profileId) {
-  let created = createProfile(profileId);
-  (created.albums = ['test']), (created.displayName = 'Test Profile');
-  (created.invs = ['test']), (created.profileId = 'test');
+function createDefaultProfile() {
+  let created = createProfile('test');
+  return created;
+}
+
+function createFullProfile() {
+  let created = createProfile('test');
+  created.albums = ['test'];
+  created.displayName = 'Test Profile';
+  created.invs = ['test'];
+  created.profileId = 'test';
   return created;
 }
 
@@ -21,28 +27,19 @@ function assertProfileLinksV1Compatibility(target, profileLinkV1) {
 
 describe('The default profile links data format', () => {
   describe('for default profile links', () => {
-    describeJSONFormat('profile_links_v1', createProfile, exportProfileToJSON, importProfileFromJSON);
+    describeJSONFormat('profile_links_v1', createDefaultProfile, exportProfileToJSON, importProfileFromJSON);
   });
   describe('for full profile links', () => {
     it('should be modifiable', () => {
-      let created = createProfile('test');
-      let fullCreated = createFullProfile('test');
+      let created = createDefaultProfile();
+      let fullCreated = createFullProfile();
       assert.notDeepEqual(fullCreated, created);
     });
     describeJSONFormat('profile_links_v1', createFullProfile, exportProfileToJSON, importProfileFromJSON);
   });
 });
 
-const PROFILE_V1_FIXTURES = {
-  default: ['profile_links_v1_default.json', 'profile_links_v1_default_export.json'],
-  full: ['profile_links_v1_full.json', 'profile_links_v1_full_export.json'],
-};
 describe('The "profile_links_v1" data format', () => {
-  describeBackwardsCompatibleJSONFormat(
-    'profile_links_v1',
-    importProfileFromJSON,
-    assertProfileLinksV1Compatibility,
-    PROFILE_V1_FIXTURES
-  );
-  describeCurrentJSONFormat(createProfile, exportProfileToJSON, PROFILE_V1_FIXTURES);
+  describeBackwardsCompatibleJSONFormat('profile_links_v1', 'default_export', createDefaultProfile, exportProfileToJSON, importProfileFromJSON);
+  describeBackwardsCompatibleJSONFormat('profile_links_v1', 'full_export', createFullProfile, exportProfileToJSON, importProfileFromJSON);
 });

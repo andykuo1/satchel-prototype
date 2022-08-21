@@ -1,8 +1,10 @@
 import { exportDataToJSON, importDataFromJSON } from './DataLoader.js';
 import { cloneInventory } from '../satchel/inv/Inv.js';
 
+export const CURRENT_INV_VERSION = 'inv_v3';
+
 export function exportInventoryToJSON(inv, dst = undefined) {
-  return exportDataToJSON('inv_v2', compressInventoryJson(cloneInventory(inv)), {}, dst);
+  return exportDataToJSON(CURRENT_INV_VERSION, compressInventoryJson(cloneInventory(inv)), {}, dst);
 }
 
 export function importInventoryFromJSON(jsonData, dst = undefined) {
@@ -11,6 +13,10 @@ export function importInventoryFromJSON(jsonData, dst = undefined) {
       return importDataFromJSON(jsonData, 'inv_v1', (data) => cloneInventory(data, dst));
     case 'inv_v2':
       return importDataFromJSON(jsonData, 'inv_v2', (data) =>
+        cloneInventory(decompressInventoryJson(data), dst)
+      );
+    case 'inv_v3': // Added `flags` field
+      return importDataFromJSON(jsonData, 'inv_v3', (data) =>
         cloneInventory(decompressInventoryJson(data), dst)
       );
     default:

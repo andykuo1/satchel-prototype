@@ -1,0 +1,1 @@
+{"_type":"inv_v3","_data":{"invId":"test","type":"grid","items":{"test":{"itemId":"test","width":2,"height":1,"imgSrc":"","displayName":"","description":"","stackSize":-1,"background":"","metadata":{}}},"slots":[1,1,0,0],"width":2,"height":2,"length":4,"displayName":"Test Inventory","metadata":{"test":"test"},"flags":7,"__slotsMap":{"1":"test"}},"_meta":{"time":1661110717549}}

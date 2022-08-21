@@ -8,6 +8,17 @@ import { uuid } from '../util/uuid.js';
  * @typedef {import('./DataLoader.js').ImportDataFormat} ImportDataFormat
  */
 
+const CURRENT_ITEM_VERSION = 'item_v2';
+
+/**
+ * @param {Item} item
+ * @param {object} dst
+ * @returns {ImportDataFormat}
+ */
+export function exportItemToJSON(item, dst = undefined) {
+  return exportDataToJSON(CURRENT_ITEM_VERSION, compressItemJson(cloneItem(item)), {}, dst);
+}
+
 /**
  * @param {object} jsonData
  * @param {Item} dst
@@ -24,18 +35,6 @@ export function importItemFromJSON(jsonData, dst = undefined) {
         return cloneItem(data, dst);
       });
   }
-}
-
-/**
- * @param {Item} item
- * @param {object} dst
- * @returns {ImportDataFormat}
- */
-export function exportItemToJSON(item, dst = undefined) {
-  /** @type {object} */
-  let data = cloneItem(item);
-  data = compressItemJson(data);
-  return exportDataToJSON('item_v2', data, {}, dst);
 }
 
 export function exportItemV1ToJSON(item, dst = undefined) {
