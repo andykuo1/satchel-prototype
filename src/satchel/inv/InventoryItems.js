@@ -1,5 +1,5 @@
 import { getExistingInvInStore } from '../../store/InvStore.js';
-import { clearItems, getItemByItemId, getItemIds, getItems, putItem, removeItem } from './InvItems.js';
+import { getItemByItemId, getItemIds, getItems, putItem, removeItem } from './InvItems.js';
 
 export function putItemInInv(store, invId, item, coordX = 0, coordY = 0) {
   let inv = getExistingInvInStore(store, invId);
@@ -34,9 +34,4 @@ export function getItemIdsInInv(store, invId) {
 export function getItemsInInv(store, invId) {
   let inv = getExistingInvInStore(store, invId);
   return getItems(inv);
-}
-
-export function clearItemsInInv(store, invId) {
-  let inv = getExistingInvInStore(store, invId);
-  clearItems(inv);
 }

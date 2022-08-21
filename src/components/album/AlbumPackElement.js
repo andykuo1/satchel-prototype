@@ -3,14 +3,15 @@ import { isAlbumExpanded, isAlbumLocked, setAlbumExpanded, setAlbumLocked } from
 import { getCursor } from '../cursor/index.js';
 import { downloadText } from '../../util/downloader.js';
 import { exportAlbumToJSON } from '../../loader/AlbumLoader.js';
-import { deleteAlbumInStore, getAlbumInStore, isAlbumInStore } from '../../store/AlbumStore.js';
-import { dispatchAlbumChange } from '../../events/AlbumEvents.js';
 import { IconButtonElement } from '../lib/IconButtonElement.js';
-import { clearItemsInAlbum, getItemIdsInAlbum, getItemsInAlbum } from '../../satchel/album/AlbumItems.js';
 import { isGroundAlbum } from '../../satchel/GroundAlbum.js';
 import { isFoundryAlbum } from '../../satchel/FoundryAlbum.js';
 import { isTrashAlbum, saveItemToTrashAlbum } from '../../satchel/TrashAlbum.js';
 import './AlbumListElement.js';
+import { dispatchInventoryChange } from '../../events/InvEvents.js';
+import { getItemIdsInInv, getItemsInInv } from '../../satchel/inv/InventoryItems.js';
+import { clearItemsInInventory } from '../../satchel/inv/InventoryTransfer.js';
+import { deleteInvInStore, getInvInStore, isInvInStore } from '../../store/InvStore.js';
 
 /**
  * @typedef {import('../../satchel/item/Item.js').Item} Item
@@ -199,7 +200,7 @@ export class AlbumPackElement extends HTMLElement {
   onAlbumListChange(e) {
     const albumId = e.detail.albumId;
     const store = getSatchelStore();
-    const album = getAlbumInStore(store, albumId);
+    const album = getInvInStore(store, albumId);
 
     if (isGroundAlbum(album) || isTrashAlbum(album)) {
       // Cannot change lock state for a ground album
@@ -235,7 +236,7 @@ export class AlbumPackElement extends HTMLElement {
     }
 
     // Update if empty
-    let empty = getItemIdsInAlbum(store, albumId).length > 0;
+    let empty = getItemIdsInInv(store, albumId).length > 0;
     this.labelEmpty.classList.toggle('hidden', empty);
   }
 
@@ -243,11 +244,11 @@ export class AlbumPackElement extends HTMLElement {
   onInputTitle(e) {
     const store = getSatchelStore();
     const albumId = this.albumId;
-    if (isAlbumInStore(store, albumId)) {
+    if (isInvInStore(store, albumId)) {
       const name = this.inputTitle.textContent;
-      const album = getAlbumInStore(store, albumId);
+      const album = getInvInStore(store, albumId);
       album.displayName = name;
-      dispatchAlbumChange(store, albumId);
+      dispatchInventoryChange(store, albumId);
     }
   }
 
@@ -255,7 +256,7 @@ export class AlbumPackElement extends HTMLElement {
   onButtonLock() {
     const store = getSatchelStore();
     const albumId = this.albumId;
-    if (isAlbumInStore(store, albumId)) {
+    if (isInvInStore(store, albumId)) {
       const locked = isAlbumLocked(store, albumId);
       setAlbumLocked(store, albumId, !locked);
     }
@@ -264,7 +265,7 @@ export class AlbumPackElement extends HTMLElement {
   /** @private */
   onButtonExport() {
     const store = getSatchelStore();
-    const album = getAlbumInStore(store, this.albumId);
+    const album = getInvInStore(store, this.albumId);
     if (album) {
       try {
         const jsonData = exportAlbumToJSON(album);
@@ -280,9 +281,9 @@ export class AlbumPackElement extends HTMLElement {
   onButtonDelete() {
     const store = getSatchelStore();
     const albumId = this.albumId;
-    clearItemsInAlbum(store, albumId);
-    const album = getAlbumInStore(store, albumId);
-    deleteAlbumInStore(store, albumId, album);
+    clearItemsInInventory(store, albumId);
+    const album = getInvInStore(store, albumId);
+    deleteInvInStore(store, albumId, album);
     this.remove();
   }
 
@@ -290,7 +291,7 @@ export class AlbumPackElement extends HTMLElement {
   onButtonExpand() {
     const store = getSatchelStore();
     const albumId = this.albumId;
-    if (isAlbumInStore(store, albumId)) {
+    if (isInvInStore(store, albumId)) {
       const expanded = isAlbumExpanded(store, albumId);
       setAlbumExpanded(store, albumId, !expanded);
     }
@@ -300,7 +301,7 @@ export class AlbumPackElement extends HTMLElement {
   onAlbumDrop(e) {
     const store = getSatchelStore();
     const albumId = this.albumId;
-    if (!isAlbumInStore(store, albumId)) {
+    if (!isInvInStore(store, albumId)) {
       return;
     }
     if (!isAlbumExpanded(store, albumId)) {
@@ -311,7 +312,7 @@ export class AlbumPackElement extends HTMLElement {
       // @ts-ignore
     if (isAlbumLocked(store, albumId) && cursor.hasHeldItem() && !cursor.ignoreFirstPutDown) {
       let heldItem = cursor.getHeldItem();
-      let items = getItemsInAlbum(store, albumId);
+      let items = getItemsInInv(store, albumId);
       for(let item of items) {
         // Dragging similar items to the album will delete it.
         if (isItemSimilarEnoughToBeDestroyed(item, heldItem)) {

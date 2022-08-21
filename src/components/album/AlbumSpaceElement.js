@@ -1,8 +1,8 @@
 import { getSatchelStore } from '../../store/SatchelStore.js';
 import { upgradeProperty } from '../../util/wc.js';
 import { getCursor } from '../cursor/index.js';
-import { getAlbumInStore, isAlbumInStore } from '../../store/AlbumStore.js';
 import './AlbumListElement.js';
+import { getInvInStore, isInvInStore } from '../../store/InvStore.js';
 
 /**
  * @typedef {import('../../satchel/item/Item.js').ItemId} ItemId
@@ -123,7 +123,7 @@ export class AlbumSpaceElement extends HTMLElement {
   /** @private */
   onAlbumListChange(e) {
     const store = getSatchelStore();
-    const album = getAlbumInStore(store, e.detail.albumId);
+    const album = getInvInStore(store, e.detail.albumId);
     // Update name
     const name = album.displayName;
     this.containerTitle.textContent = name;
@@ -134,7 +134,7 @@ export class AlbumSpaceElement extends HTMLElement {
     const cursor = getCursor();
     const store = getSatchelStore();
     const albumId = this.albumId;
-    if (!isAlbumInStore(store, albumId)) {
+    if (!isInvInStore(store, albumId)) {
       return;
     }
     if (cursor.putDownInAlbum(albumId)) {

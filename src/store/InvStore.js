@@ -1,5 +1,5 @@
 import { createGridInventory, createSocketInventory } from '../satchel/inv/Inv.js';
-import { dispatchInventoryChange } from '../events/InvEvents.js';
+import { dispatchInventoryChange, dispatchInventoryListChange } from '../events/InvEvents.js';
 
 /**
  * @typedef {import('./SatchelStore.js').SatchelStore} Store
@@ -8,6 +8,8 @@ import { dispatchInventoryChange } from '../events/InvEvents.js';
  */
 
 /**
+ * Get an existing inventory. Will throw if it does not exist.
+ * 
  * @param {Store} store
  * @param {InvId} invId
  * @returns {Inv}
@@ -97,6 +99,7 @@ export function addInvInStore(store, invId, inv) {
   }
   store.data.inventory[invId] = inv;
   dispatchInventoryChange(store, invId);
+  dispatchInventoryListChange(store);
   return true;
 }
 
@@ -115,5 +118,6 @@ export function deleteInvInStore(store, invId, inv) {
   }
   delete store.data.inventory[invId];
   dispatchInventoryChange(store, invId);
+  dispatchInventoryListChange(store);
   return true;
 }

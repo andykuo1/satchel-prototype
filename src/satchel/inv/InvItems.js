@@ -52,15 +52,19 @@ export function removeItem(inv, itemId) {
   if (!(itemId in inv.items)) {
     throw new Error(`Cannot remove item '${itemId}' that does not exist in inventory '${inv.invId}'.`);
   }
-  let slotIndex = getSlotIndexByItemId(inv, itemId);
-  if (slotIndex < 0) {
-    throw new Error(`Failed to remove item '${itemId}' - missing slot index for item.`);
+  // If slots exist, then check it is in there.
+  if (inv.slots.length > 0) {
+    let slotIndex = getSlotIndexByItemId(inv, itemId);
+    if (slotIndex < 0) {
+      throw new Error(`Failed to remove item '${itemId}' - missing slot index for item.`);
+    }
+    let item = getItemByItemId(inv, itemId);
+    let [fromX, fromY] = getSlotCoordsByIndex(inv, slotIndex);
+    let toX = fromX + item.width - 1;
+    let toY = fromY + item.height - 1;
+    clearSlots(inv, fromX, fromY, toX, toY);
   }
-  let item = getItemByItemId(inv, itemId);
-  let [fromX, fromY] = getSlotCoordsByIndex(inv, slotIndex);
-  let toX = fromX + item.width - 1;
-  let toY = fromY + item.height - 1;
-  clearSlots(inv, fromX, fromY, toX, toY);
+  // And delete it regardless.
   delete inv.items[itemId];
   return true;
 }

@@ -3,7 +3,6 @@ import {
   getSatchelStore,
 } from '../../store/SatchelStore.js';
 import {
-  getExistingInventory,
   removeItemFromInventory,
   clearItemsInInventory,
   addItemToInventory,
@@ -13,8 +12,7 @@ import { getItemByItemId } from '../../satchel/inv/InvItems.js';
 import { getSlotCoordsByIndex, getSlotIndexByItemId, isSlotIndexEmpty } from '../../satchel/inv/InvSlots.js';
 import { putDownToGridInventory, putDownToSocketInventory, tryTakeOneItem } from './InvCursorElementHelper.js';
 import { DEFAULT_ITEM_UNIT_SIZE } from '../invgrid/InvMouseHelper.js';
-import { isInvInStore, getInvInStore, createSocketInvInStore, deleteInvInStore } from '../../store/InvStore.js';
-import { addItemToAlbum } from '../../satchel/album/AlbumItems.js';
+import { isInvInStore, getInvInStore, createSocketInvInStore, deleteInvInStore, getExistingInvInStore } from '../../store/InvStore.js';
 import { dropFallingItem } from './FallingItemElement.js';
 import { playSound } from '../../sounds.js';
 
@@ -194,7 +192,7 @@ export class InvCursorElement extends HTMLElement {
       return false;
     }
     let store = getSatchelStore();
-    let inv = getExistingInventory(store, invId);
+    let inv = getExistingInvInStore(store, invId);
     const slotIndex = getSlotIndexByItemId(inv, itemId);
     const [fromItemX, fromItemY] = getSlotCoordsByIndex(inv, slotIndex);
     const item = getItemByItemId(inv, itemId);
@@ -225,7 +223,7 @@ export class InvCursorElement extends HTMLElement {
       return true;
     }
     playSound('putdown');
-    const toInventory = getExistingInventory(store, invId);
+    const toInventory = getExistingInvInStore(store, invId);
     const invType = toInventory.type;
     switch (invType) {
       case 'socket':
@@ -282,7 +280,7 @@ export class InvCursorElement extends HTMLElement {
       const store = getSatchelStore();
       let newItem = tryTakeOneItem(store, heldItem);
       if (newItem) {
-        addItemToAlbum(store, albumId, newItem);
+        addItemToInventory(store, albumId, newItem, 0, 0);
         playSound('putdownAlbum');
         return true;
       }
@@ -291,7 +289,7 @@ export class InvCursorElement extends HTMLElement {
     }
     const store = getSatchelStore();
     this.clearHeldItem();
-    addItemToAlbum(store, albumId, heldItem);
+    addItemToInventory(store, albumId, heldItem, 0, 0);
     // TODO: drop as falling item?
     playSound('putdownAlbum');
     return true;
@@ -299,7 +297,7 @@ export class InvCursorElement extends HTMLElement {
 
   hasHeldItem() {
     let store = getSatchelStore();
-    let inv = getExistingInventory(store, this.invId);
+    let inv = getExistingInvInStore(store, this.invId);
     return !isSlotIndexEmpty(inv, 0);
   }
 

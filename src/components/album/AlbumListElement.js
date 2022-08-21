@@ -1,14 +1,15 @@
 import { getSatchelStore } from '../../store/SatchelStore.js';
-import { createAlbumInStore, deleteAlbumInStore, getAlbumInStore, isAlbumInStore } from '../../store/AlbumStore.js';
-import { addAlbumChangeListener, removeAlbumChangeListener } from '../../events/AlbumEvents.js';
-import { getItemInAlbum, getItemsInAlbum, hasItemInAlbum, removeItemFromAlbum } from '../../satchel/album/AlbumItems.js';
-import { isInvInStore } from '../../store/InvStore.js';
+import { createAlbumInStore } from '../../store/AlbumStore.js';
+import { deleteInvInStore, getInvInStore, isInvInStore } from '../../store/InvStore.js';
 import { updateList } from '../ElementListHelper.js';
 import { cleanUpItemInvElements, itemAlphabeticalComparator, setUpItemInvElement, tearDownItemInvElement } from './AlbumElementHelper.js';
 import { upgradeProperty } from '../../util/wc.js';
 import { getTrashAlbumId, isTrashAlbum } from '../../satchel/TrashAlbum.js';
 import { uuid } from '../../util/uuid.js';
 import { getGroundAlbumId, isGroundAlbum } from '../../satchel/GroundAlbum.js';
+import { addInventoryChangeListener, removeInventoryChangeListener } from '../../events/InvEvents.js';
+import { hasItemInInventory, removeItemFromInventory } from '../../satchel/inv/InventoryTransfer.js';
+import { getItemInInv, getItemsInInv } from '../../satchel/inv/InventoryItems.js';
 
 /**
  * @typedef {import('../invgrid/InvSocketElement.js').InvSocketElement} InvSocketElement
@@ -171,9 +172,9 @@ export class AlbumListElement extends HTMLElement {
 
     // Only stop init if initialized.
     if (init) {
-      const album = getAlbumInStore(store, albumId);
+      const album = getInvInStore(store, albumId);
       if (!isTrashAlbum(album) && !isGroundAlbum(album)) {
-        deleteAlbumInStore(store, albumId, album);
+        deleteInvInStore(store, albumId, album);
       }
     }
   }
@@ -210,15 +211,11 @@ export class AlbumListElement extends HTMLElement {
     if (prevAlbumId !== newAlbumId) {
       this._albumId = newAlbumId;
       if (prevAlbumId) {
-        removeAlbumChangeListener(
-          store,
-          prevAlbumId,
-          this.onAlbumChange
-        );
+        removeInventoryChangeListener(store, prevAlbumId, this.onAlbumChange);
         cleanUpItemInvElements(store, this.itemList.children, this.itemListEntryIds, this.onItemListEntryInventoryChange);
       }
       if (newAlbumId) {
-        addAlbumChangeListener(store, newAlbumId, this.onAlbumChange);
+        addInventoryChangeListener(store, newAlbumId, this.onAlbumChange);
         this.onAlbumChange(store, newAlbumId);
       }
     }
@@ -230,11 +227,11 @@ export class AlbumListElement extends HTMLElement {
    * @param albumId
    */
   onAlbumChange(store, albumId) {
-    if (!isAlbumInStore(store, albumId)) {
+    if (!isInvInStore(store, albumId)) {
       // The album has been deleted.
       return;
     }
-    const list = getItemsInAlbum(store, albumId)
+    const list = getItemsInInv(store, albumId)
       .sort(itemAlphabeticalComparator)
       .map(a => a.itemId);
     const [created, deleted] = updateList(this.itemList, list, this.onItemListEntryCreate, undefined, this.onItemListEntryUpdate);
@@ -258,7 +255,7 @@ export class AlbumListElement extends HTMLElement {
     const albumId = this.albumId;
     const store = getSatchelStore();
 
-    let albumItem = getItemInAlbum(store, albumId, key);
+    let albumItem = getItemInInv(store, albumId, key);
     let element = setUpItemInvElement(store, albumItem, this.itemListEntryIds, this.onItemListEntryInventoryChange);
     element.toggleAttribute('fixed', this.hasAttribute('fixed'));
     element.classList.add('shaking');
@@ -288,8 +285,8 @@ export class AlbumListElement extends HTMLElement {
     }
     const itemId = tearDownItemInvElement(store, invId, this.itemListEntryIds, this.onItemListEntryInventoryChange);
     const albumId = this.albumId;
-    if (hasItemInAlbum(store, albumId, itemId)) {
-      removeItemFromAlbum(store, albumId, itemId);
+    if (hasItemInInventory(store, albumId, itemId)) {
+      removeItemFromInventory(store, albumId, itemId);
     }
   }
 }

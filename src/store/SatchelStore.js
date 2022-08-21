@@ -9,6 +9,7 @@
  * @property {SatchelEventListenersMap} activeProfile
  * @property {SatchelEventListenersMap} albumList
  * @property {SatchelEventListenersMap} profileList
+ * @property {SatchelEventListenersMap} inventoryList
  *
  * @typedef SatchelSessionStore
  * @property {SatchelEvents} events
@@ -49,6 +50,7 @@ const SATCHEL_STORE = {
       activeProfile: {},
       albumList: {},
       profileList: {},
+      inventoryList: {},
     },
   },
 };

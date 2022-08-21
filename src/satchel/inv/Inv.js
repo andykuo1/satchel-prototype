@@ -1,3 +1,5 @@
+import { dispatchInventoryChange } from '../../events/InvEvents.js';
+import { getExistingInvInStore } from '../../store/InvStore.js';
 import { uuid } from '../../util/uuid.js';
 import { cloneItem, copyItem } from '../item/Item.js';
 
@@ -8,7 +10,7 @@ import { cloneItem, copyItem } from '../item/Item.js';
 
 /**
  * @typedef {string} InvId
- * @typedef {'grid'|'socket'} InventoryType
+ * @typedef {'grid'|'socket'|'album'} InventoryType
  *
  * @typedef Inventory
  * @property {InvId} invId
@@ -18,10 +20,9 @@ import { cloneItem, copyItem } from '../item/Item.js';
  * @property {number} width
  * @property {number} height
  * @property {number} length
- * @property {number} groundX
- * @property {number} groundY
  * @property {string} displayName
  * @property {object} metadata
+ * @property {number} flags
  */
 
 /**
@@ -43,10 +44,9 @@ export function createInventory(invId, invType, slotCount, maxCoordX, maxCoordY)
     width: maxCoordX,
     height: maxCoordY,
     length: slotCount,
-    groundX: 0,
-    groundY: 0,
     displayName: '',
     metadata: {}, // TODO: Not used yet.
+    flags: 0,
   };
   return inv;
 }
@@ -72,6 +72,16 @@ export function createGridInventory(invId, width, height) {
 export function createSocketInventory(invId) {
   // TODO: width, height = Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY
   return createInventory(invId, 'socket', 1, 1, 1);
+}
+
+/**
+ * Create an album inventory.
+ * 
+ * @param {InvId} invId 
+ * @returns {Inventory}
+ */
+export function createAlbumInventory(invId) {
+  return createInventory(invId, 'album', 0, 0, 0);
 }
 
 /**
@@ -106,9 +116,9 @@ export function cloneInventory(other, dst = undefined, opts = {}) {
   const { preserveItemId = true } = opts;
   const invId = other.invId || uuid();
   const type = other.type || 'grid';
-  const width = Number(other.width) || 1;
-  const height = Number(other.height) || 1;
-  const length = Number(other.length) || 1;
+  const width = Number(other.width);
+  const height = Number(other.height);
+  const length = Number(other.length);
   if (!dst) {
     dst = createInventory(invId, type, length, width, height);
   } else {
@@ -158,9 +168,42 @@ export function cloneInventory(other, dst = undefined, opts = {}) {
       dst.metadata = {};
     }
   }
+  if (typeof other.flags === 'number') {
+    dst.flags = other.flags;
+  }
   return dst;
 }
 
 export function getInventorySlotCount(inv) {
   return inv.length;
+}
+
+export function toggleInventoryFlag(store, invId, bitmask, force = undefined) {
+  let inv = getExistingInvInStore(store, invId);
+  if (typeof force === 'undefined') {
+    inv.flags ^= bitmask;
+    dispatchInventoryChange(store, invId);
+    return true;
+  } else if (Boolean(force)) {
+    if (!isInventoryFlagEnabled(inv, bitmask)) {
+      inv.flags |= bitmask;
+      dispatchInventoryChange(store, invId);
+      return true;
+    }
+  } else {
+    if (!isInventoryFlagDisabled(inv, bitmask)) {
+      inv.flags &= ~bitmask;
+      dispatchInventoryChange(store, invId);
+      return true;
+    }
+  }
+  return false;
+}
+
+export function isInventoryFlagEnabled(inv, bitmask) {
+  return (inv.flags & bitmask) === bitmask;
+}
+
+export function isInventoryFlagDisabled(inv, bitmask) {
+  return (inv.flags & bitmask) === 0;
 }

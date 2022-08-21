@@ -18,7 +18,7 @@ export function importInventoryFromJSON(jsonData, dst = undefined) {
   }
 }
 
-function compressInventoryJson(uncompressedJson) {
+export function compressInventoryJson(uncompressedJson) {
   const slots = uncompressedJson.slots;
   const length = uncompressedJson.length;
   let newSlots = new Array(length).fill(0);
@@ -43,9 +43,8 @@ function compressInventoryJson(uncompressedJson) {
   };
 }
 
-function decompressInventoryJson(compressedJson) {
-  const { __slotsMap: slotsMapping, ...json } = compressedJson;
-  const slots = compressedJson.slots;
+export function decompressInventoryJson(compressedJson) {
+  const { __slotsMap: slotsMapping, slots, ...json } = compressedJson;
   const length = compressedJson.length;
   let newSlots = new Array(length).fill(null);
   for (let i = 0; i < length; ++i) {

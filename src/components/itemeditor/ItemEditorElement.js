@@ -8,10 +8,9 @@ import { dispatchItemChange } from '../../events/ItemEvents.js';
 import { dropFallingItem } from '../cursor/FallingItemElement.js';
 import { playSound } from '../../sounds.js';
 import { updateList } from '../ElementListHelper.js';
-import { getItemsInAlbum } from '../../satchel/album/AlbumItems.js';
-import { addAlbumChangeListener, removeAlbumChangeListener } from '../../events/AlbumEvents.js';
 import '../invgrid/InvSocketElement.js';
 import '../lib/ContextMenuElement.js';
+import { getItemsInInv } from '../../satchel/inv/InventoryItems.js';
 
 /**
  * @typedef {import('../invgrid/InvSocketElement.js').InvSocketElement} InvSocketElement
@@ -542,7 +541,7 @@ export class ItemEditorElement extends HTMLElement {
 
     const store = getSatchelStore();
     addInventoryChangeListener(store, this.socket.invId, this.onSocketInventoryChange);
-    addAlbumChangeListener(store, getFoundryAlbumId(store), this.onFoundryAlbumChange);
+    addInventoryChangeListener(store, getFoundryAlbumId(store), this.onFoundryAlbumChange);
 
     this.disableInputs(true);
   }
@@ -572,7 +571,7 @@ export class ItemEditorElement extends HTMLElement {
 
     const store = getSatchelStore();
     removeInventoryChangeListener(store, this.socket.invId, this.onSocketInventoryChange);
-    removeAlbumChangeListener(store, getFoundryAlbumId(store), this.onFoundryAlbumChange);
+    removeInventoryChangeListener(store, getFoundryAlbumId(store), this.onFoundryAlbumChange);
   }
 
   grabDefaultFocus() {
@@ -871,7 +870,7 @@ export class ItemEditorElement extends HTMLElement {
       return;
     }
     const albumId = getFoundryAlbumId(store);
-    const items = getItemsInAlbum(store, albumId);
+    const items = getItemsInInv(store, albumId);
     const list = new Set([
       'res/images/potion.png',
       'res/images/blade.png',

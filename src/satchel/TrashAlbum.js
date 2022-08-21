@@ -1,9 +1,11 @@
 import { getSatchelStore } from '../store/SatchelStore.js';
 import { uuid } from '../util/uuid.js';
-import { createAlbum } from './album/Album.js';
-import { addItemToAlbum, getItemIdsInAlbum, removeItemFromAlbum } from './album/AlbumItems.js';
-import { addAlbumInStore, getAlbumsInStore } from '../store/AlbumStore.js';
+import { ALBUM_FLAG_EXPAND_BIT, ALBUM_FLAG_LOCKED_BIT, createAlbum } from './album/Album.js';
+import { getAlbumsInStore } from '../store/AlbumStore.js';
 import { playSound } from '../sounds.js';
+import { addItemToInventory, removeItemFromInventory } from './inv/InventoryTransfer.js';
+import { getItemIdsInInv } from './inv/InventoryItems.js';
+import { addInvInStore } from '../store/InvStore.js';
 
 const TRASH_ALBUM_DISPLAY_NAME = '[ Trash ]';
 const MAX_ITEMS_IN_TRASH = 30;
@@ -14,11 +16,11 @@ const MAX_ITEMS_IN_TRASH = 30;
 export function saveItemToTrashAlbum(freedItem) {
   const store = getSatchelStore();
   let trashAlbumId = getTrashAlbumId(store);
-  addItemToAlbum(store, trashAlbumId, freedItem);
-  let itemIds = getItemIdsInAlbum(store, trashAlbumId);
+  addItemToInventory(store, trashAlbumId, freedItem, 0, 0);
+  let itemIds = getItemIdsInInv(store, trashAlbumId);
   if (itemIds.length > MAX_ITEMS_IN_TRASH) {
     let firstItemId = itemIds[0];
-    removeItemFromAlbum(store, trashAlbumId, firstItemId);
+    removeItemFromInventory(store, trashAlbumId, firstItemId);
   }
   playSound('clearItem');
 }
@@ -27,9 +29,8 @@ function resolveTrashAlbumId(store) {
   let trashAlbumId = uuid();
   let album = createAlbum(trashAlbumId);
   album.displayName = TRASH_ALBUM_DISPLAY_NAME;
-  album.locked = false;
-  album.expand = false;
-  addAlbumInStore(store, album.albumId, album);
+  album.flags &= ~ALBUM_FLAG_LOCKED_BIT & ~ALBUM_FLAG_EXPAND_BIT;
+  addInvInStore(store, album.invId, album);
   return trashAlbumId;
 }
 
@@ -55,7 +56,7 @@ export function getTrashAlbumId(store) {
   const albums = getAlbumsInStore(store);
   for (let album of albums) {
     if (isTrashAlbum(album)) {
-      return album.albumId;
+      return album.invId;
     }
   }
   return resolveTrashAlbumId(store);

@@ -24,8 +24,9 @@ export const InventoryViewResizeModes = {
 /**
  * @param {HTMLElement & { _container: HTMLElement, invId: string }} containerElement
  */
-export function createInventoryView(containerElement) {
+export function createInventoryView(containerElement, invId) {
   return {
+    invId,
     containerElement,
   };
 }
@@ -41,7 +42,7 @@ export function getInventoryViewContainerElement(invView) {
  * @param {InventoryView} invView
  */
 export function getInventoryViewInvId(invView) {
-  return invView.containerElement.invId;
+  return invView.invId;
 }
 
 /**

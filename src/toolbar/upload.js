@@ -2,11 +2,11 @@ import { notify } from '../components/NotifyPrompt.js';
 import { importAlbumFromJSON } from '../loader/AlbumLoader.js';
 import { importItemFromJSON } from '../loader/ItemLoader.js';
 import { loadSatchelFromData, loadSatchelProfilesFromData } from '../loader/SatchelLoader.js';
-import { copyAlbum } from '../satchel/album/Album.js';
 import { dropItemOnGround } from '../satchel/GroundAlbum.js';
+import { copyInventory } from '../satchel/inv/Inv.js';
 import { copyItem } from '../satchel/item/Item.js';
 import { forceEmptyStorage } from '../Storage.js';
-import { addAlbumInStore, isAlbumInStore } from '../store/AlbumStore.js';
+import { addInvInStore, isInvInStore } from '../store/InvStore.js';
 import { setActiveProfileInStore } from '../store/ProfileStore.js';
 import { getSatchelStore } from '../store/SatchelStore.js';
 import { uploadFile } from '../util/uploader.js';
@@ -69,16 +69,17 @@ async function tryLoadJSONFile(store, jsonData) {
         }
       }
       break;
+    case 'album_v3':
     case 'album_v2':
     case 'album_v1':
       {
         try {
           const album = importAlbumFromJSON(jsonData);
-          if (isAlbumInStore(store, album.albumId)) {
-            const newAlbum = copyAlbum(album);
-            addAlbumInStore(store, newAlbum.albumId, newAlbum);
+          if (isInvInStore(store, album.invId)) {
+            const newAlbum = copyInventory(album);
+            addInvInStore(store, newAlbum.invId, newAlbum);
           } else {
-            addAlbumInStore(store, album.albumId, album);
+            addInvInStore(store, album.invId, album);
           }
           // Make sure to open the container
           openAlbumPane();

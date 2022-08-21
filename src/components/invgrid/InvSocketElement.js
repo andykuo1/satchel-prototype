@@ -158,7 +158,7 @@ export class InvSocketElement extends HTMLElement {
     /** @private */
     this._invId = null;
     /** @private */
-    this._invView = createInventoryView(this);
+    this._invView = createInventoryView(this, null);
 
     /** @private */
     this.rootContainer = shadowRoot.querySelector('.root');
@@ -266,6 +266,7 @@ export class InvSocketElement extends HTMLElement {
         );
       }
       if (newInvId) {
+        this._invView.invId = newInvId;
         addInventoryChangeListener(store, newInvId, this.onInventoryChange);
         this.onInventoryChange(store, newInvId);
       }

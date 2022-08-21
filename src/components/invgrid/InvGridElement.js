@@ -5,7 +5,7 @@ import { isInventoryEmpty } from '../../satchel/inv/InventoryTransfer.js';
 import { addInventoryChangeListener, removeInventoryChangeListener } from '../../events/InvEvents.js';
 import { createGridInvInStore, deleteInvInStore, getInvInStore, isInvInStore } from '../../store/InvStore.js';
 import { uuid } from '../../util/uuid.js';
-import { InventoryItemList } from '../inventory/InventoryItemList.js';
+import { useInternalInventoryItemList } from '../inventory/InventoryItemList.js';
 import { createInventoryView } from '../inventory/InventoryView.js';
 
 /**
@@ -150,7 +150,7 @@ export class InvGridElement extends HTMLElement {
     /** @private */
     this._invId = null;
     /** @private */
-    this._invView = createInventoryView(this);
+    this._invView = createInventoryView(this, null);
 
     /** @private */
     this.rootContainer = shadowRoot.querySelector('.root');
@@ -160,14 +160,14 @@ export class InvGridElement extends HTMLElement {
     this.invHeader = shadowRoot.querySelector('h2');
 
     /** @private */
-    this.itemList = new InventoryItemList(shadowRoot.querySelector('.itemList'));
-
-    /** @private */
     this.onInventoryChange = this.onInventoryChange.bind(this);
     /** @private */
     this.onMouseUp = this.onMouseUp.bind(this);
     /** @private */
     this.onContextMenu = this.onContextMenu.bind(this);
+
+    /** @private */
+    this.updateItemList = useInternalInventoryItemList(shadowRoot.querySelector('.itemList'), this._invView);
   }
 
   /** @protected */
@@ -252,6 +252,7 @@ export class InvGridElement extends HTMLElement {
         );
       }
       if (newInvId) {
+        this._invView.invId = newInvId;
         addInventoryChangeListener(store, newInvId, this.onInventoryChange);
         this.onInventoryChange(store, newInvId);
       }
@@ -300,7 +301,7 @@ export class InvGridElement extends HTMLElement {
     this.innerContainer.classList.toggle('flattop', isDisplayName);
     
     // Update items
-    const [created, deleted] = this.itemList.update(store, this._invView);
+    const [created, deleted] = this.updateItemList();
     this.dispatchEvent(new CustomEvent('change', {
       composed: true,
       bubbles: false,

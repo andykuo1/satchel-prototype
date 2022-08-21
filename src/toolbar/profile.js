@@ -2,10 +2,9 @@ import { el } from '../ToolbarHelper.js';
 import { dispatchProfileChange } from '../events/ProfileEvents.js';
 import { saveSatchelProfilesToData } from '../loader/SatchelLoader.js';
 import { resolveActiveProfile } from '../satchel/ActiveProfile.js';
-import { createAlbum } from '../satchel/album/Album.js';
+import { ALBUM_FLAG_HIDDEN_BIT, createAlbum } from '../satchel/album/Album.js';
 import { createGridInventory, createSocketInventory } from '../satchel/inv/Inv.js';
 import { createProfile } from '../satchel/profile/Profile.js';
-import { getAlbumInStore, isAlbumInStore, deleteAlbumInStore, addAlbumInStore } from '../store/AlbumStore.js';
 import {
   createGridInvInStore,
   getInvInStore,
@@ -172,7 +171,7 @@ function prepareEditProfileDialog(store, profileId) {
     rootContainerElement.appendChild(containerElement);
   }
   for (let albumId of profile.albums) {
-    let album = getAlbumInStore(store, albumId);
+    let album = getInvInStore(store, albumId);
     let labelElement = document.createElement('label');
     labelElement.textContent = `${album.displayName || 'Inventory'} | ∞`;
     let deleteElement = document.createElement('icon-button');
@@ -244,7 +243,7 @@ function onActionProfileAlbumDelete(e) {
     return;
   }
   const albumId = e.target.getAttribute('data-album');
-  if (!isAlbumInStore(store, albumId)) {
+  if (!isInvInStore(store, albumId)) {
     return;
   }
   let profile = getProfileInStore(store, profileId);
@@ -253,8 +252,8 @@ function onActionProfileAlbumDelete(e) {
     profile.albums.splice(i, 1);
     dispatchProfileChange(store, profileId);
   }
-  let album = getAlbumInStore(store, albumId);
-  deleteAlbumInStore(store, albumId, album);
+  let album = getInvInStore(store, albumId);
+  deleteInvInStore(store, albumId, album);
   prepareEditProfileDialog(store, profileId);
 }
 
@@ -316,8 +315,8 @@ function onActionProfileInvSubmit() {
     const newAlbumId = uuid();
     const newAlbum = createAlbum(newAlbumId);
     newAlbum.displayName = title;
-    newAlbum.hidden = true;
-    addAlbumInStore(store, newAlbumId, newAlbum);
+    newAlbum.flags |= ALBUM_FLAG_HIDDEN_BIT;
+    addInvInStore(store, newAlbumId, newAlbum);
     activeProfile.albums.push(newAlbumId);
   } else {
     let newInv;

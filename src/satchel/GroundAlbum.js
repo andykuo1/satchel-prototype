@@ -1,39 +1,37 @@
-import { addItemToAlbum, clearItemsInAlbum } from '../satchel/album/AlbumItems.js';
 import { getSatchelStore } from '../store/SatchelStore.js';
 import { createAlbum } from './album/Album.js';
-import { addAlbumInStore, isAlbumInStore } from '../store/AlbumStore.js';
-import { dispatchAlbumChange } from '../events/AlbumEvents.js';
+import { addItemToInventory, clearItemsInInventory } from './inv/InventoryTransfer.js';
+import { addInvInStore, isInvInStore } from '../store/InvStore.js';
 
 const GROUND_ALBUM_DISPLAY_NAME = '[ Ground ]';
 
 export function dropItemOnGround(freedItem) {
   const store = getSatchelStore();
   const groundAlbumId = getGroundAlbumId(store);
-  addItemToAlbum(store, groundAlbumId, freedItem);
+  addItemToInventory(store, groundAlbumId, freedItem, 0, 0);
 }
 
 function resolveGroundAlbumId(store) {
   const groundAlbumId = 'ground';
   let album = createAlbum(groundAlbumId);
   album.displayName = GROUND_ALBUM_DISPLAY_NAME;
-  addAlbumInStore(store, album.albumId, album);
-  dispatchAlbumChange(store, album.albumId);
+  addInvInStore(store, album.invId, album);
   return groundAlbumId;
 }
 
 export function clearItemsOnGround() {
   const store = getSatchelStore();
   const groundAlbumId = getGroundAlbumId(store);
-  clearItemsInAlbum(store, groundAlbumId);
+  clearItemsInInventory(store, groundAlbumId);
 }
 
 export function isGroundAlbum(album) {
-  return album.albumId === 'ground';
+  return album.invId === 'ground';
 }
 
 export function hasGroundAlbum(store) {
   let groundAlbumId = 'ground';
-  if (!isAlbumInStore(store, groundAlbumId)) {
+  if (!isInvInStore(store, groundAlbumId)) {
     return false;
   } else {
     return true;
@@ -42,7 +40,7 @@ export function hasGroundAlbum(store) {
 
 export function getGroundAlbumId(store) {
   let groundAlbumId = 'ground';
-  if (!isAlbumInStore(store, groundAlbumId)) {
+  if (!isInvInStore(store, groundAlbumId)) {
     return resolveGroundAlbumId(store);
   } else {
     return groundAlbumId;

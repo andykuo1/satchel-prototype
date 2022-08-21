@@ -1,7 +1,6 @@
-import { cloneAlbum, copyAlbum, isAlbumHidden } from '../satchel/album/Album.js';
-import { dispatchAlbumChange } from '../events/AlbumEvents.js';
+import { isAlbumHidden } from '../satchel/album/Album.js';
 import { exportAlbumToJSON, importAlbumFromJSON } from './AlbumLoader.js';
-import { addAlbumInStore, getAlbumIdsInStore, getAlbumInStore, isAlbumInStore } from '../store/AlbumStore.js';
+import { getAlbumIdsInStore } from '../store/AlbumStore.js';
 import { cloneInventory, copyInventory } from '../satchel/inv/Inv.js';
 import { dispatchInventoryChange } from '../events/InvEvents.js';
 import { exportInventoryToJSON, importInventoryFromJSON } from './InvLoader.js';
@@ -86,16 +85,16 @@ export function loadSatchelProfilesFromData(store, jsonData, overrideData, chang
       if (albumJson) {
         const album = importAlbumFromJSON(albumJson);
         if (!overrideData) {
-          const newAlbum = copyAlbum(album);
-          overrideAlbumIds[albumId] = newAlbum.albumId;
-          addAlbumInStore(store, newAlbum.albumId, newAlbum);
+          const newAlbum = copyInventory(album);
+          overrideAlbumIds[albumId] = newAlbum.invId;
+          addInvInStore(store, newAlbum.invId, newAlbum);
         } else {
-          if (isAlbumInStore(store, albumId)) {
-            const oldAlbum = getAlbumInStore(store, albumId);
-            cloneAlbum(album, oldAlbum);
-            dispatchAlbumChange(store, albumId);
+          if (isInvInStore(store, albumId)) {
+            const oldAlbum = getInvInStore(store, albumId);
+            cloneInventory(album, oldAlbum);
+            dispatchInventoryChange(store, albumId);
           } else {
-            addAlbumInStore(store, albumId, album);
+            addInvInStore(store, albumId, album);
           }
         }
       }
@@ -110,7 +109,7 @@ export function loadSatchelProfilesFromData(store, jsonData, overrideData, chang
       // NOTE: Same with albums
       profile.albums = profile.albums
         .map((albumId) => overrideAlbumIds[albumId] || albumId)
-        .filter((albumId) => isAlbumInStore(store, albumId));
+        .filter((albumId) => isInvInStore(store, albumId));
       if (!overrideData) {
         const newProfile = copyProfile(store, profile);
         addProfileInStore(store, newProfile.profileId, newProfile);
@@ -146,7 +145,7 @@ export function saveSatchelProfilesToData(store, profileIds, dst = {}) {
         outInvs[invId] = exportInventoryToJSON(inv);
       }
       for (let albumId of profile.albums) {
-        let album = getAlbumInStore(store, albumId);
+        let album = getInvInStore(store, albumId);
         outAlbums[albumId] = exportAlbumToJSON(album);
       }
       outProfiles.push(exportProfileToJSON(profile));
@@ -167,38 +166,38 @@ export function loadSatchelAlbumsFromData(store, jsonData, overrideData) {
   let inAlbums = jsonData.albums;
   for (let albumJson of inAlbums) {
     const album = importAlbumFromJSON(albumJson);
-    const albumId = album.albumId;
+    const albumId = album.invId;
     if (!overrideData) {
-      const newAlbum = copyAlbum(album);
-      addAlbumInStore(store, newAlbum.albumId, newAlbum);
-      result.push(newAlbum.albumId);
+      const newAlbum = copyInventory(album);
+      addInvInStore(store, newAlbum.invId, newAlbum);
+      result.push(newAlbum.invId);
     } else {
       // HACK: Named albums are hacky. There's gotta be a better way to manage them.
       if (isFoundryAlbum(album)) {
         let internalAlbumId = getFoundryAlbumId(store);
-        let internalAlbum = cloneAlbum(album, getAlbumInStore(store, internalAlbumId));
-        internalAlbum.albumId = internalAlbumId;
-        dispatchAlbumChange(store, internalAlbumId);
+        let internalAlbum = cloneInventory(album, getInvInStore(store, internalAlbumId));
+        internalAlbum.invId = internalAlbumId;
+        dispatchInventoryChange(store, internalAlbumId);
         result.push(internalAlbumId);
       } else if (isGroundAlbum(album)) {
         let internalAlbumId = getGroundAlbumId(store);
-        let internalAlbum = cloneAlbum(album, getAlbumInStore(store, internalAlbumId));
-        internalAlbum.albumId = internalAlbumId;
-        dispatchAlbumChange(store, internalAlbumId);
+        let internalAlbum = cloneInventory(album, getInvInStore(store, internalAlbumId));
+        internalAlbum.invId = internalAlbumId;
+        dispatchInventoryChange(store, internalAlbumId);
         result.push(internalAlbumId);
       } else if (isTrashAlbum(album)) {
         let internalAlbumId = getTrashAlbumId(store);
-        let internalAlbum = cloneAlbum(album, getAlbumInStore(store, internalAlbumId));
-        internalAlbum.albumId = internalAlbumId;
-        dispatchAlbumChange(store, internalAlbumId);
+        let internalAlbum = cloneInventory(album, getInvInStore(store, internalAlbumId));
+        internalAlbum.invId = internalAlbumId;
+        dispatchInventoryChange(store, internalAlbumId);
         result.push(internalAlbumId);
-      } else if (isAlbumInStore(store, albumId)) {
-        const oldAlbum = getAlbumInStore(store, albumId);
-        cloneAlbum(album, oldAlbum);
-        dispatchAlbumChange(store, albumId);
+      } else if (isInvInStore(store, albumId)) {
+        const oldAlbum = getInvInStore(store, albumId);
+        cloneInventory(album, oldAlbum);
+        dispatchInventoryChange(store, albumId);
         result.push(albumId);
       } else {
-        addAlbumInStore(store, albumId, album);
+        addInvInStore(store, albumId, album);
         result.push(albumId);
       }
     }
@@ -209,7 +208,7 @@ export function loadSatchelAlbumsFromData(store, jsonData, overrideData) {
 export function saveSatchelAlbumsToData(store, albumIds, dst = {}) {
   let outAlbums = [];
   for (let albumId of albumIds) {
-    let album = getAlbumInStore(store, albumId);
+    let album = getInvInStore(store, albumId);
     try {
       outAlbums.push(exportAlbumToJSON(album));
     } catch (e) {

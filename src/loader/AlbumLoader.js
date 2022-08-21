@@ -1,6 +1,10 @@
 import { exportDataToJSON, importDataFromJSON } from './DataLoader.js';
 import { exportItemToJSON, importItemFromJSON } from './ItemLoader.js';
-import { cloneAlbum } from '../satchel/album/Album.js';
+import { compressInventoryJson, decompressInventoryJson } from './InvLoader.js';
+import { cloneInventory } from '../satchel/inv/Inv.js';
+import { uuid } from '../util/uuid.js';
+import { createAlbum } from '../satchel/album/Album.js';
+import { cloneItem, copyItem } from '../satchel/item/Item.js';
 
 /**
  * @typedef {import('../satchel/album/Album.js').Album} Album
@@ -13,7 +17,7 @@ import { cloneAlbum } from '../satchel/album/Album.js';
  * @returns {ImportDataFormat}
  */
 export function exportAlbumToJSON(album, dst = undefined) {
-  return exportDataToJSON('album_v2', compressAlbumJson(cloneAlbum(album)), {}, dst);
+  return exportDataToJSON('album_v3', compressInventoryJson(cloneInventory(album)), {}, dst);
 }
 
 /**
@@ -27,9 +31,44 @@ export function importAlbumFromJSON(jsonData, dst = undefined) {
       return importDataFromJSON(jsonData, 'album_v1', (data) => cloneAlbum(data, dst));
     case 'album_v2':
       return importDataFromJSON(jsonData, 'album_v2', (data) => cloneAlbum(decompressAlbumJson(data), dst));
+    case 'album_v3':
+      return importDataFromJSON(jsonData, 'album_v3', (data) => cloneInventory(decompressInventoryJson(data), dst));
     default:
       throw new Error(`Unsupported album version '${jsonData._type}'.`);
   }
+}
+function toAlbumV3(data, dst = undefined) {
+  if (data._type === 'album_v1') {
+    cloneAlbum(data, dst);
+  }
+}
+
+function cloneAlbum(other, dst, opts) {
+  const { preserveItemId = true } = opts;
+  const albumId = other.albumId || uuid();
+  if (!dst) {
+    dst = createAlbum(albumId);
+  } else {
+    dst.albumId = albumId;
+  }
+  if (typeof other.items === 'object') {
+    if (preserveItemId) {
+      for (let item of Object.values(other.items)) {
+        let newItem = cloneItem(item);
+        dst.items[newItem.itemId] = newItem;
+      }
+    } else {
+      for (let item of Object.values(other.items)) {
+        let newItem = copyItem(item);
+        dst.items[newItem.itemId] = newItem;
+      }
+    }
+  }
+  dst.displayName = String(other.displayName);
+  dst.locked = Boolean(other.locked);
+  dst.hidden = Boolean(other.hidden);
+  dst.expand = typeof other.expand === 'boolean' ? other.expand : true;
+  return dst;
 }
 
 /**

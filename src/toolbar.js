@@ -18,11 +18,12 @@ import { setupSync } from './toolbar/sync.js';
 import { notify } from './components/NotifyPrompt.js';
 import { setupAlbum } from './toolbar/album.js';
 import { uploadSatchelFile } from './toolbar/upload.js';
-import { clearItemsInAlbum, getItemIdsInAlbum, getItemInAlbum } from './satchel/album/AlbumItems.js';
 import { clearItemsOnGround, getGroundAlbumId, hasGroundAlbum } from './satchel/GroundAlbum.js';
 import { resetTutorial, setupTutorial } from './toolbar/tutorial.js';
 import { getCursor } from './components/index.js';
-import { isAlbumInStore } from './store/AlbumStore.js';
+import { getItemIdsInInv, getItemInInv } from './satchel/inv/InventoryItems.js';
+import { clearItemsInInventory } from './satchel/inv/InventoryTransfer.js';
+import { isInvInStore } from './store/InvStore.js';
 
 window.addEventListener('DOMContentLoaded', () => {
   el('#downloadButton', 'click', onDownloadClick);
@@ -64,7 +65,7 @@ function onActionGroundClear() {
     return;
   }
   let albumId = getGroundAlbumId(store);
-  let itemIds = getItemIdsInAlbum(store, albumId);
+  let itemIds = getItemIdsInInv(store, albumId);
   if (itemIds.length <= 0) {
     return;
   }
@@ -72,7 +73,7 @@ function onActionGroundClear() {
     return;
   }
   for (let itemId of itemIds) {
-    let item = getItemInAlbum(store, albumId, itemId);
+    let item = getItemInInv(store, albumId, itemId);
     saveItemToTrashAlbum(item);
   }
   clearItemsOnGround();
@@ -94,7 +95,7 @@ function onActionTrashDrop(e) {
   const cursor = getCursor();
   const store = getSatchelStore();
   const albumId = getTrashAlbumId(store);
-  if (!isAlbumInStore(store, albumId)) {
+  if (!isInvInStore(store, albumId)) {
     return;
   }
   if (cursor.putDownInAlbum(albumId)) {
@@ -107,14 +108,14 @@ function onActionTrashDrop(e) {
 function onActionTrashClear() {
   const store = getSatchelStore();
   const trashAlbumId = getTrashAlbumId(store);
-  let itemIds = getItemIdsInAlbum(store, trashAlbumId);
+  let itemIds = getItemIdsInInv(store, trashAlbumId);
   if (itemIds.length <= 0) {
     return;
   }
   if (!window.confirm('This will destroy all items in the trash. Are you sure?')) {
     return;
   }
-  clearItemsInAlbum(store, trashAlbumId);
+  clearItemsInInventory(store, trashAlbumId);
   playSound('clearItem');
 }
 

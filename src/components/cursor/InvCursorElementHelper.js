@@ -1,7 +1,6 @@
 import { dijkstra2d } from '../../util/dijkstra2d.js';
 import {
   addItemToInventory,
-  getExistingInventory,
   getItemAtSlotCoords,
   getItemAtSlotIndex,
   getItemIdAtSlotCoords,
@@ -9,7 +8,7 @@ import {
 } from '../../satchel/inv/InventoryTransfer.js';
 import { getItemByItemId } from '../../satchel/inv/InvItems.js';
 import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../../satchel/inv/InvSlots.js';
-import { getInvInStore } from '../../store/InvStore.js';
+import { getExistingInvInStore, getInvInStore } from '../../store/InvStore.js';
 import { dispatchItemChange } from '../../events/ItemEvents.js';
 import { copyItem } from '../../satchel/item/Item.js';
 
@@ -51,7 +50,7 @@ export function putDownToSocketInventory(
   if (prevItem) {
     if (swappable) {
       // Has an item to swap. So pick up this one for later.
-      let inv = getExistingInventory(store, toInvId);
+      let inv = getExistingInvInStore(store, toInvId);
       let prevItemId = prevItem.itemId;
       let slotIndex = getSlotIndexByItemId(inv, prevItemId);
       let [x, y] = getSlotCoordsByIndex(inv, slotIndex);

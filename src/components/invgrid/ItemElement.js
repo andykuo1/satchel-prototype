@@ -1,10 +1,10 @@
 import { DEFAULT_ITEM_UNIT_SIZE, itemMouseDownCallback } from './InvMouseHelper.js';
 import { getSatchelStore } from '../../store/SatchelStore.js';
-import { getExistingInventory } from '../../satchel/inv/InventoryTransfer.js';
 import { hasItem, getItemByItemId } from '../../satchel/inv/InvItems.js';
 import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../../satchel/inv/InvSlots.js';
 import { addItemChangeListener, removeItemChangeListener } from '../../events/ItemEvents.js';
 import { isInventoryViewEditable, isInventoryViewUnitSized } from '../inventory/InventoryView.js';
+import { getExistingInvInStore } from '../../store/InvStore.js';
 
 /** @typedef {import('../inventory/InventoryView.js').InventoryView} InventoryView */
 
@@ -155,7 +155,7 @@ export class ItemElement extends HTMLElement {
     if (!itemId) {
       throw new Error('Missing item id for item element.');
     }
-    const inv = getExistingInventory(getSatchelStore(), invId);
+    const inv = getExistingInvInStore(getSatchelStore(), invId);
     if (!hasItem(inv, itemId)) {
       throw new Error(
         'Cannot create item element with item id not in given inventory.'
@@ -222,7 +222,7 @@ export class ItemElement extends HTMLElement {
   onItemChange(store, itemId) {
     const unitSized = isInventoryViewUnitSized(this._invView);
     const invId = this._invId;
-    const inv = getExistingInventory(store, invId);
+    const inv = getExistingInvInStore(store, invId);
     const slotIndex = getSlotIndexByItemId(inv, itemId);
     const [x, y] = getSlotCoordsByIndex(inv, slotIndex);
     const item = getItemByItemId(inv, itemId);

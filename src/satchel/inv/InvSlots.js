@@ -13,7 +13,7 @@ import { getInventorySlotCount } from './Inv.js';
  */
 export function isSlotCoordEmpty(inv, coordX, coordY) {
   let slotIndex = getSlotIndexByCoords(inv, coordX, coordY);
-  return isSlotIndexEmpty(inv, slotIndex);
+  return slotIndex >= 0 && isSlotIndexEmpty(inv, slotIndex);
 }
 
 /**
@@ -89,6 +89,8 @@ export function getSlotIndexByCoords(inv, coordX, coordY) {
       }
       return Math.floor(coordX) + Math.floor(coordY) * width;
     }
+    case 'album':
+      return -1;
     default:
       throw new Error('Unsupported inventory type for slot coords.');
   }

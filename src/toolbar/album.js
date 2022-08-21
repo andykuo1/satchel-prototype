@@ -1,8 +1,7 @@
 import { el } from '../ToolbarHelper.js';
 import { updateList } from '../components/ElementListHelper.js';
 import { AlbumPackElement, getCursor } from '../components/index.js';
-import { addAlbumListChangeListener } from '../events/AlbumEvents.js';
-import { isAlbumHidden } from '../satchel/album/Album.js';
+import { isAlbumHidden, isAlbumLocked } from '../satchel/album/Album.js';
 import { isGroundAlbum } from '../satchel/GroundAlbum.js';
 import { isTrashAlbum } from '../satchel/TrashAlbum.js';
 import { playSound } from '../sounds.js';
@@ -10,13 +9,14 @@ import { createAlbumInStore, getAlbumsInStore } from '../store/AlbumStore.js';
 import { getSatchelStore } from '../store/SatchelStore.js';
 import { uuid } from '../util/uuid.js';
 import { uploadSatchelFile } from './upload.js';
+import { addInventoryListChangeListener } from '../events/InvEvents.js';
 
 export function setupAlbum() {
   el('#actionAlbumOpen', 'click', onActionAlbumOpen);
   el('#actionAlbumNew', 'click', onActionAlbumNew);
   el('#actionAlbumImport', 'click', uploadSatchelFile);
   el('.albumContainer', 'mouseup', onAlbumItemDrop);
-  addAlbumListChangeListener(getSatchelStore(), onAlbumListUpdate);
+  addInventoryListChangeListener(getSatchelStore(), onAlbumListUpdate);
 }
 
 export function openAlbumPane() {
@@ -41,17 +41,17 @@ function onActionAlbumOpen() {
 function onAlbumItemDrop(e) {
   const store = getSatchelStore();
   const albums = getAlbumsInStore(store)
-    .filter((a) => !a.locked)
+    .filter((a) => !isAlbumLocked(store, a.invId))
     .filter((a) => !isGroundAlbum(a))
     .filter((a) => !isTrashAlbum(a))
-    .filter((a) => !isAlbumHidden(store, a.albumId));
+    .filter((a) => !isAlbumHidden(store, a.invId));
   let cursor = getCursor();
   // HACK: This is so single clicks won't create albums
   // @ts-ignore
   if (cursor.hasHeldItem() && !cursor.ignoreFirstPutDown) {
     let albumId;
     if (albums.length > 0) {
-      albumId = albums[0].albumId;
+      albumId = albums[0].invId;
     } else {
       albumId = onActionAlbumNew();
     }
@@ -70,8 +70,8 @@ function onAlbumListUpdate() {
     .sort((a, b) => (a.displayName || '').localeCompare(b.displayName || ''))
     .filter((a) => !isGroundAlbum(a))
     .filter((a) => !isTrashAlbum(a))
-    .filter((a) => !isAlbumHidden(store, a.albumId))
-    .map((a) => a.albumId)
+    .filter((a) => !isAlbumHidden(store, a.invId))
+    .map((a) => a.invId)
     .reverse();
   const albumList = document.querySelector('#albumList');
   const factoryCreate = (key) => new AlbumPackElement(key);

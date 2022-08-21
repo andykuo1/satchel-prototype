@@ -1,55 +1,32 @@
-import { cloneItem, copyItem } from '../item/Item.js';
-import { uuid } from '../../util/uuid.js';
-
-import { dispatchAlbumChange } from '../../events/AlbumEvents.js';
-import { getExistingAlbumInStore } from '../../store/AlbumStore.js';
+import { getExistingInvInStore } from '../../store/InvStore.js';
+import { cloneInventory, createAlbumInventory, isInventoryFlagEnabled, toggleInventoryFlag } from '../inv/Inv.js';
 
 /**
  * @typedef {import('../../store/SatchelStore').SatchelStore} Store
  * @typedef {import('../inv/Inv.js').InvId} InvId
  * @typedef {import('../item/Item.js').Item} Item
  * @typedef {import('../item/Item.js').ItemId} ItemId
+ * @typedef {import('../inv/Inv.js').Inventory} Inventory
  */
 
 /**
- * @typedef {string} AlbumId
- * 
- * @typedef Album
- * @property {AlbumId} albumId
- * @property {Record<ItemId, Item>} items
- * @property {string} displayName
- * @property {boolean} locked
- * @property {boolean} hidden
- * @property {boolean} expand
+ * @typedef {InvId} AlbumId
+ * @typedef {Inventory} Album
  */
+
+export const ALBUM_FLAG_HIDDEN_BIT = 0x1;
+export const ALBUM_FLAG_LOCKED_BIT = 0x2;
+export const ALBUM_FLAG_EXPAND_BIT = 0x4;
 
 /**
  * @param {AlbumId} albumId 
  * @returns {Album}
  */
 export function createAlbum(albumId) {
-  let album = {
-    albumId,
-    items: {},
-    locked: false,
-    displayName: 'Untitled',
-    hidden: false,
-    expand: true,
-  };
+  let album = createAlbumInventory(albumId);
+  album.displayName = 'Untitled';
+  album.flags |= ALBUM_FLAG_EXPAND_BIT;
   return album;
-}
-
-/**
- * @param {Album} other 
- * @param {Album} dst 
- * @returns {Album}
- */
-export function copyAlbum(other, dst = undefined) {
-  let result = cloneAlbum(other, dst, { preserveItemId: false });
-  if (result.albumId === other.albumId) {
-    result.albumId = uuid();
-  }
-  return result;
 }
 
 /**
@@ -60,31 +37,7 @@ export function copyAlbum(other, dst = undefined) {
  * @returns {Album}
  */
 export function cloneAlbum(other, dst = undefined, opts = {}) {
-  const { preserveItemId = true } = opts;
-  const albumId = other.albumId || uuid();
-  if (!dst) {
-    dst = createAlbum(albumId);
-  } else {
-    dst.albumId = albumId;
-  }
-  if (typeof other.items === 'object') {
-    if (preserveItemId) {
-      for (let item of Object.values(other.items)) {
-        let newItem = cloneItem(item);
-        dst.items[newItem.itemId] = newItem;
-      }
-    } else {
-      for (let item of Object.values(other.items)) {
-        let newItem = copyItem(item);
-        dst.items[newItem.itemId] = newItem;
-      }
-    }
-  }
-  dst.displayName = String(other.displayName);
-  dst.locked = Boolean(other.locked);
-  dst.hidden = Boolean(other.hidden);
-  dst.expand = typeof other.expand === 'boolean' ? other.expand : true;
-  return dst;
+  return cloneInventory(other, dst, opts);
 }
 
 /**
@@ -93,11 +46,7 @@ export function cloneAlbum(other, dst = undefined, opts = {}) {
  * @param {boolean} locked 
  */
 export function setAlbumLocked(store, albumId, locked) {
-  let album = getExistingAlbumInStore(store, albumId);
-  if (album.locked !== locked) {
-    album.locked = locked;
-    dispatchAlbumChange(store, albumId);
-  }
+  toggleInventoryFlag(store, albumId, ALBUM_FLAG_LOCKED_BIT, locked);
 }
 
 /**
@@ -106,8 +55,8 @@ export function setAlbumLocked(store, albumId, locked) {
  * @returns {boolean}
  */
 export function isAlbumLocked(store, albumId) {
-  let album = getExistingAlbumInStore(store, albumId);
-  return album.locked;
+  let album = getExistingInvInStore(store, albumId);
+  return isInventoryFlagEnabled(album, ALBUM_FLAG_LOCKED_BIT);
 }
 
 /**
@@ -116,11 +65,7 @@ export function isAlbumLocked(store, albumId) {
  * @param {boolean} hidden 
  */
  export function setAlbumHidden(store, albumId, hidden) {
-  let album = getExistingAlbumInStore(store, albumId);
-  if (album.hidden !== hidden) {
-    album.hidden = hidden;
-    dispatchAlbumChange(store, albumId);
-  }
+  toggleInventoryFlag(store, albumId, ALBUM_FLAG_HIDDEN_BIT, hidden);
 }
 
 /**
@@ -129,8 +74,8 @@ export function isAlbumLocked(store, albumId) {
  * @returns {boolean}
  */
  export function isAlbumHidden(store, albumId) {
-  let album = getExistingAlbumInStore(store, albumId);
-  return album.hidden;
+  let album = getExistingInvInStore(store, albumId);
+  return isInventoryFlagEnabled(album, ALBUM_FLAG_HIDDEN_BIT);
 }
 
 /**
@@ -139,11 +84,7 @@ export function isAlbumLocked(store, albumId) {
  * @param {boolean} expand 
  */
  export function setAlbumExpanded(store, albumId, expand) {
-  let album = getExistingAlbumInStore(store, albumId);
-  if (album.expand !== expand) {
-    album.expand = expand;
-    dispatchAlbumChange(store, albumId);
-  }
+  toggleInventoryFlag(store, albumId, ALBUM_FLAG_EXPAND_BIT, expand);
 }
 
 /**
@@ -152,6 +93,6 @@ export function isAlbumLocked(store, albumId) {
  * @returns {boolean}
  */
 export function isAlbumExpanded(store, albumId) {
-  let album = getExistingAlbumInStore(store, albumId);
-  return album.expand;
+  let album = getExistingInvInStore(store, albumId);
+  return isInventoryFlagEnabled(album, ALBUM_FLAG_EXPAND_BIT);
 }
