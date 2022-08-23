@@ -30,17 +30,6 @@ export function createAlbum(albumId) {
 }
 
 /**
- * @param {Album} other 
- * @param {Album} dst 
- * @param {object} [opts]
- * @param {boolean} [opts.preserveItemId]
- * @returns {Album}
- */
-export function cloneAlbum(other, dst = undefined, opts = {}) {
-  return cloneInventory(other, dst, opts);
-}
-
-/**
  * @param {Store} store
  * @param {AlbumId} albumId 
  * @param {boolean} locked 
