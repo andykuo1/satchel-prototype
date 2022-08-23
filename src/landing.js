@@ -1,4 +1,3 @@
-
 import { BUILD_VERSION } from './globals.js';
 import { pasteFromClipboard } from './util/clipboard.js';
 import { uuid } from './util/uuid.js';
@@ -27,7 +26,7 @@ window.addEventListener('DOMContentLoaded', () => {
     e.preventDefault();
     e.stopPropagation();
     // Start a client.
-    const formElement = /** @type {HTMLFormElement} */(e.target);
+    const formElement = /** @type {HTMLFormElement} */ (e.target);
     const formData = new FormData(formElement);
     const targetRemoteId = formData.get('id');
     const newSessionId = uuid();

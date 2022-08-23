@@ -27,7 +27,7 @@ export function playSound(name) {
   if (name in SOUNDS) {
     const { sound, pitchLow, pitchRange, gain, pan } = SOUNDS[name];
     sound.play({
-      pitch: (Math.random() * pitchRange) - pitchLow,
+      pitch: Math.random() * pitchRange - pitchLow,
       gain: gain,
       pan: pan,
     });
@@ -56,10 +56,10 @@ async function initSounds() {
 }
 
 /**
- * @param {string} name 
- * @param {object} sound 
- * @param {number} pitchLow 
- * @param {number} pitchHigh 
+ * @param {string} name
+ * @param {object} sound
+ * @param {number} pitchLow
+ * @param {number} pitchHigh
  * @param {number} gain
  */
 function registerSound(name, sound, pitchLow = 0, pitchHigh = pitchLow, gain = 0, pan = 0) {

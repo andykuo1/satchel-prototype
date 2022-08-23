@@ -1,7 +1,4 @@
-import {
-  describeBackwardsCompatibleJSONFormat,
-  describeJSONFormat,
-} from './DataLoaderHelper.js';
+import { describeBackwardsCompatibleJSONFormat, describeJSONFormat } from './DataLoaderHelper.js';
 
 import { exportProfileToJSON, importProfileFromJSON } from '../../src/loader/ProfileLoader.js';
 import { createProfile } from '../../src/satchel/profile/Profile.js';
@@ -40,6 +37,18 @@ describe('The default profile links data format', () => {
 });
 
 describe('The "profile_links_v1" data format', () => {
-  describeBackwardsCompatibleJSONFormat('profile_links_v1', 'default_export', createDefaultProfile, exportProfileToJSON, importProfileFromJSON);
-  describeBackwardsCompatibleJSONFormat('profile_links_v1', 'full_export', createFullProfile, exportProfileToJSON, importProfileFromJSON);
+  describeBackwardsCompatibleJSONFormat(
+    'profile_links_v1',
+    'default_export',
+    createDefaultProfile,
+    exportProfileToJSON,
+    importProfileFromJSON
+  );
+  describeBackwardsCompatibleJSONFormat(
+    'profile_links_v1',
+    'full_export',
+    createFullProfile,
+    exportProfileToJSON,
+    importProfileFromJSON
+  );
 });

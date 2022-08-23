@@ -3,7 +3,12 @@ import { exportItemToJSON, importItemFromJSON } from './ItemLoader.js';
 import { compressInventoryJson, decompressInventoryJson } from './InvLoader.js';
 import { cloneInventory } from '../satchel/inv/Inv.js';
 import { uuid } from '../util/uuid.js';
-import { ALBUM_FLAG_EXPAND_BIT, ALBUM_FLAG_HIDDEN_BIT, ALBUM_FLAG_LOCKED_BIT, createAlbum } from '../satchel/album/Album.js';
+import {
+  ALBUM_FLAG_EXPAND_BIT,
+  ALBUM_FLAG_HIDDEN_BIT,
+  ALBUM_FLAG_LOCKED_BIT,
+  createAlbum,
+} from '../satchel/album/Album.js';
 
 /**
  * @typedef {import('../satchel/album/Album.js').Album} Album
@@ -31,9 +36,13 @@ export function importAlbumFromJSON(jsonData, dst = undefined) {
     case 'album_v1':
       return importDataFromJSON(jsonData, 'album_v1', (data) => cloneInventory(albumV1ToV3(data, dst)));
     case 'album_v2':
-      return importDataFromJSON(jsonData, 'album_v2', (data) => cloneInventory(albumV1ToV3(decompressAlbumJsonV2(data), dst)));
+      return importDataFromJSON(jsonData, 'album_v2', (data) =>
+        cloneInventory(albumV1ToV3(decompressAlbumJsonV2(data), dst))
+      );
     case 'album_v3':
-      return importDataFromJSON(jsonData, 'album_v3', (data) => cloneInventory(decompressInventoryJson(data), dst));
+      return importDataFromJSON(jsonData, 'album_v3', (data) =>
+        cloneInventory(decompressInventoryJson(data), dst)
+      );
     default:
       throw new Error(`Unsupported album version '${jsonData._type}'.`);
   }

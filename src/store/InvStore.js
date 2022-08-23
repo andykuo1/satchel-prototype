@@ -9,7 +9,7 @@ import { dispatchInventoryChange, dispatchInventoryListChange } from '../events/
 
 /**
  * Get an existing inventory. Will throw if it does not exist.
- * 
+ *
  * @param {Store} store
  * @param {InvId} invId
  * @returns {Inv}

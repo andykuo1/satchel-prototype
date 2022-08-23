@@ -9,7 +9,7 @@ import { addStoreEventListener, dispatchStoreEvent, removeStoreEventListener } f
  * @callback OnInventoryChangeCallback
  * @param {Store} store
  * @param {InvId} invId
- * 
+ *
  * @callback OnInventoryListChangeCallback
  * @param {Store} store
  */

@@ -1,7 +1,4 @@
-import {
-  describeBackwardsCompatibleJSONFormat,
-  describeJSONFormat,
-} from './DataLoaderHelper.js';
+import { describeBackwardsCompatibleJSONFormat, describeJSONFormat } from './DataLoaderHelper.js';
 
 import { importItemFromJSON, exportItemToJSON } from '../../src/loader/ItemLoader.js';
 import { createItem } from '../../src/satchel/item/Item.js';
@@ -39,13 +36,37 @@ describe('The default item data format', () => {
 });
 
 describe('The "item_v2" data format', () => {
-  describeBackwardsCompatibleJSONFormat('item_v2', 'default_export', createDefaultItem, exportItemToJSON, importItemFromJSON);
-  describeBackwardsCompatibleJSONFormat('item_v2', 'full_export', createFullItem, exportItemToJSON, importItemFromJSON);
+  describeBackwardsCompatibleJSONFormat(
+    'item_v2',
+    'default_export',
+    createDefaultItem,
+    exportItemToJSON,
+    importItemFromJSON
+  );
+  describeBackwardsCompatibleJSONFormat(
+    'item_v2',
+    'full_export',
+    createFullItem,
+    exportItemToJSON,
+    importItemFromJSON
+  );
 });
 
 describe('The "item_v1" data format', () => {
-  describeBackwardsCompatibleJSONFormat('item_v1', 'default_export', createDefaultItem, exportItemToJSON, importItemFromJSONForV1);
-  describeBackwardsCompatibleJSONFormat('item_v1', 'full_export', createFullItem, exportItemToJSON, importItemFromJSONForV1);
+  describeBackwardsCompatibleJSONFormat(
+    'item_v1',
+    'default_export',
+    createDefaultItem,
+    exportItemToJSON,
+    importItemFromJSONForV1
+  );
+  describeBackwardsCompatibleJSONFormat(
+    'item_v1',
+    'full_export',
+    createFullItem,
+    exportItemToJSON,
+    importItemFromJSONForV1
+  );
 });
 
 function importItemFromJSONForV1(data) {

@@ -30,7 +30,7 @@ async function connect() {
 window.addEventListener('DOMContentLoaded', () => {
   // Set build version
   document.querySelector('#appVersion').textContent = `v${BUILD_VERSION}`;
-  
+
   if (document.hasFocus()) {
     setTimeout(onDocumentFocusUpdate, 300);
   } else {

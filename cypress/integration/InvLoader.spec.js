@@ -1,7 +1,4 @@
-import {
-  describeBackwardsCompatibleJSONFormat,
-  describeJSONFormat,
-} from './DataLoaderHelper.js';
+import { describeBackwardsCompatibleJSONFormat, describeJSONFormat } from './DataLoaderHelper.js';
 
 import { importInventoryFromJSON, exportInventoryToJSON } from '../../src/loader/InvLoader.js';
 import { createInventory } from '../../src/satchel/inv/Inv.js';
@@ -52,16 +49,52 @@ describe('The default inv data format', () => {
 });
 
 describe('The "inv_v3" data format', () => {
-  describeBackwardsCompatibleJSONFormat('inv_v3', 'default_export', createDefaultInventory, exportInventoryToJSON, importInventoryFromJSON);
-  describeBackwardsCompatibleJSONFormat('inv_v3', 'full_export', createFullInventory, exportInventoryToJSON, importInventoryFromJSON);
+  describeBackwardsCompatibleJSONFormat(
+    'inv_v3',
+    'default_export',
+    createDefaultInventory,
+    exportInventoryToJSON,
+    importInventoryFromJSON
+  );
+  describeBackwardsCompatibleJSONFormat(
+    'inv_v3',
+    'full_export',
+    createFullInventory,
+    exportInventoryToJSON,
+    importInventoryFromJSON
+  );
 });
 
 describe('The "inv_v2" data format', () => {
-  describeBackwardsCompatibleJSONFormat('inv_v2', 'default_export', createDefaultInventory, exportInventoryToJSON, importInventoryFromJSON);
-  describeBackwardsCompatibleJSONFormat('inv_v2', 'full_export', createFullInventoryPreV2, exportInventoryToJSON, importInventoryFromJSON);
+  describeBackwardsCompatibleJSONFormat(
+    'inv_v2',
+    'default_export',
+    createDefaultInventory,
+    exportInventoryToJSON,
+    importInventoryFromJSON
+  );
+  describeBackwardsCompatibleJSONFormat(
+    'inv_v2',
+    'full_export',
+    createFullInventoryPreV2,
+    exportInventoryToJSON,
+    importInventoryFromJSON
+  );
 });
 
 describe('The "inv_v1" data format', () => {
-  describeBackwardsCompatibleJSONFormat('inv_v1', 'default_export', createDefaultInventory, exportInventoryToJSON, importInventoryFromJSON);
-  describeBackwardsCompatibleJSONFormat('inv_v1', 'full_export', createFullInventoryPreV2, exportInventoryToJSON, importInventoryFromJSON);
+  describeBackwardsCompatibleJSONFormat(
+    'inv_v1',
+    'default_export',
+    createDefaultInventory,
+    exportInventoryToJSON,
+    importInventoryFromJSON
+  );
+  describeBackwardsCompatibleJSONFormat(
+    'inv_v1',
+    'full_export',
+    createFullInventoryPreV2,
+    exportInventoryToJSON,
+    importInventoryFromJSON
+  );
 });

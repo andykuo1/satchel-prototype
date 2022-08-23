@@ -12,7 +12,7 @@ import { addInvInStore, deleteInvInStore, getInvsInStore } from './InvStore.js';
  * @returns {Array<Album>}
  */
 export function getAlbumsInStore(store) {
-  return getInvsInStore(store).filter(inv => inv.type === 'album');
+  return getInvsInStore(store).filter((inv) => inv.type === 'album');
 }
 
 /**
@@ -20,7 +20,7 @@ export function getAlbumsInStore(store) {
  * @returns {Array<AlbumId>}
  */
 export function getAlbumIdsInStore(store) {
-  return getAlbumsInStore(store).map(album => album.invId);
+  return getAlbumsInStore(store).map((album) => album.invId);
 }
 
 /**

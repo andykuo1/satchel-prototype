@@ -107,7 +107,13 @@ export function describeJSONFormat(jsonFormat, jsonDataFactory, jsonExporter, js
  * @param {(target: T) => object} jsonExporter
  * @param {(target: object) => T} jsonImporter
  */
- export function describeBackwardsCompatibleJSONFormat(jsonFormat, fixtureName, jsonDataFactory, jsonExporter, jsonImporter) {
+export function describeBackwardsCompatibleJSONFormat(
+  jsonFormat,
+  fixtureName,
+  jsonDataFactory,
+  jsonExporter,
+  jsonImporter
+) {
   const created = jsonDataFactory();
   const exported = jsonExporter(created);
   const exportedPath = `${jsonFormat}_${fixtureName}.json`;
@@ -117,7 +123,10 @@ export function describeJSONFormat(jsonFormat, jsonDataFactory, jsonExporter, js
     it(`should export correctly for ${fixtureName} data`, () => {
       assert.equal(exported._type, jsonFormat);
       downloadText(exportedPath, JSON.stringify(exported));
-      assert.exists(exportedPath, 'should copy missing exported fixtures from "cypress/downloads" to "cypress/fixtures".');
+      assert.exists(
+        exportedPath,
+        'should copy missing exported fixtures from "cypress/downloads" to "cypress/fixtures".'
+      );
     });
   } else {
     // Validate fixtures exist for the future

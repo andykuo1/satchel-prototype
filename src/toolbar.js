@@ -5,7 +5,13 @@ import { getCursorContext } from './satchel/inv/CursorHelper.js';
 import { copyToClipboard, pasteFromClipboard } from './util/clipboard.js';
 import { ItemBuilder } from './satchel/item/Item.js';
 import { exportItemToString, importItemFromString } from './loader/ItemLoader.js';
-import { clearFoundry, closeFoundry, copyFoundry, isFoundryOpen, openFoundry } from './satchel/inv/FoundryHelper.js';
+import {
+  clearFoundry,
+  closeFoundry,
+  copyFoundry,
+  isFoundryOpen,
+  openFoundry,
+} from './satchel/inv/FoundryHelper.js';
 import { ActivityPlayerList } from './satchel/peer/ActivityPlayerList.js';
 import { forceEmptyStorage } from './Storage.js';
 import { saveSatchelToData } from './loader/SatchelLoader.js';
@@ -129,14 +135,22 @@ function onActionShareItem() {
       let giftTarget = document.querySelector('#giftTarget');
       let ctx = getCursorContext();
       if (ctx.server && ctx.server.instance) {
-        const localServer = /** @type {import('./satchel/peer/PeerSatchel.js').SatchelServer} */ (ctx.server.instance);
+        const localServer = /** @type {import('./satchel/peer/PeerSatchel.js').SatchelServer} */ (
+          ctx.server.instance
+        );
         const playerNames = ActivityPlayerList.getPlayerNameListOnServer(localServer);
-        let content = playerNames.map(clientName => `<option>${clientName.toLowerCase()}</option>`).join('\n');
+        let content = playerNames
+          .map((clientName) => `<option>${clientName.toLowerCase()}</option>`)
+          .join('\n');
         giftTarget.innerHTML = content;
       } else if (ctx.client && ctx.client.instance) {
-        const localClient = /** @type {import('./satchel/peer/PeerSatchel.js').SatchelClient} */ (ctx.client.instance);
+        const localClient = /** @type {import('./satchel/peer/PeerSatchel.js').SatchelClient} */ (
+          ctx.client.instance
+        );
         const playerNames = ActivityPlayerList.getPlayerNameListOnClient(localClient);
-        let content = playerNames.map(clientName => `<option>${clientName.toLowerCase()}</option>`).join('\n');
+        let content = playerNames
+          .map((clientName) => `<option>${clientName.toLowerCase()}</option>`)
+          .join('\n');
         giftTarget.innerHTML = content;
       } else {
         giftTarget.innerHTML = '';
@@ -174,7 +188,9 @@ function onGiftCodeExport() {
   const socketedItem = itemDialog.copySocketedItem();
   const itemString = exportItemToString(socketedItem);
   copyToClipboard(itemString).then(() => {
-    window.alert('Copied to clipboard!\n\nShare this code with a friend, then import item by pasting in Foundry.');
+    window.alert(
+      'Copied to clipboard!\n\nShare this code with a friend, then import item by pasting in Foundry.'
+    );
   });
 }
 
@@ -254,7 +270,9 @@ function onActionItemCodeExport() {
   }
   let itemString = exportItemToString(item);
   copyToClipboard(itemString).then(() => {
-    window.alert(`Copied to clipboard! Share this with a friend, then paste the code in Foundry.\n\n${itemString}`);
+    window.alert(
+      `Copied to clipboard! Share this with a friend, then paste the code in Foundry.\n\n${itemString}`
+    );
   });
 }
 
@@ -290,7 +308,10 @@ async function onActionItemCodeSubmit() {
   try {
     newItem = importItemFromString(itemString);
   } catch (e) {
-    notify('Sorry! That is not a valid item code. Try copy a valid item code text then click this button again.\n\n' + e);
+    notify(
+      'Sorry! That is not a valid item code. Try copy a valid item code text then click this button again.\n\n' +
+        e
+    );
   }
   if (newItem) {
     /** @type {import('./components/itemeditor/ItemEditorElement.js').ItemEditorElement} */
