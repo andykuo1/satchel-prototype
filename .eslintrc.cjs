@@ -4,14 +4,13 @@ module.exports = {
     browser: true,
     es2021: true,
   },
+  parserOptions: {
+    sourceType: 'module',
+  },
   extends: [
     'eslint:recommended',
     'prettier',
   ],
-  parserOptions: {
-    ecmaVersion: 13,
-    sourceType: 'module',
-  },
   plugins: [],
   rules: {
     'no-console': 'error',

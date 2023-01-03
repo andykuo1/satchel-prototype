@@ -1,14 +1,14 @@
-import { DEFAULT_ITEM_UNIT_SIZE, itemMouseDownCallback } from './InvMouseHelper.js';
-import { getSatchelStore } from '../../store/SatchelStore.js';
-import { hasItem, getItemByItemId } from '../../satchel/inv/InvItems.js';
-import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../../satchel/inv/InvSlots.js';
 import { addItemChangeListener, removeItemChangeListener } from '../../events/ItemEvents.js';
-import { isInventoryViewEditable, isInventoryViewUnitSized } from '../inventory/InventoryView.js';
+import { getItemByItemId, hasItem } from '../../satchel/inv/InvItems.js';
+import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../../satchel/inv/InvSlots.js';
 import { getExistingInvInStore } from '../../store/InvStore.js';
+import { getSatchelStore } from '../../store/SatchelStore.js';
+import { isInventoryViewEditable, isInventoryViewUnitSized } from '../inventory/InventoryView.js';
+import { DEFAULT_ITEM_UNIT_SIZE, itemMouseDownCallback } from './InvMouseHelper.js';
 
 /** @typedef {import('../inventory/InventoryView.js').InventoryView} InventoryView */
 
-const INNER_HTML = /* html */`
+const INNER_HTML = /* html */ `
 <figure class="container">
   <div class="innerContainer">
     <img src="res/images/potion.png">
@@ -17,7 +17,7 @@ const INNER_HTML = /* html */`
   </div>
 </figure>
 `;
-const INNER_STYLE = /* css */`
+const INNER_STYLE = /* css */ `
 :host {
   --foreground-color: var(--item-foreground-color);
   --background-color: var(--item-background-color);
@@ -157,17 +157,11 @@ export class ItemElement extends HTMLElement {
     }
     const inv = getExistingInvInStore(getSatchelStore(), invId);
     if (!hasItem(inv, itemId)) {
-      throw new Error(
-        'Cannot create item element with item id not in given inventory.'
-      );
+      throw new Error('Cannot create item element with item id not in given inventory.');
     }
     const shadowRoot = this.attachShadow({ mode: 'open' });
-    shadowRoot.append(
-      this.constructor[Symbol.for('templateNode')].content.cloneNode(true)
-    );
-    shadowRoot.append(
-      this.constructor[Symbol.for('styleNode')].cloneNode(true)
-    );
+    shadowRoot.append(this.constructor[Symbol.for('templateNode')].content.cloneNode(true));
+    shadowRoot.append(this.constructor[Symbol.for('styleNode')].cloneNode(true));
 
     /** @private */
     this._invView = invView;
@@ -207,11 +201,7 @@ export class ItemElement extends HTMLElement {
     const store = getSatchelStore();
     this.removeEventListener('mousedown', this.onMouseDown);
     this.removeEventListener('contextmenu', this.onContextMenu);
-    removeItemChangeListener(
-      store,
-      this.itemId,
-      this.onItemChange
-    );
+    removeItemChangeListener(store, this.itemId, this.onItemChange);
   }
 
   /**
@@ -238,9 +228,9 @@ export class ItemElement extends HTMLElement {
     if (item.background) {
       try {
         let hex = Number.parseInt(item.background.substring(1), 16);
-        let r = (hex >> 16) & 0xFF;
-        let g = (hex >> 8) & 0xFF;
-        let b = (hex & 0xFF);
+        let r = (hex >> 16) & 0xff;
+        let g = (hex >> 8) & 0xff;
+        let b = hex & 0xff;
         let a = hex === 0 ? 0.1 : 0.3;
         let background = `rgba(${r}, ${g}, ${b}, ${a})`;
         this.style.setProperty('--itemBackground', background);

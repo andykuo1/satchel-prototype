@@ -24,7 +24,7 @@ export function setupPlayer(client) {
 }
 
 /**
- * @param {PlayerClient} client 
+ * @param {PlayerClient} client
  * @returns {PlayerState}
  */
 function getPlayer(client) {
@@ -32,7 +32,7 @@ function getPlayer(client) {
 }
 
 /**
- * @param {PlayerClient} client 
+ * @param {PlayerClient} client
  * @returns {boolean}
  */
 export function isPlayer(client) {
@@ -40,7 +40,7 @@ export function isPlayer(client) {
 }
 
 /**
- * @param {PlayerClient} client 
+ * @param {PlayerClient} client
  * @returns {string}
  */
 export function getPlayerName(client) {
@@ -48,8 +48,8 @@ export function getPlayerName(client) {
 }
 
 /**
- * @param {PlayerClient} client 
- * @param {string} name 
+ * @param {PlayerClient} client
+ * @param {string} name
  */
 export function setPlayerName(client, name) {
   if (!validatePlayerName(name)) {
@@ -59,7 +59,7 @@ export function setPlayerName(client, name) {
 }
 
 /**
- * @param {string} name 
+ * @param {string} name
  * @returns {string} The valid formatted name or an empty string if invalid.
  */
 export function validatePlayerName(name) {
@@ -75,7 +75,7 @@ export function validatePlayerName(name) {
 }
 
 /**
- * @param {PlayerClient} client 
+ * @param {PlayerClient} client
  * @returns {boolean}
  */
 export function hasPlayerHeartbeat(client) {
@@ -83,7 +83,7 @@ export function hasPlayerHeartbeat(client) {
 }
 
 /**
- * @param {PlayerClient} client 
+ * @param {PlayerClient} client
  * @param {number} value
  */
 export function setPlayerLastHeartbeat(client, value) {
@@ -91,7 +91,7 @@ export function setPlayerLastHeartbeat(client, value) {
 }
 
 /**
- * @param {PlayerClient} client 
+ * @param {PlayerClient} client
  * @returns {number}
  */
 export function getPlayerLastHeartbeat(client) {

@@ -1,24 +1,29 @@
-import { getSatchelStore } from '../../store/SatchelStore.js';
-import { isAlbumExpanded, isAlbumLocked, setAlbumExpanded, setAlbumLocked } from '../../satchel/album/Album.js';
-import { getCursor } from '../cursor/index.js';
-import { downloadText } from '../../util/downloader.js';
-import { exportAlbumToJSON } from '../../loader/AlbumLoader.js';
-import { IconButtonElement } from '../lib/IconButtonElement.js';
-import { isGroundAlbum } from '../../satchel/GroundAlbum.js';
-import { isFoundryAlbum } from '../../satchel/FoundryAlbum.js';
-import { isTrashAlbum, saveItemToTrashAlbum } from '../../satchel/TrashAlbum.js';
-import './AlbumListElement.js';
 import { dispatchInventoryChange } from '../../events/InvEvents.js';
+import { exportAlbumToJSON } from '../../loader/AlbumLoader.js';
+import { isFoundryAlbum } from '../../satchel/FoundryAlbum.js';
+import { isGroundAlbum } from '../../satchel/GroundAlbum.js';
+import { isTrashAlbum, saveItemToTrashAlbum } from '../../satchel/TrashAlbum.js';
+import {
+  isAlbumExpanded,
+  isAlbumLocked,
+  setAlbumExpanded,
+  setAlbumLocked,
+} from '../../satchel/album/Album.js';
 import { getItemIdsInInv, getItemsInInv } from '../../satchel/inv/InventoryItems.js';
 import { clearItemsInInventory } from '../../satchel/inv/InventoryTransfer.js';
 import { deleteInvInStore, getInvInStore, isInvInStore } from '../../store/InvStore.js';
+import { getSatchelStore } from '../../store/SatchelStore.js';
+import { downloadText } from '../../util/downloader.js';
+import { getCursor } from '../cursor/index.js';
+import { IconButtonElement } from '../lib/IconButtonElement.js';
+import './AlbumListElement.js';
 
 /**
  * @typedef {import('../../satchel/item/Item.js').Item} Item
  * @typedef {import('../../satchel/item/Item.js').ItemId} ItemId
  */
 
-const INNER_HTML = /* html */`
+const INNER_HTML = /* html */ `
 <fieldset>
   <legend contenteditable></legend>
   <span class="preactionbar">
@@ -33,7 +38,7 @@ const INNER_HTML = /* html */`
   <album-list fixed></album-list>
 </fieldset>
 `;
-const INNER_STYLE = /* css */`
+const INNER_STYLE = /* css */ `
 fieldset {
   position: relative;
   min-height: 2em;
@@ -125,13 +130,9 @@ export class AlbumPackElement extends HTMLElement {
       throw new Error('Missing album id for album element.');
     }
     const shadowRoot = this.attachShadow({ mode: 'open' });
-    shadowRoot.append(
-      this.constructor[Symbol.for('templateNode')].content.cloneNode(true)
-    );
-    shadowRoot.append(
-      this.constructor[Symbol.for('styleNode')].cloneNode(true)
-    );
-    
+    shadowRoot.append(this.constructor[Symbol.for('templateNode')].content.cloneNode(true));
+    shadowRoot.append(this.constructor[Symbol.for('styleNode')].cloneNode(true));
+
     /** @private */
     this._albumId = albumId;
     /** @private */
@@ -169,7 +170,7 @@ export class AlbumPackElement extends HTMLElement {
     this.onButtonDelete = this.onButtonDelete.bind(this);
     /** @private */
     this.onButtonExpand = this.onButtonExpand.bind(this);
-    
+
     /** @private */
     this.onAlbumDrop = this.onAlbumDrop.bind(this);
   }
@@ -309,11 +310,11 @@ export class AlbumPackElement extends HTMLElement {
     }
     let cursor = getCursor();
     // HACK: This is so single clicks won't create albums
-      // @ts-ignore
+    // @ts-ignore
     if (isAlbumLocked(store, albumId) && cursor.hasHeldItem() && !cursor.ignoreFirstPutDown) {
       let heldItem = cursor.getHeldItem();
       let items = getItemsInInv(store, albumId);
-      for(let item of items) {
+      for (let item of items) {
         // Dragging similar items to the album will delete it.
         if (isItemSimilarEnoughToBeDestroyed(item, heldItem)) {
           cursor.clearHeldItem();
@@ -342,8 +343,8 @@ export class AlbumPackElement extends HTMLElement {
 AlbumPackElement.define();
 
 /**
- * @param {Item} item 
- * @param {Item} other 
+ * @param {Item} item
+ * @param {Item} other
  */
 export function isItemSimilarEnoughToBeDestroyed(item, other) {
   if (item.displayName !== other.displayName) {

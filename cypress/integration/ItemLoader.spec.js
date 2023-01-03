@@ -1,7 +1,6 @@
-import { describeBackwardsCompatibleJSONFormat, describeJSONFormat } from './DataLoaderHelper.js';
-
-import { importItemFromJSON, exportItemToJSON } from '../../src/loader/ItemLoader.js';
+import { exportItemToJSON, importItemFromJSON } from '../../src/loader/ItemLoader.js';
 import { createItem } from '../../src/satchel/item/Item.js';
+import { describeBackwardsCompatibleJSONFormat, describeJSONFormat } from './DataLoaderHelper.js';
 
 function createDefaultItem() {
   let created = createItem('test');

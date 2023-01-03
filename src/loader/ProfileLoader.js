@@ -1,5 +1,5 @@
-import { exportDataToJSON, importDataFromJSON } from './DataLoader.js';
 import { cloneProfile } from '../satchel/profile/Profile.js';
+import { exportDataToJSON, importDataFromJSON } from './DataLoader.js';
 
 /**
  * @typedef {import('../satchel/profile/Profile.js').Profile} Profile

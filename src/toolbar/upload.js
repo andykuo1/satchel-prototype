@@ -1,3 +1,4 @@
+import { forceEmptyStorage } from '../Storage.js';
 import { notify } from '../components/NotifyPrompt.js';
 import { importAlbumFromJSON } from '../loader/AlbumLoader.js';
 import { importItemFromJSON } from '../loader/ItemLoader.js';
@@ -5,7 +6,6 @@ import { loadSatchelFromData, loadSatchelProfilesFromData } from '../loader/Satc
 import { dropItemOnGround } from '../satchel/GroundAlbum.js';
 import { copyInventory } from '../satchel/inv/Inv.js';
 import { copyItem } from '../satchel/item/Item.js';
-import { forceEmptyStorage } from '../Storage.js';
 import { addInvInStore, isInvInStore } from '../store/InvStore.js';
 import { setActiveProfileInStore } from '../store/ProfileStore.js';
 import { getSatchelStore } from '../store/SatchelStore.js';

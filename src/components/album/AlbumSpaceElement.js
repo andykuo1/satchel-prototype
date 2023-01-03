@@ -1,20 +1,20 @@
+import { getInvInStore, isInvInStore } from '../../store/InvStore.js';
 import { getSatchelStore } from '../../store/SatchelStore.js';
 import { upgradeProperty } from '../../util/wc.js';
 import { getCursor } from '../cursor/index.js';
 import './AlbumListElement.js';
-import { getInvInStore, isInvInStore } from '../../store/InvStore.js';
 
 /**
  * @typedef {import('../../satchel/item/Item.js').ItemId} ItemId
  */
 
-const INNER_HTML = /* html */`
+const INNER_HTML = /* html */ `
 <fieldset>
   <legend></legend>
   <album-list></album-list>
 </fieldset>
 `;
-const INNER_STYLE = /* css */`
+const INNER_STYLE = /* css */ `
 :host {
   display: inline-block;
   min-width: 2em;
@@ -84,12 +84,8 @@ export class AlbumSpaceElement extends HTMLElement {
   constructor() {
     super();
     const shadowRoot = this.attachShadow({ mode: 'open' });
-    shadowRoot.append(
-      this.constructor[Symbol.for('templateNode')].content.cloneNode(true)
-    );
-    shadowRoot.append(
-      this.constructor[Symbol.for('styleNode')].cloneNode(true)
-    );
+    shadowRoot.append(this.constructor[Symbol.for('templateNode')].content.cloneNode(true));
+    shadowRoot.append(this.constructor[Symbol.for('styleNode')].cloneNode(true));
 
     /** @private */
     this.container = shadowRoot.querySelector('fieldset');

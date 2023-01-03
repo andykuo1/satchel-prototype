@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES6",
+    "target": "ESNext",
     "lib": ["ESNext", "dom"],
     "allowJs": true,
     "noEmit": true,
@@ -10,13 +10,20 @@
       "gapi.auth2",
       "gapi.client",
       "gapi.client.drive"
-    ]
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@satchel/*": ["./src/*"]
+    }
   },
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "dist",
   ],
   "include": [
-    "src/**/*.js",
-    "res/**/*.js"
+    "src/*",
+    "src/**/*",
+    "res/*",
+    "res/**/*",
   ]
 }

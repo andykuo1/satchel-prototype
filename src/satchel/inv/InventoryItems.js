@@ -27,8 +27,8 @@ export function getItemIdsInInv(store, invId) {
 }
 
 /**
- * @param {import('../../store/SatchelStore.js').SatchelStore} store 
- * @param {string} invId 
+ * @param {import('../../store/SatchelStore.js').SatchelStore} store
+ * @param {string} invId
  * @returns {Array<import('../item/Item.js').Item>}
  */
 export function getItemsInInv(store, invId) {

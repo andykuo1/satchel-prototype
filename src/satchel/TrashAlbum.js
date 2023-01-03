@@ -1,11 +1,11 @@
+import { playSound } from '../sounds.js';
+import { getAlbumsInStore } from '../store/AlbumStore.js';
+import { addInvInStore } from '../store/InvStore.js';
 import { getSatchelStore } from '../store/SatchelStore.js';
 import { uuid } from '../util/uuid.js';
 import { ALBUM_FLAG_EXPAND_BIT, ALBUM_FLAG_LOCKED_BIT, createAlbum } from './album/Album.js';
-import { getAlbumsInStore } from '../store/AlbumStore.js';
-import { playSound } from '../sounds.js';
-import { addItemToInventory, removeItemFromInventory } from './inv/InventoryTransfer.js';
 import { getItemIdsInInv } from './inv/InventoryItems.js';
-import { addInvInStore } from '../store/InvStore.js';
+import { addItemToInventory, removeItemFromInventory } from './inv/InventoryTransfer.js';
 
 const TRASH_ALBUM_DISPLAY_NAME = '[ Trash ]';
 const MAX_ITEMS_IN_TRASH = 30;

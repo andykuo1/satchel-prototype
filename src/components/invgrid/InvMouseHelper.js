@@ -1,11 +1,10 @@
-import { getSatchelStore } from '../../store/SatchelStore.js';
+import { dispatchItemChange } from '../../events/ItemEvents.js';
 import { getItemByItemId } from '../../satchel/inv/InvItems.js';
 import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../../satchel/inv/InvSlots.js';
 import { copyItem } from '../../satchel/item/Item.js';
-
-import { getCursor } from '../cursor/index.js';
 import { getInvInStore } from '../../store/InvStore.js';
-import { dispatchItemChange } from '../../events/ItemEvents.js';
+import { getSatchelStore } from '../../store/SatchelStore.js';
+import { getCursor } from '../cursor/index.js';
 
 /**
  * @typedef {import('./ItemElement.js').ItemElement} ItemElement
@@ -27,16 +26,8 @@ export function itemMouseDownCallback(mouseEvent, itemElement, unitSize) {
     return;
   }
   const boundingRect = containerElement._container.getBoundingClientRect();
-  const clientCoordX = getClientCoordX(
-    boundingRect,
-    mouseEvent.clientX,
-    unitSize
-  );
-  const clientCoordY = getClientCoordY(
-    boundingRect,
-    mouseEvent.clientY,
-    unitSize
-  );
+  const clientCoordX = getClientCoordX(boundingRect, mouseEvent.clientX, unitSize);
+  const clientCoordY = getClientCoordY(boundingRect, mouseEvent.clientY, unitSize);
   const store = getSatchelStore();
   const itemId = itemElement.itemId;
   const invId = containerElement.invId;
@@ -98,11 +89,7 @@ export function itemMouseDownCallback(mouseEvent, itemElement, unitSize) {
  * @param {number} unitSize The item unit size.
  * @returns {boolean} Whether to allow the event to propagate.
  */
-export function containerMouseUpCallback(
-  mouseEvent,
-  containerElement,
-  unitSize
-) {
+export function containerMouseUpCallback(mouseEvent, containerElement, unitSize) {
   if (containerElement.hasAttribute('noinput')) {
     return;
   }
@@ -112,16 +99,8 @@ export function containerMouseUpCallback(
   const mergable = !containerElement.hasAttribute('noinput');
   const shiftKey = mouseEvent.shiftKey;
   const boundingRect = rootElement.getBoundingClientRect();
-  const clientCoordX = getClientCoordX(
-    boundingRect,
-    mouseEvent.clientX,
-    unitSize
-  );
-  const clientCoordY = getClientCoordY(
-    boundingRect,
-    mouseEvent.clientY,
-    unitSize
-  );
+  const clientCoordX = getClientCoordX(boundingRect, mouseEvent.clientX, unitSize);
+  const clientCoordY = getClientCoordY(boundingRect, mouseEvent.clientY, unitSize);
   let cursor = getCursor();
   let result = cursor.putDown(invId, clientCoordX, clientCoordY, swappable, mergable, shiftKey);
   if (result) {

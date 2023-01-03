@@ -1,9 +1,8 @@
+import './components/lib/BannerPromptElement.js';
 import { BUILD_VERSION } from './globals.js';
+import { prepareSessionStatus } from './satchel/session/SatchelSession.js';
 import { pasteFromClipboard } from './util/clipboard.js';
 import { uuid } from './util/uuid.js';
-import { prepareSessionStatus } from './satchel/session/SatchelSession.js';
-
-import './components/lib/BannerPromptElement.js';
 
 const UUIDV4_PATTERN = /[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}/;
 

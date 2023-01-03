@@ -1,3 +1,4 @@
+import { debug } from './PeerfulUtil.js';
 import {
   createPromiseStatus,
   createPromiseStatusPromise,
@@ -5,7 +6,6 @@ import {
   rejectPromiseStatus,
   resolvePromiseStatus,
 } from './PromiseStatus.js';
-import { debug } from './PeerfulUtil.js';
 
 /**
  * @typedef {(error: Error|null, data: object|null, src?: string, dst?: string) => void} PeerJsSignalingHandler

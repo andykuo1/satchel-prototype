@@ -237,21 +237,23 @@ export class BannerPromptElement extends HTMLElement {
    */
   attributeChangedCallback(attribute, previous, value) {
     switch (attribute) {
-      case 'open': {
-        let result = value !== null;
-        let prev = previous !== null;
-        this.dialogElement.toggleAttribute('open', result);
-        this.containerElement.classList.toggle('hidden', !result);
-        // Dispatch 'open' event. The 'close' events are handled elsewhere.
-        if (prev !== result && result) {
-          this.dispatchEvent(
-            new CustomEvent('open', {
-              composed: true,
-              bubbles: false,
-            })
-          );
+      case 'open':
+        {
+          let result = value !== null;
+          let prev = previous !== null;
+          this.dialogElement.toggleAttribute('open', result);
+          this.containerElement.classList.toggle('hidden', !result);
+          // Dispatch 'open' event. The 'close' events are handled elsewhere.
+          if (prev !== result && result) {
+            this.dispatchEvent(
+              new CustomEvent('open', {
+                composed: true,
+                bubbles: false,
+              })
+            );
+          }
         }
-      } break;
+        break;
     }
   }
 
@@ -273,7 +275,7 @@ export class BannerPromptElement extends HTMLElement {
     this.dispatchEvent(
       new CustomEvent('close', {
         composed: true,
-        bubbles: false
+        bubbles: false,
       })
     );
     e.preventDefault();

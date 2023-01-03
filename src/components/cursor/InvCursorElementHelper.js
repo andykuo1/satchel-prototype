@@ -1,4 +1,6 @@
-import { dijkstra2d } from '../../util/dijkstra2d.js';
+import { dispatchItemChange } from '../../events/ItemEvents.js';
+import { getItemByItemId } from '../../satchel/inv/InvItems.js';
+import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../../satchel/inv/InvSlots.js';
 import {
   addItemToInventory,
   getItemAtSlotCoords,
@@ -6,11 +8,9 @@ import {
   getItemIdAtSlotCoords,
   removeItemFromInventory,
 } from '../../satchel/inv/InventoryTransfer.js';
-import { getItemByItemId } from '../../satchel/inv/InvItems.js';
-import { getSlotCoordsByIndex, getSlotIndexByItemId } from '../../satchel/inv/InvSlots.js';
-import { getExistingInvInStore, getInvInStore } from '../../store/InvStore.js';
-import { dispatchItemChange } from '../../events/ItemEvents.js';
 import { copyItem } from '../../satchel/item/Item.js';
+import { getExistingInvInStore, getInvInStore } from '../../store/InvStore.js';
+import { dijkstra2d } from '../../util/dijkstra2d.js';
 
 /**
  * @typedef {import('../../satchel/inv/Inv.js').Inventory} Inventory
@@ -76,11 +76,7 @@ export function putDownToSocketInventory(
   addItemToInventory(store, toInvId, heldItem, 0, 0);
   // ...finally put the remaining item back now that there is space.
   if (prevItem) {
-    cursor.setHeldItem(
-      prevItem,
-      Math.min(0, prevItemX - coordX),
-      Math.min(0, prevItemY - coordY)
-    );
+    cursor.setHeldItem(prevItem, Math.min(0, prevItemX - coordX), Math.min(0, prevItemY - coordY));
   }
   return true;
 }
@@ -95,16 +91,7 @@ export function putDownToSocketInventory(
  * @param {boolean} mergable
  * @param {boolean} shiftKey
  */
-export function putDownToGridInventory(
-  cursor,
-  store,
-  toInvId,
-  itemX,
-  itemY,
-  swappable,
-  mergable,
-  shiftKey,
-) {
+export function putDownToGridInventory(cursor, store, toInvId, itemX, itemY, swappable, mergable, shiftKey) {
   const toInventory = getInvInStore(store, toInvId);
   const heldItem = cursor.getHeldItem();
   const invWidth = toInventory.width;
@@ -118,16 +105,11 @@ export function putDownToGridInventory(
   }
   const targetCoordX = Math.min(Math.max(0, itemX), maxCoordX);
   const targetCoordY = Math.min(Math.max(0, itemY), maxCoordY);
-  
+
   let prevItemId = null;
   for (let y = 0; y < itemHeight; ++y) {
     for (let x = 0; x < itemWidth; ++x) {
-      let itemId = getItemIdAtSlotCoords(
-        store,
-        toInvId,
-        targetCoordX + x,
-        targetCoordY + y
-      );
+      let itemId = getItemIdAtSlotCoords(store, toInvId, targetCoordX + x, targetCoordY + y);
       if (itemId) {
         if (prevItemId) {
           if (itemId !== prevItemId) {
@@ -178,12 +160,8 @@ export function putDownToGridInventory(
     return true;
   } else {
     // Cannot swap here. Find somehwere close?
-    const [x, y] = findEmptyCoords(
-      targetCoordX,
-      targetCoordY,
-      maxCoordX,
-      maxCoordY,
-      (x, y) => canPlaceAt(store, toInvId, x, y, itemWidth, itemHeight)
+    const [x, y] = findEmptyCoords(targetCoordX, targetCoordY, maxCoordX, maxCoordY, (x, y) =>
+      canPlaceAt(store, toInvId, x, y, itemWidth, itemHeight)
     );
     if (x >= 0 && y >= 0) {
       cursor.clearHeldItem();
@@ -252,8 +230,8 @@ function tryMergeItems(store, cursor, prevItem, heldItem, mergable, shiftKey) {
 }
 
 /**
- * @param {Item} item 
- * @param {Item} other 
+ * @param {Item} item
+ * @param {Item} other
  */
 function mergeItems(item, other) {
   item.stackSize += other.stackSize;
@@ -273,8 +251,8 @@ function mergeItems(item, other) {
 }
 
 /**
- * @param {Item} item 
- * @param {Item} other 
+ * @param {Item} item
+ * @param {Item} other
  */
 function isMergableItems(item, other) {
   if (item.stackSize < 0 || other.stackSize < 0) {
@@ -309,15 +287,7 @@ function isMergableItems(item, other) {
  * @param itemHeight
  * @param exclude
  */
-function canPlaceAt(
-  store,
-  invId,
-  coordX,
-  coordY,
-  itemWidth,
-  itemHeight,
-  exclude = null
-) {
+function canPlaceAt(store, invId, coordX, coordY, itemWidth, itemHeight, exclude = null) {
   for (let y = 0; y < itemHeight; ++y) {
     for (let x = 0; x < itemWidth; ++x) {
       const item = getItemAtSlotCoords(store, invId, coordX + x, coordY + y);
@@ -337,13 +307,7 @@ function canPlaceAt(
  * @param maxCoordY
  * @param isEmptyCallback
  */
-function findEmptyCoords(
-  coordX,
-  coordY,
-  maxCoordX,
-  maxCoordY,
-  isEmptyCallback = () => true
-) {
+function findEmptyCoords(coordX, coordY, maxCoordX, maxCoordY, isEmptyCallback = () => true) {
   return dijkstra2d(
     coordX,
     coordY,

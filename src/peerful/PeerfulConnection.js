@@ -1,4 +1,6 @@
 import { Eventable } from '../util/Eventable.js';
+import { PeerfulNegotiator } from './PeerfulNegotiator.js';
+import { DEFAULT_ICE_SERVERS, FILTER_TRICKLE_SDP_PATTERN, debug } from './PeerfulUtil.js';
 import {
   createPromiseStatus,
   createPromiseStatusPromise,
@@ -6,9 +8,6 @@ import {
   rejectPromiseStatus,
   resolvePromiseStatus,
 } from './PromiseStatus.js';
-
-import { debug, DEFAULT_ICE_SERVERS, FILTER_TRICKLE_SDP_PATTERN } from './PeerfulUtil.js';
-import { PeerfulNegotiator } from './PeerfulNegotiator.js';
 
 /** @typedef {import('./PeerJsSignaling.js').PeerJsSignaling} PeerJsSignaling */
 

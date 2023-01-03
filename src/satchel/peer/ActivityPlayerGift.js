@@ -1,11 +1,9 @@
-import { ActivityBase } from './ActivityBase.js';
-
 import { exportItemToJSON, importItemFromJSON } from '../../loader/ItemLoader.js';
-import { SatchelLocal, SatchelRemote } from './SatchelLocal.js';
-
-import { ActivityPlayerHandshake } from './ActivityPlayerHandshake.js';
 import { dropItemOnGround } from '../GroundAlbum.js';
 import { copyItem } from '../item/Item.js';
+import { ActivityBase } from './ActivityBase.js';
+import { ActivityPlayerHandshake } from './ActivityPlayerHandshake.js';
+import { SatchelLocal, SatchelRemote } from './SatchelLocal.js';
 
 /** @typedef {import('../item/Item.js').Item} Item */
 
@@ -27,11 +25,7 @@ export class ActivityPlayerGift extends ActivityBase {
       case 'gift':
         let freeItem = copyItem(importItemFromJSON(item));
         dropItemOnGround(freeItem);
-        window.alert(
-          `You received a gift from ${
-            from || 'the server'
-          }!`
-        );
+        window.alert(`You received a gift from ${from || 'the server'}!`);
         remoteServer.sendMessage('giftack', { from, target });
         return true;
       case 'giftack':
@@ -52,7 +46,7 @@ export class ActivityPlayerGift extends ActivityBase {
    * @param {object} messageData
    */
   static onRemoteClientMessage(localServer, remoteClient, messageType, messageData) {
-    switch(messageType) {
+    switch (messageType) {
       case 'gift':
         const target = messageData.target;
         const targetClient = ActivityPlayerHandshake.getActiveClientByName(localServer, target);
@@ -84,9 +78,9 @@ export class ActivityPlayerGift extends ActivityBase {
   }
 
   /**
-   * @param {SatchelRemote} remoteClient 
-   * @param {string} playerName 
-   * @param {Item} item 
+   * @param {SatchelRemote} remoteClient
+   * @param {string} playerName
+   * @param {Item} item
    */
   static sendPlayerItem(remoteClient, playerName, item) {
     console.log('Sending item to client...', playerName);

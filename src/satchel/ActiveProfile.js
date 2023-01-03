@@ -1,24 +1,24 @@
-import { getCursorContext } from './inv/CursorHelper.js';
-import { getSatchelStore } from '../store/SatchelStore.js';
-import { uuid } from '../util/uuid.js';
-import { createProfile } from './profile/Profile.js';
+import { loadFromStorage, saveToStorage } from '../Storage.js';
 import {
   addActiveProfileChangeListener,
   addProfileChangeListener,
   removeActiveProfileChangeListener,
   removeProfileChangeListener,
 } from '../events/ProfileEvents.js';
+import { createGridInvInStore } from '../store/InvStore.js';
 import {
+  addProfileInStore,
   getActiveProfileInStore,
-  getProfileInStore,
   getProfileIdsInStore,
+  getProfileInStore,
   hasActiveProfileInStore,
   isProfileInStore,
   setActiveProfileInStore,
-  addProfileInStore,
 } from '../store/ProfileStore.js';
-import { createGridInvInStore } from '../store/InvStore.js';
-import { loadFromStorage, saveToStorage } from '../Storage.js';
+import { getSatchelStore } from '../store/SatchelStore.js';
+import { uuid } from '../util/uuid.js';
+import { getCursorContext } from './inv/CursorHelper.js';
+import { createProfile } from './profile/Profile.js';
 
 export function setupActiveProfile() {
   const store = getSatchelStore();

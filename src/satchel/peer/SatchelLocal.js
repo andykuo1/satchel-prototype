@@ -5,7 +5,7 @@
 
 export class SatchelLocal {
   /**
-   * @param {Peerful} peerful 
+   * @param {Peerful} peerful
    */
   constructor(peerful) {
     this.peerful = peerful;
@@ -21,7 +21,7 @@ export class SatchelLocal {
     this.onError = this.onError.bind(this);
     /** @private */
     this.onMessage = this.onMessage.bind(this);
-    
+
     /** @private */
     this.onInterval = this.onInterval.bind(this);
     /** @private */
@@ -137,7 +137,7 @@ export class SatchelLocal {
 
   /** @private */
   onInterval() {
-    for(let remote of this.remotes) {
+    for (let remote of this.remotes) {
       this.onRemoteNanny(remote);
     }
   }
@@ -163,7 +163,7 @@ export class SatchelRemote {
   }
 
   /**
-   * @param {string} type 
+   * @param {string} type
    * @param {number} timeout
    */
   async awaitMessage(type, timeout = 10_000) {
@@ -188,8 +188,8 @@ export class SatchelRemote {
   }
 
   /**
-   * @param {string} type 
-   * @param {object} data 
+   * @param {string} type
+   * @param {object} data
    * @returns {boolean}
    */
   handleMessage(type, data) {
@@ -197,7 +197,7 @@ export class SatchelRemote {
     if (type in this.pending) {
       const pendings = this.pending[type];
       delete this.pending[type];
-      for(let pending of pendings) {
+      for (let pending of pendings) {
         if (!pending.done) {
           pending.done = true;
           pending.resolve(data);

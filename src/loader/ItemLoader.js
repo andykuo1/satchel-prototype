@@ -1,7 +1,7 @@
-import { exportDataToJSON, importDataFromJSON } from './DataLoader.js';
 import { cloneItem, createItem } from '../satchel/item/Item.js';
 import { exportItemToBase64, importItemFromBase64 } from '../satchel/item/ItemBase64.js';
 import { uuid } from '../util/uuid.js';
+import { exportDataToJSON, importDataFromJSON } from './DataLoader.js';
 
 /**
  * @typedef {import('../satchel/item/Item.js').Item} Item

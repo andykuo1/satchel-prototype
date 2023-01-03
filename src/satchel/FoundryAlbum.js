@@ -1,10 +1,10 @@
+import { getAlbumsInStore } from '../store/AlbumStore.js';
+import { addInvInStore } from '../store/InvStore.js';
 import { getSatchelStore } from '../store/SatchelStore.js';
 import { uuid } from '../util/uuid.js';
 import { ALBUM_FLAG_EXPAND_BIT, ALBUM_FLAG_LOCKED_BIT, createAlbum, isAlbumLocked } from './album/Album.js';
-import { getAlbumsInStore } from '../store/AlbumStore.js';
-import { addItemToInventory } from './inv/InventoryTransfer.js';
 import { getItemsInInv } from './inv/InventoryItems.js';
-import { addInvInStore } from '../store/InvStore.js';
+import { addItemToInventory } from './inv/InventoryTransfer.js';
 
 const FOUNDRY_ALBUM_DISPLAY_NAME = '[ Recent ]';
 

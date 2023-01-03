@@ -3,16 +3,16 @@
  */
 
 /**
- * 
+ *
  * @typedef LocalClient
  * @property {Array<RemoteServer>} remotes
- * 
+ *
  * @typedef LocalServer
  * @property {Array<RemoteClient>} remotes
- * 
+ *
  * @typedef RemoteClient
  * @property {PeerfulConnection} connection
- * 
+ *
  * @typedef RemoteServer
  * @property {PeerfulConnection} connection
  */
@@ -27,7 +27,7 @@ export class ActivityBase {
    * @param {LocalClient} localClient
    */
   static onLocalClientCreated(localClient) {}
-  
+
   /**
    * @abstract
    * @param {LocalServer} localServer
@@ -41,34 +41,34 @@ export class ActivityBase {
 
   /**
    * @abstract
-   * @param {LocalClient} localClient 
-   * @param {RemoteServer} remoteServer 
+   * @param {LocalClient} localClient
+   * @param {RemoteServer} remoteServer
    */
   static onRemoteServerConnected(localClient, remoteServer) {}
   /**
    * @abstract
-   * @param {LocalServer} localServer 
-   * @param {RemoteClient} remoteClient 
+   * @param {LocalServer} localServer
+   * @param {RemoteClient} remoteClient
    */
   static onRemoteClientConnected(localServer, remoteClient) {}
 
   /**
    * @abstract
-   * @param {LocalClient} localClient 
-   * @param {RemoteServer} remoteServer 
+   * @param {LocalClient} localClient
+   * @param {RemoteServer} remoteServer
    */
   static onRemoteServerDisconnected(localClient, remoteServer) {}
   /**
    * @abstract
-   * @param {LocalServer} localServer 
-   * @param {RemoteClient} remoteClient 
+   * @param {LocalServer} localServer
+   * @param {RemoteClient} remoteClient
    */
   static onRemoteClientDisconnected(localServer, remoteClient) {}
-  
+
   /**
    * @abstract
-   * @param {LocalClient} localClient 
-   * @param {RemoteServer} remoteServer 
+   * @param {LocalClient} localClient
+   * @param {RemoteServer} remoteServer
    * @param {string} messageType
    * @param {object} messageData
    * @returns {boolean}
@@ -78,8 +78,8 @@ export class ActivityBase {
   }
   /**
    * @abstract
-   * @param {LocalServer} localServer 
-   * @param {RemoteClient} remoteClient 
+   * @param {LocalServer} localServer
+   * @param {RemoteClient} remoteClient
    * @param {string} messageType
    * @param {object} messageData
    * @returns {boolean}
@@ -90,15 +90,15 @@ export class ActivityBase {
 
   /**
    * @abstract
-   * @param {LocalClient} localClient 
-   * @param {RemoteServer} remoteServer 
+   * @param {LocalClient} localClient
+   * @param {RemoteServer} remoteServer
    * @param {number} now
    */
   static onRemoteServerNanny(localClient, remoteServer, now) {}
   /**
    * @abstract
-   * @param {LocalServer} localServer 
-   * @param {RemoteClient} remoteClient 
+   * @param {LocalServer} localServer
+   * @param {RemoteClient} remoteClient
    * @param {number} now
    */
   static onRemoteClientNanny(localServer, remoteClient, now) {}

@@ -1,4 +1,3 @@
-
 const STACK_SIZE_PATTERN = /(.*)\s+x([0-9]+)\s*$/;
 export function parseTextToItem(text) {
   let titleStartIndex = text.indexOf('#');
@@ -14,7 +13,7 @@ export function parseTextToItem(text) {
         // eslint-disable-next-line no-unused-vars
         _,
         displayNameText,
-        stackSizeText
+        stackSizeText,
       ] = STACK_SIZE_PATTERN.exec(fullTitle);
       stackSize = Number.parseInt(stackSizeText);
       fullTitle = displayNameText;

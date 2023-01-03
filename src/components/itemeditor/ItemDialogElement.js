@@ -1,21 +1,21 @@
+import { dispatchItemChange } from '../../events/ItemEvents.js';
 import { getCursorContext } from '../../satchel/inv/CursorHelper.js';
 import { openFoundry } from '../../satchel/inv/FoundryHelper.js';
-import { getSatchelStore } from '../../store/SatchelStore.js';
-import { removeItemFromInventory } from '../../satchel/inv/InventoryTransfer.js';
 import { getItemByItemId } from '../../satchel/inv/InvItems.js';
-import { ActivityPlayerList } from '../../satchel/peer/ActivityPlayerList.js';
+import { removeItemFromInventory } from '../../satchel/inv/InventoryTransfer.js';
 import { cloneItem, copyItem } from '../../satchel/item/Item.js';
-import { ItemEditorElement } from './ItemEditorElement.js';
-import { dispatchItemChange } from '../../events/ItemEvents.js';
+import { ActivityPlayerList } from '../../satchel/peer/ActivityPlayerList.js';
 import { getInvInStore } from '../../store/InvStore.js';
+import { getSatchelStore } from '../../store/SatchelStore.js';
 import { dropFallingItem } from '../cursor/FallingItemElement.js';
+import { ItemEditorElement } from './ItemEditorElement.js';
 
 /**
  * @typedef {import('../../satchel/item/Item.js').Item} Item
  * @typedef {import('../lib/BannerPromptElement.js').BannerPromptElement} BannerPromptElement
  */
 
-const INNER_HTML = /* html */`
+const INNER_HTML = /* html */ `
 <banner-prompt>
   <item-editor>
     <icon-button slot="actions" id="actionFoundry" icon="res/anvil.svg" alt="foundry" title="Edit in Foundry"></icon-button>
@@ -24,7 +24,7 @@ const INNER_HTML = /* html */`
   </item-editor>
 </banner-prompt>
 `;
-const INNER_STYLE = /* css */`
+const INNER_STYLE = /* css */ `
 `;
 
 export class ItemDialogElement extends HTMLElement {
@@ -51,12 +51,8 @@ export class ItemDialogElement extends HTMLElement {
   constructor() {
     super();
     const shadowRoot = this.attachShadow({ mode: 'open' });
-    shadowRoot.append(
-      this.constructor[Symbol.for('templateNode')].content.cloneNode(true)
-    );
-    shadowRoot.append(
-      this.constructor[Symbol.for('styleNode')].cloneNode(true)
-    );
+    shadowRoot.append(this.constructor[Symbol.for('templateNode')].content.cloneNode(true));
+    shadowRoot.append(this.constructor[Symbol.for('styleNode')].cloneNode(true));
 
     /** @private */
     this._containerElement = null;
@@ -69,7 +65,7 @@ export class ItemDialogElement extends HTMLElement {
      * @private
      * @type {BannerPromptElement}
      */
-     this.dialog = shadowRoot.querySelector('banner-prompt');
+    this.dialog = shadowRoot.querySelector('banner-prompt');
     /**
      * @private
      * @type {ItemEditorElement}
@@ -188,14 +184,22 @@ export class ItemDialogElement extends HTMLElement {
         let giftTarget = document.querySelector('#giftTarget');
         let ctx = getCursorContext();
         if (ctx.server && ctx.server.instance) {
-          const localServer = /** @type {import('../../satchel/peer/PeerSatchel.js').SatchelServer} */ (ctx.server.instance);
+          const localServer = /** @type {import('../../satchel/peer/PeerSatchel.js').SatchelServer} */ (
+            ctx.server.instance
+          );
           const playerNames = ActivityPlayerList.getPlayerNameListOnServer(localServer);
-          let content = playerNames.map(clientName => `<option>${clientName.toLowerCase()}</option>`).join('\n');
+          let content = playerNames
+            .map((clientName) => `<option>${clientName.toLowerCase()}</option>`)
+            .join('\n');
           giftTarget.innerHTML = content;
         } else if (ctx.client && ctx.client.instance) {
-          const localClient = /** @type {import('../../satchel/peer/PeerSatchel.js').SatchelClient} */ (ctx.client.instance);
+          const localClient = /** @type {import('../../satchel/peer/PeerSatchel.js').SatchelClient} */ (
+            ctx.client.instance
+          );
           const playerNames = ActivityPlayerList.getPlayerNameListOnClient(localClient);
-          let content = playerNames.map(clientName => `<option>${clientName.toLowerCase()}</option>`).join('\n');
+          let content = playerNames
+            .map((clientName) => `<option>${clientName.toLowerCase()}</option>`)
+            .join('\n');
           giftTarget.innerHTML = content;
         } else {
           giftTarget.innerHTML = '';

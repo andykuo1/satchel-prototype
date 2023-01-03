@@ -1,5 +1,10 @@
 import { getExistingInvInStore } from '../../store/InvStore.js';
-import { cloneInventory, createAlbumInventory, isInventoryFlagEnabled, toggleInventoryFlag } from '../inv/Inv.js';
+import {
+  cloneInventory,
+  createAlbumInventory,
+  isInventoryFlagEnabled,
+  toggleInventoryFlag,
+} from '../inv/Inv.js';
 
 /**
  * @typedef {import('../../store/SatchelStore').SatchelStore} Store
@@ -19,7 +24,7 @@ export const ALBUM_FLAG_LOCKED_BIT = 0x2;
 export const ALBUM_FLAG_EXPAND_BIT = 0x4;
 
 /**
- * @param {AlbumId} albumId 
+ * @param {AlbumId} albumId
  * @returns {Album}
  */
 export function createAlbum(albumId) {
@@ -31,8 +36,8 @@ export function createAlbum(albumId) {
 
 /**
  * @param {Store} store
- * @param {AlbumId} albumId 
- * @param {boolean} locked 
+ * @param {AlbumId} albumId
+ * @param {boolean} locked
  */
 export function setAlbumLocked(store, albumId, locked) {
   toggleInventoryFlag(store, albumId, ALBUM_FLAG_LOCKED_BIT, locked);
@@ -40,7 +45,7 @@ export function setAlbumLocked(store, albumId, locked) {
 
 /**
  * @param {Store} store
- * @param {AlbumId} albumId 
+ * @param {AlbumId} albumId
  * @returns {boolean}
  */
 export function isAlbumLocked(store, albumId) {
@@ -50,35 +55,35 @@ export function isAlbumLocked(store, albumId) {
 
 /**
  * @param {Store} store
- * @param {AlbumId} albumId 
- * @param {boolean} hidden 
+ * @param {AlbumId} albumId
+ * @param {boolean} hidden
  */
- export function setAlbumHidden(store, albumId, hidden) {
+export function setAlbumHidden(store, albumId, hidden) {
   toggleInventoryFlag(store, albumId, ALBUM_FLAG_HIDDEN_BIT, hidden);
 }
 
 /**
  * @param {Store} store
- * @param {AlbumId} albumId 
+ * @param {AlbumId} albumId
  * @returns {boolean}
  */
- export function isAlbumHidden(store, albumId) {
+export function isAlbumHidden(store, albumId) {
   let album = getExistingInvInStore(store, albumId);
   return isInventoryFlagEnabled(album, ALBUM_FLAG_HIDDEN_BIT);
 }
 
 /**
  * @param {Store} store
- * @param {AlbumId} albumId 
- * @param {boolean} expand 
+ * @param {AlbumId} albumId
+ * @param {boolean} expand
  */
- export function setAlbumExpanded(store, albumId, expand) {
+export function setAlbumExpanded(store, albumId, expand) {
   toggleInventoryFlag(store, albumId, ALBUM_FLAG_EXPAND_BIT, expand);
 }
 
 /**
  * @param {Store} store
- * @param {AlbumId} albumId 
+ * @param {AlbumId} albumId
  * @returns {boolean}
  */
 export function isAlbumExpanded(store, albumId) {

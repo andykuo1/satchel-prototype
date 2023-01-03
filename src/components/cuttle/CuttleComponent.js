@@ -1,10 +1,14 @@
 import { Eventable } from '../../util/Eventable.js';
-import { upgradePropertyAttributes, getPropertyAttribute, setPropertyAttribute, createPropertyAttribute } from './PropertyAttribute.js';
+import {
+  createPropertyAttribute,
+  getPropertyAttribute,
+  setPropertyAttribute,
+  upgradePropertyAttributes,
+} from './PropertyAttribute.js';
 import { dispatchPropertyAttributeChanged, getObservedPropertyAttributes } from './PropertyObserved.js';
 import { createPropertyTypeDescriptor } from './PropertyTypeDescriptor.js';
 
 export class CuttleComponent extends HTMLElement {
-
   /** @abstract */
   static get tagName() {
     return camelToKebab(this.name);
@@ -60,7 +64,7 @@ export class CuttleComponent extends HTMLElement {
 
   constructor() {
     super();
-    let c = /** @type {typeof CuttleComponent} */(this.constructor);
+    let c = /** @type {typeof CuttleComponent} */ (this.constructor);
     let t = c[Symbol.for('templateNode')];
     let s = c[Symbol.for('styleNode')];
     if (t || s) {
@@ -148,5 +152,5 @@ export function resolveProps(constructor) {
 }
 
 function camelToKebab(str) {
-  return str.replace(/[A-Z]+(?![a-z])|[A-Z]/g, ($, ofs) => (ofs ? "-" : "") + $.toLowerCase());
+  return str.replace(/[A-Z]+(?![a-z])|[A-Z]/g, ($, ofs) => (ofs ? '-' : '') + $.toLowerCase());
 }

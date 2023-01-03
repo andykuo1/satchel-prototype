@@ -1,8 +1,8 @@
-import { uuid } from '../util/uuid.js';
 import { Eventable } from '../util/Eventable.js';
+import { Logger } from '../util/Logger.js';
+import { uuid } from '../util/uuid.js';
 import { PeerJsSignaling } from './PeerJsSignaling.js';
 import { PeerfulLocalConnection, PeerfulRemoteConnection } from './PeerfulConnection.js';
-import { Logger } from '../util/Logger.js';
 
 /**
  * @typedef {import('./PeerfulConnection.js').PeerfulConnection} PeerfulConnection

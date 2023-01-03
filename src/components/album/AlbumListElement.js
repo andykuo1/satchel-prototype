@@ -1,15 +1,20 @@
-import { getSatchelStore } from '../../store/SatchelStore.js';
+import { addInventoryChangeListener, removeInventoryChangeListener } from '../../events/InvEvents.js';
+import { getGroundAlbumId, isGroundAlbum } from '../../satchel/GroundAlbum.js';
+import { getTrashAlbumId, isTrashAlbum } from '../../satchel/TrashAlbum.js';
+import { getItemInInv, getItemsInInv } from '../../satchel/inv/InventoryItems.js';
+import { hasItemInInventory, removeItemFromInventory } from '../../satchel/inv/InventoryTransfer.js';
 import { createAlbumInStore } from '../../store/AlbumStore.js';
 import { deleteInvInStore, getInvInStore, isInvInStore } from '../../store/InvStore.js';
-import { updateList } from '../ElementListHelper.js';
-import { cleanUpItemInvElements, itemAlphabeticalComparator, setUpItemInvElement, tearDownItemInvElement } from './AlbumElementHelper.js';
-import { upgradeProperty } from '../../util/wc.js';
-import { getTrashAlbumId, isTrashAlbum } from '../../satchel/TrashAlbum.js';
+import { getSatchelStore } from '../../store/SatchelStore.js';
 import { uuid } from '../../util/uuid.js';
-import { getGroundAlbumId, isGroundAlbum } from '../../satchel/GroundAlbum.js';
-import { addInventoryChangeListener, removeInventoryChangeListener } from '../../events/InvEvents.js';
-import { hasItemInInventory, removeItemFromInventory } from '../../satchel/inv/InventoryTransfer.js';
-import { getItemInInv, getItemsInInv } from '../../satchel/inv/InventoryItems.js';
+import { upgradeProperty } from '../../util/wc.js';
+import { updateList } from '../ElementListHelper.js';
+import {
+  cleanUpItemInvElements,
+  itemAlphabeticalComparator,
+  setUpItemInvElement,
+  tearDownItemInvElement,
+} from './AlbumElementHelper.js';
 
 /**
  * @typedef {import('../invgrid/InvSocketElement.js').InvSocketElement} InvSocketElement
@@ -18,9 +23,9 @@ import { getItemInInv, getItemsInInv } from '../../satchel/inv/InventoryItems.js
  * @typedef {import('../../store/SatchelStore.js').SatchelStore} Store
  */
 
-const INNER_HTML = /* html */`
+const INNER_HTML = /* html */ `
 `;
-const INNER_STYLE = /* css */`
+const INNER_STYLE = /* css */ `
 :host {
   display: inline-block;
   vertical-align: top;
@@ -105,12 +110,8 @@ export class AlbumListElement extends HTMLElement {
   constructor() {
     super();
     const shadowRoot = this.attachShadow({ mode: 'open' });
-    shadowRoot.append(
-      this.constructor[Symbol.for('templateNode')].content.cloneNode(true)
-    );
-    shadowRoot.append(
-      this.constructor[Symbol.for('styleNode')].cloneNode(true)
-    );
+    shadowRoot.append(this.constructor[Symbol.for('templateNode')].content.cloneNode(true));
+    shadowRoot.append(this.constructor[Symbol.for('styleNode')].cloneNode(true));
 
     /** @private */
     this._albumId = null;
@@ -185,26 +186,30 @@ export class AlbumListElement extends HTMLElement {
    * @param previous
    * @param value
    */
-   attributeChangedCallback(attribute, previous, value) {
+  attributeChangedCallback(attribute, previous, value) {
     switch (attribute) {
-      case 'albumid': {
-        if (value && this.init) {
-          throw new Error(`Cannot set album id '${value}' for init type '${this.init}' albums.`);
+      case 'albumid':
+        {
+          if (value && this.init) {
+            throw new Error(`Cannot set album id '${value}' for init type '${this.init}' albums.`);
+          }
+          const store = getSatchelStore();
+          this.internallyChangeAlbumId(store, value);
         }
-        const store = getSatchelStore();
-        this.internallyChangeAlbumId(store, value);
-      } break;
-      case 'locked': {
-        const store = getSatchelStore();
-        this.onAlbumChange(store, this._albumId);
-      } break;
+        break;
+      case 'locked':
+        {
+          const store = getSatchelStore();
+          this.onAlbumChange(store, this._albumId);
+        }
+        break;
     }
   }
 
   /**
    * @private
-   * @param {Store} store 
-   * @param {AlbumId} newAlbumId 
+   * @param {Store} store
+   * @param {AlbumId} newAlbumId
    */
   internallyChangeAlbumId(store, newAlbumId) {
     const prevAlbumId = this._albumId;
@@ -212,7 +217,12 @@ export class AlbumListElement extends HTMLElement {
       this._albumId = newAlbumId;
       if (prevAlbumId) {
         removeInventoryChangeListener(store, prevAlbumId, this.onAlbumChange);
-        cleanUpItemInvElements(store, this.itemList.children, this.itemListEntryIds, this.onItemListEntryInventoryChange);
+        cleanUpItemInvElements(
+          store,
+          this.itemList.children,
+          this.itemListEntryIds,
+          this.onItemListEntryInventoryChange
+        );
       }
       if (newAlbumId) {
         addInventoryChangeListener(store, newAlbumId, this.onAlbumChange);
@@ -233,22 +243,30 @@ export class AlbumListElement extends HTMLElement {
     }
     const list = getItemsInInv(store, albumId)
       .sort(itemAlphabeticalComparator)
-      .map(a => a.itemId);
-    const [created, deleted] = updateList(this.itemList, list, this.onItemListEntryCreate, undefined, this.onItemListEntryUpdate);
-    this.dispatchEvent(new CustomEvent('change', {
-      composed: true,
-      bubbles: false,
-      detail: {
-        albumId,
-        created,
-        deleted,
-      }
-    }));
+      .map((a) => a.itemId);
+    const [created, deleted] = updateList(
+      this.itemList,
+      list,
+      this.onItemListEntryCreate,
+      undefined,
+      this.onItemListEntryUpdate
+    );
+    this.dispatchEvent(
+      new CustomEvent('change', {
+        composed: true,
+        bubbles: false,
+        detail: {
+          albumId,
+          created,
+          deleted,
+        },
+      })
+    );
   }
 
   /**
    * @private
-   * @param {ItemId} key 
+   * @param {ItemId} key
    * @returns {InvSocketElement}
    */
   onItemListEntryCreate(key) {
@@ -256,7 +274,12 @@ export class AlbumListElement extends HTMLElement {
     const store = getSatchelStore();
 
     let albumItem = getItemInInv(store, albumId, key);
-    let element = setUpItemInvElement(store, albumItem, this.itemListEntryIds, this.onItemListEntryInventoryChange);
+    let element = setUpItemInvElement(
+      store,
+      albumItem,
+      this.itemListEntryIds,
+      this.onItemListEntryInventoryChange
+    );
     element.toggleAttribute('fixed', this.hasAttribute('fixed'));
     element.classList.add('shaking');
     return element;
@@ -264,8 +287,8 @@ export class AlbumListElement extends HTMLElement {
 
   /**
    * @private
-   * @param {ItemId} key 
-   * @param {InvSocketElement} element 
+   * @param {ItemId} key
+   * @param {InvSocketElement} element
    */
   onItemListEntryUpdate(key, element) {
     if (this.hasAttribute('locked')) {
@@ -283,7 +306,12 @@ export class AlbumListElement extends HTMLElement {
       // It still exists. Continue as normal.
       return;
     }
-    const itemId = tearDownItemInvElement(store, invId, this.itemListEntryIds, this.onItemListEntryInventoryChange);
+    const itemId = tearDownItemInvElement(
+      store,
+      invId,
+      this.itemListEntryIds,
+      this.onItemListEntryInventoryChange
+    );
     const albumId = this.albumId;
     if (hasItemInInventory(store, albumId, itemId)) {
       removeItemFromInventory(store, albumId, itemId);

@@ -1,9 +1,9 @@
-import * as InvItems from './InvItems.js';
-import { getInventorySlotCount } from './Inv.js';
-import { cloneItem } from '../item/Item.js';
-import { dispatchItemChange } from '../../events/ItemEvents.js';
 import { dispatchInventoryChange } from '../../events/InvEvents.js';
+import { dispatchItemChange } from '../../events/ItemEvents.js';
 import { getExistingInvInStore } from '../../store/InvStore.js';
+import { cloneItem } from '../item/Item.js';
+import { getInventorySlotCount } from './Inv.js';
+import * as InvItems from './InvItems.js';
 
 /**
  * @typedef {import('../item/Item.js').Item} Item

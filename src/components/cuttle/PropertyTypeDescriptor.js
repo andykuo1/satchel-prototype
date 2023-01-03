@@ -20,7 +20,7 @@ export function createPropertyTypeDescriptor(type, attribute) {
  * @returns {PropertyDescriptor}
  */
 function createReflectivePropertyDescriptor(type, attribute) {
-  switch(type) {
+  switch (type) {
     case Boolean:
       return {
         /** @this {HTMLElement} */

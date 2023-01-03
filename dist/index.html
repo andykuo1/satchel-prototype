@@ -1,0 +1,102 @@
+<!DOCTYPE html><html lang="en"><head>
+    <title>Satchel</title>
+    <meta charset="utf-8">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+    <link rel="manifest" href="assets/site.webmanifest">
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <style>
+      html, body {
+        background-color: #222222;
+        color: #ffffff;
+        text-align: center;
+      }
+      body {
+        --foreground-color: #ffffff;
+        --background-color: #333333;
+        --outline-color: #444444;
+        --shadow-color: #111111;
+      }
+      h1 {
+        font-size: 3em;
+      }
+      /** To prevent FOUC */
+      banner-prompt:not([open]) {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <style>
+      .container {
+        display: flex;
+      }
+      .spacing {
+        flex: 1;
+      }
+
+      nav {
+        display: flex;
+        flex-direction: column;
+      }
+      nav button {
+        font-size: 1.2em;
+        cursor: pointer;
+      }
+      nav > * {
+        margin: 0.5em 0;
+      }
+      nav p {
+        opacity: 0.6;
+      }
+
+      #logo {
+        width: 10em;
+        height: 14em;
+        margin: 2em;
+      }
+      
+      #buttonIntro {
+        background: none;
+        border: none;
+        color: #ffffff;
+      }
+      #buttonIntro:hover {
+        color: #aaaaaa;
+      }
+
+      #sessionForm {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+    </style>
+    <h1>Satchel</h1>
+    <img id="logo" src="assets/potion-d50c5163.png">
+    <div class="container">
+      <div class="spacing"></div>
+      <nav>
+        <button id="buttonIntro">Getting Started</button>
+        <button id="buttonStart">Start Session</button>
+        <button id="buttonJoin">Join Session</button>
+        <p>Alpha <span id="appVersion">v-.-.-</span></p>
+      </nav>
+      <div class="spacing"></div>
+    </div>
+    <banner-prompt id="sessionDialog" horizontal="">
+      <form id="sessionForm" autocomplete="off">
+        <p>Your Invitation?</p>
+        <p style="display: flex;">
+          <input type="text" name="id" id="sessionId" placeholder="Session Id" required="" pattern="[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}">
+          <button id="sessionPaste">Paste</button>
+        </p>
+        <p>
+          <input type="submit" id="sessionJoin" value="Join">
+        </p>
+      </form>
+    </banner-prompt>
+    
+  
+
+<script type="module" src="./landing.js"></script></body></html>

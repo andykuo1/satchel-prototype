@@ -1,0 +1,771 @@
+<!DOCTYPE html><html lang="en"><head>
+    <title>Satchel</title>
+    <meta charset="utf-8">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+    <link rel="manifest" href="assets/site.webmanifest">
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap');
+
+      html,
+      body {
+        margin: 0;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        width: 100vw;
+        height: 100vh;
+        background-image: url('res/images/wood.jpg');
+        background-size: 30rem;
+        background-repeat: repeat;
+        background-color: #211b1c;
+        color: #ffffff;
+        overflow: hidden;
+        font-family: Georgia, 'Times New Roman', Times, serif;
+        box-shadow: inset 0 0 16rem #000000;
+
+        --foreground-color: #ffffff;
+        --background-color: #333333;
+        --outline-color: #444444;
+        --shadow-color: #111111;
+
+        --satchel-background-color: #7f6b50;
+        --satchel-outline-color: #352e25;
+        --satchel-title-color: #662200;
+        --satchel-grid-color: rgba(0, 0, 0, 0.2);
+
+        --item-foreground-color: #ffffff;
+        --item-background-color: rgba(0, 0, 0, 0.1);
+        --item-hover-color: rgba(0, 0, 0, 0.2);
+        --item-title-font: 'Indie Flower', cursive;
+      }
+
+      .foreground {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        pointer-events: none;
+        overflow: hidden;
+        z-index: 5;
+      }
+
+      /** To prevent FOUC */
+      banner-prompt:not([open]) {
+        display: none;
+      }
+      context-menu:not([open]) {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <style>
+      .bigButton {
+        border: 0.2em solid #666666;
+        border-radius: 1em;
+        height: 3em;
+        padding: 0 3em;
+        color: var(--foreground-color);
+        background-color: var(--background-color);
+      }
+      .bigButton:hover {
+        cursor: pointer;
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+    </style>
+    <style>
+      .flexColumn {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+      .flexRow {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+      }
+      .flexPadding {
+        flex: 1;
+      }
+      .flexList {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+    </style>
+    <sidebar-layout>
+      <style>
+        .leftSideContainer {
+          flex-direction: row;
+        }
+        .sideContainer {
+          display: flex;
+          flex-direction: column;
+          border-right: 0.1em solid #222222;
+        }
+        .spacing {
+          flex: 1;
+          overflow-y: auto;
+          margin-left: 0.5em;
+          width: 5em;
+          scroll-behavior: smooth;
+        }
+      </style>
+      <div slot="sidebar" class="leftSideContainer">
+        <div class="sideContainer">
+          <div class="sidebarActions">
+            <foundry-anvil id="actionItemEdit"></foundry-anvil>
+          </div>
+          <div class="spacing">
+          </div>
+          <div class="sidebarActions">
+            <icon-button id="cloudButton" icon="res/cloud.svg" alt="sync" title="Cloud Sync" disabled=""></icon-button>
+          </div>
+          <div class="sidebarActions">
+            <icon-button id="actionAlbumOpen" icon="res/bookmarks.svg" alt="album" title="Albums"></icon-button>
+          </div>
+        </div>
+        <!-- EDITOR CONTENT -->
+        <style>
+          .editorContainer {
+            display: none;
+            flex-direction: column;
+            width: 20em;
+            background-color: #333333;
+            padding: 0.5em;
+            z-index: 1;
+          }
+          .editorContainer.open {
+            display: flex;
+          }
+          .editorContainer > * {
+            visibility: hidden;
+          }
+          .editorContainer.open > * {
+            visibility: visible;
+          }
+          #itemEditor {
+            flex: 1;
+            overflow-y: auto;
+            z-index: 0;
+          }
+
+          .editorActions {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            text-align: center;
+            height: 3em;
+            margin-top: 0.2em;
+          }
+          #actionFoundryNew {
+            flex: 3;
+            margin-right: 1.5em;
+          }
+
+          #editorWatermark {
+            position: absolute;
+            pointer-events: none;
+            font-size: 2em;
+            opacity: 0.1;
+            top: 2.2em;
+            right: -0.7em;
+            text-orientation: mixed;
+            writing-mode: vertical-rl;
+          }
+        </style>
+        <div class="editorContainer">
+          <div class="editorActions">
+            <button id="actionFoundryNew" class="bigButton">+ Item</button>
+            <icon-button id="actionItemCodeImport" icon="res/paste.svg" alt="paste" title="Paste Item Code"></icon-button>
+            <trash-can id="actionFoundryReset"></trash-can>
+          </div>
+          <div id="editorWatermark">
+            <h3>Foundry</h3>
+          </div>
+          <item-editor id="itemEditor" editable="">
+            <icon-button slot="actions" icon="res/anvil.svg" alt="foundry" title="Edit in Foundry" disabled=""></icon-button>
+            <icon-button slot="actions" id="actionItemCodeExport" icon="res/share.svg" alt="share" title="Share Item"></icon-button>
+            <icon-button slot="actions" id="actionItemDuplicate" icon="res/duplicate.svg" alt="duplicate" title="Duplicate Item"></icon-button>
+          </item-editor>
+        </div>
+      </div>
+      <sidebar-layout style="flex-direction: row-reverse; --background-color: none">
+        <style>
+          .rightSideContainer {
+            flex-direction: row;
+          }
+          #ground {
+            flex: 1;
+            overflow-y: auto;
+            margin-left: 0.5em;
+            width: 5em;
+            scroll-behavior: smooth;
+          }
+          .sidebarActions {
+            padding: 0.5em 0;
+          }
+        </style>
+        <div slot="sidebar" class="rightSideContainer">
+          <style>
+            #groundWatermark {
+              position: absolute;
+              pointer-events: none;
+              font-size: 2em;
+              opacity: 0.1;
+              top: 2.2em;
+              right: -0.5em;
+              text-orientation: mixed;
+              writing-mode: vertical-rl;
+            }
+          </style>
+          <!-- GROUND CONTENT -->
+          <div class="groundContainer flexColumn">
+            <div id="groundWatermark">
+              <h3>Ground</h3>
+            </div>
+            <div class="sidebarActions">
+              <icon-button id="actionSettings" icon="res/settings.svg" alt="settings" title="Settings"></icon-button>
+            </div>
+            <album-ground id="ground"></album-ground>
+            <div class="sidebarActions">
+              <trash-can id="actionGroundDelete"></trash-can>
+            </div>
+          </div>
+        </div>
+
+<!--=========================================== CENTER CONTENT ==-->
+        <style>
+          .body {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+          }
+        </style>
+        <div class="body">
+          <style>
+            /** Title Header */
+            header {
+              position: absolute;
+              top: 0.5em;
+              left: 1em;
+            }
+            #title {
+              background-color: #444444;
+              border-radius: 1em;
+              padding: 0.2em 1em;
+              white-space: nowrap;
+            }
+            #appTitle {
+              display: inline-block;
+              margin: 0;
+            }
+            /** Online Status */
+            #onlineStatus {
+              color: #000000;
+            }
+            #onlineStatus::after {
+              content: 'OFFLINE';
+            }
+            #onlineStatus.active {
+              color: green;
+            }
+            #onlineStatus.active::after {
+              content: 'ONLINE';
+            }
+          </style>
+          <header>
+            <span id="title">
+              <h1 id="appTitle">Satchel</h1>
+              <small id="onlineStatus"></small>
+            </span>
+          </header>
+          <main>
+            <!-- WORKSPACE CONTENT -->
+            <style>
+              main {
+                width: 100%;
+                height: 100%;
+                flex: 1;
+                position: relative;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+              }
+              #workspace {
+                width: 100%;
+                height: 100%;
+                flex: 1;
+                text-align: center;
+                overflow: auto;
+              }
+              #overlayWorkspace {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                box-shadow: inset 0 0 0.5em #000000;
+                pointer-events: none;
+                animation-name: fadein;
+                animation-delay: 1s;
+                animation-duration: 1s;
+                animation-timing-function: linear;
+                animation-fill-mode: forwards;
+                opacity: 0;
+              }
+              .workspacePadding {
+                min-width: 4em;
+                min-height: 4em;
+              }
+              @keyframes fadein {
+                from {
+                  opacity: 0;
+                }
+                to {
+                  opacity: 1;
+                }
+              }
+            </style>
+            <div id="workspace">
+              <div class="workspacePadding"></div>
+              <div id="localWorkspace"></div>
+              <div id="remoteWorkspace"></div>
+              <div class="workspacePadding"></div>
+              <div id="overlayWorkspace"></div>
+            </div>
+            <style>
+              .albumContainer {
+                flex: 1;
+                width: 100%;
+                height: 100%;
+                position: relative;
+                display: none;
+                flex-direction: column;
+                background-color: #333333;
+                text-align: left;
+                border-top-right-radius: 2em;
+                padding-top: 0.5em;
+                overflow: hidden;
+                border-left: 0.2em solid #222222;
+              }
+              .albumContainer.open {
+                display: flex;
+              }
+              .albumContainer > * {
+                visibility: hidden;
+              }
+              .albumContainer.open > * {
+                visibility: visible;
+              }
+              .albumActions {
+                display: flex;
+                text-align: center;
+                padding: 0.5em;
+                padding-bottom: 1em;
+              }
+              .albumActions > * {
+                margin: 0 0.25em;
+              }
+              #albumList {
+                flex: 1;
+                overflow-y: auto;
+                scroll-behavior: smooth;
+                padding: 0 0.5em;
+              }
+              #albumList > * {
+                margin: 0.5em;
+              }
+
+              #albumWatermark {
+                position: absolute;
+                pointer-events: none;
+                font-size: 2em;
+                opacity: 0.1;
+                top: 1.2em;
+                right: -0.5em;
+                text-orientation: mixed;
+                writing-mode: vertical-rl;
+              }
+            </style>
+            <div class="albumContainer">
+              <div id="albumWatermark">
+                <h3>Album</h3>
+              </div>
+              <div id="albumList"></div>
+              <div class="albumActions" style="display: flex; flex-direction: row;">
+                <button id="actionAlbumNew" class="bigButton" style="flex: 1; margin-right: 1em;">+ Album</button>
+                <button id="actionAlbumImport" class="bigButton">Import</button>
+              </div>
+            </div>
+          </main>
+        </div>
+      </sidebar-layout>
+    </sidebar-layout>
+
+<!--=========================================== OUTER CONTENT ==-->
+    <div class="foreground">
+      <inv-cursor id="cursor"></inv-cursor>
+      <falling-item id="falling"></falling-item>
+    </div>
+
+    <banner-prompt id="giftDialog">
+      <h3>Share Item</h3>
+      <fieldset id="giftCode">
+        <legend>Item Code</legend>
+        <button id="giftCodeExport">Copy Item Code</button>
+      </fieldset>
+      <fieldset id="giftSend">
+        <legend>Send Item</legend>
+        <p>
+          <select id="giftTarget"></select>
+        </p>
+        <p>
+          <button id="giftSubmit">Send</button>
+        </p>
+      </fieldset>
+    </banner-prompt>
+
+    <banner-prompt id="settingsDialog" style="text-align: center;">
+      <div class="flexColumn">
+        <div class="flexPadding"></div>
+        <div>
+          <h3>Settings</h3>
+          <p class="flexColumn">
+            <button id="actionEraseAll">Erase All Content</button>
+            <br>
+            <button id="uploadButton">Import Data</button>
+            <button id="downloadButton">Export Data</button>
+            <br>
+            <button id="actionImportGoogle" class="googleOnly">Import Google Drive</button>
+            <button disabled="">Import Notion.so</button>
+            <button id="actionSignOut">Sign Out</button>
+            <br>
+            <button id="actionProfile">Change Profiles</button>
+            <button id="actionTutorialReset">Reset Tutorial</button>
+            <button id="actionSoundToggle">Sound On/Off</button>
+          </p>
+          <small id="appVersion">v-.-.-</small>
+          <p>
+            <style>
+              #author {
+                font-family: monospace;
+                opacity: 0.3;
+                color: #ffffff;
+              }
+              #author:hover {
+                opacity: 0.6;
+              }
+            </style>
+            <a id="author" href="https://github.com/andykuo1/satchel" target="_blank">
+              <small>Made with ❤ by Andrew Kuo</small>
+            </a>
+          </p>
+        </div>
+        <div class="flexPadding"></div>
+      </div>
+    </banner-prompt>
+
+    <banner-prompt id="profilesDialog" horizontal="">
+      <style>
+        #profilesDialog h3 {
+          margin: 0;
+        }
+        #activeProfileList {
+          display: flex;
+          flex-direction: column;
+        }
+        #activeProfileList > * {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          height: 2.5em;
+        }
+        #activeProfileList > *:hover {
+          background-color: #333333;
+        }
+        #activeProfileList > * > label {
+          flex: 1;
+          margin: 0 0.5em;
+        }
+        #activeProfileList icon-button {
+          width: 2em;
+          height: 2em;
+        }
+      </style>
+      <div class="flexRow">
+        <div class="flexPadding"></div>
+        <div style="flex: 3;">
+          <h3>Profiles</h3>
+          <p id="activeProfileList"></p>
+          <div style="margin-bottom: 2em; display: flex; flex-direction: row;">
+            <button id="actionProfileNew" class="bigButton" style="flex: 1; margin-right: 1em;">+ Profile</button>
+            <button id="actionProfileImport" class="bigButton">Import</button>
+          </div>
+        </div>
+        <div class="flexPadding"></div>
+      </div>
+    </banner-prompt>
+
+    <banner-prompt id="inventoriesDialog">
+      <style>
+        #inventoriesDialog h3 {
+          margin: 0;
+        }
+        #inventoriesDialog output {
+          display: block;
+          opacity: 0.6;
+          font-size: 0.4em;
+        }
+        #inventoriesDialog fieldset {
+          display: flex;
+          flex-direction: column;
+        }
+        #activeInventoryList {
+          display: flex;
+          flex-direction: column;
+          border: 4px solid #ffffff;
+          overflow-y: auto;
+          min-height: 1em;
+          max-height: 30vh;
+        }
+        #activeInventoryList > * {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          height: 2.5em;
+        }
+        #activeInventoryList > *:hover {
+          background-color: #333333;
+        }
+        #activeInventoryList > * > label {
+          flex: 1;
+          margin: 0 0.5em;
+        }
+        #activeInventoryList icon-button {
+          width: 2em;
+          height: 2em;
+        }
+      </style>
+      <h3>Edit Profile</h3>
+      <br>
+      <fieldset>
+        <legend>Name</legend>
+        <input type="text" id="actionProfileEditName">
+        <output id="outputProfileEditId"></output>
+      </fieldset>
+      <fieldset>
+        <legend>Inventory</legend>
+        <p id="activeInventoryList"></p>
+        <button id="actionProfileInvNew" class="bigButton">+ Inventory</button>
+      </fieldset>
+    </banner-prompt>
+
+    <banner-prompt id="profileInventoryDialog">
+      <style>
+        #profileInventoryDialog > div {
+          display: flex;
+          flex-direction: column;
+        }
+      </style>
+      <div>
+        <h3>New Inventory</h3>
+        <label for="actionProfileInvType">Type</label>
+        <select id="actionProfileInvType">
+          <option value="socket">Single</option>
+          <option value="grid" selected="">Grid</option>
+          <option value="space">Borderless</option>
+        </select>
+        <label for="actionProfileInvTitle">Title</label>
+        <input id="actionProfileInvTitle" placeholder="Default">
+        <label for="actionProfileInvWidth">Width</label>
+        <input type="number" min="1" max="12" id="actionProfileInvWidth" value="1">
+        <label for="actionProfileInvHeight">Height</label>
+        <input type="number" min="1" max="12" id="actionProfileInvHeight" value="1">
+        <br>
+        <button id="actionProfileInvSubmit">Apply</button>
+      </div>
+    </banner-prompt>
+
+    <style>
+      #itemDialog {
+        z-index: 1;
+      }
+    </style>
+    <item-dialog id="itemDialog">
+      <icon-button slot="actions" id="actionShareItem" icon="res/share.svg" alt="send" title="Send Item"></icon-button>
+    </item-dialog>
+
+    <context-menu id="cloudDialog">
+      <style>
+        #cloudDialog {
+          --width: 5em;
+        }
+        #cloudDialog[open] {
+          display: flex;
+        }
+        #cloudDialog h3 {
+          font-size: 1em;
+          margin: 0.2em;
+          text-align: center;
+        }
+        .cloudOptionList {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+        .cloudOption {
+          flex: 1;
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+        }
+        .cloudOption label {
+          font-size: 0.5em;
+        }
+      </style>
+      <div>
+        <h3>Save to</h3>
+        <div class="cloudOptionList">
+          <div class="cloudOption">
+            <icon-button id="actionExportGoogle" icon="res/googledrive.svg" title="Google Drive"></icon-button>
+          </div>
+          <div class="cloudOption">
+            <icon-button id="actionExportNotion" icon="res/notionso.svg" disabled="" title="Notion.so"></icon-button>
+          </div>
+          <div class="cloudOption">
+            <icon-button id="actionPeer" icon="res/group.svg" disabled="" title="P2P Session"></icon-button>
+          </div>
+        </div>
+      </div>
+    </context-menu>
+
+    <context-menu id="itemCodeDialog">
+      <style>
+        #itemCodeDialog[open] {
+          display: flex;
+        }
+        #itemCodeDialog > div {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+        }
+        #itemCodeInput {
+          resize: none;
+        }
+      </style>
+      <div>
+        <h3 style="margin: 0;">Item Code</h3>
+        <textarea id="itemCodeInput" type="text" style="flex: 1;" placeholder="Paste here..."></textarea>
+        <button id="itemCodeSubmit" class="bigButton">Submit</button>
+      </div>
+    </context-menu>
+
+    <context-menu id="trashDialog">
+      <style>
+        #trashDialog[open] {
+          display: flex;
+          --width: 11em;
+        }
+        #trashDialog > div {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          text-align: center;
+          height: 100%;
+        }
+        #trashAlbum {
+          flex: 1;
+          overflow-y: auto;
+          text-align: left;
+        }
+      </style>
+      <div>
+        <h3 style="margin: 0;">Trash</h3>
+        <album-list id="trashAlbum" init="trash" fixed=""></album-list>
+        <button id="actionTrashClear" class="bigButton">Clear All</button>
+      </div>
+    </context-menu>
+
+    <style>
+      .tooltip {
+        text-align: center;
+      }
+    </style>
+    <context-menu style="--height: 4.5em;" class="tooltip" id="tooltipTutorial01" required="">
+      <p>
+        Click the Anvil to forge your first item.
+      </p>
+    </context-menu>
+    <context-menu style="--height: 4.5em;" class="tooltip" id="tooltipTutorial02" required="">
+      <p>
+        Click <b>+</b> to spawn a new item.
+      </p>
+    </context-menu>
+    <context-menu style="--height: 8em;" class="tooltip" id="tooltipTutorial03" required="">
+      <p>
+        Try editing your item!
+      </p>
+      <p>
+        When done, drag the item to your inventory →
+      </p>
+    </context-menu>
+    <style>
+      .finalTutorial {
+        --width: 12em;
+        --height: 1em;
+      }
+    </style>
+    <context-menu class="tooltip finalTutorial" id="tooltipDelete">
+      Drag here to delete.
+    </context-menu>
+    <context-menu class="tooltip finalTutorial" id="tooltipFoundry">
+      Drag here to edit.
+    </context-menu>
+    <context-menu class="tooltip finalTutorial" id="tooltipAlbums">
+      Click here for Albums.
+    </context-menu>
+    <context-menu class="tooltip finalTutorial" id="tooltipSettings">
+      Click here for Settings.
+    </context-menu>
+    
+    <template id="busyTemplate">
+      <banner-prompt id="busyDialog" horizontal="" required="" style="text-align: center;">
+        <div class="flexColumn">
+          <div class="flexPadding"></div>
+          <h2>
+            <label id="busyLabel">Fetching Goblins</label>
+            <span id="busyProgress">...</span>
+          </h2>
+          <div class="flexPadding"></div>
+        </div>
+      </banner-prompt>
+    </template>
+
+    <template id="notifyTemplate">
+      <banner-prompt id="notifyDialog" horizontal="" open="">
+        <div class="flexColumn">
+          <div class="flexPadding"></div>
+          <div class="flexList">
+            <h3 style="width: 60%; font-family: fantasy;">
+              <label id="notifyLabel">You hear footsteps is approaching...</label>
+            </h3>
+            <button id="notifyConfirm" class="bigButton" style="margin-bottom: 2em;">Accept</button>
+          </div>
+          <div class="flexPadding"></div>
+        </div>
+      </banner-prompt>
+    </template>
+
+    
+  
+
+<script type="module" src="./main.js"></script></body></html>

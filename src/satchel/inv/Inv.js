@@ -76,8 +76,8 @@ export function createSocketInventory(invId) {
 
 /**
  * Create an album inventory.
- * 
- * @param {InvId} invId 
+ *
+ * @param {InvId} invId
  * @returns {Inventory}
  */
 export function createAlbumInventory(invId) {
@@ -87,7 +87,7 @@ export function createAlbumInventory(invId) {
 /**
  * Copies the target inventory to destination as a new inventory. Unlike cloneInventory(),
  * the resultant inventory can be added to the store with its copy.
- * 
+ *
  * @param {Inventory} other
  * @param {Inventory} [dst]
  * @returns {Inventory}
@@ -105,7 +105,7 @@ export function copyInventory(other, dst = undefined) {
  * to store an exact replica of an inventory state, including ids. Unlike copyInventory(),
  * the resultant inventory CANNOT be added to the store with its clone. It must be replace
  * its clone.
- * 
+ *
  * @param {Inventory} other
  * @param {Inventory} [dst]
  * @param {object} [opts]
@@ -131,12 +131,12 @@ export function cloneInventory(other, dst = undefined, opts = {}) {
   let overrideItemIds = {};
   if (typeof other.items === 'object') {
     if (preserveItemId) {
-      for(let item of Object.values(other.items)) {
+      for (let item of Object.values(other.items)) {
         let newItem = cloneItem(item);
         dst.items[newItem.itemId] = newItem;
       }
     } else {
-      for(let item of Object.values(other.items)) {
+      for (let item of Object.values(other.items)) {
         let newItem = copyItem(item);
         overrideItemIds[item.itemId] = newItem.itemId;
         dst.items[newItem.itemId] = newItem;

@@ -43,8 +43,8 @@ export function copyItem(other, dst = undefined) {
 }
 
 /**
- * @param {Item} item 
- * @param {Item} other 
+ * @param {Item} item
+ * @param {Item} other
  */
 export function compareItem(item, other) {
   if (item.displayName !== other.displayName) {
@@ -85,7 +85,7 @@ export function cloneItem(other, dst = undefined) {
     dst = createItem(itemId || uuid());
   } else if (itemId) {
     dst.itemId = itemId;
-  } else if (!(dst.itemId)) {
+  } else if (!dst.itemId) {
     dst.itemId = uuid();
   }
   if (typeof other.width === 'number') {

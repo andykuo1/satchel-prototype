@@ -38,9 +38,9 @@ export function getPropertyTypeParser(type) {
   }
   let result;
   if ('parse' in type && 'stringify' in type) {
-    result = /** @type {Parser<T>}*/(/** @type {unknown}*/(type));
+    result = /** @type {Parser<T>}*/ (/** @type {unknown}*/ (type));
   } else if (typeof type === 'function') {
-    result = /** @type {Parser<T>}*/({
+    result = /** @type {Parser<T>}*/ ({
       parse: type,
       stringify: String,
     });

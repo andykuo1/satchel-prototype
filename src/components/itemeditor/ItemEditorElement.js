@@ -1,16 +1,30 @@
-import { getCursor } from '../cursor/index.js';
-import { getSatchelStore } from '../../store/SatchelStore.js';
-import { addItemToInventory, clearItemsInInventory, getItemAtSlotIndex, isInventoryEmpty } from '../../satchel/inv/InventoryTransfer.js';
-import { getFoundryAlbumId, hasFoundryAlbum, saveItemToFoundryAlbum, shouldSaveItemToFoundryAlbum } from '../../satchel/FoundryAlbum.js';
-import { addInventoryChangeListener, dispatchInventoryChange, removeInventoryChangeListener } from '../../events/InvEvents.js';
-import { ItemBuilder } from '../../satchel/item/Item.js';
+import {
+  addInventoryChangeListener,
+  dispatchInventoryChange,
+  removeInventoryChangeListener,
+} from '../../events/InvEvents.js';
 import { dispatchItemChange } from '../../events/ItemEvents.js';
-import { dropFallingItem } from '../cursor/FallingItemElement.js';
+import {
+  getFoundryAlbumId,
+  hasFoundryAlbum,
+  saveItemToFoundryAlbum,
+  shouldSaveItemToFoundryAlbum,
+} from '../../satchel/FoundryAlbum.js';
+import { getItemsInInv } from '../../satchel/inv/InventoryItems.js';
+import {
+  addItemToInventory,
+  clearItemsInInventory,
+  getItemAtSlotIndex,
+  isInventoryEmpty,
+} from '../../satchel/inv/InventoryTransfer.js';
+import { ItemBuilder } from '../../satchel/item/Item.js';
 import { playSound } from '../../sounds.js';
+import { getSatchelStore } from '../../store/SatchelStore.js';
 import { updateList } from '../ElementListHelper.js';
+import { dropFallingItem } from '../cursor/FallingItemElement.js';
+import { getCursor } from '../cursor/index.js';
 import '../invgrid/InvSocketElement.js';
 import '../lib/ContextMenuElement.js';
-import { getItemsInInv } from '../../satchel/inv/InventoryItems.js';
 
 /**
  * @typedef {import('../invgrid/InvSocketElement.js').InvSocketElement} InvSocketElement
@@ -21,7 +35,7 @@ import { getItemsInInv } from '../../satchel/inv/InventoryItems.js';
 const MAX_ITEM_WIDTH = 8;
 const MAX_ITEM_HEIGHT = 8;
 
-const INNER_HTML = /* html */`
+const INNER_HTML = /* html */ `
 <div class="rootContainer">
   <fieldset class="portraitContainer">
     <div class="foundrySocketContainer">
@@ -99,7 +113,7 @@ const INNER_HTML = /* html */`
   </div>
 </context-menu>
 `;
-const INNER_STYLE = /* css */`
+const INNER_STYLE = /* css */ `
 :host {
   text-align: center;
   height: 100%;
@@ -386,12 +400,8 @@ export class ItemEditorElement extends HTMLElement {
   constructor() {
     super();
     const shadowRoot = this.attachShadow({ mode: 'open' });
-    shadowRoot.append(
-      this.constructor[Symbol.for('templateNode')].content.cloneNode(true)
-    );
-    shadowRoot.append(
-      this.constructor[Symbol.for('styleNode')].cloneNode(true)
-    );
+    shadowRoot.append(this.constructor[Symbol.for('templateNode')].content.cloneNode(true));
+    shadowRoot.append(this.constructor[Symbol.for('styleNode')].cloneNode(true));
 
     /** @private */
     this.rootContainer = shadowRoot.querySelector('.rootContainer');
@@ -400,13 +410,17 @@ export class ItemEditorElement extends HTMLElement {
     /** @private */
     this.detailContainer = shadowRoot.querySelector('.detailContainer');
     /** @private */
-    this.galleryContextMenu = /** @type {ContextMenuElement} */ (shadowRoot.querySelector('#galleryContextMenu'));
+    this.galleryContextMenu = /** @type {ContextMenuElement} */ (
+      shadowRoot.querySelector('#galleryContextMenu')
+    );
     /** @private */
     this.galleryImages = shadowRoot.querySelector('#galleryImages');
     /** @private */
     this.foundryActions = shadowRoot.querySelector('#foundryActions');
     /** @private */
-    this.paletteContextMenu = /** @type {ContextMenuElement} */ (shadowRoot.querySelector('#paletteContextMenu'));
+    this.paletteContextMenu = /** @type {ContextMenuElement} */ (
+      shadowRoot.querySelector('#paletteContextMenu')
+    );
     /** @private */
     this.paletteColors = shadowRoot.querySelectorAll('#paletteColors > button');
 
@@ -535,7 +549,7 @@ export class ItemEditorElement extends HTMLElement {
     this.portraitContainer.addEventListener('mouseup', this.onItemDrop);
     this.actionExpand.addEventListener('click', this.onActionExpand);
     this.actionBackground.addEventListener('click', this.onActionBackground);
-    this.paletteColors.forEach(e => {
+    this.paletteColors.forEach((e) => {
       e.addEventListener('click', this.onActionColor);
     });
 
@@ -565,7 +579,7 @@ export class ItemEditorElement extends HTMLElement {
     this.portraitContainer.removeEventListener('mouseup', this.onItemDrop);
     this.actionExpand.removeEventListener('click', this.onActionExpand);
     this.actionBackground.removeEventListener('click', this.onActionBackground);
-    this.paletteColors.forEach(e => {
+    this.paletteColors.forEach((e) => {
       e.removeEventListener('click', this.onActionColor);
     });
 
@@ -875,7 +889,7 @@ export class ItemEditorElement extends HTMLElement {
       'res/images/potion.png',
       'res/images/blade.png',
       'res/images/scroll.png',
-      ...items.map(item => item.imgSrc).filter(Boolean)
+      ...items.map((item) => item.imgSrc).filter(Boolean),
     ]);
     const create = (key) => {
       let element = document.createElement('img');
@@ -927,7 +941,11 @@ export class ItemEditorElement extends HTMLElement {
     const imgSrc = this.parseItemImage();
     const store = getSatchelStore();
     const socketItem = getItemAtSlotIndex(store, this.socket.invId, 0);
-    const defaultImgSrc = getDefaultImageSourceByDimensions(socketItem.width, socketItem.height, socketItem.stackSize);
+    const defaultImgSrc = getDefaultImageSourceByDimensions(
+      socketItem.width,
+      socketItem.height,
+      socketItem.stackSize
+    );
     socketItem.imgSrc = imgSrc || defaultImgSrc;
     dispatchItemChange(store, socketItem.itemId);
   }
@@ -1014,7 +1032,7 @@ export class ItemEditorElement extends HTMLElement {
   parseItemWidth() {
     return Math.min(Math.max(Number(this.itemWidth.value) || 1, 1), MAX_ITEM_WIDTH);
   }
-  
+
   /** @private */
   parseItemHeight() {
     return Math.min(Math.max(Number(this.itemHeight.value) || 1, 1), MAX_ITEM_HEIGHT);

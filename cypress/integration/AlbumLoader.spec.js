@@ -1,5 +1,3 @@
-import { describeBackwardsCompatibleJSONFormat, describeJSONFormat } from './DataLoaderHelper.js';
-
 import { exportAlbumToJSON, importAlbumFromJSON } from '../../src/loader/AlbumLoader.js';
 import {
   ALBUM_FLAG_EXPAND_BIT,
@@ -8,6 +6,7 @@ import {
   createAlbum,
 } from '../../src/satchel/album/Album.js';
 import { createItem } from '../../src/satchel/item/Item.js';
+import { describeBackwardsCompatibleJSONFormat, describeJSONFormat } from './DataLoaderHelper.js';
 
 function createDefaultAlbum() {
   let created = createAlbum('test');

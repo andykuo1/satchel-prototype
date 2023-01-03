@@ -1,5 +1,5 @@
-import { exportDataToJSON, importDataFromJSON } from './DataLoader.js';
 import { cloneInventory } from '../satchel/inv/Inv.js';
+import { exportDataToJSON, importDataFromJSON } from './DataLoader.js';
 
 export const CURRENT_INV_VERSION = 'inv_v3';
 

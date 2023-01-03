@@ -1,7 +1,6 @@
-import { describeBackwardsCompatibleJSONFormat, describeJSONFormat } from './DataLoaderHelper.js';
-
 import { exportProfileToJSON, importProfileFromJSON } from '../../src/loader/ProfileLoader.js';
 import { createProfile } from '../../src/satchel/profile/Profile.js';
+import { describeBackwardsCompatibleJSONFormat, describeJSONFormat } from './DataLoaderHelper.js';
 
 function createDefaultProfile() {
   let created = createProfile('test');

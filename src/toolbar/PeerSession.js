@@ -1,6 +1,6 @@
-import { copyToClipboard } from '../util/clipboard.js';
-import { connectAsServer } from '../satchel/peer/PeerSatchelConnector.js';
 import { getCursorContext } from '../satchel/inv/CursorHelper.js';
+import { connectAsServer } from '../satchel/peer/PeerSatchelConnector.js';
+import { copyToClipboard } from '../util/clipboard.js';
 
 export async function startCloud() {
   const ctx = getCursorContext();

@@ -1,16 +1,16 @@
+import { getGroundAlbumId } from '../../satchel/GroundAlbum.js';
 import { getSatchelStore } from '../../store/SatchelStore.js';
 import { getCursor } from '../cursor/index.js';
-import { getGroundAlbumId } from '../../satchel/GroundAlbum.js';
 import './AlbumListElement.js';
 
 /**
  * @typedef {import('../../satchel/item/Item.js').ItemId} ItemId
  */
 
-const INNER_HTML = /* html */`
+const INNER_HTML = /* html */ `
 <album-list init="ground" fixed></album-list>
 `;
-const INNER_STYLE = /* css */`
+const INNER_STYLE = /* css */ `
 album-list {
   display: flex;
   flex-direction: column;
@@ -50,12 +50,8 @@ export class AlbumGroundElement extends HTMLElement {
   constructor() {
     super();
     const shadowRoot = this.attachShadow({ mode: 'open' });
-    shadowRoot.append(
-      this.constructor[Symbol.for('templateNode')].content.cloneNode(true)
-    );
-    shadowRoot.append(
-      this.constructor[Symbol.for('styleNode')].cloneNode(true)
-    );
+    shadowRoot.append(this.constructor[Symbol.for('templateNode')].content.cloneNode(true));
+    shadowRoot.append(this.constructor[Symbol.for('styleNode')].cloneNode(true));
 
     const store = getSatchelStore();
     /** @private */

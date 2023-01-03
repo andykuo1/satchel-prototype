@@ -1,7 +1,12 @@
 import { addInventoryChangeListener, removeInventoryChangeListener } from '../../events/InvEvents.js';
 import { addItemToInventory } from '../../satchel/inv/InventoryTransfer.js';
 import { cloneItem } from '../../satchel/item/Item.js';
-import { createSocketInvInStore, deleteInvInStore, getInvInStore, isInvInStore } from '../../store/InvStore.js';
+import {
+  createSocketInvInStore,
+  deleteInvInStore,
+  getInvInStore,
+  isInvInStore,
+} from '../../store/InvStore.js';
 import { uuid } from '../../util/uuid.js';
 
 /**
@@ -23,9 +28,9 @@ export function itemAlphabeticalComparator(a, b) {
 
 /**
  * @param {Store} store
- * @param {Item} readOnlyItem 
- * @param {Record<InvId, ItemId>} itemInvMap 
- * @param {() => void} invChangeCallback 
+ * @param {Item} readOnlyItem
+ * @param {Record<InvId, ItemId>} itemInvMap
+ * @param {() => void} invChangeCallback
  * @returns {InvSocketElement}
  */
 export function setUpItemInvElement(store, readOnlyItem, itemInvMap, invChangeCallback) {
@@ -43,10 +48,10 @@ export function setUpItemInvElement(store, readOnlyItem, itemInvMap, invChangeCa
 }
 
 /**
- * @param {Store} store 
- * @param {InvId} invId 
- * @param {Record<InvId, ItemId>} itemInvMap 
- * @param {() => void} invChangeCallback 
+ * @param {Store} store
+ * @param {InvId} invId
+ * @param {Record<InvId, ItemId>} itemInvMap
+ * @param {() => void} invChangeCallback
  * @returns {ItemId}
  */
 export function tearDownItemInvElement(store, invId, itemInvMap, invChangeCallback) {
@@ -58,14 +63,14 @@ export function tearDownItemInvElement(store, invId, itemInvMap, invChangeCallba
 
 /**
  * @param {Store} store
- * @param {HTMLCollection} itemElements 
- * @param {Record<InvId, ItemId>} itemInvMap 
- * @param {() => void} invChangeCallback 
+ * @param {HTMLCollection} itemElements
+ * @param {Record<InvId, ItemId>} itemInvMap
+ * @param {() => void} invChangeCallback
  */
 export function cleanUpItemInvElements(store, itemElements, itemInvMap, invChangeCallback) {
   // Remove all temp inv listeners
   const keys = Object.keys(itemInvMap);
-  for(let invId of keys) {
+  for (let invId of keys) {
     tearDownItemInvElement(store, invId, itemInvMap, invChangeCallback);
   }
 
@@ -81,7 +86,7 @@ export function cleanUpItemInvElements(store, itemElements, itemInvMap, invChang
     }
     elements.push(element);
   }
-  for(let element of elements) {
+  for (let element of elements) {
     element.remove();
   }
 }

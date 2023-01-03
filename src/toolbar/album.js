@@ -1,15 +1,15 @@
 import { el } from '../ToolbarHelper.js';
 import { updateList } from '../components/ElementListHelper.js';
 import { AlbumPackElement, getCursor } from '../components/index.js';
-import { isAlbumHidden, isAlbumLocked } from '../satchel/album/Album.js';
+import { addInventoryListChangeListener } from '../events/InvEvents.js';
 import { isGroundAlbum } from '../satchel/GroundAlbum.js';
 import { isTrashAlbum } from '../satchel/TrashAlbum.js';
+import { isAlbumHidden, isAlbumLocked } from '../satchel/album/Album.js';
 import { playSound } from '../sounds.js';
 import { createAlbumInStore, getAlbumsInStore } from '../store/AlbumStore.js';
 import { getSatchelStore } from '../store/SatchelStore.js';
 import { uuid } from '../util/uuid.js';
 import { uploadSatchelFile } from './upload.js';
-import { addInventoryListChangeListener } from '../events/InvEvents.js';
 
 export function setupAlbum() {
   el('#actionAlbumOpen', 'click', onActionAlbumOpen);

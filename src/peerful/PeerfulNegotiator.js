@@ -1,11 +1,11 @@
 import { Eventable } from '../util/Eventable.js';
+import { debug } from './PeerfulUtil.js';
 import {
   createPromiseStatus,
-  resolvePromiseStatus,
-  rejectPromiseStatus,
   createPromiseStatusPromise,
+  rejectPromiseStatus,
+  resolvePromiseStatus,
 } from './PromiseStatus.js';
-import { debug } from './PeerfulUtil.js';
 
 /** @typedef {import('./PeerJsSignaling.js').PeerJsSignaling} PeerJsSignaling */
 

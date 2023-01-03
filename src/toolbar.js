@@ -1,10 +1,13 @@
+import { forceEmptyStorage } from './Storage.js';
 import { el } from './ToolbarHelper.js';
-import { downloadText } from './util/downloader.js';
-import { getSatchelStore } from './store/SatchelStore.js';
-import { getCursorContext } from './satchel/inv/CursorHelper.js';
-import { copyToClipboard, pasteFromClipboard } from './util/clipboard.js';
-import { ItemBuilder } from './satchel/item/Item.js';
+import { notify } from './components/NotifyPrompt.js';
+import { dropFallingItem } from './components/cursor/FallingItemElement.js';
+import { getCursor } from './components/index.js';
 import { exportItemToString, importItemFromString } from './loader/ItemLoader.js';
+import { saveSatchelToData } from './loader/SatchelLoader.js';
+import { clearItemsOnGround, getGroundAlbumId, hasGroundAlbum } from './satchel/GroundAlbum.js';
+import { getTrashAlbumId, saveItemToTrashAlbum } from './satchel/TrashAlbum.js';
+import { getCursorContext } from './satchel/inv/CursorHelper.js';
 import {
   clearFoundry,
   closeFoundry,
@@ -12,24 +15,20 @@ import {
   isFoundryOpen,
   openFoundry,
 } from './satchel/inv/FoundryHelper.js';
-import { ActivityPlayerList } from './satchel/peer/ActivityPlayerList.js';
-import { forceEmptyStorage } from './Storage.js';
-import { saveSatchelToData } from './loader/SatchelLoader.js';
-import { dropFallingItem } from './components/cursor/FallingItemElement.js';
-import { playSound, toggleSound } from './sounds.js';
-import { getTrashAlbumId, saveItemToTrashAlbum } from './satchel/TrashAlbum.js';
-
-import { setupProfile } from './toolbar/profile.js';
-import { setupSync } from './toolbar/sync.js';
-import { notify } from './components/NotifyPrompt.js';
-import { setupAlbum } from './toolbar/album.js';
-import { uploadSatchelFile } from './toolbar/upload.js';
-import { clearItemsOnGround, getGroundAlbumId, hasGroundAlbum } from './satchel/GroundAlbum.js';
-import { resetTutorial, setupTutorial } from './toolbar/tutorial.js';
-import { getCursor } from './components/index.js';
 import { getItemIdsInInv, getItemInInv } from './satchel/inv/InventoryItems.js';
 import { clearItemsInInventory } from './satchel/inv/InventoryTransfer.js';
+import { ItemBuilder } from './satchel/item/Item.js';
+import { ActivityPlayerList } from './satchel/peer/ActivityPlayerList.js';
+import { playSound, toggleSound } from './sounds.js';
 import { isInvInStore } from './store/InvStore.js';
+import { getSatchelStore } from './store/SatchelStore.js';
+import { setupAlbum } from './toolbar/album.js';
+import { setupProfile } from './toolbar/profile.js';
+import { setupSync } from './toolbar/sync.js';
+import { resetTutorial, setupTutorial } from './toolbar/tutorial.js';
+import { uploadSatchelFile } from './toolbar/upload.js';
+import { copyToClipboard, pasteFromClipboard } from './util/clipboard.js';
+import { downloadText } from './util/downloader.js';
 
 window.addEventListener('DOMContentLoaded', () => {
   el('#downloadButton', 'click', onDownloadClick);

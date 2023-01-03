@@ -6,23 +6,31 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "start": "web-dev-server --node-resolve --open",
-    "lint": "eslint src/**/*.js cypress/**/*.js",
-    "format": "prettier --write src/**/*.js cypress/**/*.js",
+    "build": "rollup -c",
+    "start": "web-dev-server --node-resolve --open --watch",
+    "lint": "eslint src/** cypress/**/*.js",
+    "format": "prettier --write src/** cypress/**/*.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "Andrew Kuo",
   "license": "MIT",
   "devDependencies": {
+    "@rollup/plugin-alias": "^3.1.9",
+    "@rollup/plugin-eslint": "^8.0.2",
+    "@trivago/prettier-plugin-sort-imports": "^3.3.0",
     "@types/gapi.auth2": "^0.0.55",
     "@types/gapi.client": "^1.0.5",
     "@types/gapi.client.drive": "^3.0.13",
     "@web/dev-server": "^0.1.29",
+    "@web/dev-server-rollup": "^0.3.19",
+    "@web/rollup-plugin-html": "^1.11.0",
     "cypress": "^9.2.1",
-    "eslint": "^8.2.0",
+    "eslint": "^8.22.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-cypress": "^2.12.1",
-    "prettier": "^2.4.1"
+    "prettier": "^2.4.1",
+    "rollup": "^2.78.1",
+    "rollup-plugin-delete": "^2.0.0"
   }
 }

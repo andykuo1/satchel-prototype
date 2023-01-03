@@ -1,8 +1,7 @@
-import { describeBackwardsCompatibleJSONFormat, describeJSONFormat } from './DataLoaderHelper.js';
-
-import { importInventoryFromJSON, exportInventoryToJSON } from '../../src/loader/InvLoader.js';
+import { exportInventoryToJSON, importInventoryFromJSON } from '../../src/loader/InvLoader.js';
 import { createInventory } from '../../src/satchel/inv/Inv.js';
 import { createItem } from '../../src/satchel/item/Item.js';
+import { describeBackwardsCompatibleJSONFormat, describeJSONFormat } from './DataLoaderHelper.js';
 
 function createDefaultInventory() {
   let created = createInventory('test', 'grid', 1, 1, 1);

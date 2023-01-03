@@ -1,4 +1,10 @@
-import { clearSlots, getSlotCoordsByIndex, getSlotIndexByCoords, getSlotIndexByItemId, setSlots } from './InvSlots.js';
+import {
+  clearSlots,
+  getSlotCoordsByIndex,
+  getSlotIndexByCoords,
+  getSlotIndexByItemId,
+  setSlots,
+} from './InvSlots.js';
 
 /**
  * @typedef {import('./Inv.js').Inventory} Inventory
@@ -7,8 +13,8 @@ import { clearSlots, getSlotCoordsByIndex, getSlotIndexByCoords, getSlotIndexByI
  */
 
 /**
- * @param {Inventory} inv 
- * @param {ItemId} itemId 
+ * @param {Inventory} inv
+ * @param {ItemId} itemId
  * @returns {boolean}
  */
 export function hasItem(inv, itemId) {
@@ -21,10 +27,10 @@ export function hasItem(inv, itemId) {
 }
 
 /**
- * @param {Inventory} inv 
- * @param {Item} item 
- * @param {number} coordX 
- * @param {number} coordY 
+ * @param {Inventory} inv
+ * @param {Item} item
+ * @param {number} coordX
+ * @param {number} coordY
  */
 export function putItem(inv, item, coordX, coordY) {
   if (!inv) {
@@ -42,7 +48,7 @@ export function putItem(inv, item, coordX, coordY) {
 }
 
 /**
- * @param {Inventory} inv 
+ * @param {Inventory} inv
  * @param {ItemId} itemId
  */
 export function removeItem(inv, itemId) {
@@ -70,7 +76,7 @@ export function removeItem(inv, itemId) {
 }
 
 /**
- * @param {Inventory} inv 
+ * @param {Inventory} inv
  */
 export function clearItems(inv) {
   clearSlots(inv, 0, 0, inv.width - 1, inv.height - 1);
@@ -78,9 +84,9 @@ export function clearItems(inv) {
 }
 
 /**
- * @param {Inventory} inv 
- * @param {number} coordX 
- * @param {number} coordY 
+ * @param {Inventory} inv
+ * @param {number} coordX
+ * @param {number} coordY
  * @returns {ItemId}
  */
 export function getItemIdBySlotCoords(inv, coordX, coordY) {
@@ -89,8 +95,8 @@ export function getItemIdBySlotCoords(inv, coordX, coordY) {
 }
 
 /**
- * @param {Inventory} inv 
- * @param {number} slotIndex 
+ * @param {Inventory} inv
+ * @param {number} slotIndex
  * @returns {ItemId}
  */
 export function getItemIdBySlotIndex(inv, slotIndex) {
@@ -98,7 +104,7 @@ export function getItemIdBySlotIndex(inv, slotIndex) {
 }
 
 /**
- * @param {Inventory} inv 
+ * @param {Inventory} inv
  * @returns {Array<ItemId>}
  */
 export function getItemIds(inv) {
@@ -106,7 +112,7 @@ export function getItemIds(inv) {
 }
 
 /**
- * @param {Inventory} inv 
+ * @param {Inventory} inv
  * @param {ItemId} itemId
  * @returns {Item}
  */
@@ -115,7 +121,7 @@ export function getItemByItemId(inv, itemId) {
 }
 
 /**
- * @param {Inventory} inv 
+ * @param {Inventory} inv
  * @returns {Array<Item>}
  */
 export function getItems(inv) {

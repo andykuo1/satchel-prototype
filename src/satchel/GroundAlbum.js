@@ -1,7 +1,7 @@
+import { addInvInStore, isInvInStore } from '../store/InvStore.js';
 import { getSatchelStore } from '../store/SatchelStore.js';
 import { createAlbum } from './album/Album.js';
 import { addItemToInventory, clearItemsInInventory } from './inv/InventoryTransfer.js';
-import { addInvInStore, isInvInStore } from '../store/InvStore.js';
 
 const GROUND_ALBUM_DISPLAY_NAME = '[ Ground ]';
 

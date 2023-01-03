@@ -1,13 +1,13 @@
-import { getAlbumIdsInStore } from '../../store/AlbumStore.js';
-import { getSatchelStore } from '../../store/SatchelStore.js';
 import { loadFromStorage, saveToStorage } from '../../Storage.js';
-import { getProfileIdsInStore } from '../../store/ProfileStore.js';
 import {
   loadSatchelAlbumsFromData,
   loadSatchelProfilesFromData,
   saveSatchelAlbumsToData,
   saveSatchelProfilesToData,
 } from '../../loader/SatchelLoader.js';
+import { getAlbumIdsInStore } from '../../store/AlbumStore.js';
+import { getProfileIdsInStore } from '../../store/ProfileStore.js';
+import { getSatchelStore } from '../../store/SatchelStore.js';
 import { isAlbumHidden } from '../album/Album.js';
 
 export function loadSatchelFromStorage() {
@@ -48,7 +48,7 @@ export function saveSatchelToStorage() {
   try {
     let albumIds = getAlbumIdsInStore(store);
     // Do not save hidden albums
-    albumIds.filter(albumId => !isAlbumHidden(store, albumId));
+    albumIds.filter((albumId) => !isAlbumHidden(store, albumId));
     let albumData = saveSatchelAlbumsToData(store, albumIds);
     saveToStorage('satchel_album_v3', JSON.stringify(albumData));
   } catch (e) {

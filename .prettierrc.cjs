@@ -5,4 +5,7 @@ module.exports = {
   singleQuote: true,
   semi: true,
   printWidth: 110,
+  importOrder: ["^@satchel/(.*)$", "^[./]" ],
+  importOrderSeparation: true, 
+  importOrderSortSpecifiers: true 
 };

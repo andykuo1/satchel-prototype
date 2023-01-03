@@ -1,17 +1,16 @@
 /**
  * @typedef {import('../../satchel/item/Item.js').Item} Item
  */
-
 import { dropItemOnGround } from '../../satchel/GroundAlbum.js';
 import { playSound } from '../../sounds.js';
 import { DEFAULT_ITEM_UNIT_SIZE } from '../invgrid/InvMouseHelper.js';
 
-const INNER_HTML = /* html */`
+const INNER_HTML = /* html */ `
 <div class="outer">
   <img>
 </div>
 `;
-const INNER_STYLE = /* css */`
+const INNER_STYLE = /* css */ `
 :host {
   display: inline-block;
   pointer-events: none;
@@ -75,13 +74,9 @@ export class FallingItemElement extends HTMLElement {
   constructor() {
     super();
     const shadowRoot = this.attachShadow({ mode: 'open' });
-    shadowRoot.append(
-      this.constructor[Symbol.for('templateNode')].content.cloneNode(true)
-    );
-    shadowRoot.append(
-      this.constructor[Symbol.for('styleNode')].cloneNode(true)
-    );
-    
+    shadowRoot.append(this.constructor[Symbol.for('templateNode')].content.cloneNode(true));
+    shadowRoot.append(this.constructor[Symbol.for('styleNode')].cloneNode(true));
+
     /** @private */
     this.containerElement = /** @type {HTMLElement} */ (shadowRoot.querySelector('.outer'));
     /** @private */
@@ -89,7 +84,7 @@ export class FallingItemElement extends HTMLElement {
   }
 
   /**
-   * @param {Item} item 
+   * @param {Item} item
    */
   animateItem(item, clientX, clientY) {
     const img = this.imageElement;

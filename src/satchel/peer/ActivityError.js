@@ -19,8 +19,8 @@ export class ActivityError extends ActivityBase {
   }
 
   /**
-   * @param {SatchelRemote} remote 
-   * @param {object} data 
+   * @param {SatchelRemote} remote
+   * @param {object} data
    */
   static sendError(remote, data) {
     remote.sendMessage('error', data);

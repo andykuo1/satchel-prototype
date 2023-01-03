@@ -1,9 +1,9 @@
+import { getItemInInv } from '../../satchel/inv/InventoryItems.js';
+import { getItemIdsInSlots } from '../../satchel/inv/InventoryTransfer.js';
+import { getSatchelStore } from '../../store/SatchelStore.js';
 import { updateList } from '../ElementListHelper.js';
 import { ItemElement } from '../invgrid/ItemElement.js';
-import { getItemIdsInSlots } from '../../satchel/inv/InventoryTransfer.js';
-import { getItemInInv } from '../../satchel/inv/InventoryItems.js';
 import { getInventoryViewInvId } from './InventoryView.js';
-import { getSatchelStore } from '../../store/SatchelStore.js';
 
 export function useInternalInventoryItemList(parent, invView) {
   return () => {
@@ -25,7 +25,7 @@ export class InventoryItemList {
   constructor(parent) {
     this.parent = parent;
   }
-  
+
   update(store, invView) {
     const invId = getInventoryViewInvId(invView);
     const list = getItemIdsInSlots(store, invId);

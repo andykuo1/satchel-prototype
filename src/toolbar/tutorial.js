@@ -1,8 +1,8 @@
 import { loadFromStorage, saveToStorage } from '../Storage.js';
 import { addInventoryChangeListener, removeInventoryChangeListener } from '../events/InvEvents.js';
-import { getSatchelStore } from '../store/SatchelStore.js';
-import { isInventoryEmpty } from '../satchel/inv/InventoryTransfer.js';
 import { closeFoundry } from '../satchel/inv/FoundryHelper.js';
+import { isInventoryEmpty } from '../satchel/inv/InventoryTransfer.js';
+import { getSatchelStore } from '../store/SatchelStore.js';
 
 export async function setupTutorial() {
   let skipTutorial = loadFromStorage('skipTutorial') === 'true';

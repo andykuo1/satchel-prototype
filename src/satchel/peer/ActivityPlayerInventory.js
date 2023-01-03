@@ -1,14 +1,18 @@
-import { ActivityBase } from './ActivityBase.js';
-
-import { getSatchelStore } from '../../store/SatchelStore.js';
-import { SatchelLocal, SatchelRemote } from './SatchelLocal.js';
-import { getPlayerLastHeartbeat, getPlayerName, hasPlayerHeartbeat, setPlayerLastHeartbeat } from './PlayerState.js';
 import { loadFromStorage, saveToStorage } from '../../Storage.js';
-import { addProfileInStore, isProfileInStore, setActiveProfileInStore } from '../../store/ProfileStore.js';
-import { createProfile } from '../profile/Profile.js';
-import { uuid } from '../../util/uuid.js';
 import { loadSatchelProfilesFromData, saveSatchelProfilesToData } from '../../loader/SatchelLoader.js';
 import { createGridInvInStore } from '../../store/InvStore.js';
+import { addProfileInStore, isProfileInStore, setActiveProfileInStore } from '../../store/ProfileStore.js';
+import { getSatchelStore } from '../../store/SatchelStore.js';
+import { uuid } from '../../util/uuid.js';
+import { createProfile } from '../profile/Profile.js';
+import { ActivityBase } from './ActivityBase.js';
+import {
+  getPlayerLastHeartbeat,
+  getPlayerName,
+  hasPlayerHeartbeat,
+  setPlayerLastHeartbeat,
+} from './PlayerState.js';
+import { SatchelLocal, SatchelRemote } from './SatchelLocal.js';
 
 function onAutoSave(localServer) {
   const serverData = ActivityPlayerInventory.getLocalServerData(localServer);
@@ -58,7 +62,7 @@ export class ActivityPlayerInventory extends ActivityBase {
 
   /** @override */
   static onRemoteServerMessage(localClient, remoteServer, messageType, messageData) {
-    switch(messageType) {
+    switch (messageType) {
       case 'reset':
         const store = getSatchelStore();
         const playerName = getPlayerName(localClient);
@@ -113,7 +117,7 @@ export class ActivityPlayerInventory extends ActivityBase {
    * @param {SatchelRemote} remoteClient
    */
   static onRemoteClientMessage(localServer, remoteClient, messageType, messageData) {
-    switch(messageType) {
+    switch (messageType) {
       case 'sync':
         const remotePlayerName = getPlayerName(remoteClient);
         if (!remotePlayerName) {
@@ -140,8 +144,8 @@ export class ActivityPlayerInventory extends ActivityBase {
   }
 
   /**
-   * @param {SatchelRemote} remoteClient 
-   * @param {string} profileId 
+   * @param {SatchelRemote} remoteClient
+   * @param {string} profileId
    */
   static sendPlayerReset(remoteClient, profileId) {
     const store = getSatchelStore();
@@ -158,7 +162,7 @@ export class ActivityPlayerInventory extends ActivityBase {
   static resetLocalServerData(localServer, serverData) {
     localServer.localData = serverData;
   }
-  
+
   static getLocalServerData(localServer) {
     return localServer.localData;
   }

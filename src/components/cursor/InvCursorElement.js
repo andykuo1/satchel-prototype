@@ -1,26 +1,33 @@
-import { distanceSquared } from '../../util/math.js';
-import {
-  getSatchelStore,
-} from '../../store/SatchelStore.js';
-import {
-  removeItemFromInventory,
-  clearItemsInInventory,
-  addItemToInventory,
-  getItemAtSlotIndex
-} from '../../satchel/inv/InventoryTransfer.js';
 import { getItemByItemId } from '../../satchel/inv/InvItems.js';
 import { getSlotCoordsByIndex, getSlotIndexByItemId, isSlotIndexEmpty } from '../../satchel/inv/InvSlots.js';
-import { putDownToGridInventory, putDownToSocketInventory, tryTakeOneItem } from './InvCursorElementHelper.js';
-import { DEFAULT_ITEM_UNIT_SIZE } from '../invgrid/InvMouseHelper.js';
-import { isInvInStore, getInvInStore, createSocketInvInStore, deleteInvInStore, getExistingInvInStore } from '../../store/InvStore.js';
-import { dropFallingItem } from './FallingItemElement.js';
+import {
+  addItemToInventory,
+  clearItemsInInventory,
+  getItemAtSlotIndex,
+  removeItemFromInventory,
+} from '../../satchel/inv/InventoryTransfer.js';
 import { playSound } from '../../sounds.js';
-
+import {
+  createSocketInvInStore,
+  deleteInvInStore,
+  getExistingInvInStore,
+  getInvInStore,
+  isInvInStore,
+} from '../../store/InvStore.js';
+import { getSatchelStore } from '../../store/SatchelStore.js';
+import { distanceSquared } from '../../util/math.js';
+import { DEFAULT_ITEM_UNIT_SIZE } from '../invgrid/InvMouseHelper.js';
 import '../invgrid/InvSocketElement.js';
+import { dropFallingItem } from './FallingItemElement.js';
+import {
+  putDownToGridInventory,
+  putDownToSocketInventory,
+  tryTakeOneItem,
+} from './InvCursorElementHelper.js';
 
 /**
  * @typedef {import('../invgrid/InvSocketElement.js').InvSocketElement} InvSocketElement
- * 
+ *
  * @typedef {import('../../satchel/inv/Inv.js').Inventory} Inventory
  * @typedef {import('../../satchel/inv/Inv.js').InvId} InvId
  * @typedef {import('../../store/SatchelStore.js').SatchelStore} SatchelStore
@@ -34,10 +41,10 @@ const PLACE_BUFFER_RANGE = 10;
 const PLACE_BUFFER_RANGE_SQUARED = PLACE_BUFFER_RANGE * PLACE_BUFFER_RANGE;
 const CURSOR_INV_ID = 'cursor';
 
-const INNER_HTML = /* html */`
+const INNER_HTML = /* html */ `
 <inv-socket invid="${CURSOR_INV_ID}"></inv-socket>
 `;
-const INNER_STYLE = /* css */`
+const INNER_STYLE = /* css */ `
 :host {
   position: absolute;
   display: none;
@@ -80,12 +87,8 @@ export class InvCursorElement extends HTMLElement {
   constructor() {
     super();
     const shadowRoot = this.attachShadow({ mode: 'open' });
-    shadowRoot.append(
-      this.constructor[Symbol.for('templateNode')].content.cloneNode(true)
-    );
-    shadowRoot.append(
-      this.constructor[Symbol.for('styleNode')].cloneNode(true)
-    );
+    shadowRoot.append(this.constructor[Symbol.for('templateNode')].content.cloneNode(true));
+    shadowRoot.append(this.constructor[Symbol.for('styleNode')].cloneNode(true));
 
     /** @private */
     this.animationHandle = null;
@@ -105,7 +108,7 @@ export class InvCursorElement extends HTMLElement {
 
     /**
      * This allows drag-n-drop or click-n-deposit gestures.
-     * 
+     *
      * @private
      */
     this.ignoreFirstPutDown = false;
@@ -158,8 +161,7 @@ export class InvCursorElement extends HTMLElement {
     this.style.setProperty('top', `calc(${posY - CURSOR_OFFSET_PIXELS}px)`);
     if (
       this.ignoreFirstPutDown &&
-      distanceSquared(clientX, clientY, this.startHeldX, this.startHeldY) >=
-        PLACE_BUFFER_RANGE_SQUARED
+      distanceSquared(clientX, clientY, this.startHeldX, this.startHeldY) >= PLACE_BUFFER_RANGE_SQUARED
     ) {
       // This is a drag motion. Next putDown should be intentful.
       this.ignoreFirstPutDown = false;
@@ -313,9 +315,7 @@ export class InvCursorElement extends HTMLElement {
    */
   setHeldItem(item, offsetX = 0, offsetY = 0) {
     if (!item) {
-      throw new Error(
-        'Cannot set held item to null - use clearHeldItem() instead.'
-      );
+      throw new Error('Cannot set held item to null - use clearHeldItem() instead.');
     }
     if (this.hasHeldItem()) {
       throw new Error('Cannot set held item - already holding another item.');

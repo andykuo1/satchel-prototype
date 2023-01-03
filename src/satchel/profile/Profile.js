@@ -3,13 +3,13 @@ import { uuid } from '../../util/uuid.js';
 /**
  * @typedef {import('../inv/Inv.js').InvId} InvId
  * @typedef {import('../../store/SatchelStore').SatchelStore} Store
- * 
+ *
  * @typedef {import('../album/Album.js').AlbumId} AlbumId
  */
 
 /**
  * @typedef {string} ProfileId
- * 
+ *
  * @typedef Profile
  * @property {ProfileId} profileId
  * @property {Array<InvId>} invs
@@ -18,7 +18,7 @@ import { uuid } from '../../util/uuid.js';
  */
 
 /**
- * @param {ProfileId} profileId 
+ * @param {ProfileId} profileId
  * @returns {Profile}
  */
 export function createProfile(profileId) {
@@ -33,8 +33,8 @@ export function createProfile(profileId) {
 
 /**
  * @param {Store} store
- * @param {Profile} other 
- * @param {Profile} dst 
+ * @param {Profile} other
+ * @param {Profile} dst
  * @returns {Profile}
  */
 export function copyProfile(store, other, dst = undefined) {
@@ -46,8 +46,8 @@ export function copyProfile(store, other, dst = undefined) {
 }
 
 /**
- * @param {Profile} other 
- * @param {Profile} dst 
+ * @param {Profile} other
+ * @param {Profile} dst
  * @returns {Profile}
  */
 export function cloneProfile(other, dst = undefined) {
@@ -68,7 +68,7 @@ export function cloneProfile(other, dst = undefined) {
 }
 
 /**
- * @param {Profile} profile 
+ * @param {Profile} profile
  * @returns {Array<InvId>}
  */
 export function getProfileInvIds(profile) {
@@ -76,9 +76,9 @@ export function getProfileInvIds(profile) {
 }
 
 /**
- * @param {Profile} profile 
+ * @param {Profile} profile
  * @returns {Array<AlbumId>}
  */
- export function getProfileAlbumIds(profile) {
+export function getProfileAlbumIds(profile) {
   return profile.albums;
 }

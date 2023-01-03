@@ -1,12 +1,11 @@
 import { exportItemToJSON } from '../../loader/ItemLoader.js';
-
+import { ActivityError } from './ActivityError.js';
 import { ActivityPlayerGift } from './ActivityPlayerGift.js';
-import { ActivityPlayerList } from './ActivityPlayerList.js';
 import { ActivityPlayerHandshake } from './ActivityPlayerHandshake.js';
 import { ActivityPlayerInventory } from './ActivityPlayerInventory.js';
-import { SatchelLocal } from './SatchelLocal.js';
-import { ActivityError } from './ActivityError.js';
+import { ActivityPlayerList } from './ActivityPlayerList.js';
 import { getPlayerName } from './PlayerState.js';
+import { SatchelLocal } from './SatchelLocal.js';
 
 /**
  * @typedef {import('../../peerful/PeerfulConnection.js').PeerfulConnection} PeerfulConnection

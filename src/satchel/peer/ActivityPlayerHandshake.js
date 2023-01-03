@@ -1,13 +1,18 @@
 import { ActivityBase } from './ActivityBase.js';
 import { ActivityPlayerInventory } from './ActivityPlayerInventory.js';
-import { getPlayerName, isPlayer, setPlayerLastHeartbeat, setPlayerName, setupPlayer, validatePlayerName } from './PlayerState.js';
+import {
+  getPlayerName,
+  isPlayer,
+  setPlayerLastHeartbeat,
+  setPlayerName,
+  setupPlayer,
+  validatePlayerName,
+} from './PlayerState.js';
 import { SatchelLocal, SatchelRemote } from './SatchelLocal.js';
 
 export class ActivityPlayerHandshake extends ActivityBase {
   static get observedMessages() {
-    return [
-      'handshake'
-    ];
+    return ['handshake'];
   }
 
   /**
@@ -69,7 +74,7 @@ export class ActivityPlayerHandshake extends ActivityBase {
   }
 
   /**
-   * @param {SatchelLocal} localServer 
+   * @param {SatchelLocal} localServer
    * @returns {Array<string>}
    */
   static getActiveClientNames(localServer) {
@@ -77,7 +82,7 @@ export class ActivityPlayerHandshake extends ActivityBase {
   }
 
   /**
-   * @param {SatchelLocal} localServer 
+   * @param {SatchelLocal} localServer
    * @returns {SatchelRemote|null}
    */
   static getActiveClientByName(localServer, playerName) {

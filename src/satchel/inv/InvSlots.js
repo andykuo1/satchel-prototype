@@ -118,7 +118,7 @@ export function getSlotCoordsByIndex(inv, slotIndex) {
 
 export function getSlotIndexByItemId(inv, itemId, startIndex = 0) {
   const length = getInventorySlotCount(inv);
-  for(let i = startIndex; i < length; ++i) {
+  for (let i = startIndex; i < length; ++i) {
     let invItemId = inv.slots[i];
     if (invItemId && invItemId === itemId) {
       return i;

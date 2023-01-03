@@ -132,7 +132,7 @@ export class ContextMenuElement extends HTMLElement {
     document.removeEventListener('click', this.onOutside, true);
     document.removeEventListener('contextmenu', this.onOutside, true);
   }
-  
+
   /**
    * @param attribute
    * @param previous
@@ -141,7 +141,8 @@ export class ContextMenuElement extends HTMLElement {
    */
   attributeChangedCallback(attribute, previous, value) {
     switch (attribute) {
-      case 'open': {
+      case 'open':
+        {
           let result = value !== null;
           if (result) {
             this.performOpen();
@@ -155,8 +156,8 @@ export class ContextMenuElement extends HTMLElement {
 
   /**
    * @private
-   * @param {number} clientX 
-   * @param {number} clientY 
+   * @param {number} clientX
+   * @param {number} clientY
    * @returns {ContextMenuElement}
    */
   setPosition(clientX, clientY) {
@@ -169,13 +170,13 @@ export class ContextMenuElement extends HTMLElement {
     const rootHeight = root.clientHeight;
     let bottom = false;
     let right = false;
-    if (rootHeight < (clientY + height)) {
+    if (rootHeight < clientY + height) {
       contextMenu.style.top = `${clientY - height}px`;
       bottom = true;
     } else {
       contextMenu.style.top = `${clientY}px`;
     }
-    if (rootWidth < (clientX + width)) {
+    if (rootWidth < clientX + width) {
       contextMenu.style.left = `${clientX - width}px`;
       right = true;
     } else {

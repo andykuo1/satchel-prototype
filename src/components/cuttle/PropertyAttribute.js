@@ -47,10 +47,10 @@ export function createPropertyAttribute(name, opts = undefined) {
 }
 
 /**
- * 
- * @param {HTMLElement} el 
- * @param {Props} props 
- * @param {string} propName 
+ *
+ * @param {HTMLElement} el
+ * @param {Props} props
+ * @param {string} propName
  * @returns {any}
  */
 export function getPropertyAttribute(el, props, propName) {
@@ -59,9 +59,9 @@ export function getPropertyAttribute(el, props, propName) {
 }
 
 /**
- * @param {HTMLElement} el 
- * @param {Props} props 
- * @param {string} propName 
+ * @param {HTMLElement} el
+ * @param {Props} props
+ * @param {string} propName
  * @param {string} value
  */
 export function setPropertyAttribute(el, props, propName, value) {
@@ -69,11 +69,11 @@ export function setPropertyAttribute(el, props, propName, value) {
 }
 
 /**
- * @param {HTMLElement} el 
- * @param {Props} props 
+ * @param {HTMLElement} el
+ * @param {Props} props
  */
 export function upgradePropertyAttributes(el, props) {
-  for(let prop of Object.values(props)) {
+  for (let prop of Object.values(props)) {
     upgradeProperty(el, prop.name);
   }
 }

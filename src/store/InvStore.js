@@ -1,5 +1,5 @@
-import { createGridInventory, createSocketInventory } from '../satchel/inv/Inv.js';
 import { dispatchInventoryChange, dispatchInventoryListChange } from '../events/InvEvents.js';
+import { createGridInventory, createSocketInventory } from '../satchel/inv/Inv.js';
 
 /**
  * @typedef {import('./SatchelStore.js').SatchelStore} Store

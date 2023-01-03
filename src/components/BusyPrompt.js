@@ -1,5 +1,4 @@
 /** @typedef {import('./lib/BannerPromptElement.js').BannerPromptElement} BannerPromptElement */
-
 import { getCursorContext } from '../satchel/inv/CursorHelper.js';
 
 const BUSY_ADJ = [

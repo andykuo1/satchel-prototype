@@ -10,9 +10,7 @@ import { getPlayerName } from './PlayerState.js';
 
 export class ActivityPlayerList extends ActivityBase {
   static get observedMessages() {
-    return [
-      'clients'
-    ];
+    return ['clients'];
   }
 
   /** @override */
@@ -35,25 +33,25 @@ export class ActivityPlayerList extends ActivityBase {
   }
 
   /**
-   * @param {SatchelServer} localServer 
+   * @param {SatchelServer} localServer
    * @returns {Array<string>}
    */
   static getPlayerNameListOnServer(localServer) {
-    return ActivityPlayerHandshake.getActiveClientNames(localServer).filter(name => name.length > 0);
+    return ActivityPlayerHandshake.getActiveClientNames(localServer).filter((name) => name.length > 0);
   }
 
   /**
-   * @param {SatchelClient} localClient 
+   * @param {SatchelClient} localClient
    * @returns {Array<string>}
    */
   static getPlayerNameListOnClient(localClient) {
     const localPlayerName = getPlayerName(localClient);
-    return localClient.remoteServer.clientNames.filter(name => name !== localPlayerName);
+    return localClient.remoteServer.clientNames.filter((name) => name !== localPlayerName);
   }
-  
+
   /**
-   * @param {SatchelServer} localServer 
-   * @param {SatchelRemote} remoteClient 
+   * @param {SatchelServer} localServer
+   * @param {SatchelRemote} remoteClient
    */
   static sendPlayerList(localServer, remoteClient) {
     const validClientNames = this.getPlayerNameListOnServer(localServer);

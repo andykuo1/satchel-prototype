@@ -6,11 +6,11 @@ import { ALBUM_FLAG_HIDDEN_BIT, createAlbum } from '../satchel/album/Album.js';
 import { createGridInventory, createSocketInventory } from '../satchel/inv/Inv.js';
 import { createProfile } from '../satchel/profile/Profile.js';
 import {
-  createGridInvInStore,
-  getInvInStore,
-  deleteInvInStore,
-  isInvInStore,
   addInvInStore,
+  createGridInvInStore,
+  deleteInvInStore,
+  getInvInStore,
+  isInvInStore,
 } from '../store/InvStore.js';
 import {
   addProfileInStore,
@@ -22,8 +22,8 @@ import {
   setActiveProfileInStore,
 } from '../store/ProfileStore.js';
 import { getSatchelStore } from '../store/SatchelStore.js';
-import { downloadText } from '../util/downloader.js';
 import { Logger } from '../util/Logger.js';
+import { downloadText } from '../util/downloader.js';
 import { uuid } from '../util/uuid.js';
 import { uploadSatchelFile } from './upload.js';
 

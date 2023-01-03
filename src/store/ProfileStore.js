@@ -1,5 +1,5 @@
-import { createProfile } from '../satchel/profile/Profile.js';
 import { dispatchActiveProfileChange, dispatchProfileChange } from '../events/ProfileEvents.js';
+import { createProfile } from '../satchel/profile/Profile.js';
 
 /**
  * @typedef {import('./SatchelStore.js').SatchelStore} Store
