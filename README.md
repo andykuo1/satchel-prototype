@@ -1,4 +1,4 @@
-# Satchel
+# Satchel (The Original Prototype)
 
 ## Ideas
 [ ] Different item styles: foil, metallic, pearlescent, etc.
